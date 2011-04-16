@@ -7,5 +7,7 @@ window.Game = class Game
     
     draw: (ctx) ->
         ctx.save()
+        naubi = new Naub
+        naubi.draw(ctx)
         ctx.restore()
 
