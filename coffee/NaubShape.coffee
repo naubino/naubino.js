@@ -1,8 +1,8 @@
-window.NaubShape = class NaubShape 
+class NaubShape
   constructor: ->
     @pos = new b2Vec2(5,5)
-    @size = 5
-    @style = 
+    @size = 25
+    @style =
       fill: ["fillme"]
 
 
@@ -10,11 +10,11 @@ window.NaubShape = class NaubShape
     context.save()
     pos = @pos
     size = @size
-    w = 5
-    h = 5
+    w = 25
+    h = 25
     context.translate(pos.x, pos.y)
     context.beginPath()
-    context.rect(-w / 2, -h / 2, w, h)
+    context.arc(0, 0, 15, 0, 0)
     context.closePath()
     context.fillStyle = "#ffaaaa"
     context.fill()

@@ -1,4 +1,4 @@
-window.Naub = class Naub
+class Naub
   constructor: ->
     @physics = new PhysicsModel
     @shape = new NaubShape

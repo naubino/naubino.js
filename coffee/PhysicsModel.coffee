@@ -1,3 +1,3 @@
-window.PhysicsModel = class PhysicsModel
+class PhysicsModel
   constructor: ->
-
+    

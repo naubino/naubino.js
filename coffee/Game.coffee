@@ -1,7 +1,10 @@
-window.Game = class Game
+class Game
     constructor: (@canvas, @bindings) ->
         @width = @canvas.width
         @height = @canvas.height
+        field = [0, 0, @width, @height]
+        @world = new World field
+
 
     step: (dt) ->
     
