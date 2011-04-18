@@ -11,6 +11,7 @@ $(PROJECTJS): $(COFFEE) $(JS)
 	mkdir -p $(BUILD_PATH)
 	rm -f $(PROJECTJS)
 	echo "\n// copied JavaScripts\n" >> $(PROJECTJS)
+	cat $(JS) >> $(PROJECTJS)
 	echo "\n// generated from CoffeeScripts\n" >> $(PROJECTJS)
 	coffee -jpb $(COFFEE) >> $(PROJECTJS)
 
