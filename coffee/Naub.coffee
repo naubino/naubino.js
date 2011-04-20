@@ -10,7 +10,6 @@ class Naub
     
   step: (dt) =>
     @physics.step dt
-    console.log @physics.pos.x
     
   remove: ->
     @removed = true
