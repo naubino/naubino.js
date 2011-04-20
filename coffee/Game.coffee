@@ -10,6 +10,7 @@ class Game
   create_some_naubs: (n) ->
     for [0..n]
       naub = new Naub @world
+      naub.randomcolor
       x = Math.random() * 600
       y = Math.random() * 400
       naub.physics.pos.Set x, y
