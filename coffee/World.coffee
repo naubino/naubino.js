@@ -1,5 +1,6 @@
 class World
   constructor: (@field) ->
+    @center = new b2Vec2 @field[2]/2, @field[2]/2
     @objs = []
     
   draw: (ctx) ->
@@ -14,12 +15,11 @@ class World
       @world.remove_obj(this) if obj.removed
     
   naub_forces: (dt) ->
-    center = new b2Vec2 300, 200
     for naub in @objs
       { pos, vel, force } = naub.physics
       
       # move to center
-      v = center.Copy()
+      v = @center.Copy()
       v.Subtract(pos)
       v.Normalize()
       v.Multiply(4000)
