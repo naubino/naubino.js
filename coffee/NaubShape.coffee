@@ -1,10 +1,9 @@
 class NaubShape
-  constructor: ->
-    @pos = new b2Vec2(5,5)
+  constructor: (physics) ->
+    @pos = physics.pos
     @size = 25
     @style =
       fill: ["fillme"]
-
 
   draw: (context) ->
     context.save()
@@ -14,9 +13,9 @@ class NaubShape
     h = 25
     context.translate(pos.x, pos.y)
     context.beginPath()
-    context.arc(0, 0, 15, 0, 0)
+    context.arc(0, 0, 15, 0, Math.PI * 2)
     context.closePath()
-    context.fillStyle = "#ffaaaa"
+    context.fillStyle = "#ff0000"
     context.fill()
     context.restore()
 

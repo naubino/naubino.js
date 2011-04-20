@@ -17,14 +17,14 @@ window.onload = ->
     setInterval((-> mainloop(game, ctx, canvas, maxdt, interval)), interval*1e3)
 
 mainloop = (game, ctx, canvas, maxdt, interval) ->
-    interval *= game.time_factor
-    while interval > 0
-        dt = if interval - maxdt > 0 then maxdt else interval
-        game.step(dt)
-        window.keybindings.step(dt)
-        interval -= dt
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-    game.draw(ctx)
+  interval *= game.time_factor
+  while interval > 0
+    dt = if interval - maxdt > 0 then maxdt else interval
+    game.step(dt)
+    window.keybindings.step(dt)
+    interval -= dt
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  game.draw(ctx)
 
 class KeyBindings
     constructor: ->
