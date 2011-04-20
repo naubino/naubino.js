@@ -15,7 +15,7 @@ class NaubShape
     context.beginPath()
     context.arc(0, 0, 15, 0, Math.PI * 2)
     context.closePath()
-    context.fillStyle = "#ff0000"
+    context.fillStyle = "#aaaaaa"
     context.fill()
     context.restore()
 

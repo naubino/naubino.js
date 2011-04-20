@@ -17,11 +17,26 @@ class World
     center = new b2Vec2 300, 200
     for naub in @objs
       { pos, vel, force } = naub.physics
+      
+      # move to center
       v = center.Copy()
       v.Subtract(pos)
       v.Normalize()
       v.Multiply(4000)
       force.Add(v)
+      
+      # collide
+      for other in @objs
+        { pos: opos, vel: ovel, force: oforce } = other.physics
+        diff = opos.Copy()
+        diff.Subtract(pos)
+        l = diff.Length()
+        if l < 30
+          diff.Normalize()
+          v = diff.Copy()
+          v.Multiply(4000)
+          force.Subtract(v)
+          oforce.Add(v)
     
   add_obj: (obj) ->
     @objs.push obj

@@ -5,13 +5,15 @@ class Game
     field = [0, 0, @width, @height]
     @time_factor = 1
     @world = new World field
-    @create_some_naubs 1
+    @create_some_naubs 5
 
   create_some_naubs: (n) ->
     for [0..n]
       naub = new Naub @world
-      naub.physics.pos.Set 50, 50
-      naub.physics.vel.Set 50, 0
+      x = Math.random() * 600
+      y = Math.random() * 400
+      naub.physics.pos.Set x, y
+      naub.physics.vel.Set 0, 0
 
   step: (dt) ->
     @world.step dt
