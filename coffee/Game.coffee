@@ -5,12 +5,12 @@ class Game
     field = [0, 0, @width, @height]
     @time_factor = 1
     @world = new World field
-    @create_some_naubs 5
+    @create_some_naubs 6
 
   create_some_naubs: (n) ->
     for [0..n]
       naub = new Naub @world
-      naub.randomcolor
+      naub.shape.style.fill = naub.shape.random_color()
       x = Math.random() * 600
       y = Math.random() * 400
       naub.physics.pos.Set x, y

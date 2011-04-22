@@ -26,17 +26,21 @@ class World
       force.Add(v)
       
       # collide
-      for other in @objs
-        { pos: opos, vel: ovel, force: oforce } = other.physics
-        diff = opos.Copy()
-        diff.Subtract(pos)
-        l = diff.Length()
-        if l < 30
-          diff.Normalize()
-          v = diff.Copy()
-          v.Multiply(4000)
-          force.Subtract(v)
-          oforce.Add(v)
+      for [0..3]
+        for other in @objs
+          { pos: opos, vel: ovel, force: oforce } = other.physics
+          diff = opos.Copy()
+          diff.Subtract(pos)
+          l = diff.Length()
+          if l < 30
+            v = diff.Copy()
+            v.Normalize()
+            v.Multiply(30 - l)
+            v.Multiply(0.5)
+            pos.Subtract(v)
+            opos.Add(v)
+            #force.Subtract(v)
+            #oforce.Add(v)
     
   add_obj: (obj) ->
     @objs.push obj

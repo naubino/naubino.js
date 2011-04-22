@@ -11,7 +11,7 @@ class Naub
   step: (dt) =>
     @physics.step dt
     
-  remove: ->
+  remove: =>
     @removed = true
 
 
