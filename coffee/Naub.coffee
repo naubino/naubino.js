@@ -1,7 +1,7 @@
 class Naub
   constructor: (@world) ->
     @physics = new PhysicsModel
-    @shape = new NaubShape this 
+    @shape = new NaubShape this
     @removed = false
     @world.add_obj this
 
@@ -13,8 +13,3 @@ class Naub
     
   remove: =>
     @removed = true
-
-
-
-
-
