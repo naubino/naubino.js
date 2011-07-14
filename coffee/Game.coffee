@@ -1,11 +1,12 @@
 class Game
-  constructor: (@canvas, @bindings) ->
+  constructor: (@canvas, @keybindings) ->
+    # TODO Exchangeable display class
     @width = @canvas.width
     @height = @canvas.height
     field = [0, 0, @width, @height]
     @time_factor = 1
     @world = new World field
-    @create_some_naubs 6
+    @ctx = @canvas.getContext('2d')
 
   create_some_naubs: (n) ->
     for [0..n]
@@ -20,7 +21,13 @@ class Game
     @world.step dt
   
   draw: (ctx) ->
+    ctx.clearRect(0, 0, @canvas.width, @canvas.height)
     ctx.save()
     @world.draw ctx
     ctx.restore()
 
+  mainloop: ()=>
+    dt = 0.02
+    @step(dt)
+    @keybindings.step(dt)
+    @draw(@ctx)

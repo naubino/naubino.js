@@ -1,31 +1,3 @@
-window.onload = ->
-    canvas = document.getElementById("canvas")
-    ctx = canvas.getContext("2d")
-
-    keybindings = window.keybindings = new KeyBindings()
-    window.onkeydown = (key) -> keybindings.keydown(key)
-    window.onkeyup = (key) -> keybindings.keyup(key)
-
-    game = new Game(canvas, keybindings)
-
-    canvas.onmousemove = (e) ->
-    canvas.onmousedown = (e) ->
-    canvas.onmouseup = (e) ->
-
-    interval = 0.03
-    maxdt = 0.01
-    setInterval((-> mainloop(game, ctx, canvas, maxdt, interval)), interval*1e3)
-
-mainloop = (game, ctx, canvas, maxdt, interval) ->
-  interval *= game.time_factor
-  while interval > 0
-    dt = if interval - maxdt > 0 then maxdt else interval
-    game.step(dt)
-    window.keybindings.step(dt)
-    interval -= dt
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  game.draw(ctx)
-
 class KeyBindings
     constructor: ->
         # down, up, during
@@ -52,7 +24,7 @@ class KeyBindings
 
     keydown: (key) =>
         k = key.which
-        #console.log("keydown", k)
+        console.log("keydown", k)
         if k of @bindings && !(k of @active_bindings)
             @bindings[k].down?()
             @active_bindings[k] =

@@ -3,8 +3,7 @@ class NaubShape
     @naub = @naub
     @pos = naub.physics.pos
     @size = 25
-    @style =
-      fill: [1,0,0,0]
+    @style = { fill: [1,0,0,0] }
 
   draw: (context) =>
     context.save()
