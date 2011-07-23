@@ -19,7 +19,15 @@ class Game
 
   step: (dt) ->
     @world.step dt
-  
+
+  click: (x, y) ->
+    @getNaub x, y
+
+  getNaub: (x, y) ->
+    for naub in @world.objs
+      if naub.isHit(x, y)
+        console.log naub.shape.style.fill
+
   draw: (ctx) ->
     ctx.clearRect(0, 0, @canvas.width, @canvas.height)
     ctx.save()

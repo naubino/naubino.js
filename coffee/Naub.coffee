@@ -13,3 +13,10 @@ class Naub
     
   remove: =>
     @removed = true
+
+  isHit: (x, y) ->
+    ox = @physics.pos.x
+    oy = @physics.pos.y
+    distance = Math.sqrt((x - ox) + (y - oy)*(y - oy))
+    distance < @shape.size
+

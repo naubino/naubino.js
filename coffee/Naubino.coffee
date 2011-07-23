@@ -17,8 +17,9 @@ window.onload = ->
     game = new Game(canvas, keybindings)
     game.create_some_naubs 6
 
-    canvas.onmousemove=(e) ->
-    canvas.onmousedown=(e)->
+    canvas.onmousemove = (e) ->
+    canvas.onmousedown = (e)->
     canvas.onmouseup = (e) ->
+      game.click e.clientX, e.clientY
 
     setInterval(( -> game.mainloop()), 0.1*1e3)

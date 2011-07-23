@@ -24,7 +24,7 @@ class KeyBindings
 
     keydown: (key) =>
         k = key.which
-        console.log("keydown", k)
+        #console.log("keydown", k)
         if k of @bindings && !(k of @active_bindings)
             @bindings[k].down?()
             @active_bindings[k] =
