@@ -4,6 +4,7 @@ class Naub
     @shape = new NaubShape this
     @removed = false
     @world.add_obj this
+    @joins = []
 
   draw: (context)  =>
     @shape.draw context
@@ -13,6 +14,14 @@ class Naub
     
   remove: =>
     @removed = true
+
+  joinWith: (other_naub) ->
+    # Check if already joined
+    # check for cycle
+    join = new Join(this, naub)
+    @joins.push join
+    naub.joins.push join
+
 
   isHit: (x, y) ->
     ox = @physics.pos.x

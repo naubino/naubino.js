@@ -6,16 +6,20 @@ class Game
     field = [0, 0, @width, @height]
     @time_factor = 1
     @world = new World field
-    @ctx = @canvas.getContext('2d')
+    @context = @canvas.getContext('2d')
 
   create_some_naubs: (n) ->
     for [0..n]
-      naub = new Naub @world
-      naub.shape.style.fill = naub.shape.random_color()
+      naub_a = new Naub @world
+      naub_b = new Naub @world
+      naub_a.shape.style.fill = naub_a.shape.random_color()
+      naub_b.shape.style.fill = naub_b.shape.random_color()
       x = Math.random() * 600
       y = Math.random() * 400
-      naub.physics.pos.Set x, y
-      naub.physics.vel.Set 0, 0
+      naub_a.physics.pos.Set x, y
+      naub_b.physics.pos.Set x + 25, y + 25
+      naub_a.physics.vel.Set 0, 0
+      naub_b.physics.vel.Set 0, 0
 
   step: (dt) ->
     @world.step dt
@@ -28,14 +32,14 @@ class Game
       if naub.isHit(x, y)
         console.log naub.shape.style.fill
 
-  draw: (ctx) ->
-    ctx.clearRect(0, 0, @canvas.width, @canvas.height)
-    ctx.save()
-    @world.draw ctx
-    ctx.restore()
+  draw: (context) ->
+    context.clearRect(0, 0, @canvas.width, @canvas.height)
+    context.save()
+    @world.draw context
+    context.restore()
 
   mainloop: ()=>
     dt = 0.02
     @step(dt)
     @keybindings.step(dt)
-    @draw(@ctx)
+    @draw(@context)

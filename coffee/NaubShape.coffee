@@ -19,6 +19,8 @@ class NaubShape
     context.fill()
     context.restore()
 
+  draw_join: (context) =>
+
   color_to_css: (color) =>
     r = Math.round(color[0] * 255)
     g = Math.round(color[1] * 255)
