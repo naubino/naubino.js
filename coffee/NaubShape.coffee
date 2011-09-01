@@ -1,22 +1,25 @@
 class NaubShape
   constructor: (naub) ->
-    @naub = @naub
+    @naub = naub
     @pos = naub.physics.pos
-    @size = 25
+    @size = 15
     @style = { fill: [1,0,0,0] }
 
   draw: (context) =>
     context.save()
     pos = @pos
     size = @size
-    w = 25
-    h = 25
+    #w = 25
+    #h = 25
     context.translate(pos.x, pos.y)
     context.beginPath()
-    context.arc(0, 0, 15, 0, Math.PI * 2)
+    context.arc(0, 0, size, 0, Math.PI * 2)
     context.closePath()
     context.fillStyle = @color_to_css(@style.fill)
     context.fill()
+    context.fillStyle = "white"
+    context.font= "12pt Helvetica"
+    context.fillText(@naub.number, -6, 6)
     context.restore()
 
   draw_join: (context) =>

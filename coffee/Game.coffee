@@ -17,7 +17,7 @@ class Game
       x = Math.random() * 600
       y = Math.random() * 400
       naub_a.physics.pos.Set x, y
-      naub_b.physics.pos.Set x + 25, y + 25
+      naub_b.physics.pos.Set x + 50, y + 50
       naub_a.physics.vel.Set 0, 0
       naub_b.physics.vel.Set 0, 0
 
@@ -30,7 +30,7 @@ class Game
   getNaub: (x, y) ->
     for naub in @world.objs
       if naub.isHit(x, y)
-        console.log naub.shape.style.fill
+        console.log naub.number
 
   draw: (context) ->
     context.clearRect(0, 0, @canvas.width, @canvas.height)

@@ -19,7 +19,13 @@ window.onload = ->
 
     canvas.onmousemove = (e) ->
     canvas.onmousedown = (e)->
-    canvas.onmouseup = (e) ->
-      game.click e.clientX, e.clientY
+    onmouseup = (e) ->
+      game.click e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop
+
+    canvas.addEventListener("mousedown", onmouseup, false)
+    #canvas.addEventListener("mousemove", mouseXY, false)
+    #canvas.addEventListener("touchstart", touchDown, false)
+    #canvas.addEventListener("touchend", touchUp, false)
+    #canvas.addEventListener("touchmove", touchXY, false)
 
     setInterval(( -> game.mainloop()), 0.1*1e3)

@@ -5,6 +5,7 @@ class Naub
     @removed = false
     @world.add_obj this
     @joins = []
+    @number = @world.objs.length
 
   draw: (context)  =>
     @shape.draw context
@@ -22,10 +23,7 @@ class Naub
     @joins.push join
     naub.joins.push join
 
-
   isHit: (x, y) ->
-    ox = @physics.pos.x
-    oy = @physics.pos.y
-    distance = Math.sqrt((x - ox) + (y - oy)*(y - oy))
-    distance < @shape.size
-
+    click = new b2Vec2(x,y)
+    click.Subtract(@physics.pos)
+    click.Length() < @shape.size

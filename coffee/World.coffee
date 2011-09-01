@@ -32,7 +32,7 @@ class World
           diff = opos.Copy()
           diff.Subtract(pos)
           l = diff.Length()
-          if l < 30
+          if l < 30 # TODO replace with obj size
             v = diff.Copy()
             v.Normalize()
             v.Multiply(30 - l)
