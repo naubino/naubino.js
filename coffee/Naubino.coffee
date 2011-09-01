@@ -4,6 +4,7 @@ require 'javascripts/Naub.js'
 require 'javascripts/NaubShape.js'
 require 'javascripts/PhysicsModel.js'
 require 'javascripts/World.js'
+require 'javascripts/Join.js'
 require 'lib/b2Vec2.js'
 
 window.onload = ->
@@ -28,4 +29,4 @@ window.onload = ->
     #canvas.addEventListener("touchend", touchUp, false)
     #canvas.addEventListener("touchmove", touchXY, false)
 
-    setInterval(( -> game.mainloop()), 0.1*1e3)
+    window.loop = setInterval(( -> game.mainloop()), 0.1*1e3)
