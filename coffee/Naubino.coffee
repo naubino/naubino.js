@@ -4,7 +4,7 @@ require 'javascripts/Naub.js'
 require 'javascripts/NaubShape.js'
 require 'javascripts/PhysicsModel.js'
 require 'javascripts/World.js'
-require 'javascripts/Join.js'
+require 'javascripts/Graph.js'
 require 'lib/b2Vec2.js'
 
 window.onload = ->

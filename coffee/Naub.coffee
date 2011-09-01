@@ -16,7 +16,7 @@ class Naub
   remove: =>
     @removed = true
 
-  joinWith: (other_naub) ->
+  joinWith: (naub) ->
     # Check if already joined
     # check for cycle
     join = new Join(this, naub)

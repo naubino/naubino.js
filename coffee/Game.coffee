@@ -6,6 +6,7 @@ class Game
     field = [0, 0, @width, @height]
     @time_factor = 1
     @world = new World field
+    @graph = new Graph
     @context = @canvas.getContext('2d')
 
   create_some_naubs: (n) ->
@@ -20,6 +21,7 @@ class Game
       naub_b.physics.pos.Set x + 50, y + 50
       naub_a.physics.vel.Set 0, 0
       naub_b.physics.vel.Set 0, 0
+      naub_a.joinWith naub_b
 
   step: (dt) ->
     @world.step dt
@@ -30,7 +32,7 @@ class Game
   getNaub: (x, y) ->
     for naub in @world.objs
       if naub.isHit(x, y)
-        console.log naub.number
+        console.log naub.number + " -> " + naub.joins[0].number
 
   draw: (context) ->
     context.clearRect(0, 0, @canvas.width, @canvas.height)
