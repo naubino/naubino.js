@@ -1,13 +1,20 @@
 class Naub
-  constructor: (@world) ->
+  constructor: (@game) ->
     @physics = new PhysicsModel
     @shape = new NaubShape this
     @removed = false
-    @world.add_obj this
+    @world = @game.world
+    @world.add_object this
     @joins = []
-    @number = @world.objs.length
 
   draw: (context)  =>
+    # drawing joins
+    for id in @joins
+      join = @game.graph.joins[id]
+      if join[0] == @number
+        partner = @world.get_object(@game.graph.getPartner(id, @number)) #TODO simplify this
+        @shape.draw_join context, partner
+    # drawing naubs
     @shape.draw context
     
   step: (dt) =>
@@ -19,7 +26,7 @@ class Naub
   joinWith: (naub) ->
     # Check if already joined
     # check for cycle
-    join = new Join(this, naub)
+    join = @game.graph.addJoin this, naub
     @joins.push join
     naub.joins.push join
 

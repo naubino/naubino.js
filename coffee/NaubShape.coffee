@@ -20,9 +20,23 @@ class NaubShape
     context.fillStyle = "white"
     context.font= "12pt Helvetica"
     context.fillText(@naub.number, -6, 6)
+    context.closePath()
     context.restore()
 
-  draw_join: (context) =>
+  draw_join: (context, partner) =>
+    pos = @pos
+    pos2 = partner.physics.pos
+
+    context.save()
+    context.strokeStyle = "black"
+
+    context.beginPath()
+    context.moveTo pos.x, pos.y
+    context.lineTo pos2.x, pos2.y
+    context.lineWidth = 4
+    context.stroke()
+    context.closePath()
+    context.restore()
 
   color_to_css: (color) =>
     r = Math.round(color[0] * 255)

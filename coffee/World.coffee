@@ -1,11 +1,31 @@
 class World
-  constructor: (@field) ->
+
+  # controlls everything that happens inside the field
+  
+  constructor: (@game) ->
+
+    @width = @game.canvas.width
+    @height = @game.canvas.height
+    @field = [0, 0, @width, @height]
     @center = new b2Vec2 @field[2]/2, @field[2]/2
+
     @objs = []
+    @objs_count = 0
+
+  add_object: (obj)->
+    @objs_count++
+    obj.number = @objs_count
+    @objs.push obj
+
+  get_object: (id)->
+    @objs[id]
+
+  remove_obj: (obj) ->
+    @objs.splice(@objs.indexOf(obj),1)
     
-  draw: (ctx) ->
+  draw: (context) ->
     for obj in @objs
-      obj.draw ctx
+      obj.draw context
       
   step: (dt) ->
     @naub_forces dt
@@ -42,8 +62,3 @@ class World
             #force.Subtract(v)
             #oforce.Add(v)
     
-  add_obj: (obj) ->
-    @objs.push obj
-    
-  remove_obj: (obj) ->
-    @objs.splice(@objs.indexOf(obj),1)
