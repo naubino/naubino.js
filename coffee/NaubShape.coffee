@@ -6,6 +6,12 @@ class NaubShape
     @style = { fill: [1,0,0,0] }
 
   draw: (context) =>
+    if @naub.focused
+      @draw_special (context)
+    else
+      @draw_simple (context)
+
+  draw_special: (context) =>
     context.save()
     pos = @pos
     size = @size
@@ -17,9 +23,26 @@ class NaubShape
     context.closePath()
     context.fillStyle = @color_to_css(@style.fill)
     context.fill()
+    context.strokeStyle = "black"
     context.fillStyle = "white"
     context.font= "12pt Helvetica"
+    context.stroke()
     context.fillText(@naub.number, -6, 6)
+    context.closePath()
+    context.restore()
+
+  draw_simple: (context) =>
+    context.save()
+    pos = @pos
+    size = @size
+    #w = 25
+    #h = 25
+    context.translate(pos.x, pos.y)
+    context.beginPath()
+    context.arc(0, 0, size, 0, Math.PI * 2)
+    context.closePath()
+    context.fillStyle = @color_to_css(@style.fill)
+    context.fill()
     context.closePath()
     context.restore()
 

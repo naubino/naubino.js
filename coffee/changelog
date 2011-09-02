@@ -1,6 +1,4 @@
-naubino class
-more definition between game and world
-timer within game
-start and pause button
-graph logic
-drawing joints
+	* fixed: more direct graph data structure
+	* added: forces between joined naubs
+	* fixed: pressing of play no longer speeds up time
+	* added: dragging (still somewhat buggy

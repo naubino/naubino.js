@@ -27,13 +27,18 @@ class Naubino
     window.onkeyup = (key) => @keybindings.keyup(key)
 
   setup_cursorbindings: () ->
-    @canvas.onmousemove = (e) ->
-    @canvas.onmousedown = (e)->
+    onmousemove = (e) =>
+      @game.movePointer e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
     onmouseup = (e) =>
+      @game.unfocus e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
+
+    onmousedown = (e) =>
       @game.click e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
 
-    @canvas.addEventListener("mousedown", onmouseup, false)
-    #canvas.addEventListener("mousemove", mouseXY, false)
+    @canvas.addEventListener("mousedown", onmousedown, false)
+    @canvas.addEventListener("mouseup", onmouseup, false)
+    @canvas.addEventListener("mousemove", onmousemove, false)
+
     #canvas.addEventListener("touchstart", touchDown, false)
     #canvas.addEventListener("touchend", touchUp, false)
     #canvas.addEventListener("touchmove", touchXY, false)

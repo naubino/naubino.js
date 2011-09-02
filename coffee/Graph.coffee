@@ -9,11 +9,12 @@ class Graph
     @joins[@joins_count] = join
     @joins_count
 
-  getPartner: (id, naub) ->
-    if @joins[id][0] is naub.number
-      @joins[id][1]
-    else
-      @joins[id][0]
+# obsolete
+#  getPartner: (id, naub) ->
+#    if @joins[id][0] is naub.number
+#      @joins[id][1]
+#    else
+#      @joins[id][0]
 
   joinList: ->
     console.log "joinList"

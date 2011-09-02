@@ -9,6 +9,8 @@ class World
     @field = [0, 0, @width, @height]
     @center = new b2Vec2 @field[2]/2, @field[2]/2
 
+    @pointer = new b2Vec2
+
     @objs = []
     @objs_count = 0
 
@@ -39,11 +41,18 @@ class World
       { pos, vel, force } = naub.physics
       
       # move to center
-      v = @center.Copy()
-      v.Subtract(pos)
-      v.Normalize()
-      v.Multiply(4000)
-      force.Add(v)
+      if not naub.focused
+        v = @center.Copy()
+        v.Subtract(pos)
+        v.Normalize()
+        v.Multiply(4000)
+        force.Add(v)
+      else
+        v = @pointer.Copy()
+        v.Subtract(pos)
+        v.Normalize()
+        v.Multiply(40000)
+        force.Add(v)
       
       # collide
       for [0..3]
@@ -51,11 +60,18 @@ class World
           { pos: opos, vel: ovel, force: oforce } = other.physics
           diff = opos.Copy()
           diff.Subtract(pos)
+
           l = diff.Length()
-          if l < 30 # TODO replace with obj size
+          if naub.isJoinedWith(other)
+            keep_distance = 40
+          else
+            keep_distance = 35
+
+
+          if (l < keep_distance) # TODO replace with obj size
             v = diff.Copy()
             v.Normalize()
-            v.Multiply(30 - l)
+            v.Multiply(keep_distance - l)
             v.Multiply(0.5)
             pos.Subtract(v)
             opos.Add(v)
