@@ -17,7 +17,7 @@ class Naubino
     @setup_keybindings()
     @setup_cursorbindings()
     @game = new Game(@canvas, @keybindings)
-    @game.create_some_naubs()
+    @game.create_some_naubs(10)
     @game.start_timer()
 
 
@@ -29,6 +29,7 @@ class Naubino
   setup_cursorbindings: () ->
     onmousemove = (e) =>
       @game.movePointer e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
+
     onmouseup = (e) =>
       @game.unfocus e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
 

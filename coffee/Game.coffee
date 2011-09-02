@@ -67,6 +67,7 @@ class Game
   ## can I touch this?
   click: (x, y) ->
     @mousedown = true
+    [@world.pointer.x, @world.pointer.y] = [x,y]
     naub = @getNaub x, y
     if naub
       console.log naub.number + " -> " + naub.joineds()

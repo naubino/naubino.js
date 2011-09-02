@@ -9,7 +9,7 @@ class World
     @field = [0, 0, @width, @height]
     @center = new b2Vec2 @field[2]/2, @field[2]/2
 
-    @pointer = new b2Vec2
+    @pointer = @center.Copy()
 
     @objs = []
     @objs_count = 0
@@ -49,9 +49,12 @@ class World
         force.Add(v)
       else
         v = @pointer.Copy()
+        pl = v.Copy()
+        pl.Subtract(pos)
+        pl = pl.Length()
         v.Subtract(pos)
         v.Normalize()
-        v.Multiply(40000)
+        v.Multiply(2000*pl)
         force.Add(v)
       
       # collide
@@ -64,9 +67,16 @@ class World
           l = diff.Length()
           if naub.isJoinedWith(other)
             keep_distance = 40
+
+            v = diff.Copy()
+            v.Normalize()
+            v.Multiply( -0.1 * l)
+            pos.Subtract(v)
+            #opos.Subtract(v)
+            #force.Subtract(v)
+            #oforce.Add(v)
           else
             keep_distance = 35
-
 
           if (l < keep_distance) # TODO replace with obj size
             v = diff.Copy()
@@ -77,4 +87,3 @@ class World
             opos.Add(v)
             #force.Subtract(v)
             #oforce.Add(v)
-    
