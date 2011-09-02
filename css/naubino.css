@@ -5,12 +5,14 @@
 body {
     width:100%;
     margin:0;
+    background-color:rgb(88%,88%,88%);
 }
 canvas {
     margin:auto;
+    margin-top: 80px;
     display:block;
-    background-color:rgb(88%,88%,88%);
     border:1px solid gray;
+    background-color: #fff;
 }
 h1 {
     font-size:1.2em;

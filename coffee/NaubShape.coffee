@@ -19,7 +19,7 @@ class NaubShape
     #h = 25
     context.translate(pos.x, pos.y)
     context.beginPath()
-    context.arc(0, 0, size, 0, Math.PI * 2)
+    context.arc(0, 0, size, 0, Math.PI * 2, false)
     context.closePath()
     context.fillStyle = @color_to_css(@style.fill)
     context.fill()
@@ -39,7 +39,7 @@ class NaubShape
     #h = 25
     context.translate(pos.x, pos.y)
     context.beginPath()
-    context.arc(0, 0, size, 0, Math.PI * 2)
+    context.arc(0, 0, size, 0, Math.PI * 2, false)
     context.closePath()
     context.fillStyle = @color_to_css(@style.fill)
     context.fill()

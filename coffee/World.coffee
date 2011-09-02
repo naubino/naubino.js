@@ -66,7 +66,7 @@ class World
 
           l = diff.Length()
           if naub.isJoinedWith(other)
-            keep_distance = 40
+            keep_distance = 45
 
             v = diff.Copy()
             v.Normalize()
