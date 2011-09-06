@@ -2,6 +2,7 @@ class Naub
   constructor: (@game) ->
     @physics = new PhysicsModel
     @shape = new NaubShape this
+    @color_id = @shape.random_palette_color()
 
     @removed = false
     @focused = false
@@ -12,10 +13,10 @@ class Naub
 
   draw: (context)  =>
     # drawing joins
-    for id, partner of @joins
+    for id, other of @joins
       join = @game.graph.joins[id]
-      if join[0] == @number
-        @shape.draw_join context, partner
+      if join[0] >=  @number
+        @shape.draw_join context, other
 
     # drawing naubs
     @shape.draw context
@@ -26,25 +27,36 @@ class Naub
   remove: =>
     @removed = true
 
-  joinWith: (naub) ->
+  ## structural functionality
+  join_with: (other) ->
     # Check if already joined
     # check for cycle
-    join = @game.graph.addJoin this, naub
-    @joins[join] = naub
-    naub.joins[join] = this
+    join = @game.graph.add_join this, other
+    @joins[join] = other
+    other.joins[join] = this
 
-  isJoinedWith: (naub) ->
+  replace_with: (other) ->
+    for id, naub of @joins
+      other.join_with(naub)
+      delete naub.joins[id]
+      @game.graph.remove_join id
+    @remove()
+
+
+  is_joined_with: (other) ->
     joined = false
     for id, opnaub of @joins
-      if opnaub == naub
+      if opnaub == other
         joined = true
     return joined
 
-  joineds: ->
+  joined_naubs: ->
     list = []
     for id, naub of @joins
       list.push naub.number
-    list
+    @joins
+
+
 
 
   isHit: (x, y) ->

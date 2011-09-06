@@ -10,21 +10,35 @@ class Game
 
     @world = new World this
     @graph = new Graph
-    @focused_naub = null
+    @settings = naubinoSettings
 
+    @focused_naub = null
     @context = @canvas.getContext('2d')
+    @colors = @settings.colors_70
+    
 
   create_some_naubs: (n = 3) ->
-    for [0..n]
+    for [1..n]
       @create_naub_pair()
 
   create_naub_pair: ->
       naub_a = new Naub this
       naub_b = new Naub this
+
+      x = Math.random() * 600
+      y = Math.random() * 400
+
+      naub_a.physics.pos.Set x, y
+      naub_b.physics.pos.Set x + 30, y + 30
+
+      naub_a.physics.vel.Set 0, 0
+      naub_b.physics.vel.Set 0, 0
+      naub_a.join_with naub_b
+
+  create_naub_triple: ->
+      naub_a = new Naub this
+      naub_b = new Naub this
       naub_c = new Naub this
-      naub_a.shape.style.fill = naub_a.shape.random_color()
-      naub_b.shape.style.fill = naub_b.shape.random_color()
-      naub_c.shape.style.fill = naub_b.shape.random_color()
 
       x = Math.random() * 600
       y = Math.random() * 400
@@ -35,8 +49,8 @@ class Game
 
       naub_a.physics.vel.Set 0, 0
       naub_b.physics.vel.Set 0, 0
-      naub_a.joinWith naub_b
-      naub_a.joinWith naub_c
+      naub_a.join_with naub_b
+      naub_a.join_with naub_c
 
 
 
@@ -70,7 +84,7 @@ class Game
     [@world.pointer.x, @world.pointer.y] = [x,y]
     naub = @getNaub x, y
     if naub
-      console.log naub.number + " -> " + naub.joineds()
+      console.log naub.joined_naubs()
       naub.focused = true
       @focused_naub = naub
 

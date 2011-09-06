@@ -5,6 +5,7 @@ require 'javascripts/NaubShape.js'
 require 'javascripts/PhysicsModel.js'
 require 'javascripts/World.js'
 require 'javascripts/Graph.js'
+require 'javascripts/Settings.js'
 require 'lib/b2Vec2.js'
 
 window.onload = ->
@@ -16,8 +17,10 @@ class Naubino
     #context = @canvas.getContext("2d")
     @setup_keybindings()
     @setup_cursorbindings()
+
     @game = new Game(@canvas, @keybindings)
-    @game.create_some_naubs(10)
+
+    @game.create_some_naubs(12)
     @game.start_timer()
 
 

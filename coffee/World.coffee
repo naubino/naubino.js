@@ -8,7 +8,9 @@ class World
     @height = @game.canvas.height
     @field = [0, 0, @width, @height]
     @center = new b2Vec2 @field[2]/2, @field[2]/2
-
+    @gravity = true
+    @springs = true
+    @rep = 3
     @pointer = @center.Copy()
 
     @objs = []
@@ -34,20 +36,24 @@ class World
     for obj in @objs
       obj.step dt
     for obj in @objs
-      @world.remove_obj(this) if obj.removed
+      if obj.removed
+        console.log obj.number
+        @objs.splice(@objs.indexOf(obj),1)
     
+  # TODO replace numbers by parameters in some tidy place
   naub_forces: (dt) ->
     for naub in @objs
       { pos, vel, force } = naub.physics
       
       # move to center
       if not naub.focused
-        v = @center.Copy()
-        v.Subtract(pos)
-        v.Normalize()
-        v.Multiply(4000)
-        force.Add(v)
-      else
+        if @gravity # debug hook
+          v = @center.Copy()
+          v.Subtract(pos)
+          v.Normalize()
+          v.Multiply(6000)
+          force.Add(v)
+      else # except when you are held by the pointer
         v = @pointer.Copy()
         pl = v.Copy()
         pl.Subtract(pos)
@@ -57,33 +63,50 @@ class World
         v.Multiply(2000*pl)
         force.Add(v)
       
-      # collide
-      for [0..3]
-        for other in @objs
+      for other in @objs
+        if (naub.number != other.number)
           { pos: opos, vel: ovel, force: oforce } = other.physics
           diff = opos.Copy()
           diff.Subtract(pos)
+          if diff.Length() < 30
+            if (naub.focused) &&  naub.is_joined_with(other) == false && naub.color_id == other.color_id
+              console.log "joining "+ [naub.number, other.number]
+              naub.replace_with(other)
+            else
+              console.log "not joined"
 
-          l = diff.Length()
-          if naub.isJoinedWith(other)
-            keep_distance = 45
+      # collide
+      for [0..3]
+        for other in @objs
+          if (naub.number != other.number)
+            { pos: opos, vel: ovel, force: oforce } = other.physics
+            diff = opos.Copy()
+            diff.Subtract(pos)
 
-            v = diff.Copy()
-            v.Normalize()
-            v.Multiply( -0.1 * l)
-            pos.Subtract(v)
-            #opos.Subtract(v)
-            #force.Subtract(v)
-            #oforce.Add(v)
-          else
-            keep_distance = 35
+            l = diff.Length()
 
-          if (l < keep_distance) # TODO replace with obj size
-            v = diff.Copy()
-            v.Normalize()
-            v.Multiply(keep_distance - l)
-            v.Multiply(0.5)
-            pos.Subtract(v)
-            opos.Add(v)
-            #force.Subtract(v)
-            #oforce.Add(v)
+            # spring force between joined naubs
+            if naub.is_joined_with(other)
+              # XXX causes slight rotation when crossing to pairs
+              keep_distance = 50
+              v = diff.Copy()
+              v.Normalize()
+              v.Multiply( -0.05 * l)
+              pos.Subtract(v)
+              opos.Add(v)
+              force.Subtract(v)
+              oforce.Add(v)
+            else
+              keep_distance = 35
+
+            # keep naubs from overlapping
+            if (l < keep_distance) # TODO replace with obj size
+              v = diff.Copy()
+              v.Normalize()
+              v.Multiply(keep_distance - l)
+              v.Multiply(0.3)
+              pos.Subtract(v)
+              opos.Add(v)
+              #force.Subtract(v)
+              #oforce.Add(v)
+
