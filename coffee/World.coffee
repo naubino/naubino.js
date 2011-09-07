@@ -68,7 +68,7 @@ class World
           { pos: opos, vel: ovel, force: oforce } = other.physics
           diff = opos.Copy()
           diff.Subtract(pos)
-          if diff.Length() < 30
+          if diff.Length() < 35
             if (naub.focused) &&  naub.is_joined_with(other) == false && naub.color_id == other.color_id
               console.log "joining "+ [naub.number, other.number]
               naub.replace_with(other)
