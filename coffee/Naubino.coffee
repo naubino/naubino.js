@@ -13,6 +13,7 @@ window.onload = ->
   window.naubino = new Naubino(canvas)
 
 class Naubino
+
   constructor: (@canvas) ->
     #context = @canvas.getContext("2d")
     @setup_keybindings()
@@ -23,15 +24,22 @@ class Naubino
     @game.create_some_naubs(12)
     @game.start_timer()
 
+    @keybindings.enable 32, => @game.pause()
+
+
+
+
+
 
   setup_keybindings: () ->
     @keybindings = new window.KeyBindings()
     window.onkeydown = (key) => @keybindings.keydown(key)
     window.onkeyup = (key) => @keybindings.keyup(key)
 
+
   setup_cursorbindings: () ->
     onmousemove = (e) =>
-      @game.movePointer e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
+      @game.move_pointer e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
 
     onmouseup = (e) =>
       @game.unfocus e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop

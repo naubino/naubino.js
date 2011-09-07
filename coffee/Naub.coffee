@@ -12,15 +12,16 @@ class Naub
     @joins = {} # {id: opposing naub}
 
   draw: (context)  =>
+    # drawing naubs
+    @shape.draw context
+
+  draw_joins: (context) =>
     # drawing joins
     for id, other of @joins
       join = @game.graph.joins[id]
       if join[0] >=  @number
         @shape.draw_join context, other
 
-    # drawing naubs
-    @shape.draw context
-    
   step: (dt) =>
     @physics.step dt
     
@@ -56,7 +57,13 @@ class Naub
       list.push naub.number
     @joins
 
+  focus: ->
+    @focused = true
+    @physics.friction = 9
 
+  unfocus: ->
+    @focused = false
+    @physics.friction = @physics.default_friction
 
 
   isHit: (x, y) ->

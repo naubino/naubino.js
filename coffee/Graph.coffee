@@ -13,6 +13,15 @@ class Graph
     delete @joins[id]
 
 
-  joinList: ->
+  join_list: ->
     console.log "joinList"
     console.log join for id, join of @joins
+
+  dotty: ->
+    dot =  "graph G {\n"
+    joins = for id, join of @joins
+      join[0] + " -- " + join[1]
+    dot += joins.join("\n") + "}"
+    console.log dot
+
+

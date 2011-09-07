@@ -9,7 +9,7 @@ body {
 }
 canvas {
     margin:auto;
-    margin-top: 80px;
+    margin-top: 20px;
     display:block;
     border:1px solid gray;
     background-color: #fff;

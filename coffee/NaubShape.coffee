@@ -2,50 +2,53 @@ class NaubShape
   constructor: (naub) ->
     @naub = naub
     @pos = naub.physics.pos
-    @size = 15
+    @size = 14
     @style = { fill: [1,0,0,0] }
 
   draw: (context) =>
-    if @naub.focused
-      @draw_special (context)
-    else
+    #if @naub.focused
+    #  @draw_special (context)
+    #else
       @draw_simple (context)
 
   draw_special: (context) =>
     context.save()
     pos = @pos
     size = @size
-    #w = 25
-    #h = 25
+    context.translate(pos.x, pos.y)
+
+    context.beginPath()
+    context.arc(0, 0, size, 0, Math.PI * 2, false)
+    context.closePath()
+
+    context.fillStyle = @color_to_css(@style.fill)
+    context.fill()
+    context.strokeStyle = 'white'
+    context.stroke()
+    
+    context.fillStyle = 'white'
+    content.textAlign = 'center'
+    context.font= '10pt Helvetica'
+    context.fillText(@naub.number, -7, 5)
+    context.closePath()
+    context.restore()
+    
+
+  draw_simple: (context) =>
+    #@draw_special context
+    #return
+    context.save()
+    pos = @pos
+    size = @size
+
     context.translate(pos.x, pos.y)
     context.beginPath()
     context.arc(0, 0, size, 0, Math.PI * 2, false)
     context.closePath()
     context.fillStyle = @color_to_css(@style.fill)
     context.fill()
-    context.strokeStyle = "black"
-    context.fillStyle = "white"
-    context.font= "12pt Helvetica"
-    context.stroke()
-    context.fillText(@naub.number, -6, 6)
     context.closePath()
     context.restore()
-
-  draw_simple: (context) =>
-    @draw_special context
-    #context.save()
-    #pos = @pos
-    #size = @size
-    ##w = 25
-    ##h = 25
-    #context.translate(pos.x, pos.y)
-    #context.beginPath()
-    #context.arc(0, 0, size, 0, Math.PI * 2, false)
-    #context.closePath()
-    #context.fillStyle = @color_to_css(@style.fill)
-    #context.fill()
-    #context.closePath()
-    #context.restore()
 
   draw_join: (context, partner) =>
     pos = @pos
@@ -57,7 +60,7 @@ class NaubShape
     context.beginPath()
     context.moveTo pos.x, pos.y
     context.lineTo pos2.x, pos2.y
-    context.lineWidth = 4
+    context.lineWidth = 5
     context.stroke()
     context.closePath()
     context.restore()

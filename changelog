@@ -1,8 +1,13 @@
+## Imidiate Plans:
+# naubino namespace
+# global object size handling ( keep_distance, spring length and so on)
+# color palettes also handle background and join color
+
 	* added: basic settings key value file
 	* added: colorschemes from colorlovers.com
-	
-# draw timer vs physics timer vs cleanup timer
-# joining
-# naubino namespace
-# debugging mode (draw center, draw directions, draw joing length)
+	* added: spacebar causes pause
+	* added: joining
 
+	* fixed: cleaned up physics a bit
+	* fixed: one collision does not need to be handled 8 times ;)
+	* fixed: correct drawing of joins

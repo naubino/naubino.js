@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<link rel="stylesheet" href="css/naubino.css" type="text/css">
+  <title>naubino.js</title>
+  <link rel="stylesheet" href="css/naubino.css" type="text/css">
 </head>
 <body>
 <div id="gamediv">
@@ -11,8 +12,9 @@
 </div>
 <input type="button" onclick="window.naubino.game.start_timer()" value="▶ start"/>
 <input type="button" onclick="window.naubino.game.stop_timer()" value="▮▮ pause"/>
-<input type="button" onclick="window.naubino.game.graph.joinList()" value="joins"/>
 <input type="button" onclick="window.naubino.game.world.gravity = !window.naubino.game.world.gravity " value="gravity on/off"/>
+<input type="button" onclick="window.naubino.game.graph.join_list()" value="joins"/>
+<input type="button" onclick="window.naubino.game.graph.dotty()" value="dotty"/>
 
 <script type="text/javascript" src="lib/my-common/my.common.js"></script>
 <script type="text/javascript" src="javascripts/Naubino.js"></script>
