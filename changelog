@@ -2,12 +2,8 @@
 # naubino namespace
 # global object size handling ( keep_distance, spring length and so on)
 # color palettes also handle background and join color
+# cycle checking
+# modi ( scriptable levels )
+# naub animation
 
-	* added: basic settings key value file
-	* added: colorschemes from colorlovers.com
-	* added: spacebar causes pause
-	* added: joining
-
-	* fixed: cleaned up physics a bit
-	* fixed: one collision does not need to be handled 8 times ;)
-	* fixed: correct drawing of joins
+	* added: focused naubs now glow (yes! I procrastinated)

@@ -2,6 +2,7 @@ class Naub
   constructor: (@game) ->
     @physics = new PhysicsModel
     @shape = new NaubShape this
+
     @color_id = @shape.random_palette_color()
 
     @removed = false
@@ -9,6 +10,7 @@ class Naub
 
     @world = @game.world
     @world.add_object this
+
     @joins = {} # {id: opposing naub}
 
   draw: (context)  =>
@@ -37,11 +39,14 @@ class Naub
     other.joins[join] = this
 
   replace_with: (other) ->
+    console.log "replace: " + [@number, other.number]
     for id, naub of @joins
       other.join_with(naub)
       delete naub.joins[id]
       @game.graph.remove_join id
     @remove()
+    @game.unfocus()
+    return 42
 
 
   is_joined_with: (other) ->

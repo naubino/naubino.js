@@ -1,7 +1,15 @@
 class Graph
   constructor: () ->
     @joins_count = 0
+    @naubs = []
     @joins = {}
+
+  update_naub_list: () ->
+    @naubs = []
+    for id, join of @joins
+      for i in [0..1]
+        unless join[i] in @naubs
+          @naubs.push join[i]
 
   add_join: (a,b) ->
     @joins_count++
@@ -15,7 +23,8 @@ class Graph
 
   join_list: ->
     console.log "joinList"
-    console.log join for id, join of @joins
+    for id, join of @joins
+      console.log id + " " + join
 
   dotty: ->
     dot =  "graph G {\n"
@@ -23,5 +32,14 @@ class Graph
       join[0] + " -- " + join[1]
     dot += joins.join("\n") + "}"
     console.log dot
+  
+  dfs: (naub) ->
+    for id, join of @joins
+      if naub in join
+        index = join.indexOf naub
+        partner = join[index^1]
+        console.log naub + " -> " + partner
+
+  cycle_test: ->
 
 

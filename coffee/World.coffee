@@ -49,28 +49,29 @@ class World
 
 
   check_joining: (naub, other) ->
-    { pos, vel, force } = naub.physics
-    { pos: opos, vel: ovel, force: oforce } = other.physics
+    if naub
+      { pos, vel, force } = naub.physics
+      { pos: opos, vel: ovel, force: oforce } = other.physics
 
-    diff = opos.Copy()
-    diff.Subtract(pos)
-    l = diff.Length()
+      diff = opos.Copy()
+      diff.Subtract(pos)
+      l = diff.Length()
 
-    unless naub == other
-      if l < 25
-        far_enough = true
-        naub_partners = for id, partner of naub.joins
-          partner.number
+      unless naub == other
+        if l < 23
+          far_enough = true
+          naub_partners = for id, partner of naub.joins
+            partner.number
 
-        for id, partner of other.joins
-          if partner.number in naub_partners
-            far_enough = false
+          for id, partner of other.joins
+            if partner.number in naub_partners
+              far_enough = false
 
-        unjoined = not naub.is_joined_with other
-        same_color = naub.color_id == other.color_id
+          unjoined = not naub.is_joined_with other
+          same_color = naub.color_id == other.color_id
 
-        if unjoined && same_color &&  far_enough
-          other.replace_with naub
+          if unjoined && same_color &&  far_enough
+            naub.replace_with other
 
 
 
