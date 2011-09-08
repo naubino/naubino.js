@@ -5,7 +5,7 @@ class Game
   ## get this started 
   constructor: (@canvas, @keybindings) ->
     # TODO Exchangeable display class
-    @paused = true
+    @paused = true # TODO make game.pause make sense
 
     @world = new World this
     @graph = new Graph

@@ -7,6 +7,7 @@ require 'javascripts/World.js'
 require 'javascripts/Graph.js'
 require 'javascripts/Settings.js'
 require 'lib/b2Vec2.js'
+require 'lib/underscore/underscore.js'
 
 window.onload = ->
   canvas = document.getElementById("canvas")

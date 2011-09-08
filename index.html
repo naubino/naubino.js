@@ -5,9 +5,6 @@
   <link rel="stylesheet" href="css/naubino.css" type="text/css">
 </head>
 <body>
-<div id="gamediv">
-    <canvas id="canvas" width="600" height="480"></canvas>
-</div> 
 <div id="footerdiv">
 </div>
 <input type="button" onclick="window.naubino.game.start_timer()" value="▶ start"/>
@@ -15,6 +12,10 @@
 <input type="button" onclick="window.naubino.game.world.gravity = !window.naubino.game.world.gravity " value="gravity on/off"/>
 <input type="button" onclick="window.naubino.game.graph.join_list()" value="joins"/>
 <input type="button" onclick="window.naubino.game.graph.dotty()" value="dotty"/>
+
+<div id="gamediv">
+    <canvas id="canvas" width="600" height="400"></canvas>
+</div> 
 
 <script type="text/javascript" src="lib/my-common/my.common.js"></script>
 <script type="text/javascript" src="javascripts/Naubino.js"></script>

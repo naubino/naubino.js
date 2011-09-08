@@ -6,4 +6,10 @@
 # modi ( scriptable levels )
 # naub animation
 
+the hardest part is done (I hope)
+
 	* added: focused naubs now glow (yes! I procrastinated)
+	* added: working cycle test
+	* optimized: join_springs now uses each naubs own list of joined naubs
+	* changed: index.html canvas size and position
+

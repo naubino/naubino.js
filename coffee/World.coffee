@@ -45,7 +45,7 @@ class World
     for obj in @objs
       if obj.removed
         @remove_obj obj
-        return 42
+        return 42 # XXX is there a way to have a void function?
 
 
   check_joining: (naub, other) ->
@@ -84,7 +84,7 @@ class World
       @gravitate naub
 
       # joined naubs have spring forces 
-      for other in @objs
+      for id, other of naub.joins
         @join_springs naub, other
       
       # collide
@@ -140,28 +140,27 @@ class World
   # spring force between joined naubs
   join_springs: (naub, other) ->
     # XXX causes slight rotation when crossing to pairs
-    if naub.is_joined_with(other)
-      { pos, vel, force } = naub.physics
-      { pos: opos, vel: ovel, force: oforce } = other.physics
+    { pos, vel, force } = naub.physics
+    { pos: opos, vel: ovel, force: oforce } = other.physics
 
-      diff = opos.Copy()
-      diff.Subtract(pos)
-      l = diff.Length()
+    diff = opos.Copy()
+    diff.Subtract(pos)
+    l = diff.Length()
+    v = diff.Copy()
+
+    v.Normalize()
+    v.Multiply( -1/100 * naub.physics.spring_force * l * l * l)
+    force.Subtract(v)
+    oforce.Add(v)
+
+    keep_distance = 40
+    if (l < keep_distance) # TODO replace with obj size
       v = diff.Copy()
-
       v.Normalize()
-      v.Multiply( -1/100 * naub.physics.spring_force * l * l * l)
+      v.Multiply(keep_distance - l)
+      v.Multiply(0.3)
+      pos.Subtract(v)
+      opos.Add(v)
       force.Subtract(v)
       oforce.Add(v)
-
-      keep_distance = 40
-      if (l < keep_distance) # TODO replace with obj size
-        v = diff.Copy()
-        v.Normalize()
-        v.Multiply(keep_distance - l)
-        v.Multiply(0.3)
-        pos.Subtract(v)
-        opos.Add(v)
-        force.Subtract(v)
-        oforce.Add(v)
 
