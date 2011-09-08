@@ -1,3 +1,6 @@
 [submodule "lib/my-common"]
 	path = lib/my-common
 	url = https://github.com/jiem/my-common.git
+[submodule "lib/underscore"]
+	path = lib/underscore
+	url = https://github.com/documentcloud/underscore.git
