@@ -1,6 +1,5 @@
 # controlls everything that has to do with logic and gameplay or menus
 class Game
-
   
   ## get this started 
   constructor: (@canvas, @keybindings) ->
