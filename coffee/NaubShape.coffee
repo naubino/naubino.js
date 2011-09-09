@@ -1,4 +1,4 @@
-class NaubShape
+Naubino.NaubShape = class NaubShape
   constructor: (naub) ->
     @naub = naub
     @pos = naub.physics.pos

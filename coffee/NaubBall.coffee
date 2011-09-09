@@ -1,4 +1,4 @@
-class NaubBall extends NaubShape
+Naubino.NaubBall = class NaubBall extends Naubino.NaubShape
   constructor: (naub) ->
     @naub = naub
     @pos = naub.physics.pos

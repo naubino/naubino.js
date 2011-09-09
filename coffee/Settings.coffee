@@ -1,5 +1,5 @@
 # all colors (except color_output) found at colorlovers.com
-naubinoSettings = {
+Naubino.Settings = {
 
   pre_rendering: on
 

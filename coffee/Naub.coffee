@@ -1,7 +1,7 @@
-class Naub
+Naubino.Naub = class Naub
   constructor: (@game) ->
-    @physics = new PhysicsModel
-    @shape = new NaubBall this
+    @physics = new Naubino.PhysicsModel
+    @shape = new Naubino.NaubBall this
 
     @color_id = @shape.random_palette_color()
 

@@ -1,43 +1,37 @@
-require 'lib/jquery-1.6.3.min.js'
-require 'lib/underscore.js'
-require 'lib/b2Vec2.js'
-require 'javascripts/Game.js'
-require 'javascripts/Keybindings.js'
-require 'javascripts/Naub.js'
-require 'javascripts/NaubShape.js'
-require 'javascripts/NaubBall.js'
-require 'javascripts/PhysicsModel.js'
-require 'javascripts/World.js'
-require 'javascripts/Graph.js'
-require 'javascripts/Settings.js'
-
-
 
 Events.bind window, 'load',  ->
   canvas = document.getElementById("canvas")
-  window.naubino = new Naubino(canvas)
+  window.naubino = Naubino.constructor(canvas)
 
-class Naubino
+@Naubino = new ->
+  require 'lib/jquery-1.6.3.min.js'
+  require 'lib/underscore.js'
+  require 'lib/b2Vec2.js'
+  require 'js/Game.js'
+  require 'js/Keybindings.js'
+  require 'js/Naub.js'
+  require 'js/NaubShape.js'
+  require 'js/NaubBall.js'
+  require 'js/PhysicsModel.js'
+  require 'js/World.js'
+  require 'js/Graph.js'
+  require 'js/Settings.js'
+
 
   constructor: (@canvas) ->
     #context = @canvas.getContext("2d")
     @setup_keybindings()
     @setup_cursorbindings()
 
-    @game = new Game(@canvas, @keybindings)
+    @game = new @Game(@canvas, @keybindings)
 
     @game.create_some_naubs(12)
     @game.start_timer()
 
     @keybindings.enable 32, => @game.pause()
 
-
-
-
-
-
   setup_keybindings: () ->
-    @keybindings = new window.KeyBindings()
+    @keybindings = new @KeyBindings()
     window.onkeydown = (key) => @keybindings.keydown(key)
     window.onkeyup = (key) => @keybindings.keyup(key)
 
@@ -59,4 +53,5 @@ class Naubino
     #canvas.addEventListener("touchstart", touchDown, false)
     #canvas.addEventListener("touchend", touchUp, false)
     #canvas.addEventListener("touchmove", touchXY, false)
+
 

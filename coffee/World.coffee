@@ -1,4 +1,4 @@
-class World
+Naubino.World = class World
 
   # controlls everything that happens inside the field
   

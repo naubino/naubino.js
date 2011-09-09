@@ -5,17 +5,17 @@
   <link rel="stylesheet" href="css/naubino.css" type="text/css">
   <script type="text/javascript" src="lib/my-common/my.common.min.js"></script>
   <script type="text/javascript" src="lib/events-js/events.min.js"></script>
-  <script type="text/javascript" src="javascripts/Naubino.js"></script>
+  <script type="text/javascript" src="js/Naubino.js"></script>
 </head>
 <body>
 <div id="footerdiv">
 </div>
-<input type="button" onclick="window.naubino.game.start_timer()" value="▶ start"/>
-<input type="button" onclick="window.naubino.game.stop_timer()" value="▮▮ pause"/>
-<input type="button" onclick="window.naubino.game.world.gravity = !window.naubino.game.world.gravity " value="gravity on/off"/>
-<input type="button" onclick="window.naubino.game.graph.join_list()" value="joins"/>
-<input type="button" onclick="window.naubino.game.graph.dotty()" value="dotty"/>
-<input type="button" onclick="window.naubino.game.pre_render = !window.naubino.game.pre_render" value="prerendering on/off"/>
+<input type="button" onclick="window.Naubino.game.start_timer()" value="▶ start"/>
+<input type="button" onclick="window.Naubino.game.stop_timer()" value="▮▮ pause"/>
+<input type="button" onclick="window.Naubino.game.world.gravity = !window.Naubino.game.world.gravity " value="gravity on/off"/>
+<input type="button" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
+<input type="button" onclick="window.Naubino.game.graph.dotty()" value="dotty"/>
+<input type="button" onclick="window.Naubino.game.pre_render = !window.Naubino.game.pre_render" value="prerendering on/off"/>
 
 <div id="gamediv">
     <canvas id="canvas" width="600" height="400"></canvas>

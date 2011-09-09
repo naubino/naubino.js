@@ -1,4 +1,4 @@
-class PhysicsModel
+@Naubino.PhysicsModel = class PhysicsModel
   constructor: ->
     @pos = new b2Vec2(0, 0)
     @force = new b2Vec2(0, 0)

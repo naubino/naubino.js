@@ -1,11 +1,10 @@
 ## Imidiate Plans:
-# incorporate underscore
 # global object size handling ( keep_distance, spring length and so on)
 # color palettes also handle background and join color
 # modi ( scriptable levels )
 # naub animation
 
-	* added: prerendering by default (saves about 15% less cpu)
+More Proctrastination
 
-	* cleanup: split NaubShape into NaubBall -> NaubShape
-	* cleanup: cleaned up the code a little... a lot
+	* added: Naubino Namespace (build with: "coffee -o ../js/ -cw	*.coffee") 
+	

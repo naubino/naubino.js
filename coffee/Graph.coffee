@@ -1,4 +1,4 @@
-class Graph
+Naubino.Graph = class Graph
   # TODO make more use of _
   constructor: () ->
     @join_id_sequence = 0 # sequential join id

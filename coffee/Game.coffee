@@ -1,17 +1,17 @@
 # controlls everything that has to do with logic and gameplay or menus
-class Game
+Naubino.Game = class Game
   
   ## get this started 
   constructor: (@canvas, @keybindings) ->
     # TODO Exchangeable display class
     @paused = true # TODO make game.pause make sense
     @drawing = true
-    @world = new World this
-    @graph = new Graph
+    @world = new Naubino.World this
+    @graph = new Naubino.Graph
     @context = @canvas.getContext('2d')
     @focused_naub = null
 
-    @settings = naubinoSettings
+    @settings = Naubino.Settings
     @pre_render = @settings.pre_rendering
     @colors = @settings.colors_output
 
@@ -29,8 +29,8 @@ class Game
       @create_naub_triple()
 
   create_naub_pair: ->
-      naub_a = new Naub this
-      naub_b = new Naub this
+      naub_a = new Naubino.Naub this
+      naub_b = new Naubino.Naub this
 
       x = Math.random() * @canvas.width
       y = Math.random() * @canvas.height
@@ -41,9 +41,9 @@ class Game
       naub_a.join_with naub_b
 
   create_naub_triple: ->
-      naub_a = new Naub this
-      naub_b = new Naub this
-      naub_c = new Naub this
+      naub_a = new Naubino.Naub this
+      naub_b = new Naubino.Naub this
+      naub_c = new Naubino.Naub this
 
       x = Math.random() * @canvas.width
       y = Math.random() * @canvas.height
