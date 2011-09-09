@@ -8,10 +8,10 @@ Naubino.World = class World
     @height = @game.canvas.height
     @field = [0, 0, @width, @height]
     @center = new b2Vec2 @field[2]/2, @field[2]/2
-    @gravity = false
+    @gravity = true
     @pointer = @center.Copy()
 
-    @objs = []
+    @objs = {}
     @objs_count = 0
 
 
@@ -19,19 +19,20 @@ Naubino.World = class World
   add_object: (obj)->
     @objs_count++
     obj.number = @objs_count
-    @objs.push obj
+    @objs[@objs_count] = obj
 
   get_object: (id)->
     @objs[id]
 
-  remove_obj: (obj) ->
-    @objs.splice(@objs.indexOf(obj),1)
+
+  remove_obj: (id) ->
+    delete @objs[id]
     
   draw: (context) ->
-    for obj in @objs
+    for id, obj of @objs
       obj.draw_joins context
 
-    for obj in @objs
+    for id, obj of @objs
       obj.draw context
       
 
@@ -44,20 +45,20 @@ Naubino.World = class World
     
     # check for joinings
     if @game.mousedown && @game.focused_naub
-      for obj in @objs
+      for id, obj of  @objs
         @game.focused_naub.check_joining obj if @game.focused_naub
 
     # delete objects
-    for obj in @objs
+    for id, obj of @objs
       if obj.removed
-        @remove_obj obj
+        @remove_obj id
         return 42 # TODO found out if there is a way to have a void function?
 
 
 
 
   naub_forces: (dt) ->
-    for naub in @objs
+    for id, naub of @objs
 
       # everything moves toward the middle
       @gravitate naub
@@ -68,7 +69,7 @@ Naubino.World = class World
       
       # collide
       for [0..3]
-        for other in @objs
+        for id, other of @objs
           @collide naub, other
       
       # use all previously calculated forces and actually move the damn thing 
@@ -105,7 +106,7 @@ Naubino.World = class World
         v = @center.Copy()
         v.Subtract(pos)
         v.Normalize()
-        v.Multiply(25)
+        v.Multiply(20)
         force.Add(v)
 
     else # except when you are held by the pointer

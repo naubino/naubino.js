@@ -56,6 +56,9 @@ Naubino.Game = class Game
       naub_a.join_with naub_c
 
 
+  destroy_naubs: (list)->
+    for id in list
+      @world.get_object(id).destroy()
 
 
   ## temus fugit
@@ -108,7 +111,7 @@ Naubino.Game = class Game
       [@world.pointer.x, @world.pointer.y] = [x,y]
 
   get_naub: (x, y) ->
-    for naub in @world.objs
+    for id, naub of @world.objs
       if naub.isHit(x, y)
         return naub
 

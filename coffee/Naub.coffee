@@ -24,8 +24,9 @@ Naubino.Naub = class Naub
     # drawing joins
     for id, other of @joins
       join = @game.graph.joins[id]
-      if join[0] >=  @number
+      if join && join[0] >=  @number
         @shape.draw_join context, other
+    return
 
 
 
@@ -35,9 +36,12 @@ Naubino.Naub = class Naub
     
   remove: =>
     @removed = true
+    for id, naub of @joins
+      delete naub.joins[id]
+      @game.graph.remove_join id
 
-
-
+  destroy: ->
+    @shape.destroy(@remove)
 
   ### do things a naub is supposed to do ###
   join_with: (other) ->
@@ -49,13 +53,13 @@ Naubino.Naub = class Naub
 
   
   replace_with: (other) ->
-    console.log "replace: " + [@number, other.number]
     for id, naub of @joins
       other.join_with(naub)
       delete naub.joins[id]
       @game.graph.remove_join id
     @remove()
     @game.unfocus()
+    Naubino.mode.naub_replaced.dispatch()
     return 42
 
 
@@ -83,6 +87,7 @@ Naubino.Naub = class Naub
 
     unless @number == other.number
       if l < @shape.size + 10
+
         far_enough = true
         naub_partners = for id, partner of @joins
           partner.number
@@ -92,10 +97,13 @@ Naubino.Naub = class Naub
             far_enough = false
 
         unjoined = not @is_joined_with other
+        alone = _.keys(@joins).length == 0  or  _.keys(other.joins).length == 0
         same_color = @color_id == other.color_id
 
-        if unjoined && same_color &&  far_enough
+        if unjoined && same_color && far_enough && not alone
           @replace_with other
+        else if alone
+          @join_with other
 
   partners: ->
     _.values @joins

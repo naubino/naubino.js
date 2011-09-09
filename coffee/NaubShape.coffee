@@ -1,16 +1,29 @@
 Naubino.NaubShape = class NaubShape
+
   constructor: (naub) ->
     @naub = naub
     @pos = naub.physics.pos
     @size = 14
+    @join_size = 6
     @frame = @size+5
     @style = { fill: [0,0,0,1] }
+    @life_rendering = false # if true redraw on each frame
 
   draw: (ctx) ->
-    if @naub.game.pre_render
+    if @naub.game.pre_render and not @life_rendering
       ctx.save()
       x = @pos.x-@frame
       y = @pos.y-@frame
+
+      #ctx.beginPath()
+      #ctx.moveTo x, y
+      #ctx.lineTo x, @frame*2+y
+      #ctx.lineTo @frame*2+x, @frame*2+y
+      #ctx.lineTo @frame*2+x, y
+      #ctx.lineTo x, y
+      #ctx.stroke()
+      #ctx.closePath()
+
       ctx.drawImage(@buffer, x, y)
       ctx.restore()
     else
@@ -33,7 +46,7 @@ Naubino.NaubShape = class NaubShape
     ctx.beginPath()
     ctx.moveTo pos.x, pos.y
     ctx.lineTo pos2.x, pos2.y
-    ctx.lineWidth = 5
+    ctx.lineWidth = @join_size
     #ctx.shadowColor = "#333"
     #ctx.shadowBlur = 5
     #ctx.shadowOffsetX = 2
@@ -41,6 +54,17 @@ Naubino.NaubShape = class NaubShape
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
+
+  destroy: (callback) ->
+    @life_rendering = true
+    shrink = =>
+      @size *= 0.8
+      @join_size *= 0.8
+      if @size <= 2
+        clearInterval @loop
+        callback.call()
+
+    @loop = setInterval shrink, 80
 
 
 

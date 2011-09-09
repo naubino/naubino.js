@@ -46,7 +46,7 @@ Naubino.Graph = class Graph
 
 
 
-  cycle_test: ->
+  cycle_test: =>
     cycles = []
 
     @dfs_map = []
@@ -57,7 +57,7 @@ Naubino.Graph = class Graph
       if dfs_num == 0
         dfs_cycle = @dfs(naub)
         cycles = _.union(cycles, dfs_cycle)
-    return ["test beendet", cycles]
+    return
 
   dfs: (naub, pre = null) ->
     cycles = []
@@ -67,12 +67,12 @@ Naubino.Graph = class Graph
     @dfs_map[naub].color = 1
 
     for partner in @partners(naub,pre)
-      console.log partner
       if @dfs_map[partner].dfs_num == 0
         cycles = _.union(cycles, @dfs(partner,naub))
 
       if @dfs_map[partner].color == 1
-        console.log @cycle_list(naub,partner)
+        list=  @cycle_list(naub,partner)
+        Naubino.mode.cycle_found.dispatch(list)
     @dfs_map[naub].color = 2
     return cycles
 

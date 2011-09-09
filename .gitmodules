@@ -4,6 +4,3 @@
 [submodule "lib/underscore"]
 	path = lib/underscore
 	url = https://github.com/documentcloud/underscore
-[submodule "lib/events-js"]
-	path = lib/events-js
-	url = https://github.com/kbjr/Events.js

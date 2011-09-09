@@ -1,10 +1,6 @@
 Naubino.NaubBall = class NaubBall extends Naubino.NaubShape
   constructor: (naub) ->
-    @naub = naub
-    @pos = naub.physics.pos
-    @size = 14
-    @frame = @size+5
-    @style = { fill: [0,0,0,1] }
+    super(naub)
 
   # inherits : 
   #
