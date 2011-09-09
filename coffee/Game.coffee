@@ -6,14 +6,16 @@ class Game
   constructor: (@canvas, @keybindings) ->
     # TODO Exchangeable display class
     @paused = true # TODO make game.pause make sense
-
+    @drawing = true
     @world = new World this
     @graph = new Graph
-    @settings = naubinoSettings
-
-    @focused_naub = null
     @context = @canvas.getContext('2d')
+    @focused_naub = null
+
+    @settings = naubinoSettings
+    @pre_render = @settings.pre_rendering
     @colors = @settings.colors_output
+
 
     # fragile calibration! don't fuck it up!
     @dt = 0.03
@@ -80,7 +82,8 @@ class Game
   mainloop: ()=>
     @step(@dt)
     @keybindings.step(@dt)
-    @draw(@context)
+    if @drawing
+      @draw(@context)
 
 
 

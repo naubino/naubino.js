@@ -1,15 +1,11 @@
 ## Imidiate Plans:
-# naubino namespace
+# incorporate underscore
 # global object size handling ( keep_distance, spring length and so on)
 # color palettes also handle background and join color
-# cycle checking
 # modi ( scriptable levels )
 # naub animation
 
-the hardest part is done (I hope)
+	* added: prerendering by default (saves about 15% less cpu)
 
-	* added: focused naubs now glow (yes! I procrastinated)
-	* added: working cycle test
-	* optimized: join_springs now uses each naubs own list of joined naubs
-	* changed: index.html canvas size and position
-
+	* cleanup: split NaubShape into NaubBall -> NaubShape
+	* cleanup: cleaned up the code a little... a lot

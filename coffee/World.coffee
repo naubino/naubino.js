@@ -8,12 +8,14 @@ class World
     @height = @game.canvas.height
     @field = [0, 0, @width, @height]
     @center = new b2Vec2 @field[2]/2, @field[2]/2
-    @gravity = true
+    @gravity = false
     @pointer = @center.Copy()
 
     @objs = []
     @objs_count = 0
 
+
+  ### managing objects ###
   add_object: (obj)->
     @objs_count++
     obj.number = @objs_count
@@ -32,6 +34,10 @@ class World
     for obj in @objs
       obj.draw context
       
+
+
+
+  # work and have everybody else do their work as well
   step: (dt) ->
     # physics
     @naub_forces dt
@@ -39,44 +45,17 @@ class World
     # check for joinings
     if @game.mousedown && @game.focused_naub
       for obj in @objs
-        @check_joining @game.focused_naub, obj
+        @game.focused_naub.check_joining obj if @game.focused_naub
 
     # delete objects
     for obj in @objs
       if obj.removed
         @remove_obj obj
-        return 42 # XXX is there a way to have a void function?
-
-
-  check_joining: (naub, other) ->
-    if naub
-      { pos, vel, force } = naub.physics
-      { pos: opos, vel: ovel, force: oforce } = other.physics
-
-      diff = opos.Copy()
-      diff.Subtract(pos)
-      l = diff.Length()
-
-      unless naub == other
-        if l < 23
-          far_enough = true
-          naub_partners = for id, partner of naub.joins
-            partner.number
-
-          for id, partner of other.joins
-            if partner.number in naub_partners
-              far_enough = false
-
-          unjoined = not naub.is_joined_with other
-          same_color = naub.color_id == other.color_id
-
-          if unjoined && same_color &&  far_enough
-            naub.replace_with other
+        return 42 # TODO found out if there is a way to have a void function?
 
 
 
 
-  # TODO replace numbers by parameters in some tidy place
   naub_forces: (dt) ->
     for naub in @objs
 
@@ -94,6 +73,10 @@ class World
       
       # use all previously calculated forces and actually move the damn thing 
       naub.step(dt)
+
+
+
+  ### collide(), gravitate(), join_springs ###
 
   # keep naubs from overlapping
   collide: (naub, other) ->

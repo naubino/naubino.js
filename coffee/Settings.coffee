@@ -1,5 +1,8 @@
 # all colors (except color_output) found at colorlovers.com
 naubinoSettings = {
+
+  pre_rendering: on
+
   colors_output: [
     [229,  53,  23, 1]
     [226,   0, 122, 1]

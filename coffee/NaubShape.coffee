@@ -3,62 +3,48 @@ class NaubShape
     @naub = naub
     @pos = naub.physics.pos
     @size = 14
-    @style = { fill: [1,0,0,0] }
+    @frame = @size+5
+    @style = { fill: [0,0,0,1] }
 
-  draw: (context) =>
-    context.save()
-    pos = @pos
-    size = @size
+  draw: (ctx) ->
+    if @naub.game.pre_render
+      ctx.save()
+      x = @pos.x-@frame
+      y = @pos.y-@frame
+      ctx.drawImage(@buffer, x, y)
+      ctx.restore()
+    else
+      @render ctx, 0
 
-    context.translate(pos.x, pos.y)
-    context.beginPath()
-    context.arc(0, 0, size, 0, Math.PI * 2, false)
-    context.closePath()
-    context.fillStyle = @color_to_css(@style.fill)
+  pre_render: (ctx) ->
+    @buffer = document.createElement('canvas')
+    @buffer.width = @buffer.height = @frame*2
+    b_ctx = @buffer.getContext('2d')
+    @render b_ctx
 
-    if @naub.focused
-      # gradient
-      gradient = context.createRadialGradient(0,0, size,0, size, size)
-      gradient.addColorStop 0, @color_to_css @style.fill
-      gradient.addColorStop 1, @color_to_css @style.fill, 1.7
-      context.fillStyle = gradient
-
-      # shadow
-      #context.shadowColor = "#333"
-      #context.shadowBlur = 5
-      #context.shadowOffsetX = 2
-      #context.shadowOffsetY = 2
-
-    context.fill()
-
-    if @naub.focused or true
-      context.fillStyle = 'white'
-      content.textAlign = 'center'
-      context.font= '10pt Helvetica'
-      context.fillText(@naub.number, -7, 5)
-
-    context.closePath()
-    context.restore()
-
-  draw_join: (context, partner) =>
+  ## actual painting routines
+  draw_join: (ctx, partner) ->
     pos = @pos
     pos2 = partner.physics.pos
 
-    context.save()
-    context.strokeStyle = "black"
+    ctx.save()
+    ctx.strokeStyle = "black"
 
-    context.beginPath()
-    context.moveTo pos.x, pos.y
-    context.lineTo pos2.x, pos2.y
-    context.lineWidth = 5
-    #context.shadowColor = "#333"
-    #context.shadowBlur = 5
-    #context.shadowOffsetX = 2
-    #context.shadowOffsetY = 2
-    context.stroke()
-    context.closePath()
-    context.restore()
+    ctx.beginPath()
+    ctx.moveTo pos.x, pos.y
+    ctx.lineTo pos2.x, pos2.y
+    ctx.lineWidth = 5
+    #ctx.shadowColor = "#333"
+    #ctx.shadowBlur = 5
+    #ctx.shadowOffsetX = 2
+    #ctx.shadowOffsetY = 2
+    ctx.stroke()
+    ctx.closePath()
+    ctx.restore()
 
+
+
+  ## utils
   color_to_css: (color,shift = 0) =>
     r = Math.round((color[0] + shift/10) * 255)
     g = Math.round((color[1] + shift/10) * 255)

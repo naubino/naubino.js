@@ -1,13 +1,15 @@
-require 'javascripts/Game.js'
-require 'javascripts/Keybindings.js'
-require 'javascripts/Naub.js'
-require 'javascripts/NaubShape.js'
-require 'javascripts/PhysicsModel.js'
-require 'javascripts/World.js'
-require 'javascripts/Graph.js'
-require 'javascripts/Settings.js'
-require 'lib/b2Vec2.js'
-require 'lib/underscore/underscore.js'
+game =          require 'javascripts/Game.js'
+keybindings =   require 'javascripts/Keybindings.js'
+naub =          require 'javascripts/Naub.js'
+naubshape =     require 'javascripts/NaubShape.js'
+naubball =      require 'javascripts/NaubBall.js'
+physicsmodel =  require 'javascripts/PhysicsModel.js'
+world =         require 'javascripts/World.js'
+graph =         require 'javascripts/Graph.js'
+settings =      require 'javascripts/Settings.js'
+b2vec2 =        require 'lib/b2Vec2.js'
+underscore =    require 'lib/underscore/underscore.js'
+
 
 window.onload = ->
   canvas = document.getElementById("canvas")
