@@ -2,9 +2,3 @@
 # global object size handling ( keep_distance, spring length and so on)
 # color palettes also handle background and join color
 
-	* added: js-signals (finally decided upon a an event system)
-	* added: generic GameMode listening to all the signals (can be overwriten as needed)
-	* littered: signals all over the place
-	* added: naubs can now gracefully destroy themselves...
-	* added: ... so they will do when a cycle is closed
-	

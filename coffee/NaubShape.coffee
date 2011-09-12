@@ -4,9 +4,9 @@ Naubino.NaubShape = class NaubShape
     @naub = naub
     @pos = naub.physics.pos
     @size = 14
-    @join_size = 6
     @frame = @size+5
     @style = { fill: [0,0,0,1] }
+    @join_style = { fill: [0,0,0,1], width: 6 }
     @life_rendering = false # if true redraw on each frame
 
   draw: (ctx) ->
@@ -15,20 +15,26 @@ Naubino.NaubShape = class NaubShape
       x = @pos.x-@frame
       y = @pos.y-@frame
 
-      #ctx.beginPath()
-      #ctx.moveTo x, y
-      #ctx.lineTo x, @frame*2+y
-      #ctx.lineTo @frame*2+x, @frame*2+y
-      #ctx.lineTo @frame*2+x, y
-      #ctx.lineTo x, y
-      #ctx.stroke()
-      #ctx.closePath()
+      #@draw_frame(ctx)
 
       ctx.drawImage(@buffer, x, y)
       ctx.restore()
     else
       @render ctx, 0
 
+  draw_frame: (ctx) ->
+    x = @pos.x-@frame
+    y = @pos.y-@frame
+
+    ctx.beginPath()
+    ctx.moveTo x, y
+    ctx.lineTo x, @frame*2+y
+    ctx.lineTo @frame*2+x, @frame*2+y
+    ctx.lineTo @frame*2+x, y
+    ctx.lineTo x, y
+    ctx.stroke()
+    ctx.closePath()
+    
   pre_render: (ctx) ->
     @buffer = document.createElement('canvas')
     @buffer.width = @buffer.height = @frame*2
@@ -41,12 +47,12 @@ Naubino.NaubShape = class NaubShape
     pos2 = partner.physics.pos
 
     ctx.save()
-    ctx.strokeStyle = "black"
+    ctx.strokeStyle = @color_to_css @join_style.fill
 
     ctx.beginPath()
     ctx.moveTo pos.x, pos.y
     ctx.lineTo pos2.x, pos2.y
-    ctx.lineWidth = @join_size
+    ctx.lineWidth = @join_style.width
     #ctx.shadowColor = "#333"
     #ctx.shadowBlur = 5
     #ctx.shadowOffsetX = 2
@@ -59,12 +65,13 @@ Naubino.NaubShape = class NaubShape
     @life_rendering = true
     shrink = =>
       @size *= 0.8
-      @join_size *= 0.8
-      if @size <= 2
+      @join_style.width *= 0.8
+      @join_style.fill[3] *= 0.8
+      if @size <= 0.1
         clearInterval @loop
         callback.call()
 
-    @loop = setInterval shrink, 80
+    @loop = setInterval shrink, 50
 
 
 

@@ -16,63 +16,69 @@ digraph G {
   ]
 
   Naubino [
-    label="{Naubino||}"
+    label="{Naubino}"
   ]
 
 
   Game[
-    label="{Game||}"
+    label="{Game}"
   ]
   
   Canvas[
-    label="{Canvas||}"
+    label="{Canvas}"
   ]
 
   Ctx[
-    label="{Context||}"
+    label="{Context}"
   ]
   
   KeyBindings[
-    label="{KeyBindings||}"
+    label="{KeyBindings}"
   ]
 
   Signals[
-    label="{Signals||}"
+    label="{Signals}"
   ]
 
   World[
-    label="{World||}"
+    label="{World}"
   ]
 
   GameMode[
-    label="{GameMode||}"
+    label="{GameMode}"
   ]
 
   The_Graph[
-    label="{Graph||}"
+    label="{Graph}"
   ]
 
   Naub[
-    label="{Naub||}"
+    label="{Naub}"
   ]
 
   NaubShape[
-    label="{NaubShape||}"
+    label="{NaubShape}"
   ]
 
-  NaubBall[
-    label="{NaubBall||}"
+  //NaubBall[
+  //  label="{NaubBall}"
+  //]
+
+  Physics[
+    label="{PhysicsModel}"
   ]
 
  Naubino -> Game 
  Naubino -> Canvas
  Naubino -> KeyBindings
  Naubino -> GameMode
- Canvas -> Ctx
+
  Game -> World
  Game -> The_Graph
  Game -> Ctx
+
  The_Graph -> Join [arrowtail = "diamond" ]
+ Canvas -> Ctx
 
  GameMode -> Game
  GameMode -> The_Graph
@@ -83,7 +89,10 @@ digraph G {
  World -> Canvas
 
  Naub -> NaubShape
- NaubShape -> NaubBall
+ Naub -> Game
+ Naub -> Physics [arrowtail = "diamond" ]
+
+ //NaubShape -> NaubBall
  Naub -> Join [arrowtail = "diamond" ]
 
 

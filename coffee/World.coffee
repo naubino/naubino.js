@@ -7,7 +7,7 @@ Naubino.World = class World
     @width = @game.canvas.width
     @height = @game.canvas.height
     @field = [0, 0, @width, @height]
-    @center = new b2Vec2 @field[2]/2, @field[2]/2
+    @center = new b2Vec2 @field[2]/2, @field[3]/2
     @gravity = true
     @pointer = @center.Copy()
 
