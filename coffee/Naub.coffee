@@ -12,6 +12,7 @@ Naubino.Naub = class Naub
     @world.add_object this
 
     @joins = {} # {id: opposing naub}
+    @drawing_join = {} # {id: true/false if this naub draws the join}
     @shape.pre_render()
 
 
@@ -22,12 +23,10 @@ Naubino.Naub = class Naub
 
   draw_joins: (context) =>
     # drawing joins
-    for id, other of @joins
-      join = @game.graph.joins[id]
-      if join && join[0] >=  @number
-        @shape.draw_join context, other
+    for id, partner of @joins
+      if @drawing_join[id]
+        @shape.draw_join context, partner
     return
-
 
 
   ### organisation ###
@@ -41,6 +40,10 @@ Naubino.Naub = class Naub
       @game.graph.remove_join id
 
   destroy: ->
+    for id, partner of @joins
+      @drawing_join[id] = true
+      partner.drawing_join[id] = false
+    @destroying = true
     @shape.destroy(@remove)
 
   ### do things a naub is supposed to do ###
@@ -49,7 +52,9 @@ Naubino.Naub = class Naub
     # check for cycle
     join = @game.graph.add_join this, other
     @joins[join] = other
+    @drawing_join[join] = true
     other.joins[join] = this
+    other.drawing_join[join] = false
 
   
   replace_with: (other) ->

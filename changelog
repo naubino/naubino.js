@@ -1,4 +1,9 @@
-## Imidiate Plans:
+## Roadmap:
+# integration of kinetic2d js
+# fix "pull naubs out of canvas" crash
+# timer clean up
 # global object size handling ( keep_distance, spring length and so on)
 # color palettes also handle background and join color
 
+	* fixed: destroyed naubs now take over painting their joins for animation
+	* added: kinetic2d js (not yet in use)

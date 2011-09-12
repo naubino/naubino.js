@@ -42,11 +42,10 @@ Naubino.NaubBall = class NaubBall extends Naubino.NaubShape
 
     ctx.fill()
 
-    #if @naub.focused
-    #  ctx.fillStyle = 'white'
-    #  ctx.textAlign = 'center'
-    #  ctx.font= '10pt Helvetica'
-    #  ctx.fillText(@naub.number, offset-7, offset+5)
+    #ctx.fillStyle = 'white'
+    #ctx.textAlign = 'center'
+    #ctx.font= '10pt Helvetica'
+    #ctx.fillText(@naub.number, offset, offset+5)
 
     ctx.closePath()
     ctx.restore()
