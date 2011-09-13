@@ -1,6 +1,7 @@
 window.onload = ->
-  canvas = document.getElementById("canvas")
-  window.naubino = Naubino.constructor(canvas)
+  window.foreground_canvas = document.getElementById("foreground_canvas")
+  window.background_canvas = document.getElementById("background_canvas")
+  window.naubino = Naubino.constructor()
 
 @Naubino = new ->
   require 'lib/jquery-1.6.3.min.js'
@@ -20,12 +21,14 @@ window.onload = ->
 
 
 
-  constructor: (@canvas) ->
+  constructor: () ->
 
+    @foreground = window.foreground_canvas
+    @background = window.background_canvas
     @setup_keybindings()
     @setup_cursorbindings()
 
-    @game = new @Game(@canvas, @keybindings)
+    @game = new @Game(@foreground, @keybindings)
     @game.create_some_naubs(12)
     @game.start_timer()
 
@@ -42,21 +45,22 @@ window.onload = ->
   setup_cursorbindings: () ->
     onmousemove = (e) =>
       #@mode.mousemove.dispatch(e)
-      @game.move_pointer e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
+      @game.move_pointer e.pageX - @foreground.offsetLeft, e.pageY - @foreground.offsetTop
 
     onmouseup = (e) =>
       #@mode.mouseup.dispatch(e)
-      @game.unfocus e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
+      @game.unfocus e.pageX - @foreground.offsetLeft, e.pageY - @foreground.offsetTop
 
     onmousedown = (e) =>
       #@mode.mousedown.dispatch(e)
-      @game.click e.pageX - @canvas.offsetLeft, e.pageY - @canvas.offsetTop
+      @game.click e.pageX - @foreground.offsetLeft, e.pageY - @foreground.offsetTop
 
-    @canvas.addEventListener("mousedown", onmousedown, false)
-    @canvas.addEventListener("mouseup", onmouseup, false)
-    @canvas.addEventListener("mousemove", onmousemove, false)
+    @foreground.addEventListener("mousedown", onmousedown, false)
+    @foreground.addEventListener("mouseup", onmouseup, false)
+    @foreground.addEventListener("mousemove", onmousemove, false)
+    @foreground.addEventListener("mouseout", onmouseup, false)
 
-    @canvas.addEventListener("touchstart", onmousedown, false)
-    @canvas.addEventListener("touchend", onmouseup, false)
-    @canvas.addEventListener("touchmove", onmousemove, false)
+    @foreground.addEventListener("touchstart", onmousedown, false)
+    @foreground.addEventListener("touchend", onmouseup, false)
+    @foreground.addEventListener("touchmove", onmousemove, false)
 

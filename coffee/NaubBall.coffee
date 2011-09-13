@@ -27,9 +27,9 @@ Naubino.NaubBall = class NaubBall extends Naubino.NaubShape
 
     if @naub.focused
       # gradient
-      gradient = ctx.createRadialGradient(offset,offset, size,0, size, size)
-      gradient.addColorStop 0, @color_to_css @style.fill
-      gradient.addColorStop 1, @color_to_css(@style.fill, 1.7)
+      gradient = ctx.createRadialGradient(offset, offset, size/2, offset, offset, size)
+      gradient.addColorStop 0, @color_to_css(@style.fill, 5)
+      gradient.addColorStop 1, @color_to_css @style.fill
       ctx.fillStyle = gradient
     else
       ctx.fillStyle = @color_to_css(@style.fill)

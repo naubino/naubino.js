@@ -1,0 +1,16 @@
+# Roadmap:
+  * restore original gameplay ( 1.0 )
+    * naub pair creating timer
+    * point counter
+      * more rewording system
+    * circle for naub overflow
+    * menu ( restarting 
+  * alternating game modes
+
+# Known Issues
+  * simplify the drawing chain
+  * global object size handling ( keep_distance, spring length and so on)
+  * color palettes also handle background and join color
+  * stretching effect causes joins to be 1px all the time in opera
+  * naubs kinda jiggle in chromium
+  * more canvas performance optimization posible

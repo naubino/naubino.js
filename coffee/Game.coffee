@@ -2,25 +2,34 @@
 Naubino.Game = class Game
   
   ## get this started 
-  constructor: (@canvas, @keybindings) ->
-    # TODO Exchangeable display class
-    @paused = true # TODO make game.pause make sense
-    @drawing = true
+  constructor: () ->
+    @settings = Naubino.Settings
+    @foreground = Naubino.foreground
+    @background = Naubino.background
+    @keybindings = Naubino.keybindings
+    @context = @foreground.getContext('2d')
     @world = new Naubino.World this
     @graph = new Naubino.Graph
-    @context = @canvas.getContext('2d')
-    @focused_naub = null
 
-    @settings = Naubino.Settings
+    @draw_background (@background.getContext('2d'))
+
+    # TODO Exchangeable display class
+    @paused = true # changed imidiately after loading by start_timer
+    @drawing = true # for debugging
+    @focused_naub = null # points to the naub you click on
+
     @pre_render = @settings.pre_rendering
     @colors = @settings.colors_output
 
-
     # fragile calibration! don't fuck it up!
-    @dt = 0.03
-    @interval = 0.05
+    @fps = 1000 / 40
+    @dt = @fps/1500
     
 
+
+
+
+  ### the game gives it the game takes it ###
   create_some_naubs: (n = 3) ->
     n = 5
     for [1..n]
@@ -32,8 +41,8 @@ Naubino.Game = class Game
       naub_a = new Naubino.Naub this
       naub_b = new Naubino.Naub this
 
-      x = Math.random() * @canvas.width
-      y = Math.random() * @canvas.height
+      x = Math.random() * @foreground.width
+      y = Math.random() * @foreground.height
 
       naub_a.physics.pos.Set x, y
       naub_b.physics.pos.Set x + 30, y + 30
@@ -45,26 +54,33 @@ Naubino.Game = class Game
       naub_b = new Naubino.Naub this
       naub_c = new Naubino.Naub this
 
-      x = Math.random() * @canvas.width
-      y = Math.random() * @canvas.height
+      x = Math.random() * @foreground.width
+      y = Math.random() * @foreground.height
 
       naub_a.physics.pos.Set x, y
       naub_b.physics.pos.Set x + 30, y + 30
       naub_c.physics.pos.Set x + 60, y - 30
 
       naub_a.join_with naub_b
-      naub_a.join_with naub_c
-
+      naub_b.join_with naub_c
 
   destroy_naubs: (list)->
-    for id in list
-      @world.get_object(id).destroy()
+    i = 0
+    one_after_another= =>
+      if i < list.length
+        @world.get_object(list[i]).destroy()
+        i++
+      setTimeout one_after_another, 50
+    one_after_another()
+
+    
 
 
-  ## temus fugit
+
+  ## tempus fugit
   start_timer: ->
     if @paused
-      @loop = setInterval(@mainloop, @interval *1e3)
+      @loop = setInterval(@mainloop, @fps )
       @paused = false
 
   stop_timer: ->
@@ -85,7 +101,7 @@ Naubino.Game = class Game
     @step(@dt)
     @keybindings.step(@dt)
     if @drawing
-      @draw(@context)
+      @draw_foreground(@context)
 
 
 
@@ -117,10 +133,27 @@ Naubino.Game = class Game
 
 
 
+
   ## paint it naubino
-  draw: (context) ->
-    context.clearRect(0, 0, @canvas.width, @canvas.height)
+  draw_foreground: (context) ->
+    context.clearRect(0, 0, @foreground.width, @foreground.height)
     context.save()
     @world.draw context
     context.restore()
 
+    #TODO have somebody else do this
+  draw_background: (context) ->
+    width = Naubino.foreground.width
+    height = Naubino.foreground.height
+    centerX = width/2
+    centerY = height/2
+
+    context.clearRect(0, 0, @foreground.width, @foreground.height)
+    context.save()
+    context.arc centerX, centerY, 160, 0, Math.PI*2, false
+
+    context.lineWidth = 5
+    context.strokeStyle = "black"
+    context.stroke()
+    context.restore()
+    

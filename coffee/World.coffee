@@ -4,8 +4,8 @@ Naubino.World = class World
   
   constructor: (@game) ->
 
-    @width = @game.canvas.width
-    @height = @game.canvas.height
+    @width = Naubino.foreground.width
+    @height = Naubino.foreground.height
     @field = [0, 0, @width, @height]
     @center = new b2Vec2 @field[2]/2, @field[3]/2
     @gravity = true
@@ -124,7 +124,7 @@ Naubino.World = class World
   # spring force between joined naubs
   join_springs: (naub, other) ->
     # XXX causes slight rotation when crossing to pairs
-    { pos, vel, force } = naub.physics
+    { pos, vel, force, keep_distance } = naub.physics
     { pos: opos, vel: ovel, force: oforce } = other.physics
 
     diff = opos.Copy()
@@ -137,7 +137,6 @@ Naubino.World = class World
     force.Subtract(v)
     oforce.Add(v)
 
-    keep_distance = 40
     if (l < keep_distance) # TODO replace with obj size
       v = diff.Copy()
       v.Normalize()

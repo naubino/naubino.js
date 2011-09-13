@@ -14,14 +14,13 @@ Naubino.NaubShape = class NaubShape
       ctx.save()
       x = @pos.x-@frame
       y = @pos.y-@frame
-
       #@draw_frame(ctx)
-
       ctx.drawImage(@buffer, x, y)
       ctx.restore()
     else
       @render ctx, 0
 
+  ### draws a frame around the buffered image for analysis ###
   draw_frame: (ctx) ->
     x = @pos.x-@frame
     y = @pos.y-@frame
@@ -35,6 +34,7 @@ Naubino.NaubShape = class NaubShape
     ctx.stroke()
     ctx.closePath()
     
+  ### Renders the shape into a buffer ###
   pre_render: (ctx) ->
     @buffer = document.createElement('canvas')
     @buffer.width = @buffer.height = @frame*2
@@ -46,27 +46,35 @@ Naubino.NaubShape = class NaubShape
     pos = @pos
     pos2 = partner.physics.pos
 
+    # joins getting thinner by stretching
+    diff = pos2.Copy()
+    diff.Subtract(pos)
+    kd = @naub.physics.keep_distance
+    l = diff.Length()
+    fiber = 30 # strength of join material ( the higher the less a join will be affected by stretching )
+    stretch = (kd + fiber) / (l + fiber)
+
     ctx.save()
     ctx.strokeStyle = @color_to_css @join_style.fill
 
     ctx.beginPath()
     ctx.moveTo pos.x, pos.y
     ctx.lineTo pos2.x, pos2.y
-    ctx.lineWidth = @join_style.width
-    #ctx.shadowColor = "#333"
-    #ctx.shadowBlur = 5
-    #ctx.shadowOffsetX = 2
-    #ctx.shadowOffsetY = 2
+    ctx.lineWidth = Math.round (@join_style.width * stretch)
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
 
+
+
+
+  ### animates the destruction of a naub ###
   destroy: (callback) ->
     @life_rendering = true
     shrink = =>
-      @size *= 0.8
-      @join_style.width *= 0.8
-      @join_style.fill[3] *= 0.8
+      @size *= 0.6
+      @join_style.width *= 0.6
+      @join_style.fill[3] *= 0.6
       if @size <= 0.1
         clearInterval @loop
         callback.call()
@@ -75,11 +83,11 @@ Naubino.NaubShape = class NaubShape
 
 
 
-  ## utils
+  ### utils ###
   color_to_css: (color,shift = 0) =>
-    r = Math.round((color[0] + shift/10) * 255)
-    g = Math.round((color[1] + shift/10) * 255)
-    b = Math.round((color[2] + shift/10) * 255)
+    r = Math.round((color[0] + shift/10)*255)
+    g = Math.round((color[1] + shift/10)*255)
+    b = Math.round((color[2] + shift/10)*255)
     a = color[3]
     "rgba(#{r},#{g},#{b},#{a})"
 

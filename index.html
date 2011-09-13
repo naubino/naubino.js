@@ -3,22 +3,29 @@
 <head>
   <title>naubino.js</title>
   <link rel="stylesheet" href="css/naubino.css" type="text/css">
+  <link rel="stylesheet" href="css/github-badge.css" type="text/css">
   <script type="text/javascript" src="lib/my-common/my.common.min.js"></script>
   <script type="text/javascript" src="js/Naubino.js"></script>
 </head>
 <body>
-<div id="footerdiv">
-</div>
-<input type="button" onclick="window.Naubino.game.pause()" value="play/pause"/>
-<input type="button" onclick="window.Naubino.game.world.gravity = !window.Naubino.game.world.gravity " value="gravity on/off"/>
-<input type="button" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
-<input type="button" onclick="window.Naubino.game.graph.dotty()" value="dotty"/>
-<input type="button" onclick="window.Naubino.game.pre_render = !window.Naubino.game.pre_render" value="prerendering on/off"/>
-<a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a>
+  <a id="github" href="https://github.com/hoodie/naubino.js">
+    <span>Watch me on Github!</span>
+    <span>Stay tuned!</span>
+  </a>
 
-<div id="gamediv">
-    <canvas id="canvas" width="600" height="400"></canvas>
-</div> 
+  <div id="footerdiv">
+  </div>
+  <input type="button" onclick="window.Naubino.game.pause()" value="play/pause"/>
+  <input type="button" onclick="window.Naubino.game.world.gravity = !window.Naubino.game.world.gravity " value="gravity on/off"/>
+  <input type="button" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
+  <input type="button" onclick="window.Naubino.game.graph.dotty()" value="dotty"/>
+  <input type="button" onclick="window.Naubino.game.pre_render = !window.Naubino.game.pre_render" value="prerendering on/off"/>
+  <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a>
+
+  <div id="gamediv">
+    <canvas id="background_canvas" style="position: absolute; z-index:0;" width="600" height="400"></canvas>
+    <canvas id="foreground_canvas" style="position: absolute; z-index:1;" width="600" height="400"></canvas>
+  </div> 
 
 
 

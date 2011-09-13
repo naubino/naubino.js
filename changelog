@@ -1,9 +1,8 @@
-## Roadmap:
-# integration of kinetic2d js
-# fix "pull naubs out of canvas" crash
-# timer clean up
-# global object size handling ( keep_distance, spring length and so on)
-# color palettes also handle background and join color
+Destruction seldom looked so beautyful
 
+	* added: separate foreground and background canvas
+	* added: roadmap 
 	* fixed: destroyed naubs now take over painting their joins for animation
-	* added: kinetic2d js (not yet in use)
+	* fixed: framerate
+	* fixed: glow effect
+	* fixed: pull naubs out of canvas crash - nomore rampaging naubs
