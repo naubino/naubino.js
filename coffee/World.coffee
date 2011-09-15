@@ -1,14 +1,10 @@
-Naubino.World = class World
+Naubino.Field = Naubino.World = class World extends Naubino.Layer
 
   # controlls everything that happens inside the field
   
-  constructor: (@game) ->
+  constructor: (canvas) ->
+    super(canvas)
 
-    @width = Naubino.foreground.width
-    @height = Naubino.foreground.height
-    @field = [0, 0, @width, @height]
-    @center = new b2Vec2 @field[2]/2, @field[3]/2
-    @gravity = true
     @pointer = @center.Copy()
 
     @objs = {}
@@ -17,6 +13,7 @@ Naubino.World = class World
 
   ### managing objects ###
   add_object: (obj)->
+    obj.center = @center
     @objs_count++
     obj.number = @objs_count
     @objs[@objs_count] = obj
@@ -28,12 +25,15 @@ Naubino.World = class World
   remove_obj: (id) ->
     delete @objs[id]
     
-  draw: (context) ->
+  draw:  ->
+    @ctx.clearRect(0, 0, Naubino.world_canvas.width, Naubino.world_canvas.height)
+    @ctx.save()
     for id, obj of @objs
-      obj.draw_joins context
+      obj.draw_joins @ctx
 
     for id, obj of @objs
-      obj.draw context
+      obj.draw @ctx
+    @ctx.restore()
       
 
 
@@ -45,6 +45,7 @@ Naubino.World = class World
     
     # check for joinings
     if @game.mousedown && @game.focused_naub
+      @game.focused_naub.physics.follow @pointer.Copy()
       for id, obj of  @objs
         @game.focused_naub.check_joining obj if @game.focused_naub
 
@@ -61,7 +62,7 @@ Naubino.World = class World
     for id, naub of @objs
 
       # everything moves toward the middle
-      @gravitate naub
+      naub.physics.gravitate()
 
       # joined naubs have spring forces 
       for id, other of naub.joins
@@ -93,32 +94,12 @@ Naubino.World = class World
         v = diff.Copy()
         v.Normalize()
         v.Multiply(35 - l)
-        v.Multiply(0.3)
+        v.Multiply(0.6)
         pos.Subtract(v)
         opos.Add(v)
         force.Subtract(v)
         oforce.Add(v)
 
-  gravitate: (naub) ->
-    { pos, vel, force } = naub.physics
-    if not naub.focused
-      if @gravity # debug hook
-        v = @center.Copy()
-        v.Subtract(pos)
-        v.Normalize()
-        v.Multiply(20)
-        force.Add(v)
-
-    else # except when you are held by the pointer
-      v = @pointer.Copy()
-      pl = v.Copy()
-      pl.Subtract(pos)
-      pl = pl.Length()
-
-      v.Subtract(pos)
-      v.Normalize()
-      v.Multiply(30*pl)
-      force.Add(v)
 
       
   # spring force between joined naubs
@@ -142,8 +123,8 @@ Naubino.World = class World
       v.Normalize()
       v.Multiply(keep_distance - l)
       v.Multiply(0.3)
-      pos.Subtract(v)
-      opos.Add(v)
+      vel.Subtract(v)
+      ovel.Add(v)
       force.Subtract(v)
       oforce.Add(v)
 

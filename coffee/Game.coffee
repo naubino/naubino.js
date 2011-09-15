@@ -2,36 +2,28 @@
 Naubino.Game = class Game
   
   ## get this started 
-  constructor: () ->
-    @settings = Naubino.Settings
-    @foreground = Naubino.foreground
-    @background = Naubino.background
-    @keybindings = Naubino.keybindings
-    @context = @foreground.getContext('2d')
-    @world = new Naubino.World this
-    @graph = new Naubino.Graph
+  constructor: (@world, @graph) ->
+    @world.game = this
 
-    @draw_background (@background.getContext('2d'))
-
-    # TODO Exchangeable display class
+    # display stuff
     @paused = true # changed imidiately after loading by start_timer
     @drawing = true # for debugging
     @focused_naub = null # points to the naub you click on
 
-    @pre_render = @settings.pre_rendering
-    @colors = @settings.colors_output
+    @points = 0
 
     # fragile calibration! don't fuck it up!
-    @fps = 1000 / 40
+    @fps = 1000 / Naubino.Settings.fps
     @dt = @fps/1500
     
-
-
+    # TODO move this to mode
+    @create_some_naubs(12)
+    @start_timer()
 
 
   ### the game gives it the game takes it ###
   create_some_naubs: (n = 3) ->
-    n = 5
+    n = 6
     for [1..n]
       @create_naub_pair()
     for [1..n]
@@ -41,8 +33,11 @@ Naubino.Game = class Game
       naub_a = new Naubino.Naub this
       naub_b = new Naubino.Naub this
 
-      x = Math.random() * @foreground.width
-      y = Math.random() * @foreground.height
+      @world.add_object naub_a
+      @world.add_object naub_b
+
+      x = Math.random() * Naubino.world_canvas.width
+      y = Math.random() * Naubino.world_canvas.height
 
       naub_a.physics.pos.Set x, y
       naub_b.physics.pos.Set x + 30, y + 30
@@ -54,8 +49,13 @@ Naubino.Game = class Game
       naub_b = new Naubino.Naub this
       naub_c = new Naubino.Naub this
 
-      x = Math.random() * @foreground.width
-      y = Math.random() * @foreground.height
+      @world.add_object naub_a
+      @world.add_object naub_b
+      @world.add_object naub_c
+
+
+      x = Math.random() * Naubino.background_canvas.width
+      y = Math.random() * Naubino.background_canvas.height
 
       naub_a.physics.pos.Set x, y
       naub_b.physics.pos.Set x + 30, y + 30
@@ -73,9 +73,9 @@ Naubino.Game = class Game
       setTimeout one_after_another, 50
     one_after_another()
 
+
+
     
-
-
 
   ## tempus fugit
   start_timer: ->
@@ -93,15 +93,11 @@ Naubino.Game = class Game
       else
         @stop_timer()
 
-
-  step: (dt) ->
-    @world.step dt
-
   mainloop: ()=>
-    @step(@dt)
-    @keybindings.step(@dt)
+    @world.step(@dt)
+    #@keybindings.step(@dt) #
     if @drawing
-      @draw_foreground(@context)
+      @world.draw()
 
 
 
@@ -111,7 +107,7 @@ Naubino.Game = class Game
   click: (x, y) ->
     @mousedown = true
     [@world.pointer.x, @world.pointer.y] = [x,y]
-    naub = @get_naub x, y
+    naub = @get_obj x, y
     if naub
       naub.focus()
       @focused_naub = naub
@@ -126,34 +122,8 @@ Naubino.Game = class Game
     if @mousedown
       [@world.pointer.x, @world.pointer.y] = [x,y]
 
-  get_naub: (x, y) ->
+  get_obj: (x, y) ->
     for id, naub of @world.objs
       if naub.isHit(x, y)
         return naub
 
-
-
-
-  ## paint it naubino
-  draw_foreground: (context) ->
-    context.clearRect(0, 0, @foreground.width, @foreground.height)
-    context.save()
-    @world.draw context
-    context.restore()
-
-    #TODO have somebody else do this
-  draw_background: (context) ->
-    width = Naubino.foreground.width
-    height = Naubino.foreground.height
-    centerX = width/2
-    centerY = height/2
-
-    context.clearRect(0, 0, @foreground.width, @foreground.height)
-    context.save()
-    context.arc centerX, centerY, 160, 0, Math.PI*2, false
-
-    context.lineWidth = 5
-    context.strokeStyle = "black"
-    context.stroke()
-    context.restore()
-    

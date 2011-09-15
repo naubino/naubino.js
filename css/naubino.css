@@ -11,9 +11,7 @@ canvas {
     margin:auto;
     display:block;
     border:1px solid gray;
-}
-canvas#foreground_canvas {
-    background-color: rgba(255,255,255,0.7);
+    background-color: rgba(255,255,255,0);
 }
 canvas#background_canvas {
     background-color: #fff;

@@ -1,13 +1,13 @@
-Naubino.NaubBall = class NaubBall extends Naubino.NaubShape
-  constructor: (naub) ->
-    super(naub)
+Naubino.Ball = class Ball extends Naubino.Shape
+  constructor: (@naub) ->
+    super(@naub)
 
   # inherits : 
   #
   #   draw()
   #   pre_render()
   #   render()
-  #   color_to_css()
+  #   color_to_rgba()
   #   random_palette_color()
   #   random_color()
 
@@ -28,24 +28,25 @@ Naubino.NaubBall = class NaubBall extends Naubino.NaubShape
     if @naub.focused
       # gradient
       gradient = ctx.createRadialGradient(offset, offset, size/2, offset, offset, size)
-      gradient.addColorStop 0, @color_to_css(@style.fill, 5)
-      gradient.addColorStop 1, @color_to_css @style.fill
+      gradient.addColorStop 0, @color_to_rgba(@style.fill, 5)
+      gradient.addColorStop 1, @color_to_rgba @style.fill
       ctx.fillStyle = gradient
     else
-      ctx.fillStyle = @color_to_css(@style.fill)
+      ctx.fillStyle = @color_to_rgba(@style.fill)
 
     # shadow
     ctx.shadowColor = "#333"
     ctx.shadowBlur = 3
-    ctx.shadowOffsetX = 2
-    ctx.shadowOffsetY = 2
+    ctx.shadowOffsetX = 1
+    ctx.shadowOffsetY = 1
 
     ctx.fill()
 
-    #ctx.fillStyle = 'white'
-    #ctx.textAlign = 'center'
-    #ctx.font= '10pt Helvetica'
-    #ctx.fillText(@naub.number, offset, offset+5)
+    if Naubino.Settings.show_numbers
+      ctx.fillStyle = 'white'
+      ctx.textAlign = 'center'
+      ctx.font= '10pt Helvetica'
+      ctx.fillText(@naub.number, offset, offset+5)
 
     ctx.closePath()
     ctx.restore()

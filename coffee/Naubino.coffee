@@ -1,6 +1,4 @@
 window.onload = ->
-  window.foreground_canvas = document.getElementById("foreground_canvas")
-  window.background_canvas = document.getElementById("background_canvas")
   window.naubino = Naubino.constructor()
 
 @Naubino = new ->
@@ -8,59 +6,67 @@ window.onload = ->
   require 'lib/underscore/underscore.js'
   require 'lib/signals/signals.min.js'
   require 'lib/b2Vec2.js'
-  require 'js/Game.js'
+  require 'js/Settings.js'
   require 'js/GameModes.js'
   require 'js/Keybindings.js'
   require 'js/Naub.js'
-  require 'js/NaubShape.js'
-  require 'js/NaubBall.js'
+  require 'js/Shape.js'
+  require 'js/Ball.js'
   require 'js/PhysicsModel.js'
+  require 'js/Layer.js'
+  require 'js/Menu.js'
   require 'js/World.js'
+  require 'js/Game.js'
   require 'js/Graph.js'
-  require 'js/Settings.js'
-
-
 
   constructor: () ->
 
-    @foreground = window.foreground_canvas
-    @background = window.background_canvas
+    @overlay_canvas = document.getElementById("overlay_canvas")
+    @world_canvas = document.getElementById("world_canvas")
+    @background_canvas = document.getElementById("background_canvas")
+
     @setup_keybindings()
     @setup_cursorbindings()
+    @colors = @Settings.colors.output
 
-    @game = new @Game(@foreground, @keybindings)
-    @game.create_some_naubs(12)
-    @game.start_timer()
+    @world = new Naubino.World(@world_canvas)
+    @background = new Naubino.Background(@background_canvas)
 
-    @keybindings.enable 32, => @game.pause()
+    @graph = new @Graph()
+    @game = new @Game(@world, @graph)
 
     @mode = new @GameMode(@game)
+    @menu = new @Menu(@overlay_canvas)
 
   setup_keybindings: () ->
     @keybindings = new @KeyBindings()
     window.onkeydown = (key) => @keybindings.keydown(key)
     window.onkeyup = (key) => @keybindings.keyup(key)
+    @keybindings.enable 32, => @game.pause()
 
 
   setup_cursorbindings: () ->
+    # TODO mouse events must go solely through mode
     onmousemove = (e) =>
       #@mode.mousemove.dispatch(e)
-      @game.move_pointer e.pageX - @foreground.offsetLeft, e.pageY - @foreground.offsetTop
+      @menu.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      @game.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmouseup = (e) =>
       #@mode.mouseup.dispatch(e)
-      @game.unfocus e.pageX - @foreground.offsetLeft, e.pageY - @foreground.offsetTop
+      @game.unfocus e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmousedown = (e) =>
       #@mode.mousedown.dispatch(e)
-      @game.click e.pageX - @foreground.offsetLeft, e.pageY - @foreground.offsetTop
+      @menu.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      @game.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
-    @foreground.addEventListener("mousedown", onmousedown, false)
-    @foreground.addEventListener("mouseup", onmouseup, false)
-    @foreground.addEventListener("mousemove", onmousemove, false)
-    @foreground.addEventListener("mouseout", onmouseup, false)
+    @overlay_canvas.addEventListener("mousedown", onmousedown, false)
+    @overlay_canvas.addEventListener("mouseup", onmouseup, false)
+    @overlay_canvas.addEventListener("mousemove", onmousemove, false)
+    @overlay_canvas.addEventListener("mouseout", onmouseup, false)
 
-    @foreground.addEventListener("touchstart", onmousedown, false)
-    @foreground.addEventListener("touchend", onmouseup, false)
-    @foreground.addEventListener("touchmove", onmousemove, false)
+    @overlay_canvas.addEventListener("touchstart", onmousedown, false)
+    @overlay_canvas.addEventListener("touchend", onmouseup, false)
+    @overlay_canvas.addEventListener("touchmove", onmousemove, false)
 

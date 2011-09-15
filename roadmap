@@ -7,7 +7,15 @@
     * menu ( restarting 
   * alternating game modes
 
+# clean up work
+  * replace references with game mode signals
+    * Naub -/-> Game
+  * think about merging Game with Naubino
+  * Redefine World, Game, Naubino
+    
+
 # Known Issues
+  * colorsystem needs rebuilding
   * simplify the drawing chain
   * global object size handling ( keep_distance, spring length and so on)
   * color palettes also handle background and join color

@@ -1,4 +1,4 @@
-Naubino.NaubShape = class NaubShape
+Naubino.Shape = class Shape
 
   constructor: (naub) ->
     @naub = naub
@@ -10,7 +10,7 @@ Naubino.NaubShape = class NaubShape
     @life_rendering = false # if true redraw on each frame
 
   draw: (ctx) ->
-    if @naub.game.pre_render and not @life_rendering
+    if Naubino.Settings.pre_rendering and not @life_rendering
       ctx.save()
       x = @pos.x-@frame
       y = @pos.y-@frame
@@ -55,12 +55,13 @@ Naubino.NaubShape = class NaubShape
     stretch = (kd + fiber) / (l + fiber)
 
     ctx.save()
-    ctx.strokeStyle = @color_to_css @join_style.fill
+    ctx.strokeStyle = @color_to_rgba @join_style.fill
 
     ctx.beginPath()
     ctx.moveTo pos.x, pos.y
     ctx.lineTo pos2.x, pos2.y
     ctx.lineWidth = Math.round (@join_style.width * stretch)
+    ctx.lineCap = "round"
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
@@ -79,12 +80,12 @@ Naubino.NaubShape = class NaubShape
         clearInterval @loop
         callback.call()
 
-    @loop = setInterval shrink, 50
+    @loop = setInterval shrink, 40
 
 
 
   ### utils ###
-  color_to_css: (color,shift = 0) =>
+  color_to_rgba: (color,shift = 0) =>
     r = Math.round((color[0] + shift/10)*255)
     g = Math.round((color[1] + shift/10)*255)
     b = Math.round((color[2] + shift/10)*255)
@@ -93,7 +94,7 @@ Naubino.NaubShape = class NaubShape
 
   ## colors the shape randomly and returns color id for comparison
   random_palette_color: ->
-    palette = @naub.game.colors
+    palette = Naubino.colors
     id = Math.round(Math.random() * (palette.length-1))
     pick = palette[id]
     @style.fill = [pick[0]/255,pick[1]/255,pick[2]/255, 1]# TODO automatically assume 1 if alpha is unset (pick[3])

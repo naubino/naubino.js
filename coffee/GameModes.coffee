@@ -1,8 +1,8 @@
 # https://github.com/millermedeiros/js-signals/wiki/Examples
 Naubino.GameMode = class GameMode
-  constructor: (@game ) ->
-    @graph = @game.graph
-    @world = @game.world
+  constructor: () ->
+    @graph = Naubino.graph
+    @world = Naubino.world
     @Signal = window.signals.Signal
 
     @add_signals()
@@ -23,9 +23,21 @@ Naubino.GameMode = class GameMode
 
     # gameplay
     @naub_replaced = new @Signal()
+    @naub_destroyed = new @Signal()
     @cycle_found = new @Signal()
 
-  add_listeners: ->
-    @naub_replaced.add(@game.graph.cycle_test)
-    @cycle_found.add( (list) => @game.destroy_naubs list )
+    # states
+    @game_paused = new @Signal()
 
+
+  add_listeners: ->
+    @naub_replaced.add(Naubino.graph.cycle_test)
+    @cycle_found.add((list) => Naubino.game.destroy_naubs list)
+    @naub_destroyed.add(()->Naubino.game.points++)
+
+
+  enter_state: =>
+  leave_state: =>
+  change_state: (next_state) ->
+    @leave_state()
+    next_state.enter_state()

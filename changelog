@@ -1,8 +1,2 @@
-Destruction seldom looked so beautyful
+Major architectural changes
 
-	* added: separate foreground and background canvas
-	* added: roadmap 
-	* fixed: destroyed naubs now take over painting their joins for animation
-	* fixed: framerate
-	* fixed: glow effect
-	* fixed: pull naubs out of canvas crash - nomore rampaging naubs

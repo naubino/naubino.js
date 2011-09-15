@@ -1,15 +1,13 @@
 Naubino.Naub = class Naub
-  constructor: (@game) ->
-    @physics = new Naubino.PhysicsModel
-    @shape = new Naubino.NaubBall this
+  constructor: () ->
+    @physics = new Naubino.PhysicsModel this
+    @shape = new Naubino.Ball this
+    @center = new b2Vec2 0, 0
 
     @color_id = @shape.random_palette_color()
 
     @removed = false
     @focused = false
-
-    @world = @game.world
-    @world.add_object this
 
     @joins = {} # {id: opposing naub}
     @drawing_join = {} # {id: true/false if this naub draws the join}
@@ -37,7 +35,7 @@ Naubino.Naub = class Naub
     @removed = true
     for id, naub of @joins
       delete naub.joins[id]
-      @game.graph.remove_join id
+      Naubino.graph.remove_join id
 
   destroy: ->
     for id, partner of @joins
@@ -45,12 +43,13 @@ Naubino.Naub = class Naub
       partner.drawing_join[id] = false
     @destroying = true
     @shape.destroy(@remove)
+    Naubino.mode.naub_destroyed.dispatch(@number)
 
   ### do things a naub is supposed to do ###
   join_with: (other) ->
     # Check if already joined
     # check for cycle
-    join = @game.graph.add_join this, other
+    join = Naubino.graph.add_join this, other
     @joins[join] = other
     @drawing_join[join] = true
     other.joins[join] = this
@@ -58,12 +57,12 @@ Naubino.Naub = class Naub
 
   
   replace_with: (other) ->
-    for id, naub of @joins
+    remove_joins = for id, naub of @joins
       other.join_with(naub)
       delete naub.joins[id]
-      @game.graph.remove_join id
+      Naubino.graph.remove_join id
+      Naubino.game.unfocus
     @remove()
-    @game.unfocus()
     Naubino.mode.naub_replaced.dispatch()
     return 42
 

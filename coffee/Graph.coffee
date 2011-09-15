@@ -46,7 +46,7 @@ Naubino.Graph = class Graph
 
 
 
-  cycle_test: =>
+  cycle_test: (first) =>
     cycles = []
 
     @dfs_map = []
@@ -71,17 +71,17 @@ Naubino.Graph = class Graph
         cycles = _.union(cycles, @dfs(partner,naub))
 
       if @dfs_map[partner].color == 1
-        list=  @cycle_list(naub,partner)
-        Naubino.mode.cycle_found.dispatch(list)
+        list =  @cycle_list(naub,partner)
+        if list.length > 0
+          Naubino.mode.cycle_found.dispatch(list)
     @dfs_map[naub].color = 2
     return cycles
 
   cycle_list: (v,w) ->
-    cycle = []
-    for inaub, {naub, dfs_num, color} of @dfs_map
-      if (dfs_num >= @dfs_map[w].dfs_num  && color == 1)
-        cycle.push naub
-    return cycle
+    cycle = _.select(@dfs_map, ({dfs_num, color})=> (dfs_num >= @dfs_map[w].dfs_num  && color == 1) )
+    cycle.sort( (a,b) -> a.dfs_num - b.dfs_num)
+    cycle_naubs = _.pluck(cycle, 'naub')
+    return cycle_naubs
 
 
 
