@@ -35,10 +35,10 @@ Naubino.Ball = class Ball extends Naubino.Shape
       ctx.fillStyle = @color_to_rgba(@style.fill)
 
     # shadow
-    ctx.shadowColor = "#333"
-    ctx.shadowBlur = 3
-    ctx.shadowOffsetX = 1
-    ctx.shadowOffsetY = 1
+    #ctx.shadowColor = "#333"
+    #ctx.shadowBlur = 3
+    #ctx.shadowOffsetX = 1
+    #ctx.shadowOffsetY = 1
 
     ctx.fill()
 

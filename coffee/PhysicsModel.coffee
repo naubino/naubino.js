@@ -18,11 +18,11 @@
       @force.Multiply 1/(@friction*@mass)
       @vel.Set 0, 0
 
-  gravitate: ->
+  gravitate:(center = @naub.center) ->
     unless  @naub.focused
       # TODO make gravity stronger the close it gets
       if Naubino.Settings.gravity # debug hook
-        v = @naub.center.Copy()
+        v = center.Copy()
         v.Subtract(@pos)
         v.Normalize()
         v.Multiply(20*@mass)

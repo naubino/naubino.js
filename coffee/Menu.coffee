@@ -2,14 +2,16 @@ Naubino.Menu = class Menu extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
     @canvas = Naubino.background
+    @position = new b2Vec2(20,25)
     @buttons = {}
     @pointer
     @paused = true
     @pointer = @center
+    @hovering = false
 
     # fragile calibration! don't fuck it up!
     @fps = 1000 / 10
-    @dt = @fps/1500
+    @dt = @fps/500
     
     @add_buttons()
     @pause()
@@ -30,17 +32,37 @@ Naubino.Menu = class Menu extends Naubino.Layer
     else
       @stop_timer()
 
+
+  add_buttons: ->
+
+    @buttons.main = new Naubino.Naub()
+    @buttons.main.draw = @draw_main_button
+    @buttons.main.physics.pos.Set(@position.x, @position.y)
+    @buttons.main.center = @position.Copy()
+
+    @buttons.play = new Naubino.Naub()
+    @buttons.play.physics.pos.Set(70,30)
+    @buttons.play.center.Set(70,30)
+    @buttons.play.focus = -> console.log "pressed play"
+
+    @buttons.main.join_with(@buttons.play)
+
   mainloop: ()=>
     @draw()
     @draw_listener_region()
+    @step()
 
   step: ->
     for name, naub of @buttons
       naub.step (@dt)
+      if @hovering
+        naub.physics.gravitate()
+      else
+        naub.physics.gravitate(@position)
 
 
   draw_main_button: (ctx) ->
-    cube_size = 75
+    cube_size = 80
 
     ctx.save()
     ctx.translate(@physics.pos.x, @physics.pos.y)
@@ -63,32 +85,23 @@ Naubino.Menu = class Menu extends Naubino.Layer
   draw_listener_region: ->
     @ctx.save()
     @ctx.beginPath()
-    @ctx.arc 0, 0, 100, 0, Math.PI*2, true
-    @ctx.lineWidth = 1
-    @ctx.strokeStyle = "grey"
+    @ctx.arc 0, 0, 85, 0, Math.PI*2, true
+    if @ctx.isPointInPath(@pointer.x,@pointer.y)
+      unless @hovering
+        @hovering =  true
+    else if @hovering
+      @hovering = false
     @ctx.stroke()
-    #if @ctx.isPointInPath(@pointer.x,@pointer.y)
     @ctx.closePath()
     @ctx.restore()
 
-  add_buttons: ->
-
-    @buttons.main = new Naubino.Naub()
-    @buttons.main.draw = @draw_main_button
-    @buttons.main.physics.pos.Set(20,25)
-
-    @buttons.play = new Naubino.Naub()
-    @buttons.play.physics.pos.Set(70,30)
-    @buttons.play.focus = -> console.log "pressed play"
-
-    @buttons.main.join_with(@buttons.play)
 
   draw: ->
     @ctx.clearRect(0, 0, Naubino.world_canvas.width, Naubino.world_canvas.height)
     @ctx.save()
     @buttons.main.draw_joins(@ctx)
-    @buttons.main.draw(@ctx)
     @buttons.play.draw(@ctx)
+    @buttons.main.draw(@ctx)
     @ctx.restore()
 
   ## can I touch this?
