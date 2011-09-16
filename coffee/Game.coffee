@@ -1,9 +1,9 @@
 # controlls everything that has to do with logic and gameplay or menus
-Naubino.Game = class Game
+Naubino.Game = class Game extends Naubino.Layer
   
   ## get this started 
-  constructor: (@world, @graph) ->
-    @world.game = this
+  constructor: (canvas, @graph) ->
+    super(canvas)
 
     # display stuff
     @paused = true # changed imidiately after loading by start_timer
@@ -12,9 +12,6 @@ Naubino.Game = class Game
 
     @points = 0
 
-    # fragile calibration! don't fuck it up!
-    @fps = 1000 / Naubino.Settings.fps
-    @dt = @fps/1500
     
     # TODO move this to mode
     @create_some_naubs(12)
@@ -33,8 +30,8 @@ Naubino.Game = class Game
       naub_a = new Naubino.Naub this
       naub_b = new Naubino.Naub this
 
-      @world.add_object naub_a
-      @world.add_object naub_b
+      @add_object naub_a
+      @add_object naub_b
 
       x = Math.random() * Naubino.world_canvas.width
       y = Math.random() * Naubino.world_canvas.height
@@ -49,9 +46,9 @@ Naubino.Game = class Game
       naub_b = new Naubino.Naub this
       naub_c = new Naubino.Naub this
 
-      @world.add_object naub_a
-      @world.add_object naub_b
-      @world.add_object naub_c
+      @add_object naub_a
+      @add_object naub_b
+      @add_object naub_c
 
 
       x = Math.random() * Naubino.background_canvas.width
@@ -68,7 +65,7 @@ Naubino.Game = class Game
     i = 0
     one_after_another= =>
       if i < list.length
-        @world.get_object(list[i]).destroy()
+        @get_object(list[i]).destroy()
         i++
       setTimeout one_after_another, 50
     one_after_another()
@@ -77,53 +74,115 @@ Naubino.Game = class Game
 
     
 
-  ## tempus fugit
-  start_timer: ->
-    if @paused
-      @loop = setInterval(@mainloop, @fps )
-      @paused = false
+  ## here used to be tempus fugit
 
-  stop_timer: ->
-    clearInterval @loop
-    @paused = true
+
+
+
+
+  # controlls everything that happens inside the field
   
-  pause: ->
-      if @paused
-        @start_timer()
-      else
-        @stop_timer()
+    
+  draw:  ->
+    @ctx.clearRect(0, 0, Naubino.world_canvas.width, Naubino.world_canvas.height)
+    @ctx.save()
+    for id, obj of @objs
+      obj.draw_joins @ctx
 
-  mainloop: ()=>
-    @world.step(@dt)
-    #@keybindings.step(@dt) #
-    if @drawing
-      @world.draw()
-
-
+    for id, obj of @objs
+      obj.draw @ctx
+    @ctx.restore()
+      
 
 
 
-  ## can I touch this?
-  click: (x, y) ->
-    @mousedown = true
-    [@world.pointer.x, @world.pointer.y] = [x,y]
-    naub = @get_obj x, y
-    if naub
-      naub.focus()
-      @focused_naub = naub
+  # work and have everybody else do their work as well
+  step: (dt) ->
+    # physics
+    @naub_forces dt
+    
+    # check for joinings
+    if @mousedown && @focused_naub
+      @focused_naub.physics.follow @pointer.Copy()
+      for id, obj of  @objs
+        @focused_naub.check_joining obj if @focused_naub
 
-  unfocus: ->
-    @mousedown = false
-    if @focused_naub
-      @focused_naub.unfocus()
-    @focused_naub = null
+    # delete objects
+    for id, obj of @objs
+      if obj.removed
+        @remove_obj id
+        return 42 # TODO found out if there is a way to have a void function?
 
-  move_pointer: (x,y) ->
-    if @mousedown
-      [@world.pointer.x, @world.pointer.y] = [x,y]
 
-  get_obj: (x, y) ->
-    for id, naub of @world.objs
-      if naub.isHit(x, y)
-        return naub
+
+
+  naub_forces: (dt) ->
+    for id, naub of @objs
+
+      # everything moves toward the middle
+      naub.physics.gravitate()
+
+      # joined naubs have spring forces 
+      for id, other of naub.joins
+        @join_springs naub, other
+      
+      # collide
+      for [0..3]
+        for id, other of @objs
+          @collide naub, other
+      
+      # use all previously calculated forces and actually move the damn thing 
+      naub.step(dt)
+
+
+
+  ### collide(), gravitate(), join_springs ###
+
+  # keep naubs from overlapping
+  collide: (naub, other) ->
+    if (naub.number != other.number)
+      { pos, vel, force } = naub.physics
+      { pos: opos, vel: ovel, force: oforce } = other.physics
+
+      diff = opos.Copy()
+      diff.Subtract(pos)
+      l = diff.Length()
+
+      if naub.number < other.number &&  l < 35  # TODO replace with obj size
+        v = diff.Copy()
+        v.Normalize()
+        v.Multiply(35 - l)
+        v.Multiply(0.6)
+        pos.Subtract(v)
+        opos.Add(v)
+        force.Subtract(v)
+        oforce.Add(v)
+
+
+      
+  # spring force between joined naubs
+  join_springs: (naub, other) ->
+    # XXX causes slight rotation when crossing to pairs
+    { pos, vel, force, keep_distance } = naub.physics
+    { pos: opos, vel: ovel, force: oforce } = other.physics
+
+    diff = opos.Copy()
+    diff.Subtract(pos)
+    l = diff.Length()
+    v = diff.Copy()
+
+    v.Normalize()
+    v.Multiply( -1/100 * naub.physics.spring_force * l * l * l)
+    force.Subtract(v)
+    oforce.Add(v)
+
+    if (l < keep_distance) # TODO replace with obj size
+      v = diff.Copy()
+      v.Normalize()
+      v.Multiply(keep_distance - l)
+      v.Multiply(0.3)
+      vel.Subtract(v)
+      ovel.Add(v)
+      force.Subtract(v)
+      oforce.Add(v)
 

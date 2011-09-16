@@ -15,7 +15,6 @@ window.onload = ->
   require 'js/PhysicsModel.js'
   require 'js/Layer.js'
   require 'js/Menu.js'
-  require 'js/World.js'
   require 'js/Game.js'
   require 'js/Graph.js'
 
@@ -29,11 +28,10 @@ window.onload = ->
     @setup_cursorbindings()
     @colors = @Settings.colors.output
 
-    @world = new Naubino.World(@world_canvas)
     @background = new Naubino.Background(@background_canvas)
 
     @graph = new @Graph()
-    @game = new @Game(@world, @graph)
+    @game = new @Game(@world_canvas, @graph)
 
     @mode = new @GameMode(@game)
     @menu = new @Menu(@overlay_canvas)
