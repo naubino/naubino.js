@@ -1,10 +1,10 @@
 Naubino.Naub = class Naub
-  constructor: () ->
+  constructor: (@game) ->
     @physics = new Naubino.PhysicsModel this
     @shape = new Naubino.Ball this
-    @center = new b2Vec2 0, 0
 
     @color_id = @shape.random_palette_color()
+    @physics.attracted_to = @game.center.Copy() # gravity center
 
     @removed = false
     @focused = false

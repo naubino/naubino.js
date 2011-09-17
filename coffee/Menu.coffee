@@ -13,8 +13,8 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @fps = 1000 / 10
     @dt = @fps/500
     
-    @add_buttons()
-    @pause()
+    #@add_buttons()
+    #@pause()
 
   ## tempus fugit
   start_timer: ->
@@ -38,11 +38,11 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @buttons.main = new Naubino.Naub()
     @buttons.main.draw = @draw_main_button
     @buttons.main.physics.pos.Set(@position.x, @position.y)
-    @buttons.main.center = @position.Copy()
+    @buttons.main.physics.attracted_to= @position.Copy()
 
     @buttons.play = new Naubino.Naub()
     @buttons.play.physics.pos.Set(70,30)
-    @buttons.play.center.Set(70,30)
+    @buttons.play.physics.attracted_to.Set(70,30)
     @buttons.play.focus = -> console.log "pressed play"
 
     @buttons.main.join_with(@buttons.play)
@@ -55,10 +55,10 @@ Naubino.Menu = class Menu extends Naubino.Layer
   step: ->
     for name, naub of @buttons
       naub.step (@dt)
-      if @hovering
-        naub.physics.gravitate()
-      else
-        naub.physics.gravitate(@position)
+      #if @hovering
+      #  naub.physics.follow()
+      #else
+      #  naub.physics.gravitate(@position)
 
 
   draw_main_button: (ctx) ->

@@ -34,6 +34,8 @@ window.onload = ->
     @game = new @Game(@world_canvas, @graph)
 
     @mode = new @GameMode(@game)
+    #TODO move this line to mode.init()
+    @game.create_some_naubs(6)
     @menu = new @Menu(@overlay_canvas)
 
   setup_keybindings: () ->

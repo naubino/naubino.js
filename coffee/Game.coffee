@@ -14,13 +14,11 @@ Naubino.Game = class Game extends Naubino.Layer
 
     
     # TODO move this to mode
-    @create_some_naubs(12)
     @start_timer()
 
 
   ### the game gives it the game takes it ###
   create_some_naubs: (n = 3) ->
-    n = 6
     for [1..n]
       @create_naub_pair()
     for [1..n]
@@ -74,11 +72,6 @@ Naubino.Game = class Game extends Naubino.Layer
 
     
 
-  ## here used to be tempus fugit
-
-
-
-
 
   # controlls everything that happens inside the field
   
@@ -124,65 +117,18 @@ Naubino.Game = class Game extends Naubino.Layer
 
       # joined naubs have spring forces 
       for id, other of naub.joins
-        @join_springs naub, other
+        naub.physics.join_springs other
       
       # collide
       for [0..3]
         for id, other of @objs
-          @collide naub, other
+          naub.physics.collide other
       
       # use all previously calculated forces and actually move the damn thing 
       naub.step(dt)
 
 
 
-  ### collide(), gravitate(), join_springs ###
-
-  # keep naubs from overlapping
-  collide: (naub, other) ->
-    if (naub.number != other.number)
-      { pos, vel, force } = naub.physics
-      { pos: opos, vel: ovel, force: oforce } = other.physics
-
-      diff = opos.Copy()
-      diff.Subtract(pos)
-      l = diff.Length()
-
-      if naub.number < other.number &&  l < 35  # TODO replace with obj size
-        v = diff.Copy()
-        v.Normalize()
-        v.Multiply(35 - l)
-        v.Multiply(0.6)
-        pos.Subtract(v)
-        opos.Add(v)
-        force.Subtract(v)
-        oforce.Add(v)
 
 
       
-  # spring force between joined naubs
-  join_springs: (naub, other) ->
-    # XXX causes slight rotation when crossing to pairs
-    { pos, vel, force, keep_distance } = naub.physics
-    { pos: opos, vel: ovel, force: oforce } = other.physics
-
-    diff = opos.Copy()
-    diff.Subtract(pos)
-    l = diff.Length()
-    v = diff.Copy()
-
-    v.Normalize()
-    v.Multiply( -1/100 * naub.physics.spring_force * l * l * l)
-    force.Subtract(v)
-    oforce.Add(v)
-
-    if (l < keep_distance) # TODO replace with obj size
-      v = diff.Copy()
-      v.Normalize()
-      v.Multiply(keep_distance - l)
-      v.Multiply(0.3)
-      vel.Subtract(v)
-      ovel.Add(v)
-      force.Subtract(v)
-      oforce.Add(v)
-

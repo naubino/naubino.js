@@ -3,7 +3,7 @@ Naubino.Settings = {
 
   pre_rendering: on
   gravity : on
-  fps: 30
+  fps: 20
   show_numbers: off
   colors:
     output: [
