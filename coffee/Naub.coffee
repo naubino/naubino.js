@@ -1,5 +1,6 @@
 Naubino.Naub = class Naub
   constructor: (@game) ->
+    @size = 14
     @physics = new Naubino.PhysicsModel this
     @shape = new Naubino.Ball this
 

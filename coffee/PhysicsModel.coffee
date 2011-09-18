@@ -6,8 +6,8 @@
     @radius = @naub.size
     @attracted_to = new b2Vec2 0, 0 # gravity center
 
-    @mass = 0.3
-    @friction = @default_friction = 4.0
+    @mass = 0.2
+    @friction = @default_friction = 2.0
     @spring_force = 0.03
     @keep_distance = @radius*2 + 10
  
@@ -19,7 +19,7 @@
     @apply_friction()
 
   gravitate: (to = @attracted_to) ->
-    unless  @naub.focused
+    unless  @naub.focused or not Naubino.Settings.gravity
       diff = to.Copy()
       diff.Subtract(@pos)
       diff.Multiply(@mass)

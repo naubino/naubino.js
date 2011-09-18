@@ -3,7 +3,7 @@ Naubino.Shape = class Shape
   constructor: (naub) ->
     @naub = naub
     @pos = naub.physics.pos
-    @size = 14
+    @size = @naub.size
     @frame = @size+5
     @style = { fill: [0,0,0,1] }
     @join_style = { fill: [0,0,0,1], width: 6 }
@@ -43,15 +43,15 @@ Naubino.Shape = class Shape
 
   ## actual painting routines
   draw_join: (ctx, partner) ->
-    pos = @pos
+    pos = @naub.physics.pos
     pos2 = partner.physics.pos
 
     # joins getting thinner by stretching
     diff = pos2.Copy()
     diff.Subtract(pos)
-    kd = @naub.physics.keep_distance
     l = diff.Length()
-    fiber = 30 # strength of join material ( the higher the less a join will be affected by stretching )
+    kd = @naub.physics.keep_distance
+    fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
     stretch = (kd + fiber) / (l + fiber)
 
     ctx.save()
@@ -60,7 +60,7 @@ Naubino.Shape = class Shape
     ctx.beginPath()
     ctx.moveTo pos.x, pos.y
     ctx.lineTo pos2.x, pos2.y
-    ctx.lineWidth = Math.round (@join_style.width * stretch)
+    ctx.lineWidth =  (@join_style.width * stretch)
     ctx.lineCap = "round"
     ctx.stroke()
     ctx.closePath()
