@@ -76,11 +76,12 @@ Naubino.Shape = class Shape
       @size *= 0.6
       @join_style.width *= 0.6
       @join_style.fill[3] *= 0.6
+      @style.fill[3] *= 0.6
       if @size <= 0.1
         clearInterval @loop
         callback.call()
 
-    @loop = setInterval shrink, 40
+    @loop = setInterval shrink, 400
 
 
 

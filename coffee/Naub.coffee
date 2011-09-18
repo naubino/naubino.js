@@ -89,32 +89,42 @@ Naubino.Naub = class Naub
     @joins
 
   check_joining: (other) ->
-    { pos, vel, force } = @physics
-    { pos: opos, vel: ovel, force: oforce } = other.physics
-
-    diff = opos.Copy()
-    diff.Subtract(pos)
-    l = diff.Length()
-
     unless @number == other.number
-      if l < @shape.size + 10
+      console.log "checking #{@number}(#{@color_id}) and #{other.number}(#{other.color_id})"
+      far_enough = true
+      naub_partners = for id, partner of @joins
+        partner.number
 
-        far_enough = true
-        naub_partners = for id, partner of @joins
-          partner.number
+      for id, partner of other.joins
+        if partner.number in naub_partners
+          far_enough = false
 
-        for id, partner of other.joins
-          if partner.number in naub_partners
-            far_enough = false
+      unjoined = not @is_joined_with other
+      alone = _.keys(@joins).length == 0  or  _.keys(other.joins).length == 0
+      same_color = @color_id == other.color_id
 
-        unjoined = not @is_joined_with other
-        alone = _.keys(@joins).length == 0  or  _.keys(other.joins).length == 0
-        same_color = @color_id == other.color_id
+      if not @disabled && unjoined && same_color && far_enough && not alone
+        @replace_with other
+        true
+      else if alone and not (other.disabled or @disabled)
+        @join_with other
+        true
+      else
+        false
+    else
+      false
+          
+  distance_to: (other) ->
+    unless other.number == @number
+      { pos, vel, force } = @physics
+      { pos: opos, vel: ovel, force: oforce } = other.physics
 
-        if not @disabled && unjoined && same_color && far_enough && not alone
-          @replace_with other
-        else if alone and not (other.disabled or @disabled)
-          @join_with other
+      diff = opos.Copy()
+      diff.Subtract(pos)
+      l = diff.Length()
+    else
+      NaN
+
 
   partners: ->
     _.values @joins

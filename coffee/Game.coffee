@@ -73,7 +73,7 @@ Naubino.Game = class Game extends Naubino.Layer
       if i < list.length
         @get_object(list[i]).destroy()
         i++
-      setTimeout one_after_another, 50
+      setTimeout one_after_another, 40
     one_after_another()
 
 
@@ -105,8 +105,10 @@ Naubino.Game = class Game extends Naubino.Layer
     # check for joinings
     if @mousedown && @focused_naub
       @focused_naub.physics.follow @pointer.Copy()
-      for id, obj of  @objs
-        @focused_naub.check_joining obj if @focused_naub
+      for id, other of  @objs
+        if (@focused_naub.distance_to other) < @focused_naub.size + 10
+          @focused_naub.check_joining(other)
+          break
 
     # delete objects
     for id, obj of @objs
