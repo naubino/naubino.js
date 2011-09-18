@@ -106,7 +106,7 @@ Naubino.Game = class Game extends Naubino.Layer
     if @mousedown && @focused_naub
       @focused_naub.physics.follow @pointer.Copy()
       for id, other of  @objs
-        if (@focused_naub.distance_to other) < @focused_naub.size + 10
+        if (@focused_naub.distance_to other) < @focused_naub.size
           @focused_naub.check_joining(other)
           break
 

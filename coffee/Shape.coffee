@@ -82,7 +82,7 @@ Naubino.Shape = class Shape
         clearInterval @loop
         callback.call()
 
-    @loop = setInterval shrink, 400
+    @loop = setInterval shrink, 40
 
 
 
