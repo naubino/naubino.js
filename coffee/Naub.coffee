@@ -1,11 +1,11 @@
 Naubino.Naub = class Naub
-  constructor: (@game) ->
+  constructor: (@layer) ->
     @size = 14
     @physics = new Naubino.PhysicsModel this
     @shape = new Naubino.Ball this
 
     @color_id = @shape.random_palette_color()
-    @physics.attracted_to = @game.center.Copy() # gravity center
+    @physics.attracted_to = @layer.center.Copy() # gravity center
 
     @removed = false # soon to be deleted by game
     @focused = false # currently activated by pointer
@@ -68,7 +68,7 @@ Naubino.Naub = class Naub
       other.join_with(naub)
       delete naub.joins[id]
       Naubino.graph.remove_join id
-      Naubino.game.unfocus
+      @layer.unfocus
     @remove()
     Naubino.mode.naub_replaced.dispatch()
     return 42
@@ -90,7 +90,7 @@ Naubino.Naub = class Naub
 
   check_joining: (other) ->
     unless @number == other.number
-      console.log "checking #{@number}(#{@color_id}) and #{other.number}(#{other.color_id})"
+      #console.log "checking #{@number}(#{@color_id}) and #{other.number}(#{other.color_id})"
       far_enough = true
       naub_partners = for id, partner of @joins
         partner.number

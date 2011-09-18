@@ -53,6 +53,7 @@ Naubino.Shape = class Shape
     kd = @naub.physics.keep_distance
     fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
     stretch = (kd + fiber) / (l + fiber)
+    #@join_style.fill[3] = stretch
 
     ctx.save()
     ctx.strokeStyle = @color_to_rgba @join_style.fill

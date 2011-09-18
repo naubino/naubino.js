@@ -8,13 +8,14 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @paused = true
     @pointer = @center
     @hovering = false
+    @listener_size = @default_listener_size = 45
 
     # fragile calibration! don't fuck it up!
-    @fps = 1000 / 10
-    @dt = @fps/500
+    @fps = 1000 / 20
+    @dt = @fps/100
     
-    #@add_buttons()
-    #@pause()
+    @add_buttons()
+    @pause()
 
   ## tempus fugit
   start_timer: ->
@@ -35,17 +36,23 @@ Naubino.Menu = class Menu extends Naubino.Layer
 
   add_buttons: ->
 
-    @buttons.main = new Naubino.Naub()
+    @buttons.main = new Naubino.Naub(this)
     @buttons.main.draw = @draw_main_button
     @buttons.main.physics.pos.Set(@position.x, @position.y)
     @buttons.main.physics.attracted_to= @position.Copy()
 
-    @buttons.play = new Naubino.Naub()
+    @buttons.play = new Naubino.Naub(this)
     @buttons.play.physics.pos.Set(70,30)
     @buttons.play.physics.attracted_to.Set(70,30)
-    @buttons.play.focus = -> console.log "pressed play"
+    @buttons.play.focus = -> Naubino.game.pause()
+
+    @buttons.restart = new Naubino.Naub(this)
+    @buttons.restart.physics.pos.Set(55,65)
+    @buttons.restart.physics.attracted_to.Set(55,65)
+    @buttons.restart.focus = -> console.log "restarting"
 
     @buttons.main.join_with(@buttons.play)
+    @buttons.main.join_with(@buttons.restart)
 
   mainloop: ()=>
     @draw()
@@ -55,10 +62,10 @@ Naubino.Menu = class Menu extends Naubino.Layer
   step: ->
     for name, naub of @buttons
       naub.step (@dt)
-      #if @hovering
-      #  naub.physics.follow()
-      #else
-      #  naub.physics.gravitate(@position)
+      if @hovering
+        naub.physics.gravitate()
+      else
+        naub.physics.gravitate(@position)
 
 
   draw_main_button: (ctx) ->
@@ -85,13 +92,15 @@ Naubino.Menu = class Menu extends Naubino.Layer
   draw_listener_region: ->
     @ctx.save()
     @ctx.beginPath()
-    @ctx.arc 0, 0, 85, 0, Math.PI*2, true
+    @ctx.arc 0, 15, @listener_size, 0, Math.PI*2, true
     if @ctx.isPointInPath(@pointer.x,@pointer.y)
       unless @hovering
         @hovering =  true
+        @listener_size = 90
     else if @hovering
       @hovering = false
-    @ctx.stroke()
+      @listener_size = @default_listener_size
+    #@ctx.stroke()
     @ctx.closePath()
     @ctx.restore()
 
@@ -101,6 +110,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @ctx.save()
     @buttons.main.draw_joins(@ctx)
     @buttons.play.draw(@ctx)
+    @buttons.restart.draw(@ctx)
     @buttons.main.draw(@ctx)
     @ctx.restore()
 

@@ -31,7 +31,7 @@
   apply_friction: ->
     @force.Multiply(0.4)
 
-  follow: (v = @naub.center) -> # except when you are held by the pointer
+  follow: (v = @attracted_to) -> # except when you are held by the pointer
       pl = v.Copy()
       pl.Subtract(@pos)
       pl = pl.Length()
