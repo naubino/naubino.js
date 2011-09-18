@@ -32,7 +32,12 @@ Naubino.GameMode = class GameMode
 
   add_listeners: ->
     @naub_replaced.add(Naubino.graph.cycle_test)
-    @cycle_found.add((list) => Naubino.game.destroy_naubs list)
+    @cycle_found.add(
+      (list) =>
+        console.log list
+        Naubino.game.destroy_naubs list
+        #Naubino.game.pause()
+    )
     @naub_destroyed.add(()->Naubino.game.points++)
 
 

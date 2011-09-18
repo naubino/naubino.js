@@ -4,7 +4,7 @@ Naubino.Settings = {
   pre_rendering: on
   gravity : on
   fps: 20
-  show_numbers: off
+  show_numbers: on
   colors:
     output: [
       [229,  53,  23, 1] # "red"

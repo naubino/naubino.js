@@ -86,9 +86,9 @@ Naubino.Shape = class Shape
 
   ### utils ###
   color_to_rgba: (color,shift = 0) =>
-    r = Math.round((color[0] + shift/10)*255)
-    g = Math.round((color[1] + shift/10)*255)
-    b = Math.round((color[2] + shift/10)*255)
+    r = Math.round((color[0] + shift/10))
+    g = Math.round((color[1] + shift/10))
+    b = Math.round((color[2] + shift/10))
     a = color[3]
     "rgba(#{r},#{g},#{b},#{a})"
 
@@ -97,7 +97,7 @@ Naubino.Shape = class Shape
     palette = Naubino.colors
     id = Math.round(Math.random() * (palette.length-1))
     pick = palette[id]
-    @style.fill = [pick[0]/255,pick[1]/255,pick[2]/255, 1]# TODO automatically assume 1 if alpha is unset (pick[3])
+    @style.fill = [pick[0],pick[1],pick[2], 1]# TODO automatically assume 1 if alpha is unset (pick[3])
     id
     
   ## colors the shape randomly and returns color id for comparison

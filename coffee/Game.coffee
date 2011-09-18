@@ -30,6 +30,8 @@ Naubino.Game = class Game extends Naubino.Layer
 
       @add_object naub_a
       @add_object naub_b
+      naub_a.shape.pre_render() # again just to get the numbers
+      naub_b.shape.pre_render() # again just to get the numbers
 
       x = Math.random() * Naubino.world_canvas.width
       y = Math.random() * Naubino.world_canvas.height
@@ -47,6 +49,9 @@ Naubino.Game = class Game extends Naubino.Layer
       @add_object naub_a
       @add_object naub_b
       @add_object naub_c
+      naub_a.shape.pre_render() # again just to get the numbers
+      naub_b.shape.pre_render() # again just to get the numbers
+      naub_c.shape.pre_render() # again just to get the numbers
 
 
       x = Math.random() * Naubino.background_canvas.width
@@ -60,6 +65,9 @@ Naubino.Game = class Game extends Naubino.Layer
       naub_b.join_with naub_c
 
   destroy_naubs: (list)->
+    for naub in list
+      @get_object(naub).disable()
+
     i = 0
     one_after_another= =>
       if i < list.length

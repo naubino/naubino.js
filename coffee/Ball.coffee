@@ -45,7 +45,7 @@ Naubino.Ball = class Ball extends Naubino.Shape
     if Naubino.Settings.show_numbers
       ctx.fillStyle = 'white'
       ctx.textAlign = 'center'
-      ctx.font= '10pt Helvetica'
+      ctx.font= "#{@size}px Helvetica"
       ctx.fillText(@naub.number, offset, offset+5)
 
     ctx.closePath()

@@ -7,8 +7,9 @@ Naubino.Naub = class Naub
     @color_id = @shape.random_palette_color()
     @physics.attracted_to = @game.center.Copy() # gravity center
 
-    @removed = false
-    @focused = false
+    @removed = false # soon to be deleted by game
+    @focused = false # currently activated by pointer
+    @disabled = false # cannot join with another
 
     @joins = {} # {id: opposing naub}
     @drawing_join = {} # {id: true/false if this naub draws the join}
@@ -32,6 +33,11 @@ Naubino.Naub = class Naub
   step: (dt) =>
     @physics.step dt
     
+  disable: ->
+    @disabled = true
+    @shape.style.fill = [100,100,100,1]
+    @shape.pre_render()
+
   remove: =>
     @removed = true
     for id, naub of @joins
@@ -105,9 +111,9 @@ Naubino.Naub = class Naub
         alone = _.keys(@joins).length == 0  or  _.keys(other.joins).length == 0
         same_color = @color_id == other.color_id
 
-        if unjoined && same_color && far_enough && not alone
+        if not @disabled && unjoined && same_color && far_enough && not alone
           @replace_with other
-        else if alone
+        else if alone and not (other.disabled or @disabled)
           @join_with other
 
   partners: ->
@@ -118,7 +124,7 @@ Naubino.Naub = class Naub
   focus: ->
     @focused = true
     @shape.pre_render()
-    @physics.friction = 9
+    @physics.friction = 10
 
   unfocus: ->
     @focused = false
