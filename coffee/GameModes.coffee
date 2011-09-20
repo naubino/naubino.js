@@ -1,13 +1,12 @@
 # https://github.com/millermedeiros/js-signals/wiki/Examples
-Naubino.GameMode = class GameMode
-  constructor: () ->
+Naubino.State = class State
+  constructor: ->
     @graph = Naubino.graph
     @world = Naubino.world
     @Signal = window.signals.Signal
 
     @add_signals()
     @add_listeners()
-
 
   add_signals: ->
     
@@ -27,8 +26,21 @@ Naubino.GameMode = class GameMode
     @cycle_found = new @Signal()
 
     # states
+    @game_started = new @Signal()
     @game_paused = new @Signal()
+    @game_ended = new @Signal()
+    @game_levelup = new @Signal()
 
+  enter_state: =>
+  leave_state: =>
+  change_state: (next_state) ->
+    @leave_state()
+    next_state.enter_state()
+
+Naubino.Playing = class PlayingState extends Naubino.State
+  constructor: ->
+    super()
+    
 
   add_listeners: ->
     @naub_replaced.add(Naubino.graph.cycle_test)
@@ -41,8 +53,14 @@ Naubino.GameMode = class GameMode
     @naub_destroyed.add(()->Naubino.game.points++)
 
 
-  enter_state: =>
-  leave_state: =>
-  change_state: (next_state) ->
-    @leave_state()
-    next_state.enter_state()
+Naubino.StateMachine = StateMachine.create {
+  initial: 'menu'
+  events: [
+    {name: 'play', from: 'menu', to 'game'}
+    {name: 'pause', from: 'game', to 'paused'}
+    {name: 'unpause', from: 'paused', to 'game'}
+    {name: 'quit', from: 'game', to 'menu'}
+    {name: 'highscore', from: 'menu', to 'highscore'}
+  ]
+
+}

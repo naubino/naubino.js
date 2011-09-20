@@ -50,7 +50,7 @@ Naubino.Naub = class Naub
       partner.drawing_join[id] = false
     @destroying = true
     @shape.destroy(@remove)
-    Naubino.mode.naub_destroyed.dispatch(@number)
+    Naubino.state.naub_destroyed.dispatch(@number)
 
   ### do things a naub is supposed to do ###
   join_with: (other) ->
@@ -70,7 +70,7 @@ Naubino.Naub = class Naub
       Naubino.graph.remove_join id
       @layer.unfocus
     @remove()
-    Naubino.mode.naub_replaced.dispatch()
+    Naubino.state.naub_replaced.dispatch()
     return 42
 
 

@@ -1,23 +1,24 @@
+require 'lib/jquery-1.6.3.min.js'
+require 'lib/underscore/underscore.js'
+require 'lib/signals/signals.min.js'
+require 'lib/state-machine/state-machine.min.js'
+require 'lib/b2Vec2.js'
+require 'js/Settings.js'
+require 'js/GameModes.js' # TODO rename modes to states
+require 'js/Keybindings.js'
+require 'js/Naub.js'
+require 'js/Shape.js'
+require 'js/Ball.js'
+require 'js/PhysicsModel.js'
+require 'js/Layer.js'
+require 'js/Menu.js'
+require 'js/Game.js'
+require 'js/Graph.js'
+
 window.onload = ->
   window.naubino = Naubino.constructor()
 
-@Naubino = new ->
-  require 'lib/jquery-1.6.3.min.js'
-  require 'lib/underscore/underscore.js'
-  require 'lib/signals/signals.min.js'
-  require 'lib/b2Vec2.js'
-  require 'js/Settings.js'
-  require 'js/GameModes.js'
-  require 'js/Keybindings.js'
-  require 'js/Naub.js'
-  require 'js/Shape.js'
-  require 'js/Ball.js'
-  require 'js/PhysicsModel.js'
-  require 'js/Layer.js'
-  require 'js/Menu.js'
-  require 'js/Game.js'
-  require 'js/Graph.js'
-
+@Naubino = {
   constructor: () ->
 
     @overlay_canvas = document.getElementById("overlay_canvas")
@@ -28,15 +29,13 @@ window.onload = ->
     @setup_cursorbindings()
     @colors = @Settings.colors.output
 
-    @background = new Naubino.Background(@background_canvas)
-
     @graph = new @Graph()
-    @game = new @Game(@world_canvas, @graph)
 
-    @mode = new @GameMode(@game)
-    #TODO move this line to mode.init()
-    @game.create_some_naubs(6)
+    @background = new Naubino.Background(@background_canvas)
+    @game = new @Game(@world_canvas, @graph)
     @menu = new @Menu(@overlay_canvas)
+
+    @game.create_some_naubs(6)
 
   setup_keybindings: () ->
     @keybindings = new @KeyBindings()
@@ -48,16 +47,16 @@ window.onload = ->
   setup_cursorbindings: () ->
     # TODO mouse events must go solely through mode
     onmousemove = (e) =>
-      #@mode.mousemove.dispatch(e)
+      #@state.mousemove.dispatch(e)
       @menu.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
       @game.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmouseup = (e) =>
-      #@mode.mouseup.dispatch(e)
+      #@state.mouseup.dispatch(e)
       @game.unfocus e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmousedown = (e) =>
-      #@mode.mousedown.dispatch(e)
+      #@state.mousedown.dispatch(e)
       @menu.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
       @game.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
@@ -69,4 +68,4 @@ window.onload = ->
     @overlay_canvas.addEventListener("touchstart", onmousedown, false)
     @overlay_canvas.addEventListener("touchend", onmouseup, false)
     @overlay_canvas.addEventListener("touchmove", onmousemove, false)
-
+}
