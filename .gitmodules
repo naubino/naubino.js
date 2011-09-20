@@ -7,6 +7,3 @@
 [submodule "lib/signals"]
 	path = lib/signals
 	url = https://github.com/millermedeiros/js-signals
-[submodule "lib/state-machine"]
-	path = lib/state-machine
-	url = https://github.com/jakesgordon/javascript-state-machine
