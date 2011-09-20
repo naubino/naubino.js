@@ -88,21 +88,21 @@ Naubino.Layer = class Layer
 
 Naubino.Background = class Background extends Naubino.Layer
 
-  draw: (context) ->
-    width = Naubino.background_canvas.width
-    height = Naubino.background_canvas.foreground.height
+  draw: () ->
+    width = @canvas.width
+    height = @canvas.height
     centerX = width/2
     centerY = height/2
 
-    context.clearRect(0, 0, Naubino.background_canvas.width, Naubino.background_canvas.height)
+    @ctx.clearRect(0, 0, width, height)
 
-    context.save()
-    context.beginPath()
-    context.arc centerX, centerY, 160, 0, Math.PI*2, false
+    @ctx.save()
+    @ctx.beginPath()
+    @ctx.arc centerX, centerY, 160, 0, Math.PI*2, false
 
-    context.lineWidth = 5
-    context.strokeStyle = "black"
-    context.stroke()
-    context.closePath()
-    context.restore()
+    @ctx.lineWidth = 5
+    @ctx.strokeStyle = "black"
+    @ctx.stroke()
+    @ctx.closePath()
+    @ctx.restore()
     
