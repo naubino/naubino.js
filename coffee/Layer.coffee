@@ -87,6 +87,10 @@ Naubino.Layer = class Layer
 
 
 Naubino.Background = class Background extends Naubino.Layer
+  constructor: (canvas) ->
+    super(canvas)
+    @fps = 1000 / 10
+    @drawing = true
 
   draw: () ->
     width = @canvas.width
@@ -101,7 +105,7 @@ Naubino.Background = class Background extends Naubino.Layer
     @ctx.arc centerX, centerY, 160, 0, Math.PI*2, false
 
     @ctx.lineWidth = 5
-    @ctx.strokeStyle = "black"
+    @ctx.strokeStyle = 'rgba(0,0,0,0.5)'
     @ctx.stroke()
     @ctx.closePath()
     @ctx.restore()
