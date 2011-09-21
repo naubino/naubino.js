@@ -1,9 +1,10 @@
 require 'lib/jquery-1.6.3.min.js'
 require 'lib/underscore/underscore.js'
-require 'lib/signals/signals.min.js'
+require 'lib/signals/signals.js'
+require 'lib/state-machine/state-machine.js'
 require 'lib/b2Vec2.js'
 require 'js/Settings.js'
-require 'js/GameModes.js' # TODO rename modes to states
+require 'js/StateMachine.js'
 require 'js/Keybindings.js'
 require 'js/Naub.js'
 require 'js/Shape.js'
@@ -28,7 +29,7 @@ window.onload = ->
     @setup_keybindings()
     @setup_cursorbindings()
 
-    @state_machine = new @StateMachine()
+    @state_machine = new @NaubMachine()
 
 
   init_dom: () ->

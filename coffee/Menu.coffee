@@ -39,7 +39,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @buttons.main = new Naubino.Naub(this)
     @buttons.main.draw = @draw_main_button
     @buttons.main.physics.pos.Set(@position.x, @position.y)
-    @buttons.main.physics.attracted_to= @position.Copy()
+    @buttons.main.physics.attracted_to = @position.Copy()
 
     @buttons.play = new Naubino.Naub(this)
     #@buttons.play.physics.pos.Set(@position.x,@position.y)
@@ -53,11 +53,21 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @buttons.help.physics.attracted_to.Set(50,60)
     @buttons.help.content = '?'
     @buttons.help.shape.pre_render()
-    @buttons.help.focus = -> Naubino.state.game_show_help.dispatch()
+    @buttons.help.focus = -> Naubino.state_machine.menu_help.dispatch()
 
 
     @buttons.main.join_with(@buttons.play, 0)
     @buttons.main.join_with(@buttons.help, 1)
+
+  set_menu_state: ->
+    @buttons.play.content = ''# ⧐    ►
+    @buttons.play.shape.pre_render()
+    @buttons.play.focus = -> Naubino.state_machine.menu_play.dispatch()
+
+  set_playing_state: ->
+    @buttons.play.content = ''# ⧐    ►
+    @buttons.play.shape.pre_render()
+    @buttons.play.focus = -> Naubino.state_machine.menu_pause.dispatch()
 
   mainloop: ()=>
     @draw()
@@ -80,16 +90,6 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @buttons.help.draw(@ctx)
     @buttons.main.draw(@ctx)
     @ctx.restore()
-
-  set_menu_state: ->
-    @buttons.play.content = ''# ⧐    ►
-    @buttons.play.shape.pre_render()
-    @buttons.play.focus = -> Naubino.state.game_started.dispatch()
-
-  set_playing_state: ->
-    @buttons.play.content = ''# ⧐    ►
-    @buttons.play.shape.pre_render()
-    @buttons.play.focus = -> Naubino.state.game_paused.dispatch()
 
   draw_main_button: (ctx) ->
     cube_size = 80
