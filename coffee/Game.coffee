@@ -10,11 +10,7 @@ Naubino.Game = class Game extends Naubino.Layer
     @drawing = true # for debugging
     @focused_naub = null # points to the naub you click on
 
-    @points = 0
-
-    
-    # TODO move this to mode
-    @start_timer()
+    @points = -1
 
 
   ### the game gives it the game takes it ###

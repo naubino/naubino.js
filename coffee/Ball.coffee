@@ -42,11 +42,12 @@ Naubino.Ball = class Ball extends Naubino.Shape
 
     ctx.fill()
 
-    if Naubino.Settings.show_numbers
+    if @naub.content
+      # gradient
       ctx.fillStyle = 'white'
       ctx.textAlign = 'center'
-      ctx.font= "#{@size}px Helvetica"
-      ctx.fillText(@naub.number, offset, offset+5)
+      ctx.font= "#{@size+4}px Helvetica"
+      ctx.fillText(@naub.content, offset, offset+6)
 
     ctx.closePath()
     ctx.restore()

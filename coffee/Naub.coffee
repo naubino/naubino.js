@@ -3,6 +3,7 @@ Naubino.Naub = class Naub
     @size = 14
     @physics = new Naubino.PhysicsModel this
     @shape = new Naubino.Ball this
+    @content = @default_content = false
 
     @color_id = @shape.random_palette_color()
     @physics.attracted_to = @layer.center.Copy() # gravity center
@@ -16,8 +17,14 @@ Naubino.Naub = class Naub
     @shape.pre_render()
 
 
+
   ### drawing ###
   draw: (context)  =>
+    if Naubino.Settings.show_numbers
+      @content = @number
+    else
+      @content = @default_content
+
     # drawing naubs
     @shape.draw context
 
@@ -53,10 +60,13 @@ Naubino.Naub = class Naub
     Naubino.state.naub_destroyed.dispatch(@number)
 
   ### do things a naub is supposed to do ###
-  join_with: (other) ->
+  join_with: (other, manual_join_id = -1) ->
     # Check if already joined
     # check for cycle
-    join = Naubino.graph.add_join this, other
+    if manual_join_id < 0
+      join = Naubino.graph.add_join this, other
+    else
+      join = manual_join_id
     @joins[join] = other
     @drawing_join[join] = true
     other.joins[join] = this

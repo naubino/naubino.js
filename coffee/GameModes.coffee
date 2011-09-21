@@ -6,6 +6,7 @@ Naubino.State = class State
     @Signal = window.signals.Signal
 
     @add_signals()
+    @add_generic_listeners()
     @add_listeners()
 
   add_signals: ->
@@ -28,19 +29,36 @@ Naubino.State = class State
     # states
     @game_started = new @Signal()
     @game_paused = new @Signal()
+    @game_show_help= new @Signal()
     @game_ended = new @Signal()
     @game_levelup = new @Signal()
 
-  enter_state: =>
-  leave_state: =>
-  change_state: (next_state) ->
-    @leave_state()
-    next_state.enter_state()
+  add_generic_listeners: ->
+    @game_paused.add ->
+      Naubino.game.stop_timer()
+      console.log "game_paused"
+    @game_started.add ->
+      Naubino.game.start_timer()
+      console.log "game_started"
+    @game_show_help.add ->
+      console.log "this person needs help"
 
-Naubino.Playing = class PlayingState extends Naubino.State
+  add_listeners: ->
+
+  enter_state: ->
+  leave_state: ->
+
+
+Naubino.MenuState = class MenuState extends Naubino.State
   constructor: ->
     super()
-    
+
+
+
+
+Naubino.PlayingState = class PlayingState extends Naubino.State
+  constructor: ->
+    super()
 
   add_listeners: ->
     @naub_replaced.add(Naubino.graph.cycle_test)
@@ -53,14 +71,27 @@ Naubino.Playing = class PlayingState extends Naubino.State
     @naub_destroyed.add(()->Naubino.game.points++)
 
 
-Naubino.StateMachine = StateMachine.create {
-  initial: 'menu'
-  events: [
-    {name: 'play', from: 'menu', to 'game'}
-    {name: 'pause', from: 'game', to 'paused'}
-    {name: 'unpause', from: 'paused', to 'game'}
-    {name: 'quit', from: 'game', to 'menu'}
-    {name: 'highscore', from: 'menu', to 'highscore'}
-  ]
+  enter_state: ->
+    Naubino.menu.set_playing_state()
+    @game.create_some_naubs(6)
+    @game.points = 0
 
-}
+  leave_state: ->
+    let_me_go = confirm "WARNING!!\n Your points are not being saved yet!\n Write them down!"
+    Naubino.menu.set_menu_state() if let_me_go
+    return let_me_go
+
+
+
+Naubino.StateMachine = class StateMachine
+  constructor: ->
+    @states = {
+      menu: new MenuState()
+      playing: new PlayingState()
+    }
+
+    Naubino.state = @states.menu
+
+  change_state: ->
+
+

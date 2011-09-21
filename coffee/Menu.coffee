@@ -42,17 +42,22 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @buttons.main.physics.attracted_to= @position.Copy()
 
     @buttons.play = new Naubino.Naub(this)
-    @buttons.play.physics.pos.Set(70,30)
-    @buttons.play.physics.attracted_to.Set(70,30)
-    @buttons.play.focus = -> Naubino.game.pause()
+    #@buttons.play.physics.pos.Set(@position.x,@position.y)
+    @buttons.play.physics.pos.Set(65,25)
+    @buttons.play.physics.attracted_to.Set(65,25)
+    @set_menu_state()
 
-    @buttons.restart = new Naubino.Naub(this)
-    @buttons.restart.physics.pos.Set(55,65)
-    @buttons.restart.physics.attracted_to.Set(55,65)
-    @buttons.restart.focus = -> console.log "restarting"
+    @buttons.help = new Naubino.Naub(this)
+    #@buttons.help.physics.pos.Set(@position.x,@position.y)
+    @buttons.help.physics.pos.Set(50,60)
+    @buttons.help.physics.attracted_to.Set(50,60)
+    @buttons.help.content = '?'
+    @buttons.help.shape.pre_render()
+    @buttons.help.focus = -> Naubino.state.game_show_help.dispatch()
 
-    @buttons.main.join_with(@buttons.play)
-    @buttons.main.join_with(@buttons.restart)
+
+    @buttons.main.join_with(@buttons.play, 0)
+    @buttons.main.join_with(@buttons.help, 1)
 
   mainloop: ()=>
     @draw()
@@ -67,6 +72,24 @@ Naubino.Menu = class Menu extends Naubino.Layer
       else
         naub.physics.gravitate(@position)
 
+  draw: ->
+    @ctx.clearRect(0, 0, Naubino.world_canvas.width, Naubino.world_canvas.height)
+    @ctx.save()
+    @buttons.main.draw_joins(@ctx)
+    @buttons.play.draw(@ctx)
+    @buttons.help.draw(@ctx)
+    @buttons.main.draw(@ctx)
+    @ctx.restore()
+
+  set_menu_state: ->
+    @buttons.play.content = ''# ⧐    ►
+    @buttons.play.shape.pre_render()
+    @buttons.play.focus = -> Naubino.state.game_started.dispatch()
+
+  set_playing_state: ->
+    @buttons.play.content = ''# ⧐    ►
+    @buttons.play.shape.pre_render()
+    @buttons.play.focus = -> Naubino.state.game_paused.dispatch()
 
   draw_main_button: (ctx) ->
     cube_size = 80
@@ -104,15 +127,6 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @ctx.closePath()
     @ctx.restore()
 
-
-  draw: ->
-    @ctx.clearRect(0, 0, Naubino.world_canvas.width, Naubino.world_canvas.height)
-    @ctx.save()
-    @buttons.main.draw_joins(@ctx)
-    @buttons.play.draw(@ctx)
-    @buttons.restart.draw(@ctx)
-    @buttons.main.draw(@ctx)
-    @ctx.restore()
 
   ## can I touch this?
   click: (x, y) ->

@@ -1,7 +1,6 @@
 require 'lib/jquery-1.6.3.min.js'
 require 'lib/underscore/underscore.js'
 require 'lib/signals/signals.min.js'
-require 'lib/state-machine/state-machine.min.js'
 require 'lib/b2Vec2.js'
 require 'js/Settings.js'
 require 'js/GameModes.js' # TODO rename modes to states
@@ -21,21 +20,27 @@ window.onload = ->
 @Naubino = {
   constructor: () ->
 
+    @graph = new @Graph()
+    @colors = @Settings.colors.output
+
+    @init_dom()
+
+    @setup_keybindings()
+    @setup_cursorbindings()
+
+    @state_machine = new @StateMachine()
+
+
+  init_dom: () ->
     @overlay_canvas = document.getElementById("overlay_canvas")
     @world_canvas = document.getElementById("world_canvas")
     @background_canvas = document.getElementById("background_canvas")
 
-    @setup_keybindings()
-    @setup_cursorbindings()
-    @colors = @Settings.colors.output
 
-    @graph = new @Graph()
+    @background = new @Background(@background_canvas)
+    @game       = new @Game(@world_canvas, @graph)
+    @menu       = new @Menu(@overlay_canvas)
 
-    @background = new Naubino.Background(@background_canvas)
-    @game = new @Game(@world_canvas, @graph)
-    @menu = new @Menu(@overlay_canvas)
-
-    @game.create_some_naubs(6)
 
   setup_keybindings: () ->
     @keybindings = new @KeyBindings()
