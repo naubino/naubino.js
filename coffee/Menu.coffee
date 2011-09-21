@@ -2,94 +2,99 @@ Naubino.Menu = class Menu extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
     @canvas = Naubino.background
-    @position = new b2Vec2(20,25)
-    @buttons = {}
-    @pointer
-    @paused = true
-    @pointer = @center
+
+    @objs = {}
     @hovering = false
+
     @listener_size = @default_listener_size = 45
 
     # fragile calibration! don't fuck it up!
     @fps = 1000 / 20
     @dt = @fps/100
     
+    @position = new b2Vec2(20,25)
+
+    @buttons = {
+      play:
+        function: -> Naubino.state_machine.menu_play.dispatch()
+        content: '' # ⧐    ►
+        position: new b2Vec2(65,35)
+      pause:
+        function: -> Naubino.state_machine.menu_pause.dispatch()
+        content: '' #   ►
+        position: new b2Vec2(65,35)
+        disabled: true
+      help:
+        function: -> Naubino.state_machine.menu_help.dispatch()
+        content: '?'
+        position: new b2Vec2(45,65)
+      exit:
+        function: -> Naubino.state_machine.menu_exit.dispatch()
+        content: 'X'
+        position: new b2Vec2(14,80)
+      }
+
     @add_buttons()
-    @pause()
-
-  ## tempus fugit
-  start_timer: ->
-    if @paused
-      @loop = setInterval(@mainloop, @fps )
-      @paused = false
-
-  stop_timer: ->
-    clearInterval @loop
-    @paused = true
-  
-  pause: ->
-    if @paused
-      @start_timer()
-    else
-      @stop_timer()
-
-
-  add_buttons: ->
-
-    @buttons.main = new Naubino.Naub(this)
-    @buttons.main.draw = @draw_main_button
-    @buttons.main.physics.pos.Set(@position.x, @position.y)
-    @buttons.main.physics.attracted_to = @position.Copy()
-
-    @buttons.play = new Naubino.Naub(this)
-    #@buttons.play.physics.pos.Set(@position.x,@position.y)
-    @buttons.play.physics.pos.Set(65,25)
-    @buttons.play.physics.attracted_to.Set(65,25)
-    @set_menu_state()
-
-    @buttons.help = new Naubino.Naub(this)
-    #@buttons.help.physics.pos.Set(@position.x,@position.y)
-    @buttons.help.physics.pos.Set(50,60)
-    @buttons.help.physics.attracted_to.Set(50,60)
-    @buttons.help.content = '?'
-    @buttons.help.shape.pre_render()
-    @buttons.help.focus = -> Naubino.state_machine.menu_help.dispatch()
-
-
-    @buttons.main.join_with(@buttons.play, 0)
-    @buttons.main.join_with(@buttons.help, 1)
-
-  set_menu_state: ->
-    @buttons.play.content = ''# ⧐    ►
-    @buttons.play.shape.pre_render()
-    @buttons.play.focus = -> Naubino.state_machine.menu_play.dispatch()
-
-  set_playing_state: ->
-    @buttons.play.content = ''# ⧐    ►
-    @buttons.play.shape.pre_render()
-    @buttons.play.focus = -> Naubino.state_machine.menu_pause.dispatch()
+    @start_timer()
 
   mainloop: ()=>
     @draw()
     @draw_listener_region()
     @step()
 
+
   step: ->
-    for name, naub of @buttons
+    for name, naub of @objs
       naub.step (@dt)
       if @hovering
         naub.physics.gravitate()
       else
         naub.physics.gravitate(@position)
 
+
+  ## can I touch this?
+
+  move_pointer: (x,y) ->
+    [@pointer.x, @pointer.y] = [x,y]
+
+
+  add_buttons: ->
+
+    @objs.main = new Naubino.Naub(this)
+    @objs.main.draw = @draw_main_button
+    @objs.main.physics.pos.Set(@position.x, @position.y)
+    @objs.main.physics.attracted_to = @position.Copy()
+
+    for name, attr of @buttons
+      @objs[name] = new Naubino.Naub(this)
+      @objs[name].physics.pos.Set attr.position.x, attr.position.y
+      @objs[name].physics.attracted_to.Set attr.position.x, attr.position.y
+      @objs[name].content = attr.content
+      @objs[name].shape.pre_render()
+      @objs[name].focus = attr.function
+      @objs[name].disable() if attr.disabled
+      @objs[name].join_with( @objs.main, name )
+
+  switch_to_playing: ->
+    @objs.play.enable() if @objs.play.disabled
+    @objs.pause.disable()
+
+  switch_to_paused: ->
+    @objs.play.disable()
+    @objs.pause.enable() if @objs.pause.disabled
+
+
   draw: ->
     @ctx.clearRect(0, 0, Naubino.world_canvas.width, Naubino.world_canvas.height)
     @ctx.save()
-    @buttons.main.draw_joins(@ctx)
-    @buttons.play.draw(@ctx)
-    @buttons.help.draw(@ctx)
-    @buttons.main.draw(@ctx)
+    for name, naub of @objs
+      naub.draw_joins(@ctx)if not naub.disabled
+      naub.draw(@ctx) if not naub.disabled
+    @objs.main.draw(@ctx)
+    @objs.main.draw_joins()
+    @draw_listener_region()
     @ctx.restore()
+
 
   draw_main_button: (ctx) ->
     cube_size = 80
@@ -123,23 +128,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
     else if @hovering
       @hovering = false
       @listener_size = @default_listener_size
-    #@ctx.stroke()
+    @ctx.stroke()
     @ctx.closePath()
     @ctx.restore()
-
-
-  ## can I touch this?
-  click: (x, y) ->
-    @mousedown = true
-    button = @get_obj x, y
-    if button
-      button.focus()
-
-  get_obj: (x, y) ->
-    for name, naub of @buttons
-      if naub.isHit(x, y)
-        return naub
-
-  move_pointer: (x,y) ->
-    [@pointer.x, @pointer.y] = [x,y]
 

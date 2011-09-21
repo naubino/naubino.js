@@ -8,7 +8,7 @@ Naubino.Layer = class Layer
     @pointer = @center.Copy()
     @objs = {}
     @objs_count = 0
-
+    @paused = true
     # fragile calibration! don't fuck it up!
     @fps = 1000 / Naubino.Settings.fps
     @dt = @fps/1500
@@ -64,7 +64,7 @@ Naubino.Layer = class Layer
     @mousedown = true
     [@pointer.x, @pointer.y] = [x,y]
     naub = @get_obj x, y
-    if naub
+    if naub and not naub.disabled
       naub.focus()
       @focused_naub = naub
 
