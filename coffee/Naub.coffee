@@ -3,11 +3,8 @@ Naubino.Naub = class Naub
     @size = 14
     @physics = new Naubino.PhysicsModel this
     @shape = new Naubino.Ball this
-    if Naubino.Settings.show_numbers
-      @content = @number
-    else
-      @content = @default_content = false
 
+    @content = false
     @color_id = @shape.random_palette_color()
     @physics.attracted_to = @layer.center.Copy() # gravity center
 
@@ -23,6 +20,8 @@ Naubino.Naub = class Naub
 
   ### drawing ###
   draw: (context)  =>
+    if Naubino.Settings.show_numbers and not @content
+      @content = @number
 
     # drawing naubs
     @shape.draw context
@@ -64,17 +63,15 @@ Naubino.Naub = class Naub
     Naubino.state_machine.naub_destroyed.dispatch(@number)
 
   ### do things a naub is supposed to do ###
-  join_with: (other, manual_join_id = null) ->
+  join_with: (other) ->
     # Check if already joined
     # check for cycle
-    if manual_join_id
-      join = Naubino.graph.add_join this, other
-    else
-      join = manual_join_id
+    join = Naubino.graph.add_join this, other
     @joins[join] = other
     @drawing_join[join] = true
     other.joins[join] = this
     other.drawing_join[join] = false
+    join
 
   
   replace_with: (other) ->
@@ -158,4 +155,4 @@ Naubino.Naub = class Naub
   isHit: (x, y) ->
     click = new b2Vec2(x,y)
     click.Subtract(@physics.pos)
-    (click.Length() < @shape.size) and not @removed
+    (click.Length() < @shape.size) and not @removed and not @disabled

@@ -23,6 +23,11 @@ Naubino.Graph = class Graph
     delete @joins[id]
     @update_naub_list()
 
+  clear: ->
+    @join_id_sequence = 0
+    @naubs = []
+    @joins = {}
+
   join_list: ->
     console.log "joinList"
     for id, join of @joins

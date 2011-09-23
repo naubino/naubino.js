@@ -34,6 +34,9 @@ Naubino.Layer = class Layer
   remove_obj: (id) ->
     delete @objs[id]
 
+  clear: ->
+    @objs = {}
+
 
 
 
@@ -64,7 +67,7 @@ Naubino.Layer = class Layer
     @mousedown = true
     [@pointer.x, @pointer.y] = [x,y]
     naub = @get_obj x, y
-    if naub and not naub.disabled
+    if naub
       naub.focus()
       @focused_naub = naub
 

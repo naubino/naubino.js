@@ -5,6 +5,7 @@ require 'lib/state-machine/state-machine.js'
 require 'lib/b2Vec2.js'
 require 'js/Settings.js'
 require 'js/StateMachine.js'
+require 'js/Rules.js'
 require 'js/Keybindings.js'
 require 'js/Naub.js'
 require 'js/Shape.js'
@@ -30,6 +31,7 @@ window.onload = ->
     @setup_cursorbindings()
 
     @state_machine = new @NaubMachine()
+    @rules = new @RuleSet()
 
 
   init_dom: () ->

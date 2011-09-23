@@ -1,2 +1,6 @@
-Major architectural changes
+The adding the game to the game
 
+	* added: clearing function to Layer and Graph
+	* changed: disabled naubs can't be clicked (menu)
+	* fixed: strange joining behavior
+	* added: rule set to controle the game flow

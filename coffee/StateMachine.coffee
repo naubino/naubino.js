@@ -1,4 +1,5 @@
 # https://github.com/millermedeiros/js-signals/wiki/Examples
+# http://codeincomplete.com/posts/2011/8/19/javascript_state_machine_v2/
 Naubino.NaubMachine = class NaubMachine
 
   constructor: ->
@@ -17,6 +18,7 @@ Naubino.NaubMachine = class NaubMachine
       events:[
         {  name: 'play',      from: 'menu',     to: 'playing' }
         {  name: 'pause',     from: 'playing',  to: 'paused' }
+        {  name: 'play',      from: 'paused',   to: 'playing' }
         {  name: 'unpause',   from: 'paused',   to: 'playing' }
         {  name: 'win',       from: 'playing',  to: 'won' }
         {  name: 'lose',      from: 'playing',  to: 'lost' }
@@ -27,15 +29,16 @@ Naubino.NaubMachine = class NaubMachine
       ]
       callbacks:
         onenterplaying: (event, from, to) ->
-          Naubino.game.create_some_naubs 3
           Naubino.game.start_timer()
-          Naubino.menu.set_playing_state()
+          Naubino.menu.switch_to_playing()
+          Naubino.rules.run()
 
         onleaveplaying: (event, from, to) ->
-          Naubino.menu.set_menu_state()
 
         onpaused: (event, from, to) ->
           Naubino.game.stop_timer()
+          Naubino.menu.switch_to_paused()
+          Naubino.rules.halt()
 
         onpause: (event, from, to) ->
 
@@ -71,20 +74,20 @@ Naubino.NaubMachine = class NaubMachine
 
   add_generic_listeners: ->
     @menu_pause.add =>
-      console.log "menu: pause"
       @fsm.pause()
+      console.log "menu: pause"
 
     @menu_play.add =>
-      console.log "menu: play"
       @fsm.play()
+      console.log "menu: play"
 
     @menu_exit.add =>
-      console.log "menu: exit"
       @fsm.exit()
+      console.log "menu: exit"
 
     @menu_help.add =>
+      @fsm.show_help()
       console.log "menu: help"
-      @fsm.help()
 
   add_listeners: ->
 

@@ -73,15 +73,18 @@ Naubino.Menu = class Menu extends Naubino.Layer
       @objs[name].shape.pre_render()
       @objs[name].focus = attr.function
       @objs[name].disable() if attr.disabled
-      @objs[name].join_with( @objs.main, name )
+      join = @objs[name].join_with( @objs.main, name )
+      Naubino.graph.remove_join join
 
   switch_to_playing: ->
-    @objs.play.enable() if @objs.play.disabled
-    @objs.pause.disable()
+    console.log 'switching menu to playing mode'
+    @objs.play.disable()
+    @objs.pause.enable()
 
   switch_to_paused: ->
-    @objs.play.disable()
-    @objs.pause.enable() if @objs.pause.disabled
+    console.log 'switching menu to paused mode'
+    @objs.play.enable()
+    @objs.pause.disable()
 
 
   draw: ->
@@ -128,7 +131,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
     else if @hovering
       @hovering = false
       @listener_size = @default_listener_size
-    @ctx.stroke()
+    #@ctx.stroke()
     @ctx.closePath()
     @ctx.restore()
 
