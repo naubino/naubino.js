@@ -48,6 +48,7 @@ Naubino.NaubMachine = class NaubMachine
         onexit: (event, from, to) ->
     }
 
+
   add_signals: ->
 
     # user interface

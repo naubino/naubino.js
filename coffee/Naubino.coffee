@@ -32,6 +32,7 @@ window.onload = ->
 
     @state_machine = new @NaubMachine()
     @rules = new @RuleSet()
+    @state_machine.menu_play.dispatch() #TODO remove this line
 
 
   init_dom: () ->

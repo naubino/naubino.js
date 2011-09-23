@@ -29,7 +29,8 @@ Naubino.RuleSet = class RuleSet
   event: =>
     @inner_clock = (@inner_clock + 1) % 10
     if @inner_clock == 0
-      Naubino.game.create_naub_pair()
+      {x,y} = Naubino.game.random_outside()
+      Naubino.game.create_naub_pair(x,y)
       console.log "new naubs!"
 
 

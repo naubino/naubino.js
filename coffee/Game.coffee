@@ -12,15 +12,19 @@ Naubino.Game = class Game extends Naubino.Layer
 
     @points = -1
 
+  
 
   ### the game gives it the game takes it ###
   create_some_naubs: (n = 3) ->
     for [1..n]
-      @create_naub_pair()
+      Naubino.background.draw_marker(x,y)
+      @create_naub_pair(x,y)
     for [1..n]
-      @create_naub_triple()
+      {x,y} = @random_outside()
+      Naubino.background.draw_marker(x,y)
+      @create_naub_triple(x,y)
 
-  create_naub_pair: ->
+  create_naub_pair: (x, y) ->
       naub_a = new Naubino.Naub this
       naub_b = new Naubino.Naub this
 
@@ -29,15 +33,17 @@ Naubino.Game = class Game extends Naubino.Layer
       naub_a.shape.pre_render() # again just to get the numbers
       naub_b.shape.pre_render() # again just to get the numbers
 
-      x = Math.random() * Naubino.world_canvas.width
-      y = Math.random() * Naubino.world_canvas.height
+      dir = Math.random() * Math.PI
 
       naub_a.physics.pos.Set x, y
-      naub_b.physics.pos.Set x + 30, y + 30
+      naub_b.physics.pos.Set x, y
+
+      naub_a.physics.pos.AddPolar(dir, 15)
+      naub_b.physics.pos.AddPolar(dir, -15)
 
       naub_a.join_with naub_b
 
-  create_naub_triple: ->
+  create_naub_triple: (x, y) ->
       naub_a = new Naubino.Naub this
       naub_b = new Naubino.Naub this
       naub_c = new Naubino.Naub this
@@ -49,16 +55,37 @@ Naubino.Game = class Game extends Naubino.Layer
       naub_b.shape.pre_render() # again just to get the numbers
       naub_c.shape.pre_render() # again just to get the numbers
 
-
-      x = Math.random() * Naubino.background_canvas.width
-      y = Math.random() * Naubino.background_canvas.height
+      dir = Math.random() * Math.PI
 
       naub_a.physics.pos.Set x, y
-      naub_b.physics.pos.Set x + 30, y + 30
-      naub_c.physics.pos.Set x + 60, y - 30
+      naub_b.physics.pos.Set x, y
+      naub_c.physics.pos.Set x, y
+
+      naub_a.physics.pos.AddPolar(dir, 30)
+      naub_c.physics.pos.AddPolar(dir, -30)
 
       naub_a.join_with naub_b
       naub_b.join_with naub_c
+
+  # produces a random set of coordinates outside the field
+  random_outside: ->
+    offset = 100
+    seed = Math.round (Math.random() * 3)+1
+    switch seed
+      when 1
+        x = @width + offset
+        y = @height * Math.random()
+      when 2
+        x = @width  * Math.random()
+        y = @height + offset
+      when 3
+        x = 0 - offset
+        y = @height * Math.random()
+      when 4
+        x = @width * Math.random()
+        y = 0 - offset
+    {x,y}
+
 
   destroy_naubs: (list)->
     for naub in list

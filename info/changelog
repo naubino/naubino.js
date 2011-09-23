@@ -1,6 +1,4 @@
-The adding the game to the game
-
-	* added: clearing function to Layer and Graph
-	* changed: disabled naubs can't be clicked (menu)
-	* fixed: strange joining behavior
-	* added: rule set to controle the game flow
+color system
+background animation
+ * added: naubs spawn outside the screen
+ * added: random rotation of new naubs
