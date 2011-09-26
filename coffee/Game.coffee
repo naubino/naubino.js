@@ -17,6 +17,7 @@ Naubino.Game = class Game extends Naubino.Layer
   ### the game gives it the game takes it ###
   create_some_naubs: (n = 3) ->
     for [1..n]
+      {x,y} = @random_outside()
       Naubino.background.draw_marker(x,y)
       @create_naub_pair(x,y)
     for [1..n]
@@ -129,7 +130,7 @@ Naubino.Game = class Game extends Naubino.Layer
     if @mousedown && @focused_naub
       @focused_naub.physics.follow @pointer.Copy()
       for id, other of  @objs
-        if (@focused_naub.distance_to other) < @focused_naub.size
+        if (@focused_naub.distance_to other) < (@focused_naub.size+10)
           @focused_naub.check_joining(other)
           break
 

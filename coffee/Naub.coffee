@@ -20,8 +20,6 @@ Naubino.Naub = class Naub
 
   ### drawing ###
   draw: (context)  =>
-    if Naubino.Settings.show_numbers and not @content
-      @content = @number
 
     # drawing naubs
     @shape.draw context
@@ -115,7 +113,7 @@ Naubino.Naub = class Naub
       same_color = @color_id == other.color_id
 
       if not @disabled && unjoined && same_color && far_enough && not alone
-        @replace_with other
+        other.replace_with this
         true
       else if alone and not (other.disabled or @disabled)
         @join_with other

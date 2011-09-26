@@ -27,11 +27,11 @@ Naubino.RuleSet = class RuleSet
 
   # does whatever
   event: =>
-    @inner_clock = (@inner_clock + 1) % 10
     if @inner_clock == 0
       {x,y} = Naubino.game.random_outside()
       Naubino.game.create_naub_pair(x,y)
       console.log "new naubs!"
+    @inner_clock = (@inner_clock + 1) % 10
 
 
   # called when exiting playing state
@@ -39,3 +39,13 @@ Naubino.RuleSet = class RuleSet
     Naubino.game.clear()
     Naubino.graph.clear()
     Naubino.game.points = 0
+
+Naubino.TestCase = class TestCase extends RuleSet
+  constructor: ->
+    super()
+    Naubino.Settings.show_numbers = on
+    Naubino.game.create_some_naubs 4
+    weightless = ->
+      Naubino.Settings.gravity = off
+    setTimeout(weightless, 4000)
+  run: ->
