@@ -1,0 +1,100 @@
+digraph G {
+  fontname = "Bitstream Vera Sans"
+  fontsize = 8
+
+  node [
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    shape = "record"
+  ]
+  edge [
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    arrowhead = "normal"
+    arrowtail  = "none"
+    dir = "both"
+  ]
+
+  Naubino [
+    label="{Naubino}"
+  ]
+
+
+  Game[
+    label="{Game}"
+  ]
+  
+  Canvas[
+    label="{Canvas}"
+  ]
+
+  Ctx[
+    label="{Context}"
+  ]
+  
+  KeyBindings[
+    label="{KeyBindings}"
+  ]
+
+  Signals[
+    label="{Signals}"
+  ]
+
+  World[
+    label="{World}"
+  ]
+
+  GameMode[
+    label="{GameMode}"
+  ]
+
+  The_Graph[
+    label="{Graph}"
+  ]
+
+  Naub[
+    label="{Naub}"
+  ]
+
+  NaubShape[
+    label="{NaubShape}"
+  ]
+
+  //NaubBall[
+  //  label="{NaubBall}"
+  //]
+
+  Physics[
+    label="{PhysicsModel}"
+  ]
+
+ Naubino -> Game 
+ Naubino -> Canvas
+ Naubino -> KeyBindings
+ Naubino -> GameMode
+
+ Game -> World
+ Game -> The_Graph
+ Game -> Ctx
+
+ The_Graph -> Join [arrowtail = "diamond" ]
+ Canvas -> Ctx
+
+ GameMode -> Game
+ GameMode -> The_Graph
+ GameMode -> World
+ GameMode -> Signals
+
+ World -> Naub [arrowtail = "diamond" ]
+ World -> Canvas
+
+ Naub -> NaubShape
+ Naub -> Game
+ Naub -> Physics [arrowtail = "diamond" ]
+
+ //NaubShape -> NaubBall
+ Naub -> Join [arrowtail = "diamond" ]
+
+
+
+}
