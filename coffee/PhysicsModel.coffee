@@ -50,10 +50,10 @@
       diff.Subtract(@pos)
       l = diff.Length()
 
-      if @naub.number < other.number &&  l < 35  # TODO replace with obj size
+      if @naub.number < other.number &&  l < @keep_distance # TODO replace with obj size
         v = diff.Copy()
         v.Normalize()
-        v.Multiply(35 - l)
+        v.Multiply(@keep_distance - l)
         v.Multiply(0.6)
         @pos.Subtract(v)
         opos.Add(v)
@@ -75,10 +75,10 @@
     @force.Subtract(v)
     oforce.Add(v)
 
-    if (l < @naub.keep_distance) # TODO replace with obj size
+    if (l < @keep_distance) # TODO replace with obj size
       v = diff.Copy()
       v.Normalize()
-      v.Multiply(@naub.keep_distance - l)
+      v.Multiply(@keep_distance - l)
       v.Multiply(0.3)
       @vel.Subtract(v)
       ovel.Add(v)

@@ -31,7 +31,8 @@ window.onload = ->
     @setup_cursorbindings()
 
     @state_machine = new @NaubMachine()
-    @rules = new @RuleSet()
+    #@rules = new @RuleSet()
+    @rules = new @TestCase()
     @state_machine.menu_play.dispatch() #TODO remove this line
 
 
@@ -50,7 +51,7 @@ window.onload = ->
     @keybindings = new @KeyBindings()
     window.onkeydown = (key) => @keybindings.keydown(key)
     window.onkeyup = (key) => @keybindings.keyup(key)
-    @keybindings.enable 32, => @game.pause()
+    @keybindings.enable 32, => @state_machine.menu_pause.dispatch()
 
 
   setup_cursorbindings: () ->
