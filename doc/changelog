@@ -1,3 +1,2 @@
 background animation
-	* changed: single naubs will only join when focused
-	* fixed: loosing focus again when joining
+	* fixed: join explosion in opera

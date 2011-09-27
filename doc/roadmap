@@ -5,11 +5,10 @@
   * alternating game modes
 
 # Known Issues
+  * need to look over every single floating point operation
   * keep on looking for the 3-way-join-bug
-  * colorsystem needs rebuilding (glow does not work)
   * naubs kinda jiggle in chromium (due to prerendering)
   * slingshooting naubs out of the field is possible (causes crash)
-  * stretching effect causes joins to be 1px all the time in opera
 
 # wishes
   * simplify the drawing chain
