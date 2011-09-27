@@ -52,8 +52,9 @@ Naubino.Shape = class Shape
     l = diff.Length()
     kd = @naub.physics.keep_distance
     fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
-    stretch = (kd + fiber) / (l + fiber)
+    stretch = Math.round(((kd + fiber) / (l + fiber))*10)/10
     #@join_style.fill[3] = stretch
+    stretched_width = @join_style.width * stretch
 
     ctx.save()
     ctx.strokeStyle = @color_to_rgba @join_style.fill
@@ -61,7 +62,7 @@ Naubino.Shape = class Shape
     ctx.beginPath()
     ctx.moveTo pos.x, pos.y
     ctx.lineTo pos2.x, pos2.y
-    ctx.lineWidth =  (@join_style.width * stretch)
+    ctx.lineWidth =  stretched_width
     ctx.lineCap = "round"
     ctx.stroke()
     ctx.closePath()
