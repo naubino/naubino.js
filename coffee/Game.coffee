@@ -9,6 +9,7 @@ Naubino.Game = class Game extends Naubino.Layer
     @paused = true # changed imidiately after loading by start_timer
     @drawing = true # for debugging
     @focused_naub = null # points to the naub you click on
+    @gravity = Naubino.Settings.gravity.game
 
     @points = -1
 

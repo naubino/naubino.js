@@ -46,6 +46,6 @@ Naubino.TestCase = class TestCase extends RuleSet
     Naubino.Settings.show_numbers = on
     Naubino.game.create_some_naubs 4
     weightless = ->
-      Naubino.Settings.gravity = off
+      Naubino.game.gravity = off
     setTimeout(weightless, 4000)
   run: ->

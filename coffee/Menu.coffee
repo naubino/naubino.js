@@ -5,6 +5,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
 
     @objs = {}
     @hovering = false
+    @gravity = Naubino.Settings.gravity.menu
 
     @listener_size = @default_listener_size = 45
 

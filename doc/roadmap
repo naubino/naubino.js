@@ -5,7 +5,7 @@
   * alternating game modes
 
 # Known Issues
-  * joining must be made easier without 3-way-join-bug
+  * keep on looking for the 3-way-join-bug
   * colorsystem needs rebuilding (glow does not work)
   * naubs kinda jiggle in chromium (due to prerendering)
   * slingshooting naubs out of the field is possible (causes crash)
