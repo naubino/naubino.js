@@ -62,8 +62,6 @@ Naubino.Naub = class Naub
 
   ### do things a naub is supposed to do ###
   join_with: (other) ->
-    # Check if already joined
-    # check for cycle
     join = Naubino.graph.add_join this, other
     @joins[join] = other
     @drawing_join[join] = true
@@ -77,8 +75,9 @@ Naubino.Naub = class Naub
       other.join_with(naub)
       delete naub.joins[id]
       Naubino.graph.remove_join id
-      @layer.unfocus
+    @layer.unfocus()
     @remove()
+    console.log "replaced #{@number}"
     Naubino.state_machine.naub_replaced.dispatch()
     return 42
 
@@ -109,7 +108,7 @@ Naubino.Naub = class Naub
           far_enough = false
 
       unjoined = not @is_joined_with other
-      alone = _.keys(@joins).length == 0  or  _.keys(other.joins).length == 0
+      alone = _.keys(@joins).length == 0
       same_color = @color_id == other.color_id
 
       if not @disabled && unjoined && same_color && far_enough && not alone

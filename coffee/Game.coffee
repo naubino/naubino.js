@@ -26,6 +26,12 @@ Naubino.Game = class Game extends Naubino.Layer
       Naubino.background.draw_marker(x,y)
       @create_naub_triple(x,y)
 
+  create_naub: (x=@center.x, y=@center.y) ->
+      naub_a = new Naubino.Naub this
+      @add_object naub_a
+      naub_a.shape.pre_render() # again just to get the numbers
+      naub_a.physics.pos.Set x, y
+
   create_naub_pair: (x, y) ->
       naub_a = new Naubino.Naub this
       naub_b = new Naubino.Naub this
@@ -68,6 +74,15 @@ Naubino.Game = class Game extends Naubino.Layer
 
       naub_a.join_with naub_b
       naub_b.join_with naub_c
+
+  toggle_numbers: () ->
+    unless @show_numbers?
+      @show_numbers = true
+    else @show_numbers = not @show_numbers
+    for id, naub of @objs
+      naub.content = if @show_numbers then naub.number else null
+
+
 
   # produces a random set of coordinates outside the field
   random_outside: ->
@@ -162,8 +177,3 @@ Naubino.Game = class Game extends Naubino.Layer
       # use all previously calculated forces and actually move the damn thing 
       naub.step(dt)
 
-
-
-
-
-      

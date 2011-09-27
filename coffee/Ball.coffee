@@ -33,7 +33,7 @@ Naubino.Ball = class Ball extends Naubino.Shape
       # gradient
       gradient = ctx.createRadialGradient(offset, offset, size/3, offset, offset, size)
       gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
-      gradient.addColorStop 1, @color_to_rgba @style.fill
+      gradient.addColorStop 1, @color_to_rgba(@style.fill, 50)
       ctx.fillStyle = gradient
     else
       ctx.fillStyle = @color_to_rgba(@style.fill)

@@ -1,6 +1,3 @@
 background animation
-	* added: naubs spawn outside the screen
-	* added: random rotation of new naubs
-	* fixed: glowing of focused naubs
-	* fixed: gravity button no longer disables menu animation
-
+	* changed: single naubs will only join when focused
+	* fixed: loosing focus again when joining
