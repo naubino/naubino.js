@@ -19,7 +19,7 @@
     @apply_friction()
 
   gravitate: (to = @attracted_to) ->
-    unless  @naub.focused or not Naubino.Settings.gravity
+    unless @naub.focused or not @naub.layer.gravity
       diff = to.Copy()
       diff.Subtract(@pos)
       diff.Multiply(@mass)

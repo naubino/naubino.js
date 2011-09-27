@@ -2,9 +2,12 @@
 Naubino.Settings = {
 
   pre_rendering: on
-  gravity : on
+  gravity:
+    menu: on
+    game: on
   fps: 20
   show_numbers: off
+
   colors:
     output: [
     # [RRR, GGG, BBB, , name,    is_background,    is_joincolor]

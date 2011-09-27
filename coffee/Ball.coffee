@@ -25,10 +25,14 @@ Naubino.Ball = class Ball extends Naubino.Shape
     ctx.arc(offset, offset, size, 0, Math.PI * 2, false)
     ctx.closePath()
 
+    ## border
+    #ctx.lineWidth = 2
+    #ctx.stroke()
+
     if @naub.focused
       # gradient
-      gradient = ctx.createRadialGradient(offset, offset, size/2, offset, offset, size)
-      gradient.addColorStop 0, @color_to_rgba(@style.fill, 3)
+      gradient = ctx.createRadialGradient(offset, offset, size/3, offset, offset, size)
+      gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
       gradient.addColorStop 1, @color_to_rgba @style.fill
       ctx.fillStyle = gradient
     else
