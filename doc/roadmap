@@ -12,6 +12,7 @@
 
 # wishes
   * simplify the drawing chain
+  * destruction of cycle should start at focused_naub
   * global object size handling ( keep_distance, spring length and so on)
   * color palettes also handle background and join color
   * more canvas performance optimization posible

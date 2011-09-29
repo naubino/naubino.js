@@ -109,9 +109,10 @@ Naubino.Naub = class Naub
 
       unjoined = not @is_joined_with other
       alone = _.keys(@joins).length == 0
+      other_alone = _.keys(other.joins).length == 0
       same_color = @color_id == other.color_id
 
-      if not @disabled && unjoined && same_color && far_enough && not alone
+      if not @disabled && unjoined && same_color && far_enough && not alone && not other_alone
         other.replace_with this
         true
       else if alone and not (other.disabled or @disabled)
