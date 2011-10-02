@@ -1,17 +1,10 @@
 naubino.js is a little game build for the browser. It is intended to be played on multi touch platforms.
 
 
-### Plans for after 1.0
+# Prerequisites:
 
-
- * achievments
- * growing number of colors
- * speciel rules
-  * coin naubs ? with countdown
-  * exponential points per cycle length
-  * destroy things inside a cycle?
-  * glue naub ? (binds first 6 naubs )
-  * slow down time
-  * mythosis naub vs. naubs that die if joined
-  * different colorthemes as rewards?
+  * `git clone https://github.com/hoodie/naubino.js` ( "thanks for pointing out the obvious!!" - your welcome)
+  * `git submodule update --init`
+  * Build once Using: `coffee -o ./js/ -c coffee/*.coffee`
+  * While coding use: `coffee -o ./js/ -cw coffee/*.coffee`
 
