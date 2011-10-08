@@ -18,25 +18,27 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @buttons = {
       play:
         function: -> Naubino.state_machine.menu_play.dispatch()
-        content: '' # ⧐    ►
+        content: (ctx) -> this.draw_string(ctx, '')
         position: new b2Vec2(65,35)
       pause:
         function: -> Naubino.state_machine.menu_pause.dispatch()
-        content: '' #   ►
+        content: (ctx) -> this.draw_string(ctx, '')
         position: new b2Vec2(65,35)
         disabled: true
       help:
         function: -> Naubino.state_machine.menu_help.dispatch()
-        content: '?'
+        content: (ctx) -> this.draw_string(ctx, '?')
         position: new b2Vec2(45,65)
       exit:
         function: -> Naubino.state_machine.menu_exit.dispatch()
-        content: 'X'
+        content: (ctx) -> this.draw_string(ctx, 'X')
         position: new b2Vec2(14,80)
       }
 
     @add_buttons()
     @start_timer()
+
+  draw_play_icon: (ctx) ->
 
   mainloop: ()=>
     @draw()

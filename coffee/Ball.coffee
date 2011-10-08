@@ -1,6 +1,6 @@
 Naubino.Ball = class Ball extends Naubino.Shape
-  constructor: (@naub) ->
-    super(@naub)
+  constructor: (naub) ->
+    super(naub)
 
   # inherits : 
   #
@@ -13,13 +13,13 @@ Naubino.Ball = class Ball extends Naubino.Shape
 
 
   ### actual painting routines ###
-  render: (ctx, offset = @frame) ->
+  render: (ctx, x = 42, y = x) ->
     ctx.save()
     pos = @pos
     size= @size
 
-    if offset == 0
-      ctx.translate(pos.x, pos.y)
+    offset = 0
+    ctx.translate( x, y)
       
     ctx.beginPath()
     ctx.arc(offset, offset, size, 0, Math.PI * 2, false)
@@ -46,12 +46,8 @@ Naubino.Ball = class Ball extends Naubino.Shape
 
     ctx.fill()
 
-    if @naub.content
-      # gradient
-      ctx.fillStyle = 'white'
-      ctx.textAlign = 'center'
-      ctx.font= "#{@size+4}px Helvetica"
-      ctx.fillText(@naub.content, offset, offset+6)
+    if @naub? and @naub.content?
+      @naub.content.call(this, ctx, offset)
 
     ctx.closePath()
     ctx.restore()

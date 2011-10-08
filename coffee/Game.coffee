@@ -80,7 +80,8 @@ Naubino.Game = class Game extends Naubino.Layer
       @show_numbers = true
     else @show_numbers = not @show_numbers
     for id, naub of @objs
-      naub.content = if @show_numbers then naub.number else null
+      naub.content = if @show_numbers then naub.shape.draw_number else null
+      naub.shape.pre_render()
 
 
 

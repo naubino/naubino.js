@@ -4,7 +4,7 @@ Naubino.Naub = class Naub
     @physics = new Naubino.PhysicsModel this
     @shape = new Naubino.Ball this
 
-    @content = false
+    @content = null
     @color_id = @shape.random_palette_color()
     @physics.attracted_to = @layer.center.Copy() # gravity center
 
@@ -20,7 +20,6 @@ Naubino.Naub = class Naub
 
   ### drawing ###
   draw: (context)  =>
-
     # drawing naubs
     @shape.draw context
 
