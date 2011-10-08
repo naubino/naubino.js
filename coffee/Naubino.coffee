@@ -1,20 +1,3 @@
-require 'lib/jquery-1.6.3.min.js'
-require 'lib/underscore/underscore.js'
-require 'lib/signals/signals.js'
-require 'lib/state-machine/state-machine.js'
-require 'lib/b2Vec2.js'
-require 'js/Settings.js'
-require 'js/StateMachine.js'
-require 'js/Rules.js'
-require 'js/Keybindings.js'
-require 'js/Naub.js'
-require 'js/Shape.js'
-require 'js/Ball.js'
-require 'js/PhysicsModel.js'
-require 'js/Layer.js'
-require 'js/Menu.js'
-require 'js/Game.js'
-require 'js/Graph.js'
 
 window.onload = ->
   window.naubino = Naubino.constructor()
@@ -31,8 +14,8 @@ window.onload = ->
     @setup_cursorbindings()
 
     @state_machine = new @NaubMachine()
-    #@rules = new @RuleSet()
-    @rules = new @TestCase()
+    @rules = new @RuleSet()
+    #@rules = new @TestCase()
     @state_machine.menu_play.dispatch() #TODO remove this line
 
 
