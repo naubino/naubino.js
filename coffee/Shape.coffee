@@ -18,7 +18,7 @@ Naubino.Shape = class Shape
       ctx.drawImage(@buffer, x, y)
       ctx.restore()
     else
-      @render ctx, 0
+      @render ctx, @pos.x, @pos.y
 
   ### draws a frame around the buffered image for analysis ###
   draw_frame: (ctx) ->
@@ -32,6 +32,8 @@ Naubino.Shape = class Shape
     ctx.lineTo @frame*2+x, y
     ctx.lineTo x, y
     ctx.stroke()
+    #ctx.fillStyle = "beige"
+    #ctx.fill()
     ctx.closePath()
     
   ### Renders the shape into a buffer ###
@@ -39,7 +41,7 @@ Naubino.Shape = class Shape
     @buffer = document.createElement('canvas')
     @buffer.width = @buffer.height = @frame*2
     b_ctx = @buffer.getContext('2d')
-    @render b_ctx
+    @render b_ctx, @frame
 
   ## actual painting routines
   draw_join: (ctx, partner) ->
@@ -68,7 +70,14 @@ Naubino.Shape = class Shape
     ctx.closePath()
     ctx.restore()
 
+  draw_string: (ctx, string, color = 'white') ->
+    ctx.fillStyle = color
+    ctx.textAlign = 'center'
+    ctx.font= "#{@size+4}px Helvetica"
+    ctx.fillText(string, 0, 6)
 
+  draw_number: (ctx, offset = 0) ->
+    @draw_string ctx, this.naub.number
 
 
   ### animates the destruction of a naub ###
