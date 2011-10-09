@@ -71,7 +71,7 @@
     v = diff.Copy()
 
     v.Normalize()
-    v.Multiply( -1/100 * @spring_force * l * l * l)
+    v.Multiply( -1/100 * @spring_force * l * l * l % 1000)
     @force.Subtract(v)
     oforce.Add(v)
 
