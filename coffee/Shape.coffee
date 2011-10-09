@@ -60,15 +60,19 @@ Naubino.Shape = class Shape
 
     ctx.save()
     ctx.strokeStyle = @color_to_rgba @join_style.fill
+    try
+      ctx.beginPath()
+      ctx.moveTo pos.x, pos.y
+      ctx.lineTo pos2.x, pos2.y
+      ctx.lineWidth =  stretched_width
+      ctx.lineCap = "round"
+      ctx.stroke()
+      ctx.closePath()
+      ctx.restore()
+    catch e
+      console.log [pos.x, pos.y]
+      Naubino.state_machine.menu_pause.dispatch()
 
-    ctx.beginPath()
-    ctx.moveTo pos.x, pos.y
-    ctx.lineTo pos2.x, pos2.y
-    ctx.lineWidth =  stretched_width
-    ctx.lineCap = "round"
-    ctx.stroke()
-    ctx.closePath()
-    ctx.restore()
 
   draw_string: (ctx, string, color = 'white') ->
     ctx.fillStyle = color
