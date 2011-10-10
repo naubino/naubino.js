@@ -6,7 +6,7 @@ window.onload = ->
   constructor: () ->
 
     @graph = new @Graph()
-    @colors = @Settings.colors.output
+    @colors = @Settings.colors.high_contrast
 
     @init_dom()
 
