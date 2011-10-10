@@ -19,6 +19,14 @@ Naubino.Settings = {
       [255, 204,   0, 1, "yellow"]
       #[ 41,  14,   3, 1, "tell me" (brown)
     ]
+    high_contrast: [
+      [255,   0,   0, 1, "hcred"]
+      [  0,   0,   0, 1, "hcblack"]
+      [255, 255,   0, 1, "hcyellow"]
+      [  0, 224,   0, 1, "hcgreen"]
+      [128,   0, 128, 1, "hcpurple"]
+      [  0, 128, 224, 1, "hcblue"]
+    ]
     normal_colors: [
       [255,   0,   0, 1, "red"]
       [255, 153,   0, 1, "Vitamin C"]
