@@ -6,7 +6,7 @@ window.onload = ->
   constructor: () ->
 
     @graph = new @Graph()
-    @colors = @Settings.colors.high_contrast
+    @colors = @Settings.colors.output
 
     @init_dom()
 
@@ -14,8 +14,8 @@ window.onload = ->
     @setup_cursorbindings()
 
     @state_machine = new @NaubMachine()
-    @rules = new @RuleSet()
-    #@rules = new @TestCase()
+    #@rules = new @RuleSet()
+    @rules = new @TestCase()
     @state_machine.menu_play.dispatch() #TODO remove this line
 
 
