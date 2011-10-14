@@ -40,13 +40,29 @@ Naubino.RuleSet = class RuleSet
     Naubino.graph.clear()
     Naubino.game.points = 0
 
+
+
+
+
+
 Naubino.TestCase = class TestCase extends RuleSet
   constructor: ->
     super()
     Naubino.Settings.show_numbers = on
-    Naubino.game.create_some_naubs 4
-    Naubino.game.toggle_numbers()
+    #Naubino.game.create_some_naubs 2
+    #Naubino.game.toggle_numbers()
     weightless = ->
       Naubino.game.gravity = off
     setTimeout(weightless, 4000)
+    basket = 150
+    Naubino.game.basket_size = basket
+    Naubino.background.basket_size = basket
+    Naubino.background.draw()
+
   run: ->
+    #@loop = setInterval(@event, 3000 )
+
+  event:->
+    inner_basket = Naubino.game.count_basket()
+    Naubino.game.destroy_naubs inner_basket
+
