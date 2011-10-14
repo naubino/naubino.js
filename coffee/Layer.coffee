@@ -132,7 +132,7 @@ Naubino.Background = class Background extends Naubino.Layer
   pulse: () ->
     @default_fps = @fps
     @seed = 0
-    @fps = 1000 / 40
+    @fps = 1000 / 20
     @start_timer()
     if @animation?
       clearInterval(@animation)
@@ -147,12 +147,32 @@ Naubino.Background = class Background extends Naubino.Layer
         @color[3] = 0.5
 
       @basket_thickness = Math.abs(Math.sin(@seed/@ttl))  * 2 *   @default_thickness + @default_thickness
-      @color[0] = Math.abs((Math.sin(@seed/@ttl))) * 200
-      @color[3] = Math.abs((Math.sin(@seed/@ttl))) * 0.5 + 0.5
+      rot = Math.sin(@seed/@ttl)
+      @color[0] = Math.abs(rot) * 200
+      @color[3] = Math.abs(rot) * 0.5 + 0.5
+      @drawTextAlongArc("naub warning", -@seed/30)
       @seed++
 
     @animation = setInterval animate, 50
 
+
+  drawTextAlongArc: (str, rot = 0) ->
+    angle = str.length * 0.1 
+    @ctx.save()
+    @ctx.translate(@center.x, @center.y)
+    @ctx.rotate(-1 * angle / 2)
+    @ctx.rotate(-1 * (angle / str.length) / 2 + rot)
+    for char in str
+      @ctx.rotate(angle / str.length)
+      #@ctx.rotate(str.length * 0.01)
+      @ctx.save()
+      @ctx.translate(0, (-1 *@basket_size + 15) )
+      @ctx.fillStyle = @color_to_rgba(@color)
+      @ctx.textAlign = 'center'
+      @ctx.font= "#{20}px Helvetica"
+      @ctx.fillText(char, 0, 0)
+      @ctx.restore()
+    @ctx.restore()
     
   draw_marker: (x,y, color = 'black') ->
     @ctx.beginPath()

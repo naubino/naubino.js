@@ -58,6 +58,8 @@ Naubino.TestCase = class TestCase extends RuleSet
     Naubino.game.basket_size = basket
     Naubino.background.basket_size = basket
     Naubino.background.draw()
+    Naubino.background.pulse()
+
 
   run: ->
     #@loop = setInterval(@event, 3000 )
