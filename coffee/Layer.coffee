@@ -89,6 +89,13 @@ Naubino.Layer = class Layer
       if obj.isHit(x, y)
         return obj
 
+  ### utils ###
+  color_to_rgba: (color, shift = 0) =>
+    r = Math.round((color[0] + shift))
+    g = Math.round((color[1] + shift))
+    b = Math.round((color[2] + shift))
+    a = color[3]
+    "rgba(#{r},#{g},#{b},#{a})"
 
 
 Naubino.Background = class Background extends Naubino.Layer
@@ -97,7 +104,9 @@ Naubino.Background = class Background extends Naubino.Layer
     @fps = 1000 / 5
     @drawing = true
     @basket_size = 170
-    @basket_thickness = 4
+    @default_thickness = @basket_thickness = 4
+    @ttl = 12
+    @color = [0,0,0,0.5]
 
   draw: () ->
     width = @canvas.width
@@ -109,34 +118,40 @@ Naubino.Background = class Background extends Naubino.Layer
 
     @ctx.save()
     @ctx.beginPath()
-    @ctx.arc centerX, centerY, @basket_size, 0, Math.PI*2, false
+    @ctx.arc centerX, centerY, @basket_size+@basket_thickness/2, 0, Math.PI*2, false
 
     @ctx.lineWidth = @basket_thickness
-    @ctx.strokeStyle = 'rgba(0,0,0,0.5)'
+    @ctx.strokeStyle = @color_to_rgba(@color)
     @ctx.stroke()
     @ctx.closePath()
     @ctx.restore()
 
+  stop_pulse: ->
+    @pulse_ends = true
+
   pulse: () ->
-    default_fps = @fps
-    @default_thickness = @basket_thickness
+    @default_fps = @fps
     @seed = 0
     @fps = 1000 / 40
     @start_timer()
+    if @animation?
+      clearInterval(@animation)
 
     animate = =>
-      @basket_thickness = Math.abs(Math.sin(@seed/10))  * 2 *   @default_thickness + @default_thickness
+      if @pulse_ends and Math.abs(@default_thickness - @basket_thickness) < 1
+        clearInterval(@animation)
+        delete @animation
+        @pulse_ends = false
+        @basket_thickness = @default_thickness
+        @color[0] = 0
+        @color[3] = 0.5
+
+      @basket_thickness = Math.abs(Math.sin(@seed/@ttl))  * 2 *   @default_thickness + @default_thickness
+      @color[0] = Math.abs((Math.sin(@seed/@ttl))) * 200
+      @color[3] = Math.abs((Math.sin(@seed/@ttl))) * 0.5 + 0.5
       @seed++
 
-    stop = =>
-      clearInterval @animation
-      @fps = default_fps
-      @basket_thickness = @default_thickness
-
     @animation = setInterval animate, 50
-    setTimeout stop, 13000
-
-
 
     
   draw_marker: (x,y, color = 'black') ->
