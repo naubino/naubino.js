@@ -104,6 +104,16 @@ Naubino.Game = class Game extends Naubino.Layer
         y = 0 - offset
     {x,y}
 
+  count_basket: ->
+    count = []
+    if @basket_size?
+      for id, naub of @objs
+        diff = @center.Copy()
+        diff.Subtract naub.physics.pos
+        if diff.Length() < @basket_size - naub.size/2
+          count.push naub.number
+    count
+
 
   destroy_naubs: (list)->
     for naub in list
@@ -123,7 +133,6 @@ Naubino.Game = class Game extends Naubino.Layer
 
 
   # controlls everything that happens inside the field
-  
     
   draw:  ->
     @ctx.clearRect(0, 0, Naubino.world_canvas.width, Naubino.world_canvas.height)

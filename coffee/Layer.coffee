@@ -91,12 +91,13 @@ Naubino.Layer = class Layer
 
 
 
-
 Naubino.Background = class Background extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
-    @fps = 1000 / 10
+    @fps = 1000 / 5
     @drawing = true
+    @basket_size = 170
+    @basket_thickness = 4
 
   draw: () ->
     width = @canvas.width
@@ -108,13 +109,35 @@ Naubino.Background = class Background extends Naubino.Layer
 
     @ctx.save()
     @ctx.beginPath()
-    @ctx.arc centerX, centerY, 160, 0, Math.PI*2, false
+    @ctx.arc centerX, centerY, @basket_size, 0, Math.PI*2, false
 
-    @ctx.lineWidth = 5
+    @ctx.lineWidth = @basket_thickness
     @ctx.strokeStyle = 'rgba(0,0,0,0.5)'
     @ctx.stroke()
     @ctx.closePath()
     @ctx.restore()
+
+  pulse: () ->
+    default_fps = @fps
+    @default_thickness = @basket_thickness
+    @seed = 0
+    @fps = 1000 / 40
+    @start_timer()
+
+    animate = =>
+      @basket_thickness = Math.abs(Math.sin(@seed/10))  * 2 *   @default_thickness + @default_thickness
+      @seed++
+
+    stop = =>
+      clearInterval @animation
+      @fps = default_fps
+      @basket_thickness = @default_thickness
+
+    @animation = setInterval animate, 50
+    setTimeout stop, 13000
+
+
+
     
   draw_marker: (x,y, color = 'black') ->
     @ctx.beginPath()
