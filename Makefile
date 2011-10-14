@@ -10,7 +10,7 @@ install: compile
 	uglifyjs Naubino.full.js > Naubino.min.js
 
 loc:
-	cat $(COFFEE) | grep -v '^\\( *#\|\s*$\)' | wc -l | tr -s ' '
+	cat coffee/*.coffee | grep -v '^\s*#' | grep -v "^\s*$$" | wc -l
 
 clean:
 	rm -f $(JS)
