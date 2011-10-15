@@ -34,7 +34,7 @@ Naubino.Layer = class Layer
   remove_obj: (id) ->
     delete @objs[id]
 
-  clear: ->
+  clear_objs: ->
     @objs = {}
 
 
@@ -89,6 +89,10 @@ Naubino.Layer = class Layer
       if obj.isHit(x, y)
         return obj
 
+  clear: ->
+    @canvas.width = @canvas.width
+
+
   ### utils ###
   color_to_rgba: (color, shift = 0) =>
     r = Math.round((color[0] + shift))
@@ -96,6 +100,23 @@ Naubino.Layer = class Layer
     b = Math.round((color[2] + shift))
     a = color[3]
     "rgba(#{r},#{g},#{b},#{a})"
+
+
+Naubino.Overlay = class Overlay extends Naubino.Layer
+  constructor: (canvas) ->
+    super(canvas)
+    @fps = 1000 / 5
+
+  draw_warning:(text) ->
+    @draw_text(text, "red", "bold 34")
+
+
+  draw_text: (text,color = 'black', font_size = 15) ->
+    @ctx.fillStyle = color
+    @ctx.strokeStyle = color
+    @ctx.textAlign = 'center'
+    @ctx.font= "#{font_size}px Helvetica"
+    @ctx.fillText(text,@center.x , @center.y)
 
 
 Naubino.Background = class Background extends Naubino.Layer
