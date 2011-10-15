@@ -5,6 +5,9 @@ Naubino.RuleSet = class RuleSet
     @configure()
 
   configure: ->
+    basket = 150
+    Naubino.game.basket_size = basket
+    Naubino.background.basket_size = basket
     Naubino.state_machine.naub_replaced.add =>
       Naubino.state_machine.graph.cycle_test()
 
@@ -30,6 +33,8 @@ Naubino.RuleSet = class RuleSet
     if @inner_clock == 0
       {x,y} = Naubino.game.random_outside()
       Naubino.game.create_naub_pair(x,y)
+      basket = Naubino.game.count_basket()
+      console.log basket if basket.length > 0
       console.log "new naubs!"
     @inner_clock = (@inner_clock + 1) % 10
 
@@ -58,7 +63,6 @@ Naubino.TestCase = class TestCase extends RuleSet
     Naubino.game.basket_size = basket
     Naubino.background.basket_size = basket
     Naubino.background.draw()
-    Naubino.background.pulse()
 
 
   run: ->
