@@ -21,13 +21,14 @@ window.onload = ->
 
   init_dom: () ->
     @overlay_canvas = document.getElementById("overlay_canvas")
+    @menu_canvas = document.getElementById("menu_canvas")
     @world_canvas = document.getElementById("world_canvas")
     @background_canvas = document.getElementById("background_canvas")
 
 
     @background = new @Background(@background_canvas)
     @game       = new @Game(@world_canvas, @graph)
-    @menu       = new @Menu(@overlay_canvas)
+    @menu       = new @Menu(@menu_canvas)
 
 
   setup_keybindings: () ->

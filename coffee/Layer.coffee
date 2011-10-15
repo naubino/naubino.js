@@ -150,7 +150,7 @@ Naubino.Background = class Background extends Naubino.Layer
       rot = Math.sin(@seed/@ttl)
       @color[0] = Math.abs(rot) * 200
       @color[3] = Math.abs(rot) * 0.5 + 0.5
-      @drawTextAlongArc("naub warning", -@seed/30)
+      #@drawTextAlongArc("naub warning", -@seed/30)
       @seed++
 
     @animation = setInterval animate, 50
