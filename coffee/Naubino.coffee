@@ -29,6 +29,7 @@ window.onload = ->
     @background = new @Background(@background_canvas)
     @game       = new @Game(@world_canvas, @graph)
     @menu       = new @Menu(@menu_canvas)
+    @overlay    = new @Overlay(@overlay_canvas)
 
 
   setup_keybindings: () ->
