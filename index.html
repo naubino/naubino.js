@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>naubino.js</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="css/naubino.css" type="text/css">
+  <link rel="stylesheet" href="css/github-badge.css" type="text/css">
+  <meta name="viewport" content="width=device-width, maximum-scale=1.2,user-scalable=no" />
+</head>
+<body>
+  <a id="github" href="https://github.com/hoodie/naubino.js">
+    <span>Watch me on Github!</span>
+    <span>Stay tuned!</span>
+  </a>
+
+
+  <div id="gamediv">
+    <canvas id="background_canvas" style="position: absolute; z-index:0;" width="800" height="480"></canvas>
+    <canvas id="world_canvas"      style="position: absolute; z-index:1;" width="800" height="480"></canvas>
+    <canvas id="menu_canvas"       style="position: absolute; z-index:2;" width="800" height="480"></canvas>
+    <canvas id="overlay_canvas"    style="position: absolute; z-index:2;" width="800" height="480"></canvas>
+  </div> 
+
+
+
+  <script type="text/javascript" src="lib/my.common.min.js"></script>
+  <script type="text/javascript" src="lib/underscore.js"></script>
+  <script type="text/javascript" src="lib/signals.min.js"></script>
+  <script type="text/javascript" src="lib/state-machine.js"></script>
+  <script type="text/javascript" src="lib/b2Vec2.js"></script>
+  <script type="text/javascript" src="Naubino.min.js"></script>
+  <script>
+    document.ontouchmove = function(event) {
+      event.preventDefault();
+    }
+  </script>
+</body>
+</html>
+

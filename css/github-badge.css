@@ -1,0 +1,47 @@
+body{
+    overflow: hidden;
+
+}
+#github {
+    -moz-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    height: 30px;
+    top: 40px;
+    right: -60px;
+    position: absolute;
+    text-decoration: none;
+    width: 250px;
+}
+#github span {
+    -moz-transition-duration: 1s;
+    -moz-transition-property: opacity;
+    -webkit-transition-duration: 1s;
+    -webkit-transition-property: opacity;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+    border-bottom: 2px solid white;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    left: 0;
+    padding: 5px 5px;
+    position: absolute;
+    text-align: center;
+    width: 250px;
+}
+#github span:first-child {
+    background: none repeat scroll 0 0 black;
+}
+#github span:last-child {
+    background: none repeat scroll 0 0 #97BE0D;
+    opacity: 0;
+}
+#github:hover span:first-child {
+    opacity: 0;
+}
+#github:hover span:last-child {
+    opacity: 1;
+}
+.trident #github {
+    display: none;
+}
