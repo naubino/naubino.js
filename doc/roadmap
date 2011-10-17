@@ -5,6 +5,7 @@
   * alternating game modes
 
 # Known Issues
+  * colors of menu buttons
   * need to look over every single floating point operation
   * play and pause button should have the same color
   * keep on looking for the 3-way-join-bug

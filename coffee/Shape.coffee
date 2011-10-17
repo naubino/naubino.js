@@ -108,13 +108,20 @@ Naubino.Shape = class Shape
     a = color[3]
     "rgba(#{r},#{g},#{b},#{a})"
 
+  ## change color
+  set_color_id:(id)->
+    palette = Naubino.colors
+    pick = palette[id]
+    @style.fill = [pick[0],pick[1],pick[2], 1]# TODO automatically assume 1 if alpha is unset (pick[3])
+    id
+
+
+
   ## colors the shape randomly and returns color id for comparison
   random_palette_color: ->
     palette = Naubino.colors
     id = Math.round(Math.random() * (palette.length-1))
-    pick = palette[id]
-    @style.fill = [pick[0],pick[1],pick[2], 1]# TODO automatically assume 1 if alpha is unset (pick[3])
-    id
+    @set_color_id id
     
   ## colors the shape randomly and returns color id for comparison
   random_color: ->
