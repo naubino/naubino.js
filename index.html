@@ -5,6 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <link rel="stylesheet" href="css/naubino.css" type="text/css">
   <link rel="stylesheet" href="css/github-badge.css" type="text/css">
+  <meta name="viewport" content="width=device-width, maximum-scale=1.2,user-scalable=no" />
 </head>
 <body>
   <a id="github" href="https://github.com/hoodie/naubino.js">
@@ -29,6 +30,11 @@
   <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
   <script type="text/javascript" src="lib/b2Vec2.js"></script>
   <script type="text/javascript" src="Naubino.min.js"></script>
+  <script>
+    document.ontouchmove = function(event) {
+      event.preventDefault();
+    }
+  </script>
 </body>
 </html>
 

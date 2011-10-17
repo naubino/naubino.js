@@ -14,15 +14,38 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @dt = @fps/100
     
     @position = new b2Vec2(20,25)
+    @draw_play_icon = (ctx) ->
+      ctx.save()
+      ctx.beginPath()
+      ctx.fillStyle = "#ffffff"
+      ctx.moveTo(-5,-5)
+      ctx.lineTo(-5, 5)
+      ctx.lineTo( 7, 0)
+      ctx.lineTo(-5,-5)
+      ctx.closePath()
+      ctx.fill()
+      ctx.restore()
+
+    @draw_pause_icon = (ctx) ->
+      ctx.save()
+      ctx.fillStyle = "#ffffff"
+      ctx.beginPath()
+      ctx.rect(-5,-6,4,12)
+      ctx.rect( 1,-6,4,12)
+      ctx.closePath()
+      ctx.fill()
+      ctx.restore()
+
+
 
     @buttons = {
       play:
         function: -> Naubino.state_machine.menu_play.dispatch()
-        content: (ctx) -> this.draw_string(ctx, '')
+        content: (ctx) => @draw_play_icon(ctx)
         position: new b2Vec2(65,35)
       pause:
         function: -> Naubino.state_machine.menu_pause.dispatch()
-        content: (ctx) -> this.draw_string(ctx, '')
+        content: (ctx) => @draw_pause_icon(ctx)
         position: new b2Vec2(65,35)
         disabled: true
       help:
@@ -73,6 +96,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
       @objs[name].physics.pos.Set attr.position.x, attr.position.y
       @objs[name].physics.attracted_to.Set attr.position.x, attr.position.y
       @objs[name].content = attr.content
+      #@objs[name].shape.set_color_id 2
       @objs[name].shape.pre_render()
       @objs[name].focus = attr.function
       @objs[name].disable() if attr.disabled

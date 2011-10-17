@@ -46,10 +46,11 @@ Naubino.Ball = class Ball extends Naubino.Shape
 
     ctx.fill()
 
+    ctx.closePath()
+
     if @naub? and @naub.content?
       @naub.content.call(this, ctx, offset)
 
-    ctx.closePath()
     ctx.restore()
 
   draw_join: (ctx, partner) ->
