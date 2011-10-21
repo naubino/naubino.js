@@ -129,7 +129,11 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
   
 
   warning:(text) ->
-    @draw_text(text, "red", "bold 34")
+    @ctx.fillStyle = color
+    @ctx.strokeStyle = Naubino.colors. # XXX interrupted work here
+    @ctx.textAlign = 'center'
+    @ctx.font= "bold #{font_size}px Helvetica"
+    @ctx.fillText(text, x,y)
 
   draw_text: (text,color = 'black', font_size = 15, x = @center.x, y = @center.y) ->
     lines = text.split("\n")
