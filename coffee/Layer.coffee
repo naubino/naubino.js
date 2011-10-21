@@ -107,16 +107,44 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     super(canvas)
     @fps = 1000 / 5
 
-  draw_warning:(text) ->
+  fade_in: ->
+    @canvas.style.opacity = 0.01
+    fade = =>
+      if (@canvas.style.opacity *= 1.2) >= 1
+        clearInterval @fadeloop
+        @canvas.style.opacity = 1
+    @fadeloop = setInterval( fade, 40 )
+      
+
+  fade_out: ->
+    @canvas.style.opacity = 1 # TODO why is opacity not set to 1 by default?
+    fade = =>
+      if (@canvas.style.opacity *= 0.8) <= 0.05
+        clearInterval @fadeloop
+        #@clear()
+        #@canvas.style.opacity = 1
+    @fadeloop = setInterval( fade, 40 )
+      
+
+  
+
+  warning:(text) ->
     @draw_text(text, "red", "bold 34")
 
+  draw_text: (text,color = 'black', font_size = 15, x = @center.x, y = @center.y) ->
+    lines = text.split("\n")
+    y -= font_size * lines.length /2
+    for line in lines
+      @render_text(line, color, font_size, x, y)
+      y += font_size
+    return
 
-  draw_text: (text,color = 'black', font_size = 15) ->
+  render_text: (text,color = 'black', font_size = 15, x = @center.x, y = @center.y) ->
     @ctx.fillStyle = color
     @ctx.strokeStyle = color
     @ctx.textAlign = 'center'
     @ctx.font= "#{font_size}px Helvetica"
-    @ctx.fillText(text,@center.x , @center.y)
+    @ctx.fillText(text, x,y)
 
 
 Naubino.Background = class Background extends Naubino.Layer

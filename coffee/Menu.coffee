@@ -115,7 +115,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
 
 
   draw: ->
-    @ctx.clearRect(0, 0, Naubino.world_canvas.width, Naubino.world_canvas.height)
+    @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
     for name, naub of @objs
       naub.draw_joins(@ctx)if not naub.disabled
