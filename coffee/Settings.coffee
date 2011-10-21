@@ -7,6 +7,9 @@ Naubino.Settings = {
     game: on
   fps: 20
   show_numbers: off
+  canvas:
+    width: 600
+    height: 400
 
   colors:
     output: [
