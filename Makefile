@@ -56,6 +56,7 @@ clean:
 	rm -f $(NAUBINO_TARGET) $(NAUBINO_UGLIFIED_TARGET) js/*
 
 
+.PHONY: loc
 loc:
 	cat $(NAUBINO_SOURCE) | grep -v '^\s*#' | grep -v "^\s*$$" | wc -l
 
