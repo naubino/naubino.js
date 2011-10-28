@@ -20,6 +20,7 @@ window.onload = ->
 
 
   init_dom: () ->
+    @gamediv = document.getElementById("gamediv")
     @overlay_canvas = document.getElementById("overlay_canvas")
     @menu_canvas = document.getElementById("menu_canvas")
     @game_canvas = document.getElementById("game_canvas")
@@ -27,6 +28,8 @@ window.onload = ->
 
     @overlay_canvas.width = @menu_canvas.width = @game_canvas.width = @background_canvas.width = @Settings.canvas.width
     @overlay_canvas.height = @menu_canvas.height = @game_canvas.height = @background_canvas.height = @Settings.canvas.height
+    @gamediv.max-width = @Settings.canvas.width
+    @gamediv.style.border = "2px"
 
     @background = new @Background(@background_canvas)
     @game       = new @Game(@game_canvas, @graph)

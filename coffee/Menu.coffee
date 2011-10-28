@@ -1,7 +1,6 @@
 Naubino.Menu = class Menu extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
-    @canvas = Naubino.background
 
     @objs = {}
     @hovering = false
