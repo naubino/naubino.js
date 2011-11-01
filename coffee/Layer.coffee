@@ -63,6 +63,32 @@ Naubino.Layer = class Layer
       @draw()
 
 
+  show: ->
+    @canvas.style.opacity = 1
+
+  hide: ->
+    @canvas.style.opacity = 0
+
+  fade_in: ->
+    @canvas.style.opacity = 0.01
+    fade = =>
+      if (@canvas.style.opacity *= 1.2) >= 1
+        clearInterval @fadeloop
+        @show()
+    @fadeloop = setInterval( fade, 40 )
+      
+
+  fade_out: ->
+    @canvas.style.opacity = 1 # TODO why is opacity not set to 1 by default?
+    fade = =>
+      if (@canvas.style.opacity *= 0.8) <= 0.05
+        clearInterval @fadeloop
+        @hide()
+        #@clear()
+        #@canvas.style.opacity = 1
+    @fadeloop = setInterval( fade, 40 )
+      
+
 
 
   ## can I touch this? (pointer interaction)
@@ -107,16 +133,29 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     super(canvas)
     @fps = 1000 / 5
 
-  draw_warning:(text) ->
-    @draw_text(text, "red", "bold 34")
+  
 
+  warning:(text, font_size = 25,x = @center.x, y = @center.y) ->
+    @ctx.fillStyle = @color_to_rgba(Naubino.colors[0])
+    @ctx.strokeStyle = @color_to_rgba(Naubino.colors[0])
+    @ctx.textAlign = 'center'
+    @ctx.font= "bold #{font_size+4}px Helvetica"
+    @ctx.fillText(text, x, y)
 
-  draw_text: (text,color = 'black', font_size = 15) ->
+  draw_text: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y) ->
+    lines = text.split("\n")
+    y -= font_size * lines.length /2
+    for line in lines
+      @render_text(line, font_size, color, x, y)
+      y += font_size
+    return
+
+  render_text: (text, font_size = 15, color = 'black', x = @center.x, y = @center.y) ->
     @ctx.fillStyle = color
     @ctx.strokeStyle = color
     @ctx.textAlign = 'center'
     @ctx.font= "#{font_size}px Helvetica"
-    @ctx.fillText(text,@center.x , @center.y)
+    @ctx.fillText(text, x,y)
 
 
 Naubino.Background = class Background extends Naubino.Layer
@@ -213,12 +252,5 @@ Naubino.Background = class Background extends Naubino.Layer
     @ctx.strokeStyle = color
     @ctx.stroke()
     @ctx.closePath()
-
-  draw_text: (x,y,text,color = 'black') ->
-    @ctx.fillStyle = color
-    @ctx.strokeStyle = color
-    @ctx.textAlign = 'center'
-    @ctx.font= "#{@size+4}px Helvetica"
-    @ctx.fillText(text, x, y)
 
 

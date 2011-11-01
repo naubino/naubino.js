@@ -135,7 +135,7 @@ Naubino.Game = class Game extends Naubino.Layer
   # controlls everything that happens inside the field
     
   draw:  ->
-    @ctx.clearRect(0, 0, Naubino.world_canvas.width, Naubino.world_canvas.height)
+    @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
     for id, obj of @objs
       obj.draw_joins @ctx

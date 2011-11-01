@@ -16,7 +16,6 @@ Naubino.RuleSet = class RuleSet
 
     Naubino.state_machine.cycle_found.add (list) =>
       Naubino.state_machine.game.destroy_naubs(list)
-      console.log list
 
 
 
@@ -46,7 +45,23 @@ Naubino.RuleSet = class RuleSet
     Naubino.game.points = 0
 
 
+Naubino.Tutorial = class Tutorial extends RuleSet
+  constructor: ->
+    super()
+  configure: ->
+    super()
+    Naubino.overlay.hide()
+    Naubino.menu.hide()
+    Naubino.game.hide()
+    #Naubino.background.hide()
+    #Naubino.background.draw()
 
+  run: ->
+    Naubino.overlay.draw_text("hello world",25)
+    Naubino.overlay.fade_in()
+
+  halt:->
+  event: ->
 
 
 
