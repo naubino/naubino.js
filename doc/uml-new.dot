@@ -11,44 +11,55 @@ digraph G {
     arrowtail  = "none"
     dir = "both"]
 
-  Naubino [label="{Naubino}"]
-  KeyBindings[label="{KeyBindings}"]
-  Signals[label="{Signals}"]
+ Naubino [label="{Naubino}"]
+ KeyBindings[label="{KeyBindings}"]
+ Signals[label="{Signals}"]
+ Layer[label="{Layer||width\lheight\lpointer\lobjs\...\l}"]
+ RuleSet[label="{RuleSet|configure()\lrun()\lhalt()\levent()\l|}"]
 
-  Overlay[label="{Overlay}"]
-  Overlay_Canvas[label="{Canvas}"]
-  Field[label="{Field}"]
-  Field_Canvas[label="{Canvas}"]
-  Background[label="{Background}"]
-  Background_Canvas[label="{Canvas}"]
+ Overlay[label="{Overlay\l#Layer\l}"]
+ Menu [label="{Menu\l#Layer||canvas\l}"]
+ Game [label="{Game\l#Layer||canvas\l}"]
+ Background[label="{Background\l#Layer||canvas\l}"]
 
-  GameMode[label="{GameMode}"]
-  The_Graph[label="{Graph}"]
-  Naub[label="{Naub}"]
-  NaubShape[label="{NaubShape}"]
+ The_Graph[label="{Graph}"]
 
-  Physics[label="{PhysicsModel}"]
+ Naub[label="{Naub||phyisics\lcolor_id\lnumber\l}"]
+ NaubShape[label="{NaubShape}"]
+ NaubBall[label="{NaubBall\l#NaubShape\l}"]
 
- Naubino -> GameMode
+ Physics[label="{PhysicsModel}"]
+
+ Naubino -> RuleSet
  Naubino -> KeyBindings 
- Naubino -> Overlay
- Naubino -> Background
- Naubino -> Field
+ Naubino -> Layer
+ Naubino -> StateMachine
+
+ subgraph {
+ Layer -> Overlay
+ Layer -> Background
+ Layer -> Menu
+ Layer -> Game
  Naubino -> The_Graph
+ }
 
- GameMode -> Signals
+ RuleSet -> Signals
 
 
- Field -> Naub [arrowtail = "diamond" ]
- Field -> Field_Canvas
+ Game -> Naub
+ Game -> Game_Canvas
+ Menu -> Menu_Canvas
  Overlay -> Overlay_Canvas
  Background -> Background_Canvas
 
  Naub -> NaubShape
- Naub -> Physics [arrowtail = "diamond" ]
- Naub -> Join [arrowtail = "diamond" ]
+ Naub -> Physics 
+ Naub -> Join  
+ Naub -> Naub  
+ NaubShape -> NaubBall
 
- //NaubShape -> NaubBall
+ //NaubShape -> NaubBall[arrowtail = "diamond" ]
+
 
 
 
