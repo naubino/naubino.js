@@ -65,6 +65,7 @@ Naubino.Layer = class Layer
 
   show: ->
     @canvas.style.opacity = 1
+
   hide: ->
     @canvas.style.opacity = 0
 
@@ -73,7 +74,7 @@ Naubino.Layer = class Layer
     fade = =>
       if (@canvas.style.opacity *= 1.2) >= 1
         clearInterval @fadeloop
-        @canvas.style.opacity = 1
+        @show()
     @fadeloop = setInterval( fade, 40 )
       
 
@@ -82,6 +83,7 @@ Naubino.Layer = class Layer
     fade = =>
       if (@canvas.style.opacity *= 0.8) <= 0.05
         clearInterval @fadeloop
+        @hide()
         #@clear()
         #@canvas.style.opacity = 1
     @fadeloop = setInterval( fade, 40 )
@@ -140,15 +142,15 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     @ctx.font= "bold #{font_size+4}px Helvetica"
     @ctx.fillText(text, x, y)
 
-  draw_text: (text,color = 'black', font_size = 15, x = @center.x, y = @center.y) ->
+  draw_text: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y) ->
     lines = text.split("\n")
     y -= font_size * lines.length /2
     for line in lines
-      @render_text(line, color, font_size, x, y)
+      @render_text(line, font_size, color, x, y)
       y += font_size
     return
 
-  render_text: (text,color = 'black', font_size = 15, x = @center.x, y = @center.y) ->
+  render_text: (text, font_size = 15, color = 'black', x = @center.x, y = @center.y) ->
     @ctx.fillStyle = color
     @ctx.strokeStyle = color
     @ctx.textAlign = 'center'
