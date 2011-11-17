@@ -45,9 +45,12 @@ Naubino.RuleSet = class RuleSet
     Naubino.game.points = 0
 
 
+
+
 Naubino.Tutorial = class Tutorial extends RuleSet
   constructor: ->
     super()
+
   configure: ->
     super()
     Naubino.overlay.hide()
@@ -57,11 +60,20 @@ Naubino.Tutorial = class Tutorial extends RuleSet
     #Naubino.background.draw()
 
   run: ->
-    Naubino.overlay.draw_text("hello world",25)
-    Naubino.overlay.fade_in()
 
   halt:->
+
+  events: [
+    ->
+      Naubino.overlay.draw_text("hello world",25)
+      Naubino.overlay.fade_in()
+      setTimeout()
+    ->
+      Naubino.overlay
+    ]
   event: ->
+
+
 
 
 

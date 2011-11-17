@@ -1,15 +1,15 @@
 # all colors (except color_output) found at colorlovers.com
 Naubino.Settings = {
 
-  pre_rendering: on
+  pre_rendering:  on
   gravity:
-    menu: on
-    game: on
-  fps: 20
-  show_numbers: off
+    menu:         on
+    game:         on
+  fps:            20
+  show_numbers:   off
   canvas:
-    width: 600
-    height: 400
+    width:        600
+    height:       400
 
   colors:
     #please sort colors by
