@@ -15,8 +15,8 @@ window.onload = ->
 
     @state_machine = new @NaubMachine()
     #@rules = new @RuleSet()
-    #@rules = new @Tutorial()
-    @rules = new @TestCase()
+    @rules = new @Tutorial()
+    #@rules = new @TestCase()
     @state_machine.menu_play.dispatch() #TODO remove this line
 
 

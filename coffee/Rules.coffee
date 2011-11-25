@@ -47,34 +47,6 @@ Naubino.RuleSet = class RuleSet
 
 
 
-Naubino.Tutorial = class Tutorial extends RuleSet
-  constructor: ->
-    super()
-
-  configure: ->
-    super()
-    Naubino.overlay.hide()
-    Naubino.menu.hide()
-    Naubino.game.hide()
-    #Naubino.background.hide()
-    #Naubino.background.draw()
-
-  run: ->
-
-  halt:->
-
-  events: [
-    ->
-      Naubino.overlay.draw_text("hello world",25)
-      Naubino.overlay.fade_in()
-      setTimeout()
-    ->
-      Naubino.overlay
-    ]
-  event: ->
-
-
-
 
 
 Naubino.TestCase = class TestCase extends RuleSet
