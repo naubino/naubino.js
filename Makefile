@@ -3,34 +3,42 @@ NAUBINO_UGLIFIED_TARGET = Naubino.min.js
 
 
 NAUBINO_SOURCE = coffee/Ball.coffee \
-				 coffee/Keybindings.coffee \
-				 coffee/Naub.coffee \
-				 coffee/Rules.coffee \
-				 coffee/StateMachine.coffee \
-				 coffee/Game.coffee \
-				 coffee/Layer.coffee \
-				 coffee/Naubino.coffee \
-				 coffee/Settings.coffee \
-				 coffee/Vector.coffee \
-				 coffee/Graph.coffee \
-				 coffee/Menu.coffee \
-				 coffee/PhysicsModel.coffee \
-				 coffee/Shape.coffee
+								 coffee/Keybindings.coffee \
+								 coffee/Naub.coffee \
+								 coffee/Rules.coffee \
+								 coffee/Tutorial.coffee \
+								 coffee/StateMachine.coffee \
+								 coffee/Game.coffee \
+								 coffee/Layer.coffee \
+								 coffee/Overlay.coffee \
+								 coffee/Background.coffee \
+								 coffee/Naubino.coffee \
+								 coffee/Settings.coffee \
+								 coffee/Vector.coffee \
+								 coffee/Graph.coffee \
+								 coffee/Menu.coffee \
+								 coffee/PhysicsModel.coffee \
+								 coffee/Shape.coffee
 
-NAUBINO_TMP = js/Ball.js \
-			  js/Keybindings.js \
-			  js/Naub.js \
-			  js/Rules.js \
-			  js/StateMachine.js \
-			  js/Game.js \
-			  js/Layer.js \
-			  js/Naubino.js \
-			  js/Settings.js \
-			  js/Vector.js \
-			  js/Graph.js \
-			  js/Menu.js \
-			  js/PhysicsModel.js \
-			  js/Shape.js
+# the order is crucial
+NAUBINO_TMP = \
+							js/Naubino.js \
+							js/Settings.js \
+							js/Rules.js \
+							js/Tutorial.js \
+							js/StateMachine.js \
+							js/PhysicsModel.js \
+							js/Keybindings.js \
+							js/Vector.js \
+							js/Naub.js \
+							js/Shape.js \
+							js/Ball.js \
+							js/Layer.js \
+							js/Overlay.js \
+							js/Background.js \
+							js/Menu.js \
+							js/Game.js \
+							js/Graph.js \
 
 
 all: $(NAUBINO_TARGET)
