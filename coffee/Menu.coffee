@@ -7,6 +7,11 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @gravity = Naubino.Settings.gravity.menu
 
     @listener_size = @default_listener_size = 45
+    Naubino.menu_focus.add =>
+      @hovering = true
+
+    Naubino.menu_blur.add =>
+      @hovering = false
 
     # fragile calibration! don't fuck it up!
     @fps = 1000 / 20
@@ -39,20 +44,20 @@ Naubino.Menu = class Menu extends Naubino.Layer
 
     @buttons = {
       play:
-        function: -> Naubino.state_machine.menu_play.dispatch()
+        function: -> Naubino.menu_play.dispatch()
         content: (ctx) => @draw_play_icon(ctx)
         position: new b2Vec2(65,35)
       pause:
-        function: -> Naubino.state_machine.menu_pause.dispatch()
+        function: -> Naubino.menu_pause.dispatch()
         content: (ctx) => @draw_pause_icon(ctx)
         position: new b2Vec2(65,35)
         disabled: true
       help:
-        function: -> Naubino.state_machine.menu_help.dispatch()
+        function: -> Naubino.menu_help.dispatch()
         content: (ctx) -> this.draw_string(ctx, '?')
         position: new b2Vec2(45,65)
       exit:
-        function: -> Naubino.state_machine.menu_exit.dispatch()
+        function: -> Naubino.menu_exit.dispatch()
         content: (ctx) -> this.draw_string(ctx, 'X')
         position: new b2Vec2(14,80)
       }
@@ -152,10 +157,12 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @ctx.arc 0, 15, @listener_size, 0, Math.PI*2, true
     if @ctx.isPointInPath(@pointer.x,@pointer.y)
       unless @hovering
-        @hovering =  true
+        #@hovering =  true
+        Naubino.menu_focus.dispatch()
         @listener_size = 90
     else if @hovering
-      @hovering = false
+      #@hovering = false
+      Naubino.menu_blur.dispatch()
       @listener_size = @default_listener_size
     #@ctx.stroke()
     @ctx.closePath()

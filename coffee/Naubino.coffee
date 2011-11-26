@@ -7,17 +7,20 @@ window.onload = ->
 
     @graph = new @Graph()
     @colors = @Settings.colors.output
+    @state_machine = new @NaubMachine()
+    @Signal = window.signals.Signal
+    @add_signals()
+    @add_generic_listeners()
 
     @init_dom()
 
     @setup_keybindings()
     @setup_cursorbindings()
 
-    @state_machine = new @NaubMachine()
-    #@rules = new @RuleSet()
-    @rules = new @Tutorial()
+    @rules = new @RuleSet()
+    #@rules = new @Tutorial()
     #@rules = new @TestCase()
-    @state_machine.menu_play.dispatch() #TODO remove this line
+    @menu_play.dispatch() #TODO remove this line
 
 
   init_dom: () ->
@@ -37,27 +40,71 @@ window.onload = ->
     @menu       = new @Menu(@menu_canvas)
     @overlay    = new @Overlay(@overlay_canvas)
 
+  add_signals: ->
+
+    # user interface
+    @mousedown       = new @Signal()
+    @mouseup         = new @Signal()
+    @mousemove       = new @Signal()
+    @keydown         = new @Signal()
+    @keyup           = new @Signal()
+    @touchstart      = new @Signal()
+    @touchend        = new @Signal()
+    @touchmove       = new @Signal()
+
+    # gameplay
+    @naub_replaced   = new @Signal()
+    @naub_destroyed  = new @Signal()
+    @cycle_found     = new @Signal()
+
+    # menu
+    @menu_focus      = new @Signal()
+    @menu_blur       = new @Signal()
+    @menu_pause      = new @Signal()
+    @menu_play       = new @Signal()
+    @menu_exit       = new @Signal()
+    @menu_help       = new @Signal()
+
+
+  add_generic_listeners: ->
+    @menu_pause.add =>
+      @state_machine.fsm.pause()
+      console.log "menu: pause"
+
+    @menu_play.add =>
+      @state_machine.fsm.play()
+      console.log "menu: play"
+
+    @menu_exit.add =>
+      @state_machine.fsm.exit()
+      console.log "menu: exit"
+
+    @menu_help.add =>
+      @state_machine.fsm.show_help()
+      console.log "menu: help"
+
+  add_listeners: ->
 
   setup_keybindings: () ->
     @keybindings = new @KeyBindings()
     window.onkeydown = (key) => @keybindings.keydown(key)
     window.onkeyup = (key) => @keybindings.keyup(key)
-    @keybindings.enable 32, => @state_machine.menu_pause.dispatch()
+    @keybindings.enable 32, => @menu_pause.dispatch()
 
 
   setup_cursorbindings: () ->
     # TODO mouse events must go solely through mode
     onmousemove = (e) =>
-      #@state_machine.mousemove.dispatch(e)
+      #@mousemove.dispatch(e)
       @menu.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
       @game.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmouseup = (e) =>
-      @state_machine.mouseup.dispatch(e)
+      @mouseup.dispatch(e)
       @game.unfocus e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmousedown = (e) =>
-      @state_machine.mousedown.dispatch(e)
+      @mousedown.dispatch(e)
       @menu.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
       @game.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
