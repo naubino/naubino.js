@@ -15,6 +15,7 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
   fade_in_message: (text) ->
     @hide()
     @message text
+    console.log "fade_in: #{text}"
     @fade_in()
 
   # uses render text

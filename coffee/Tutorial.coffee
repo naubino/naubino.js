@@ -6,14 +6,12 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
 
   configure: ->
     super()
-    #Naubino.overlay.hide()
-    #Naubino.menu.hide()
-    #Naubino.game.hide()
-    #Naubino.background.hide()
-    #Naubino.background.draw()
-    Naubino.state_machine.mousedown.add =>
-      console.log "hello"
-      Naubino.overlay.fade_in_message("you just clicked")
+
+    console.log @events.length
+
+    Naubino.menu_focus.addOnce =>
+      console.log "dont look at the menu just now"
+      Naubino.menu_focus.active = false
 
 
   run: ->
@@ -23,12 +21,8 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
 
 
   events: [
-    ->
-      Naubino.overlay.draw_text("hello world",25)
-      Naubino.overlay.fade_in()
-      setTimeout()
-    ->
-      Naubino.overlay
+    =>
+      Naubino.overlay.fade_in_message("you just clicked")
     ]
   event: ->
 
