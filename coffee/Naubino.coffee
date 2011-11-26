@@ -70,10 +70,14 @@ window.onload = ->
     @menu_pause.add =>
       @state_machine.fsm.pause()
       console.log "menu: pause"
+      @menu_pause.active = false
+      @menu_play.active = true
 
     @menu_play.add =>
       @state_machine.fsm.play()
       console.log "menu: play"
+      @menu_pause.active = true
+      @menu_play.active = false
 
     @menu_exit.add =>
       @state_machine.fsm.exit()
