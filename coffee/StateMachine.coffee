@@ -17,14 +17,14 @@ Naubino.NaubMachine = class NaubMachine
       initial: 'menu',
       events:[
         {  name: 'play',      from: 'menu',     to: 'playing' }
-        {  name: 'pause',     from: 'playing',  to: 'paused' }
+        {  name: 'pause',     from: 'playing',  to: 'paused'  }
         {  name: 'play',      from: 'paused',   to: 'playing' }
         {  name: 'unpause',   from: 'paused',   to: 'playing' }
-        {  name: 'win',       from: 'playing',  to: 'won' }
-        {  name: 'lose',      from: 'playing',  to: 'lost' }
-        {  name: 'exit',      from: 'playing',  to: 'menu' }
-        {  name: 'show_help', from: 'menu',     to: 'help' }
-        {  name: 'hide_help', from: 'help',     to: 'menu' }
+        {  name: 'win',       from: 'playing',  to: 'won'     }
+        {  name: 'lose',      from: 'playing',  to: 'lost'    }
+        {  name: 'exit',      from: 'playing',  to: 'menu'    }
+        {  name: 'show_help', from: 'menu',     to: 'help'    }
+        {  name: 'hide_help', from: 'help',     to: 'menu'    }
         {  name: 'retry',     from: 'lost',     to: 'playing' }
       ]
       callbacks:
