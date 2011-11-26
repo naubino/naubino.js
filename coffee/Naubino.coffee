@@ -48,16 +48,16 @@ window.onload = ->
   setup_cursorbindings: () ->
     # TODO mouse events must go solely through mode
     onmousemove = (e) =>
-      #@state.mousemove.dispatch(e)
+      #@state_machine.mousemove.dispatch(e)
       @menu.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
       @game.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmouseup = (e) =>
-      #@state.mouseup.dispatch(e)
+      @state_machine.mouseup.dispatch(e)
       @game.unfocus e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmousedown = (e) =>
-      #@state.mousedown.dispatch(e)
+      @state_machine.mousedown.dispatch(e)
       @menu.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
       @game.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 

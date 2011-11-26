@@ -1,4 +1,5 @@
 Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
+  @name = "Tutorial"
   constructor: ->
     super()
 
@@ -10,8 +11,9 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
     #Naubino.game.hide()
     #Naubino.background.hide()
     #Naubino.background.draw()
-    #Naubino.state_machine.mousedown.add =>
-    #  @fade_out()
+    Naubino.state_machine.mousedown.add =>
+      console.log "hello"
+      Naubino.overlay.fade_in_message("you just clicked")
 
 
   run: ->
