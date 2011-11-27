@@ -7,11 +7,6 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @gravity = Naubino.Settings.gravity.menu
 
     @listener_size = @default_listener_size = 45
-    Naubino.menu_focus.add =>
-      @hovering = true
-
-    Naubino.menu_blur.add =>
-      @hovering = false
 
     # fragile calibration! don't fuck it up!
     @fps = 1000 / 20

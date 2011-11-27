@@ -17,10 +17,11 @@ window.onload = ->
     @setup_keybindings()
     @setup_cursorbindings()
 
-    @rules = new @RuleSet()
-    #@rules = new @Tutorial()
+    #@rules = new @RuleSet()
+    @rules = new @Tutorial()
     #@rules = new @TestCase()
-    @menu_play.dispatch() #TODO remove this line
+    #@menu_play.dispatch() #TODO remove this line
+    
 
 
   init_dom: () ->
@@ -86,6 +87,11 @@ window.onload = ->
     @menu_help.add =>
       @state_machine.fsm.show_help()
       console.log "menu: help"
+    @menu_focus.add =>
+      @menu.hovering = true
+
+    @menu_blur.add =>
+      @menu.hovering = false
 
   add_listeners: ->
 

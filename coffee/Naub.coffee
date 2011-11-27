@@ -1,11 +1,15 @@
 Naubino.Naub = class Naub
-  constructor: (@layer) ->
+  constructor: (@layer, @color_id = null) ->
     @size = 14
     @physics = new Naubino.PhysicsModel this
     @shape = new Naubino.Ball this
 
     @content = null
-    @color_id = @shape.random_palette_color()
+    unless @color_id?
+      @color_id = @shape.random_palette_color()
+    else
+      @shape.set_color_id @color_id
+
     @physics.attracted_to = @layer.center.Copy() # gravity center
 
     @removed = false # soon to be deleted by game

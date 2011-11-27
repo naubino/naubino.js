@@ -26,15 +26,31 @@ Naubino.Game = class Game extends Naubino.Layer
       Naubino.background.draw_marker(x,y)
       @create_naub_triple(x,y)
 
+
+  create_matching_naubs: () ->
+    #colors
+    colors = _.shuffle [0..5]
+    colors[5] = colors[0]
+    i = 0
+    while i < (colors.length )-1
+      {x,y} = @random_outside()
+      Naubino.background.draw_marker(x,y)
+      [a,b] = @create_naub_pair(x,y,colors[i],colors[i+1])
+      console.log "pairing " + [a,b]
+      i++
+
+
   create_naub: (x=@center.x, y=@center.y) ->
       naub_a = new Naubino.Naub this
       @add_object naub_a
       naub_a.shape.pre_render() # again just to get the numbers
       naub_a.physics.pos.Set x, y
 
-  create_naub_pair: (x, y) ->
-      naub_a = new Naubino.Naub this
-      naub_b = new Naubino.Naub this
+  create_naub_pair: (x, y, color_a = null, color_b = null) ->
+      naub_a = new Naubino.Naub this, color_a
+      naub_b = new Naubino.Naub this, color_b
+      color_a = naub_a.color_id
+      color_b = naub_b.color_id
 
       @add_object naub_a
       @add_object naub_b
@@ -50,6 +66,7 @@ Naubino.Game = class Game extends Naubino.Layer
       naub_b.physics.pos.AddPolar(dir, -15)
 
       naub_a.join_with naub_b
+      [color_a, color_b]
 
   create_naub_triple: (x, y) ->
       naub_a = new Naubino.Naub this
