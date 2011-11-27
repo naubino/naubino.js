@@ -12,9 +12,9 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     @ctx.font= "bold #{font_size+4}px Helvetica"
     @ctx.fillText(text, x, y)
 
-  fade_in_message: (text) ->
+  fade_in_message: (text, font_size = null) ->
     @hide()
-    @message text
+    @message text, font_size
     console.log "fade_in: #{text}"
     @fade_in()
 
