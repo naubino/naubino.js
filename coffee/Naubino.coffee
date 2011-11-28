@@ -17,8 +17,8 @@ window.onload = ->
     @setup_keybindings()
     @setup_cursorbindings()
 
-    #@rules = new @RuleSet()
-    @rules = new @Tutorial()
+    @rules = new @RuleSet()
+    #@rules = new @Tutorial()
     #@rules = new @TestCase()
     #@menu_play.dispatch() #TODO remove this line
     
