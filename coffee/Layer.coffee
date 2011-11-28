@@ -8,10 +8,15 @@ Naubino.Layer = class Layer
     @pointer = @center.Copy()
     @objs = {}
     @objs_count = 0
+
     @paused = true
+    @fade_queue = new Naubino.Signal()
+
     # fragile calibration! don't fuck it up!
+    
     @fps = 1000 / Naubino.Settings.fps
     @dt = @fps/1500
+
     @show()
 
   ### overwrite these ###
@@ -71,7 +76,7 @@ Naubino.Layer = class Layer
     @canvas.style.opacity = 0
 
   fade_in: ->
-    #console.log "fade in"
+    console.log "fade in"
     @canvas.style.opacity = 0.01
     fade = =>
       if (@canvas.style.opacity *= 1.2) >= 1
@@ -81,14 +86,16 @@ Naubino.Layer = class Layer
     console.log @fadeloop = setInterval( fade, 40 )
       
 
-  fade_out: ->
-    #console.log "fade out"
+  fade_out: (callback = null)->
+    console.log "fade out"
     fade = =>
       if (@canvas.style.opacity *= 0.8) <= 0.05
         clearInterval @fadeloop
         @hide()
         @clear()
         #@canvas.style.opacity = 1
+        if callback?
+          callback.call()
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
       
