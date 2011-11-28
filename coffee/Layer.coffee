@@ -12,6 +12,7 @@ Naubino.Layer = class Layer
     # fragile calibration! don't fuck it up!
     @fps = 1000 / Naubino.Settings.fps
     @dt = @fps/1500
+    @show()
 
   ### overwrite these ###
   draw: ->
@@ -63,6 +64,35 @@ Naubino.Layer = class Layer
       @draw()
 
 
+  show: ->
+    @canvas.style.opacity = 1
+
+  hide: ->
+    @canvas.style.opacity = 0
+
+  fade_in: ->
+    #console.log "fade in"
+    @canvas.style.opacity = 0.01
+    fade = =>
+      if (@canvas.style.opacity *= 1.2) >= 1
+        clearInterval @fadeloop
+        @show()
+    clearInterval @fadeloop
+    console.log @fadeloop = setInterval( fade, 40 )
+      
+
+  fade_out: ->
+    #console.log "fade out"
+    fade = =>
+      if (@canvas.style.opacity *= 0.8) <= 0.05
+        clearInterval @fadeloop
+        @hide()
+        @clear()
+        #@canvas.style.opacity = 1
+    clearInterval @fadeloop
+    console.log @fadeloop = setInterval( fade, 40 )
+      
+
 
 
   ## can I touch this? (pointer interaction)
@@ -102,6 +132,7 @@ Naubino.Layer = class Layer
     "rgba(#{r},#{g},#{b},#{a})"
 
 
+<<<<<<< HEAD
 Naubino.Overlay = class Overlay extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
@@ -149,6 +180,8 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     @ctx.textAlign = 'center'
     @ctx.font= "#{font_size}px Helvetica"
     @ctx.fillText(text, x,y)
+=======
+>>>>>>> d4a75e309a43b3f2fc937ea7f8f2ba42a57fac8a
 
 
 Naubino.Background = class Background extends Naubino.Layer
@@ -245,12 +278,5 @@ Naubino.Background = class Background extends Naubino.Layer
     @ctx.strokeStyle = color
     @ctx.stroke()
     @ctx.closePath()
-
-  draw_text: (x,y,text,color = 'black') ->
-    @ctx.fillStyle = color
-    @ctx.strokeStyle = color
-    @ctx.textAlign = 'center'
-    @ctx.font= "#{@size+4}px Helvetica"
-    @ctx.fillText(text, x, y)
 
 

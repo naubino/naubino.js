@@ -8,15 +8,14 @@ Naubino.RuleSet = class RuleSet
     basket = 150
     Naubino.game.basket_size = basket
     Naubino.background.basket_size = basket
-    Naubino.state_machine.naub_replaced.add =>
-      Naubino.state_machine.graph.cycle_test()
+    Naubino.naub_replaced.add =>
+      Naubino.graph.cycle_test()
 
-    Naubino.state_machine.naub_destroyed.add =>
-      Naubino.state_machine.game.points++
+    Naubino.naub_destroyed.add =>
+      Naubino.game.points++
 
-    Naubino.state_machine.cycle_found.add (list) =>
-      Naubino.state_machine.game.destroy_naubs(list)
-      console.log list
+    Naubino.cycle_found.add (list) =>
+      Naubino.game.destroy_naubs(list)
 
 
 

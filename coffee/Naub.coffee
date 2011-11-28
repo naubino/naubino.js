@@ -1,11 +1,15 @@
 Naubino.Naub = class Naub
-  constructor: (@layer) ->
+  constructor: (@layer, @color_id = null) ->
     @size = 14
     @physics = new Naubino.PhysicsModel this
     @shape = new Naubino.Ball this
 
     @content = null
-    @color_id = @shape.random_palette_color()
+    unless @color_id?
+      @color_id = @shape.random_palette_color()
+    else
+      @shape.set_color_id @color_id
+
     @physics.attracted_to = @layer.center.Copy() # gravity center
 
     @removed = false # soon to be deleted by game
@@ -57,7 +61,7 @@ Naubino.Naub = class Naub
       partner.drawing_join[id] = false
     @destroying = true
     @shape.destroy(@remove)
-    Naubino.state_machine.naub_destroyed.dispatch(@number)
+    Naubino.naub_destroyed.dispatch(@number)
 
   ### do things a naub is supposed to do ###
   join_with: (other) ->
@@ -77,7 +81,7 @@ Naubino.Naub = class Naub
     @layer.unfocus()
     @remove()
     console.log "replaced #{@number}"
-    Naubino.state_machine.naub_replaced.dispatch()
+    Naubino.naub_replaced.dispatch()
     return 42
 
 

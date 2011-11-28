@@ -78,7 +78,7 @@ Naubino.Graph = class Graph
       if @dfs_map[partner].color == 1
         list =  @cycle_list(naub,partner)
         if list.length > 0
-          Naubino.state_machine.cycle_found.dispatch(list)
+          Naubino.cycle_found.dispatch(list)
     @dfs_map[naub].color = 2
     return cycles
 

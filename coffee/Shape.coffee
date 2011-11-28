@@ -71,7 +71,7 @@ Naubino.Shape = class Shape
       ctx.restore()
     catch e
       console.log [pos.x, pos.y]
-      Naubino.state_machine.menu_pause.dispatch()
+      Naubino.menu_pause.dispatch()
 
 
   draw_string: (ctx, string, color = 'white') ->
