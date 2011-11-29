@@ -18,19 +18,31 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     console.log "fade_in: #{text}"
     @fade_in()
 
+  buffered_message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y) ->
+    buffer = document.createElement('canvas')
+    buffer.width = Naubino.Settings.canvas.width
+    buffer.height = Naubino.Settings.canvas.height
+
+    ctx = buffer.getContext('2d')
+    @render_text(text, font_size, color, x, y, ctx )
+
+    @ctx.drawImage(buffer, 0, 0)
+    buffer
+
+
   # uses render text
-  message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y) ->
+  message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     lines = text.split("\n")
     y -= font_size * lines.length /2
     for line in lines
-      @render_text(line, font_size, color, x, y)
+      @render_text(line, font_size, color, x, y, ctx)
       y += font_size
     return
 
-  render_text: (text, font_size = 15, color = 'black', x = @center.x, y = @center.y) ->
-    @ctx.fillStyle = color
-    @ctx.strokeStyle = color
-    @ctx.textAlign = 'center'
-    @ctx.font= "#{font_size}px Helvetica"
-    @ctx.fillText(text, x,y)
+  render_text: (text, font_size = 15, color = 'black', x = @center.x, y = @center.y, ctx = @ctx) ->
+    ctx.fillStyle = color
+    ctx.strokeStyle = color
+    ctx.textAlign = 'center'
+    ctx.font= "#{font_size}px Helvetica"
+    ctx.fillText(text, x,y)
 

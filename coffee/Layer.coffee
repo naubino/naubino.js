@@ -75,6 +75,7 @@ Naubino.Layer = class Layer
   hide: ->
     @canvas.style.opacity = 0
 
+
   fade_in: ->
     console.log "fade in"
     @canvas.style.opacity = 0.01
@@ -84,7 +85,6 @@ Naubino.Layer = class Layer
         @show()
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
-      
 
   fade_out: (callback = null)->
     console.log "fade out"
