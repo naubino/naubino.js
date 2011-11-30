@@ -33,6 +33,7 @@ Naubino.Layer = class Layer
     @objs_count++
     obj.number = @objs_count
     @objs[@objs_count] = obj
+    @objs_count
 
   get_object: (id)->
     @objs[id]

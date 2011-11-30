@@ -1,8 +1,23 @@
 Naubino.Overlay = class Overlay extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
-    @fps = 1000 / 5
+    @fps = 1000 / 5 # 5fps
+    @drawing = true
+    @start_timer()
 
+  draw:  ->
+    @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
+    @ctx.save()
+
+    # objects are all full size buffers
+    for id, buffer of @objs
+      @ctx.globalAlpha = buffer.alpha if buffer.alpha?
+
+      @ctx.drawImage(buffer, 0, 0)
+
+      @ctx.globalAlpha = 1
+
+    @ctx.restore()
   
 
   warning:(text, font_size = 25,x = @center.x, y = @center.y) ->
@@ -12,11 +27,14 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     @ctx.font= "bold #{font_size+4}px Helvetica"
     @ctx.fillText(text, x, y)
 
+
   fade_in_message: (text, font_size = null) ->
     @hide()
     @message text, font_size
     console.log "fade_in: #{text}"
     @fade_in()
+
+
 
   buffered_message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y) ->
     buffer = document.createElement('canvas')
@@ -26,8 +44,7 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     ctx = buffer.getContext('2d')
     @render_text(text, font_size, color, x, y, ctx )
 
-    @ctx.drawImage(buffer, 0, 0)
-    buffer
+    @add_object buffer
 
 
   # uses render text
