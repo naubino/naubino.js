@@ -13,9 +13,7 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     # objects are all full size buffers
     for id, buffer of @objs
       @ctx.globalAlpha = buffer.alpha if buffer.alpha?
-
       @ctx.drawImage(buffer, 0, 0)
-
       @ctx.globalAlpha = 1
 
     @ctx.restore()
@@ -31,19 +29,27 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
 
 
   fade_in_message: (text, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
-    mes_id = @message text
+    mes_id = @message text, font_size , color,  x, y, ctx
     mes = @get_object mes_id
 
     mes.alpha = 0.01
     fade = =>
       if (mes.alpha *= 1.2) >= 1
-        clearInterval @fadeloop
+        clearInterval mes.fadeloop
         mes.alpha = 1
         if callback?
           callback.call()
-    clearInterval @fadeloop
-    console.log @fadeloop = setInterval( fade, 40 )
+    clearInterval mes.fadeloop
+    console.log mes.fadeloop = setInterval( fade, 40 )
     mes_id
+
+  fade_in_and_out_message: (text, time = 1000, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
+    fade_out = => setTimeout =>
+      @fade_out_message mes_id
+    ,time
+
+    mes_id = @fade_in_message text, fade_out, font_size , color,  x, y, ctx
+    mes = @get_object mes_id
 
 
   fade_out_message: (mes_id, callback = null)->
@@ -52,15 +58,15 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     fade = =>
       if (mes.alpha *= 0.8) <= 0.05
         console.log mes.alpha
-        clearInterval @fadeloop
+        clearInterval mes.fadeloop
         if callback?
           callback.call()
         @remove_obj mes_id
 
-    clearInterval @fadeloop
+    clearInterval mes.fadeloop
     console.log mes
     if mes?
-      console.log @fadeloop = setInterval( fade, 40 )
+      console.log mes.fadeloop = setInterval( fade, 40 )
 
 
   message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
