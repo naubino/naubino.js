@@ -40,12 +40,12 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
         if callback?
           callback.call()
     clearInterval mes.fadeloop
-    console.log mes.fadeloop = setInterval( fade, 40 )
+    mes.fadeloop = setInterval( fade, 40 )
     mes_id
 
-  fade_in_and_out_message: (text, time = 1000, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
+  fade_in_and_out_message: (text, time = 1000, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     fade_out = => setTimeout =>
-      @fade_out_message mes_id
+      @fade_out_message mes_id, callback
     ,time
 
     mes_id = @fade_in_message text, fade_out, font_size , color,  x, y, ctx
@@ -53,20 +53,20 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
 
 
   fade_out_message: (mes_id, callback = null)->
-    console.log "fade out"
+    #console.log "fade out"
     mes = @get_object mes_id
     fade = =>
       if (mes.alpha *= 0.8) <= 0.05
-        console.log mes.alpha
+        #console.log mes.alpha
         clearInterval mes.fadeloop
         if callback?
           callback.call()
         @remove_obj mes_id
 
     clearInterval mes.fadeloop
-    console.log mes
+    #console.log mes
     if mes?
-      console.log mes.fadeloop = setInterval( fade, 40 )
+      mes.fadeloop = setInterval( fade, 40 )
 
 
   message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
@@ -77,12 +77,10 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
 
     ctx = buffer.getContext('2d')
 
-  # uses render text
     lines = text.split("\n")
-    console.log "lines=" + lines
     y -= font_size * lines.length /2
     for line in lines
-      console.log line
+      #console.log line
       @render_text(line, font_size, color, x, y, ctx)
       y += font_size
     @add_object buffer

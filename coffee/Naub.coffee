@@ -70,6 +70,7 @@ Naubino.Naub = class Naub
     @drawing_join[join] = true
     other.joins[join] = this
     other.drawing_join[join] = false
+    Naubino.naub_joined.dispatch()
     join
 
   
@@ -147,11 +148,13 @@ Naubino.Naub = class Naub
     @focused = true
     @shape.pre_render()
     @physics.friction = 10
+    Naubino.naub_focused.dispatch(@)
 
   unfocus: ->
     @focused = false
     @shape.pre_render()
     @physics.friction = @physics.default_friction
+    Naubino.naub_unfocused.dispatch(@)
 
   isHit: (x, y) ->
     click = new b2Vec2(x,y)
