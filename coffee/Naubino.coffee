@@ -19,7 +19,7 @@ window.onload = ->
 
     #TODO switch Rulesets via a statemachine
     #@rules = new @RuleSet()
-    #@rules  = new @Tutorial()
+    @rules  = new @Tutorial()
     #@rules = new @TestCase()
     #@menu_play.dispatch() #TODO remove this line
     
@@ -56,8 +56,12 @@ window.onload = ->
 
     # gameplay
     @naub_replaced   = new @Signal()
+    @naub_joined     = new @Signal()
     @naub_destroyed  = new @Signal()
     @cycle_found     = new @Signal()
+    @naub_focused    = new @Signal()
+    @naub_unfocused  = new @Signal()
+
 
     # menu
     @menu_focus      = new @Signal()
