@@ -1,6 +1,6 @@
 
 window.onload = ->
-  window.naubino = Naubino.constructor()
+  Naubino.constructor()
 
 @Naubino = {
   constructor: () ->
@@ -17,24 +17,25 @@ window.onload = ->
     @setup_keybindings()
     @setup_cursorbindings()
 
-    @rules = new @RuleSet()
-    #@rules = new @Tutorial()
+    #TODO switch Rulesets via a statemachine
+    #@rules = new @RuleSet()
+    @rules  = new @Tutorial()
     #@rules = new @TestCase()
     #@menu_play.dispatch() #TODO remove this line
     
 
 
   init_dom: () ->
-    @gamediv = document.getElementById("gamediv")
-    @overlay_canvas = document.getElementById("overlay_canvas")
-    @menu_canvas = document.getElementById("menu_canvas")
-    @game_canvas = document.getElementById("game_canvas")
+    @gamediv           = document.getElementById("gamediv")
+    @overlay_canvas    = document.getElementById("overlay_canvas")
+    @menu_canvas       = document.getElementById("menu_canvas")
+    @game_canvas       = document.getElementById("game_canvas")
     @background_canvas = document.getElementById("background_canvas")
 
-    @overlay_canvas.width = @menu_canvas.width = @game_canvas.width = @background_canvas.width = @Settings.canvas.width
-    @overlay_canvas.height = @menu_canvas.height = @game_canvas.height = @background_canvas.height = @Settings.canvas.height
-    @gamediv.max-width = @Settings.canvas.width
-    @gamediv.style.border = "2px"
+    @overlay_canvas.width  = @menu_canvas.width     = @game_canvas.width  = @background_canvas.width  = @Settings.canvas.width
+    @overlay_canvas.height = @menu_canvas.height    = @game_canvas.height = @background_canvas.height = @Settings.canvas.height
+    @gamediv.max-width     = @Settings.canvas.width
+    @gamediv.style.border  = "2px"
 
     @background = new @Background(@background_canvas)
     @game       = new @Game(@game_canvas, @graph)
@@ -55,8 +56,12 @@ window.onload = ->
 
     # gameplay
     @naub_replaced   = new @Signal()
+    @naub_joined     = new @Signal()
     @naub_destroyed  = new @Signal()
     @cycle_found     = new @Signal()
+    @naub_focused    = new @Signal()
+    @naub_unfocused  = new @Signal()
+
 
     # menu
     @menu_focus      = new @Signal()
@@ -118,12 +123,12 @@ window.onload = ->
       @menu.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
       @game.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
-    @overlay_canvas.addEventListener("mousedown", onmousedown, false)
-    @overlay_canvas.addEventListener("mouseup", onmouseup, false)
-    @overlay_canvas.addEventListener("mousemove", onmousemove, false)
-    @overlay_canvas.addEventListener("mouseout", onmouseup, false)
+    @overlay_canvas.addEventListener("mousedown"  , onmousedown , false)
+    @overlay_canvas.addEventListener("mouseup"    , onmouseup   , false)
+    @overlay_canvas.addEventListener("mousemove"  , onmousemove , false)
+    @overlay_canvas.addEventListener("mouseout"   , onmouseup   , false)
 
-    @overlay_canvas.addEventListener("touchstart", onmousedown, false)
-    @overlay_canvas.addEventListener("touchend", onmouseup, false)
-    @overlay_canvas.addEventListener("touchmove", onmousemove, false)
+    @overlay_canvas.addEventListener("touchstart" , onmousedown , false)
+    @overlay_canvas.addEventListener("touchend"   , onmouseup   , false)
+    @overlay_canvas.addEventListener("touchmove"  , onmousemove , false)
 }

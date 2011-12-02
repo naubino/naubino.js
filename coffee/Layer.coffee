@@ -8,10 +8,15 @@ Naubino.Layer = class Layer
     @pointer = @center.Copy()
     @objs = {}
     @objs_count = 0
+
     @paused = true
+    @fade_queue = new Naubino.Signal()
+
     # fragile calibration! don't fuck it up!
+    
     @fps = 1000 / Naubino.Settings.fps
     @dt = @fps/1500
+
     @show()
 
   ### overwrite these ###
@@ -28,6 +33,7 @@ Naubino.Layer = class Layer
     @objs_count++
     obj.number = @objs_count
     @objs[@objs_count] = obj
+    @objs_count
 
   get_object: (id)->
     @objs[id]
@@ -70,8 +76,9 @@ Naubino.Layer = class Layer
   hide: ->
     @canvas.style.opacity = 0
 
+
   fade_in: ->
-    #console.log "fade in"
+    console.log "fade in"
     @canvas.style.opacity = 0.01
     fade = =>
       if (@canvas.style.opacity *= 1.2) >= 1
@@ -79,16 +86,17 @@ Naubino.Layer = class Layer
         @show()
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
-      
 
-  fade_out: ->
-    #console.log "fade out"
+  fade_out: (callback = null)->
+    console.log "fade out"
     fade = =>
       if (@canvas.style.opacity *= 0.8) <= 0.05
         clearInterval @fadeloop
         @hide()
         @clear()
         #@canvas.style.opacity = 1
+        if callback?
+          callback.call()
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
       
@@ -130,5 +138,3 @@ Naubino.Layer = class Layer
     b = Math.round((color[2] + shift))
     a = color[3]
     "rgba(#{r},#{g},#{b},#{a})"
-
-
