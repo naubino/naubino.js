@@ -4,7 +4,16 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
     super()
     
 
-# states: -> welcome -> show naubs -> move naubs -> join naubs -> form circle -> success
+# states: -> welcome 
+# -> show naubs 
+#     "Thes are Naubs"
+#     "Try Moving the Around"
+#     "Very Good"
+# -> join naubs 
+#     "Naubs can be joined if they have the same color..."
+#     "Now join two naubs by push one into the other"
+# -> form circle 
+# -> success
 
   configure: ->
     super()
