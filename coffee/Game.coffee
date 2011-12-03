@@ -12,6 +12,7 @@ Naubino.Game = class Game extends Naubino.Layer
     @gravity = Naubino.Settings.gravity.game
 
     @points = -1
+    @joining_allowed = yes
 
   
 
@@ -36,7 +37,7 @@ Naubino.Game = class Game extends Naubino.Layer
       {x,y} = @random_outside()
       Naubino.background.draw_marker(x,y)
       [a,b] = @create_naub_pair(x,y,colors[i],colors[i+1])
-      console.log "pairing " + [a,b]
+      #console.log "pairing " + [a,b]
       i++
 
 
@@ -145,6 +146,32 @@ Naubino.Game = class Game extends Naubino.Layer
     one_after_another()
 
 
+  # is one naub allowed to join with another
+  check_joining: (naub, other) ->
+    allowed = no
+    unless naub.number == other.number or not @joining_allowed
+      #console.log "checking #{@number}(#{@color_id}) and #{other.number}(#{other.color_id})"
+
+      close_related = false
+      naub_partners = for id, partner of naub.joins
+        partner.number
+
+      for id, partner of other.joins
+        if partner.number in naub_partners
+          close_related = true
+
+      joined = naub.is_joined_with other
+      alone = _.keys(naub.joins).length == 0
+      other_alone = _.keys(other.joins).length == 0
+      same_color = naub.color_id == other.color_id
+
+      if !naub.disabled && not joined && same_color && not close_related && not alone && not other_alone
+        other.replace_with naub
+        allowed = yes
+      else if alone and not (other.disabled or naub.disabled)
+        naub.join_with other
+        allowed = yes
+    allowed
 
     
 
@@ -174,7 +201,7 @@ Naubino.Game = class Game extends Naubino.Layer
       @focused_naub.physics.follow @pointer.Copy()
       for id, other of  @objs
         if (@focused_naub.distance_to other) < (@focused_naub.size+10)
-          @focused_naub.check_joining(other)
+          @check_joining(@focused_naub,other)
           break
 
     # delete objects
