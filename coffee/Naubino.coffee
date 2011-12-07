@@ -1,4 +1,5 @@
 
+# TODO questionable approach
 window.onload = ->
   Naubino.constructor()
 
@@ -18,9 +19,9 @@ window.onload = ->
     @setup_cursorbindings()
 
     #TODO switch Rulesets via a statemachine
-    @rules = new @RuleSet()
+    #@rules = new @RuleSet()
     #@rules  = new @Tutorial()
-    #@rules = new @TestCase()
+    @rules = new @TestCase()
     @menu_play.dispatch() #TODO remove this line
     
 
@@ -108,20 +109,20 @@ window.onload = ->
 
 
   setup_cursorbindings: () ->
-    # TODO mouse events must go solely through mode
+    # TODO mouse events should be handled though Signals
     onmousemove = (e) =>
-      #@mousemove.dispatch(e)
-      @menu.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
-      @game.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      @mousemove.dispatch e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      #old solution:  @menu.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      #old solution:  @game.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmouseup = (e) =>
-      @mouseup.dispatch(e)
-      @game.unfocus e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      @mouseup.dispatch e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      #old solution: @game.unfocus e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmousedown = (e) =>
-      @mousedown.dispatch(e)
-      @menu.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
-      @game.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      @mousedown.dispatch e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      #old solution: @menu.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      #old solution: @game.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     @overlay_canvas.addEventListener("mousedown"  , onmousedown , false)
     @overlay_canvas.addEventListener("mouseup"    , onmouseup   , false)

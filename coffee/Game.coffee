@@ -12,6 +12,10 @@ Naubino.Game = class Game extends Naubino.Layer
     @gravity = Naubino.Settings.gravity.game
 
     @points = -1
+    Naubino.mousemove.add @move_pointer
+    Naubino.mousedown.add @click
+    Naubino.mouseup.add @unfocus
+
 
   
 
