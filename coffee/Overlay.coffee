@@ -52,6 +52,7 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     mes = @get_object mes_id
 
 
+  ### fading out a specific message by id ###
   fade_out_message: (mes_id, callback = null)->
     #console.log "fade out"
     mes = @get_object mes_id
@@ -67,6 +68,14 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     #console.log mes
     if mes?
       mes.fadeloop = setInterval( fade, 40 )
+
+
+  ### fading out all messages ###
+  fade_out_messages: (callback = null) ->
+    for id, message of @objs
+      @fade_out_message id
+    if callback?
+      callback()
 
 
   message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
