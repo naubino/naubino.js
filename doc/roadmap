@@ -1,3 +1,4 @@
+# vim:set ft=changelog:
 # Roadmap:
   * restore original gameplay ( 1.0 )
     * circle for naub overflow
@@ -5,16 +6,16 @@
   * alternating game modes
 
 # Known Issues
-  * colors of menu buttons
-  * need to look over every single floating point operation
-  * play and pause button should have the same color
-  * keep on looking for the 3-way-join-bug
-  * naubs kinda jiggle in chromium (due to prerendering)
-  * remove 1000/n fps calculation 
+  * performance: need to look over every single floating point operation
+  * usability: play and pause button should have the same color
+  * bug: keep on looking for the 3-way-join-bug
+  * bug: naubs kinda jiggle in chromium (due to pre rendering)
 
 # wishes
-  * simplify the drawing chain
-  * destruction of cycle should start at focused_naub
-  * global object size handling ( keep_distance, spring length and so on)
-  * color palettes also handle background and join color
-  * more canvas performance optimization posible
+  * improve:   decouple step timer and draw timer
+  * improve:   global object size handling ( keep_distance, spring length and so on)
+  * improve:   more canvas performance optimization posible
+  * improve: replace 1000/n fps calculation with requestAnimationFrame
+  * simplify:  the drawing chain
+  * beauty:    destruction of cycle should start at focused_naub
+  * beauty:    color palettes also handle background and join color (for theming)
