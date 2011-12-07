@@ -1,3 +1,4 @@
+# TODO cliean up menu code
 Naubino.Menu = class Menu extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
@@ -7,6 +8,8 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @gravity = Naubino.Settings.gravity.menu
 
     @listener_size = @default_listener_size = 45
+    Naubino.mousemove.add @move_pointer
+    Naubino.mousedown.add @click
 
     # fragile calibration! don't fuck it up!
     @fps = 1000 / 20

@@ -7,7 +7,7 @@ Naubino.NaubMachine = class NaubMachine
     @game = Naubino.game
     @fsm = @create_fsm()
 
-
+  # TODO state machine should target @Naubino instead
   create_fsm: ->
     StateMachine.create {
       initial: 'menu',

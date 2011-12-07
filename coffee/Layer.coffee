@@ -104,7 +104,8 @@ Naubino.Layer = class Layer
 
 
   ## can I touch this? (pointer interaction)
-  click: (x, y) ->
+  # callback for mousedown signal
+  click: (x, y) =>
     @mousedown = true
     [@pointer.x, @pointer.y] = [x,y]
     naub = @get_obj x, y
@@ -112,13 +113,15 @@ Naubino.Layer = class Layer
       naub.focus()
       @focused_naub = naub
 
-  unfocus: ->
+  # callback for mouseup signal
+  unfocus: =>
     @mousedown = false
     if @focused_naub
       @focused_naub.unfocus()
     @focused_naub = null
 
-  move_pointer: (x,y) ->
+  # callback for mousemove signal
+  move_pointer: (x,y) =>
     if @mousedown
       [@pointer.x, @pointer.y] = [x,y]
 
