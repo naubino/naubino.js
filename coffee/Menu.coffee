@@ -10,46 +10,43 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
-
-    # fragile calibration! don't fuck it up!
-    @fps = 1000 / 20
-    @dt = @fps/100
     
-    @position = new b2Vec2(20,25)
-    @draw_play_icon = (ctx) ->
-      ctx.save()
-      ctx.beginPath()
-      ctx.fillStyle = "#ffffff"
-      ctx.moveTo(-5,-5)
-      ctx.lineTo(-5, 5)
-      ctx.lineTo( 7, 0)
-      ctx.lineTo(-5,-5)
-      ctx.closePath()
-      ctx.fill()
-      ctx.restore()
+    @position = new b2Vec2(30,30)
+    @cube_size = 45
+    
 
-    @draw_pause_icon = (ctx) ->
-      ctx.save()
-      ctx.fillStyle = "#ffffff"
-      ctx.beginPath()
-      ctx.rect(-5,-6,4,12)
-      ctx.rect( 1,-6,4,12)
-      ctx.closePath()
-      ctx.fill()
-      ctx.restore()
-
-
-
+    ### definition of each button
+    TODO: position should be dynamic
+    ###
     @buttons = {
       play:
         function: -> Naubino.menu_play.dispatch()
-        content: (ctx) => @draw_play_icon(ctx)
         position: new b2Vec2(65,35)
+        content: (ctx) ->
+          ctx.save()
+          ctx.beginPath()
+          ctx.fillStyle = "#ffffff"
+          ctx.moveTo(-5,-5)
+          ctx.lineTo(-5, 5)
+          ctx.lineTo( 7, 0)
+          ctx.lineTo(-5,-5)
+          ctx.closePath()
+          ctx.fill()
+          ctx.restore()
       pause:
         function: -> Naubino.menu_pause.dispatch()
         content: (ctx) => @draw_pause_icon(ctx)
         position: new b2Vec2(65,35)
         disabled: true
+        content: (ctx)->
+          ctx.save()
+          ctx.fillStyle = "#ffffff"
+          ctx.beginPath()
+          ctx.rect(-5,-6,4,12)
+          ctx.rect( 1,-6,4,12)
+          ctx.closePath()
+          ctx.fill()
+          ctx.restore()
       help:
         function: -> Naubino.menu_help.dispatch()
         content: (ctx) -> this.draw_string(ctx, '?')
@@ -60,10 +57,12 @@ Naubino.Menu = class Menu extends Naubino.Layer
         position: new b2Vec2(14,80)
       }
 
+    # fragile calibration! don't fuck it up!
+    @fps = 1000 / 20
+    @dt = @fps/100
+
     @add_buttons()
     @start_timer()
-
-  draw_play_icon: (ctx) ->
 
   mainloop: ()=>
     @draw()
@@ -87,9 +86,10 @@ Naubino.Menu = class Menu extends Naubino.Layer
 
 
   add_buttons: ->
-
-    @objs.main = new Naubino.Naub(this)
-    @objs.main.draw = @draw_main_button
+    @objs.main = new Naubino.Naub(this, null, @cube_size)
+    @objs.main.shape.size = @cube_size
+    @objs.main.shape.render = @draw_main_button
+    @objs.main.shape.pre_render()
     @objs.main.physics.pos.Set(@position.x, @position.y)
     @objs.main.physics.attracted_to = @position.Copy()
 
@@ -129,24 +129,24 @@ Naubino.Menu = class Menu extends Naubino.Layer
 
 
   draw_main_button: (ctx) ->
-    cube_size = 80
+
 
     ctx.save()
-    ctx.translate(@physics.pos.x, @physics.pos.y)
+    ctx.translate(@size, @size)
     ctx.rotate(Math.PI/6)
     ctx.beginPath()
-    ctx.rect( -cube_size/4, -cube_size/4, cube_size/2, cube_size/2)
-    ctx.fillStyle = @shape.color_to_rgba @shape.style.fill
+    ctx.rect( -@size/2, -@size/2, @size, @size)
+    ctx.fillStyle = @color_to_rgba @style.fill
     ctx.fill()
     ctx.closePath()
     ctx.restore()
 
     ctx.save()
-    ctx.translate(@physics.pos.x, @physics.pos.y)
+    ctx.translate(@size, @size)
     ctx.fillStyle = 'white'
     ctx.textAlign = 'center'
     ctx.font= 'bold 33px Helvetica'
-    ctx.fillText(Naubino.game.points, 0,10, cube_size)
+    ctx.fillText(Naubino.game.points, 0,10, @size)
     ctx.restore()
 
   draw_listener_region: ->

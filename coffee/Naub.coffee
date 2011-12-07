@@ -1,6 +1,5 @@
 Naubino.Naub = class Naub
-  constructor: (@layer, @color_id = null) ->
-    @size = 14
+  constructor: (@layer, @color_id = null, @size = 14) ->
     @physics = new Naubino.PhysicsModel this
     @shape = new Naubino.Ball this
 
