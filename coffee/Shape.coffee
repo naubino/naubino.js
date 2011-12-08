@@ -4,7 +4,7 @@ Naubino.Shape = class Shape
     @naub = naub
     @pos = naub.physics.pos
     @size = @naub.size
-    @frame = @size+5
+    @frame = @size*2.5
     @style = { fill: [0,0,0,1] }
     @join_style = { fill: [0,0,0,1], width: 6 }
     @life_rendering = false # if true redraw on each frame
@@ -22,14 +22,14 @@ Naubino.Shape = class Shape
 
   ### draws a frame around the buffered image for analysis ###
   draw_frame: (ctx) ->
-    x = @pos.x-@frame
-    y = @pos.y-@frame
+    x = @pos.x-@frame/2
+    y = @pos.y-@frame/2
 
     ctx.beginPath()
     ctx.moveTo x, y
-    ctx.lineTo x, @frame*2+y
-    ctx.lineTo @frame*2+x, @frame*2+y
-    ctx.lineTo @frame*2+x, y
+    ctx.lineTo x, @frame+y
+    ctx.lineTo @frame+x, @frame+y
+    ctx.lineTo @frame+x, y
     ctx.lineTo x, y
     ctx.stroke()
     #ctx.fillStyle = "beige"
@@ -41,7 +41,7 @@ Naubino.Shape = class Shape
     @buffer = document.createElement('canvas')
     @buffer.width = @buffer.height = @frame*2
     b_ctx = @buffer.getContext('2d')
-    @render b_ctx, @frame
+    @render b_ctx, @frame, @frame
 
   ## actual painting routines
   draw_join: (ctx, partner) ->

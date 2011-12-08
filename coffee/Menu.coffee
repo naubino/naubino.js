@@ -11,7 +11,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
     
-    @position = new b2Vec2(30,30)
+    @position = new b2Vec2(20,25)
     @cube_size = 45
     
 
@@ -87,11 +87,11 @@ Naubino.Menu = class Menu extends Naubino.Layer
 
   add_buttons: ->
     @objs.main = new Naubino.Naub(this, null, @cube_size)
+    @objs.main.physics.pos.Set(@position.x, @position.y)
+    @objs.main.physics.attracted_to = @position.Copy()
     @objs.main.shape.size = @cube_size
     @objs.main.shape.render = @draw_main_button
     @objs.main.shape.pre_render()
-    @objs.main.physics.pos.Set(@position.x, @position.y)
-    @objs.main.physics.attracted_to = @position.Copy()
 
     for name, attr of @buttons
       @objs[name] = new Naubino.Naub(this)
@@ -128,11 +128,10 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @ctx.restore()
 
 
-  draw_main_button: (ctx) ->
-
+  draw_main_button: (ctx, x, y) ->
 
     ctx.save()
-    ctx.translate(@size, @size)
+    ctx.translate(x,y)
     ctx.rotate(Math.PI/6)
     ctx.beginPath()
     ctx.rect( -@size/2, -@size/2, @size, @size)
@@ -142,7 +141,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
     ctx.restore()
 
     ctx.save()
-    ctx.translate(@size, @size)
+    ctx.translate(x,y)
     ctx.fillStyle = 'white'
     ctx.textAlign = 'center'
     ctx.font= 'bold 33px Helvetica'
