@@ -10,6 +10,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
+    Naubino.naub_destroyed.add -> Naubino.menu.objs.main.shape.pre_render()
     
     @position = new b2Vec2(20,25)
     @cube_size = 45
