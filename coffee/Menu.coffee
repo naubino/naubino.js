@@ -93,6 +93,7 @@ Naubino.Menu = class Menu extends Naubino.Layer
     @objs.main.shape.size = @cube_size
     @objs.main.shape.render = @draw_main_button
     @objs.main.shape.pre_render()
+    @objs.main.isClickable = no
 
     for name, attr of @buttons
       @objs[name] = new Naubino.Naub(this)

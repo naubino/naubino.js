@@ -127,7 +127,7 @@ Naubino.Layer = class Layer
 
   get_obj: (x, y) ->
     for id, obj of @objs
-      if obj.isHit(x, y)
+      if obj.isHit(x, y) and obj.isClickable
         return obj
 
   clear: ->
