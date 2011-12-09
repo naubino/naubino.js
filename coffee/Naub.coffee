@@ -18,6 +18,7 @@ Naubino.Naub = class Naub
     @joins = {} # {id: opposing naub}
     @drawing_join = {} # {id: true/false if this naub draws the join}
     @shape.pre_render()
+    @isClickable = yes
 
 
 
