@@ -1,4 +1,4 @@
-Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
+class Naubino.Tutorial extends Naubino.RuleSet
   @name = "Tutorial"
   constructor: ->
     super()

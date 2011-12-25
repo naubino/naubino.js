@@ -1,4 +1,4 @@
-Naubino.KeyBindings = class KeyBindings
+class Naubino.KeyBindings
     constructor: ->
         # down, up, during
         @bindings = {}

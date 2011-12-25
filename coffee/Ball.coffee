@@ -1,4 +1,4 @@
-Naubino.Ball = class Ball extends Naubino.Shape
+class Naubino.Ball extends Naubino.Shape
   constructor: (naub) ->
     super(naub)
 

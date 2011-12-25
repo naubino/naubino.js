@@ -1,4 +1,4 @@
-Naubino.RuleSet = class RuleSet
+class Naubino.RuleSet
   constructor: ->
     @inner_clock = 0 # to avoid resetting timer after pause
     Naubino.game.points = 0
@@ -49,7 +49,7 @@ Naubino.RuleSet = class RuleSet
 
 
 
-Naubino.TestCase = class TestCase extends RuleSet
+class Naubino.TestCase extends Naubino.RuleSet
   constructor: ->
     super()
     Naubino.Settings.show_numbers = on

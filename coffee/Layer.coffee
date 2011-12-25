@@ -1,4 +1,4 @@
-Naubino.Layer = class Layer
+class Naubino.Layer
 
   constructor: (@canvas) ->
     @width = @canvas.width

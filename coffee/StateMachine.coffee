@@ -1,6 +1,6 @@
 # https://github.com/millermedeiros/js-signals/wiki/Examples
 # http://codeincomplete.com/posts/2011/8/19/javascript_state_machine_v2/
-Naubino.NaubMachine = class NaubMachine
+class Naubino.NaubMachine
 
   constructor: ->
     @graph = Naubino.graph
