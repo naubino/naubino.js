@@ -5,6 +5,10 @@ Naubino.Graph = class Graph
     @naubs = []
     @joins = {}
 
+  ###
+  updateing naub list from joins
+  since joins are more up to date
+  ###
   update_naub_list: () ->
     @naubs = []
     for id, join of @joins
@@ -12,6 +16,10 @@ Naubino.Graph = class Graph
         unless join[i] in @naubs
           @naubs.push join[i]
 
+  ###
+  adds the join between naub a and naub b
+  TODO: simplify update_naub_list
+  ###
   add_join: (a,b) ->
     @join_id_sequence++
     join = [ a.number, b.number ]
@@ -19,20 +27,34 @@ Naubino.Graph = class Graph
     @update_naub_list()
     @join_id_sequence
 
+  ###
+  a comment explaining this function would require more bytes than the actuall function it self
+  so I decided not to explain the function after all, I guess you got to figure it out by yourself
+  ###
   remove_join: (id)->
     delete @joins[id]
     @update_naub_list()
 
+  ###
+  another one of those functions where documentation yould require more time than reading the actuall code
+  good look
+  ###
   clear: ->
     @join_id_sequence = 0
     @naubs = []
     @joins = {}
 
+  ###
+  logs a list of all joins ( for debugging )
+  ###
   join_list: ->
     console.log "joinList"
     for id, join of @joins
       console.log id + " " + join
 
+  ###
+  creates a dot file from graph :D
+  ###
   dotty: -> # :D
     dot =  "graph G {\n"
     joins = for id, join of @joins
@@ -40,7 +62,9 @@ Naubino.Graph = class Graph
     dot += joins.join("\n") + "}"
     console.log dot
   
-  # returns list of joined naubs expect a certain predecessor
+  ###
+  returns list of joined naubs expect a certain predecessor
+  ###
   partners: (naub, pre = null) ->
     partners = []
     for id, join of @joins
@@ -49,8 +73,10 @@ Naubino.Graph = class Graph
           partners.push join[(join.indexOf(naub))^1]
     partners
 
-
-
+  ###
+  this is the smartes function in the entire programm
+  searches for cycles in the graph and returns a list of all naubs within a cycle
+  ###
   cycle_test: (first) =>
     cycles = []
 
@@ -64,6 +90,10 @@ Naubino.Graph = class Graph
         cycles = _.union(cycles, dfs_cycle)
     return
 
+
+  ###
+  recursive part of cycle_test
+  ###
   dfs: (naub, pre = null) ->
     cycles = []
 
@@ -82,11 +112,11 @@ Naubino.Graph = class Graph
     @dfs_map[naub].color = 2
     return cycles
 
+  ###
+  returns the list for cycle_test
+  ###
   cycle_list: (v,w) ->
     cycle = _.select(@dfs_map, ({dfs_num, color})=> (dfs_num >= @dfs_map[w].dfs_num  && color == 1) )
     cycle.sort( (a,b) -> a.dfs_num - b.dfs_num)
     cycle_naubs = _.pluck(cycle, 'naub')
     return cycle_naubs
-
-
-
