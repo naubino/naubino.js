@@ -2,15 +2,13 @@
 # TODO questionable approach
 window.onload = ->
   Naubino.constructor()
-  Naubino.StateMachine = StateMachine
-  delete @StateMachine
 
 @Naubino = {
   constructor: () ->
 
     @graph = new @Graph()
     @colors = @Settings.colors.output
-    @state_machine = new @NaubMachine()
+    @fsm = @create_fsm()
     @Signal = window.signals.Signal
     @add_signals()
     @add_generic_listeners()
@@ -45,6 +43,43 @@ window.onload = ->
     @menu       = new @Menu(@menu_canvas)
     @overlay    = new @Overlay(@overlay_canvas)
 
+  create_fsm: ->
+    StateMachine.create {
+      initial: 'menu',
+      target: this
+      events:[
+        {  name: 'play',      from: 'menu',     to: 'playing' }
+        {  name: 'pause',     from: 'playing',  to: 'paused'  }
+        {  name: 'play',      from: 'paused',   to: 'playing' }
+        {  name: 'unpause',   from: 'paused',   to: 'playing' }
+        {  name: 'win',       from: 'playing',  to: 'won'     }
+        {  name: 'lose',      from: 'playing',  to: 'lost'    }
+        {  name: 'exit',      from: 'playing',  to: 'menu'    }
+        {  name: 'show_help', from: 'menu',     to: 'help'    }
+        {  name: 'hide_help', from: 'help',     to: 'menu'    }
+        {  name: 'retry',     from: 'lost',     to: 'playing' }
+      ]
+      callbacks:
+        onenterplaying: (event, from, to) ->
+          @game.start_timer()
+          @menu.switch_to_playing()
+          @rules.run()
+
+        onleaveplaying: (event, from, to) ->
+
+        onpaused: (event, from, to) ->
+          @game.stop_timer()
+          @menu.switch_to_paused()
+          @rules.halt()
+
+        onpause: (event, from, to) ->
+
+        onunpause: (event, from, to) ->
+          @game.start_timer()
+
+        onexit: (event, from, to) ->
+    }
+
   add_signals: ->
 
     # user interface
@@ -77,23 +112,23 @@ window.onload = ->
 
   add_generic_listeners: ->
     @menu_pause.add =>
-      @state_machine.fsm.pause()
+      @fsm.pause()
       console.log "menu: pause"
       @menu_pause.active = false
       @menu_play.active = true
 
     @menu_play.add =>
-      @state_machine.fsm.play()
+      @fsm.play()
       console.log "menu: play"
       @menu_pause.active = true
       @menu_play.active = false
 
     @menu_exit.add =>
-      @state_machine.fsm.exit()
+      @fsm.exit()
       console.log "menu: exit"
 
     @menu_help.add =>
-      @state_machine.fsm.show_help()
+      @fsm.show_help()
       console.log "menu: help"
     @menu_focus.add =>
       @menu.hovering = true
