@@ -1,4 +1,4 @@
-Naubino.Overlay = class Overlay extends Naubino.Layer
+class Naubino.Overlay extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
     @fps = 1000 / 15 # 5fps

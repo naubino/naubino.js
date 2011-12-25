@@ -1,5 +1,4 @@
-
-Naubino.Background = class Background extends Naubino.Layer
+class Naubino.Background extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
     @fps = 1000 / 5

@@ -2,6 +2,8 @@
 # TODO questionable approach
 window.onload = ->
   Naubino.constructor()
+  Naubino.StateMachine = StateMachine
+  delete @StateMachine
 
 @Naubino = {
   constructor: () ->

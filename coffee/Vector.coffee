@@ -1,4 +1,4 @@
-Naubino.Vector = class Vector
+class Naubino.Vector
   ### this is loosly based on b2Vec2, but its in coffee :D ###
   constructor: (@x, @y) ->
 

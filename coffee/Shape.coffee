@@ -1,4 +1,4 @@
-Naubino.Shape = class Shape
+class Naubino.Shape
 
   constructor: (naub) ->
     @naub = naub

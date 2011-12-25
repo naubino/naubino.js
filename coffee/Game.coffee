@@ -1,5 +1,5 @@
 # controlls everything that has to do with logic and gameplay or menus
-Naubino.Game = class Game extends Naubino.Layer
+class Naubino.Game extends Naubino.Layer
   
   ###
   * get this started 

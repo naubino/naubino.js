@@ -1,5 +1,5 @@
 # TODO cliean up menu code
-Naubino.Menu = class Menu extends Naubino.Layer
+class Naubino.Menu extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
 
