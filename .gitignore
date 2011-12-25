@@ -3,3 +3,4 @@ js/*
 *.swo
 *.js
 stats/
+node_modules/
