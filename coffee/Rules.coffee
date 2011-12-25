@@ -53,7 +53,9 @@ Naubino.TestCase = class TestCase extends RuleSet
   constructor: ->
     super()
     Naubino.Settings.show_numbers = on
-    Naubino.game.create_some_naubs 2
+    #Naubino.game.create_some_naubs 2
+    Naubino.game.create_matching_naubs()
+    Naubino.game.create_matching_naubs()
     Naubino.game.toggle_numbers()
     weightless = ->
       Naubino.game.gravity = off
