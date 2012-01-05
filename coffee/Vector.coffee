@@ -5,9 +5,9 @@ class Naubino.Vector
   set: (@x, @y) ->
     return this
 
-  setZero: () ->
-    @x = @y = 0
-    return
+  setZero: ->
+    @x = @y = 0.0
+    return this
 
   setV: (v) ->
     {@x,@y} = v
@@ -22,15 +22,11 @@ class Naubino.Vector
   add: (v) ->
     @x += v.x
     @y += v.y
+    console.log @x, @y
     return this
 
   addC: (x, y) ->
     return @add {x, y}
-
-  add: (v) ->
-    @x += v.x
-    @y += v.y
-    return this
 
   addPolar: (dir, len) ->
     @x += Math.cos(dir) * len
@@ -51,36 +47,36 @@ class Naubino.Vector
     tx = @x
     @x = s * @y
     @y = -s * tx
-    return
+    return this
  
-  crossFV: () ->
+  crossFV: (s) ->
     tx = @x
     @x = -s * @y
     @y = s * tx
-    return
+    return this
  
   minV: (b) ->
     @x = if @x < b.x then @x else b.x
     @y = if @y < b.y then @y else b.y
-    return
+    return this
  
-  maxV: () ->
+  maxV: ->
     @x = if @x > b.x then @x else b.x
     @y = if @y > b.y then @y else b.y
-    return
+    return this
 
-  abs: () ->
+  abs: ->
     @x = Math.abs @x
     @y = Math.abs @y
-    return
+    return this
  
-  length: () ->
+  length: ->
     Math.sqrt(@x * @x + @y * @y)
  
-  length2: () ->
+  length2: ->
     @x * @x + @y * @y
  
-  normalize: () ->
+  normalize: ->
     length = @length()
     if length < Number.MIN_VALUE
       return 0.0
@@ -89,6 +85,9 @@ class Naubino.Vector
     @y *= length
 
     return length
+
+  isValid : ->
+    b2Math.b2IsValid(@x) and b2Math.b2IsValid(@y)
  
 
 
