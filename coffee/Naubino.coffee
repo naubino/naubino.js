@@ -22,7 +22,7 @@ window.onload = ->
     #@rules = new @RuleSet()
     #@rules  = new @Tutorial()
     @rules = new @TestCase()
-    @menu_play.dispatch() #TODO remove this line
+    #@menu_play.dispatch() #TODO remove this line
     
 
 
@@ -51,7 +51,8 @@ window.onload = ->
         {  name: 'play',      from: 'menu',     to: 'playing' }
         {  name: 'pause',     from: 'playing',  to: 'paused'  }
         {  name: 'play',      from: 'paused',   to: 'playing' }
-        {  name: 'unpause',   from: 'paused',   to: 'playing' }
+        {  name: 'toggle',    from: 'playing',  to: 'paused'  }
+        {  name: 'toggle',    from: 'paused',   to: 'playing' }
         {  name: 'win',       from: 'playing',  to: 'won'     }
         {  name: 'lose',      from: 'playing',  to: 'lost'    }
         {  name: 'exit',      from: 'playing',  to: 'menu'    }
@@ -106,10 +107,12 @@ window.onload = ->
     @menu_blur       = new @Signal()
     @menu_pause      = new @Signal()
     @menu_play       = new @Signal()
+    @menu_toggle     = new @Signal()
     @menu_exit       = new @Signal()
     @menu_help       = new @Signal()
 
 
+# TODO: think about making the menu a statemachine too
   add_generic_listeners: ->
     @menu_pause.add =>
       @fsm.pause()
@@ -122,6 +125,9 @@ window.onload = ->
       console.log "menu: play"
       @menu_pause.active = true
       @menu_play.active = false
+
+    @menu_toggle.add =>
+      @fsm.toggle()
 
     @menu_exit.add =>
       @fsm.exit()
@@ -142,7 +148,7 @@ window.onload = ->
     @keybindings = new @KeyBindings()
     window.onkeydown = (key) => @keybindings.keydown(key)
     window.onkeyup = (key) => @keybindings.keyup(key)
-    @keybindings.enable 32, => @menu_pause.dispatch()
+    @keybindings.enable 32, => @menu_toggle.dispatch()
 
 
   setup_cursorbindings: () ->

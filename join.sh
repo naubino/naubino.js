@@ -1,5 +1,5 @@
 
-coffee --join Naubino.joined.js -c \
+coffee --join Naubino.joined.js -cw \
 							coffee/Naubino.coffee \
 							coffee/Settings.coffee \
 							coffee/Rules.coffee \

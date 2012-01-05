@@ -7,7 +7,6 @@ NAUBINO_SOURCE = coffee/Ball.coffee \
 								 coffee/Naub.coffee \
 								 coffee/Rules.coffee \
 								 coffee/Tutorial.coffee \
-								 coffee/StateMachine.coffee \
 								 coffee/Game.coffee \
 								 coffee/Layer.coffee \
 								 coffee/Overlay.coffee \
@@ -26,7 +25,6 @@ NAUBINO_TMP = \
 							js/Settings.js \
 							js/Rules.js \
 							js/Tutorial.js \
-							js/StateMachine.js \
 							js/PhysicsModel.js \
 							js/Keybindings.js \
 							js/Vector.js \
