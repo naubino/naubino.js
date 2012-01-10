@@ -39,18 +39,10 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
         mes.alpha = 1
         if callback?
           callback.call()
+        console.log 'fade in:', text
     clearInterval mes.fadeloop
     mes.fadeloop = setInterval( fade, 40 )
     mes_id
-
-  fade_in_and_out_message: (text, time = 1000, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
-    fade_out = => setTimeout =>
-      @fade_out_message mes_id, callback
-    ,time
-
-    mes_id = @fade_in_message text, fade_out, font_size , color,  x, y, ctx
-    mes = @get_object mes_id
-
 
   ### fading out a specific message by id ###
   fade_out_message: (mes_id, callback = null)->
@@ -77,16 +69,33 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     if callback?
       callback()
 
-  queue_messages: (messages) ->
+  fade_in_and_out_message: (text, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
+    if Array.isArray(text)
+      console.log text[2]
+      time = if text[1]? then text[1] else 1000
+      text = text[0]
+    else
+      time = 2000
+
+    fade_out = => setTimeout =>
+      @fade_out_message mes_id, callback
+    ,time
+
+    mes_id = @fade_in_message text, fade_out, font_size , color,  x, y, ctx
+    mes = @get_object mes_id
+
+
+  queue_messages: (messages,callback) ->
     messages = ["hello", "world"] if not messages?
 
-    next = (that, m)  ->
+    next = (that, m,callback)  ->
       m = messages.shift()
       if m?
-        console.log m,'still there'
-        that.fade_in_and_out_message m, 1000, () -> next(that, messages)
+        that.fade_in_and_out_message m, () -> next(that, messages,callback)
+      else
+        that.fade_in_and_out_message m, callback
 
-    next(this, messages)
+    next(this, messages,callback)
     
 
   message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
