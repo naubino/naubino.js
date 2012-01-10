@@ -77,6 +77,17 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     if callback?
       callback()
 
+  queue_messages: (messages) ->
+    messages = ["hello", "world"] if not messages?
+
+    next = (that, m)  ->
+      m = messages.shift()
+      if m?
+        console.log m,'still there'
+        that.fade_in_and_out_message m, 1000, () -> next(that, messages)
+
+    next(this, messages)
+    
 
   message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     buffer = document.createElement('canvas')
