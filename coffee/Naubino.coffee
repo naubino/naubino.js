@@ -5,6 +5,8 @@ window.onload = ->
 @Naubino = {
   constructor: () ->
 
+    @VERSION = 'tutorial branch'
+
     @graph = new @Graph()
     @colors = @Settings.colors.output
     @state_machine = new @NaubMachine()
