@@ -6,6 +6,7 @@ window.onload = ->
 @Naubino = {
   constructor: () ->
 
+    @VERSION = 'UNSTABLE MASTER BRANCH'
     @graph = new @Graph()
     @colors = @Settings.colors.output
     @fsm = @create_fsm()
