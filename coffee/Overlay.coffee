@@ -69,11 +69,13 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     if callback?
       callback()
 
+  kill: ->
+    @queue_messages [['Hallo Gilbert',1000],["kill me"],"Kill me nau"]
+
   fade_in_and_out_message: (text, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     if Array.isArray(text)
-      console.log text[2]
       time = if text[1]? then text[1] else 1000
-      text = text[0]
+      text = if text[0]? then text[0] else "Sorry for putting this here, but something went wrong."
     else
       time = 2000
 
@@ -84,19 +86,15 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     mes_id = @fade_in_message text, fade_out, font_size , color,  x, y, ctx
     mes = @get_object mes_id
 
+  queue_messages: (messages = ["hello", "world"], callback = null) =>
+    if m = messages.shift()
+      console.log "message '#{m}' still there"
+      messages = messages[0..]
+      @fade_in_and_out_message m, => @queue_messages messages
+    else
+      callback() if callback?
 
-  queue_messages: (messages,callback) ->
-    messages = ["hello", "world"] if not messages?
-
-    next = (that, m,callback)  ->
-      m = messages.shift()
-      if m?
-        that.fade_in_and_out_message m, () -> next(that, messages,callback)
-      else
-        that.fade_in_and_out_message m, callback
-
-    next(this, messages,callback)
-    
+    return
 
   message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     buffer = document.createElement('canvas')
