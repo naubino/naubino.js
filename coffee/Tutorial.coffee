@@ -74,7 +74,7 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
     weightless = -> Naubino.game.gravity = off
 
    # gives instructions
-    m1 = => Naubino.overlay.fade_in_and_out_message("These are Naubs", 2000, m2, 25)
+    m1 = => Naubino.overlay.fade_in_and_out_message(["These are Naubs", 2000], m2, 25)
     m2 = => Naubino.overlay.fade_in_message("Try to move them around!", m3, 25)
     m3 = => @shown()
     setTimeout weightless, 4000
