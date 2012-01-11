@@ -74,6 +74,7 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
 
   fade_in_and_out_message: (text, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     if Array.isArray(text)
+      console.log 42, text[2]
       time = if text[1]? then text[1] else 1000
       text = if text[0]? then text[0] else "Sorry for putting this here, but something went wrong."
     else
