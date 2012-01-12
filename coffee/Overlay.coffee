@@ -4,6 +4,7 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     @fps = 1000 / 15 # 5fps
     @drawing = true
     @start_timer()
+    @fade_speed = 40
 
 
   draw:  ->
@@ -41,9 +42,10 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
           callback.call()
         console.log 'fade in:', text
     clearInterval mes.fadeloop
-    mes.fadeloop = setInterval( fade, 40 )
+    mes.fadeloop = setInterval( fade, @fade_speed )
     mes_id
 
+  
   ### fading out a specific message by id ###
   fade_out_message: (mes_id, callback = null)->
     #console.log "fade out"
@@ -59,7 +61,7 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     clearInterval mes.fadeloop
     #console.log mes
     if mes?
-      mes.fadeloop = setInterval( fade, 40 )
+      mes.fadeloop = setInterval( fade, @fade_speed)
 
 
   ### fading out all messages ###
@@ -69,12 +71,8 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     if callback?
       callback()
 
-  kill: ->
-    @queue_messages [['Hallo Gilbert',1000],["kill me"],"Kill me nau"]
-
   fade_in_and_out_message: (text, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     if Array.isArray(text)
-      console.log 42, text[2]
       time = if text[1]? then text[1] else 1000
       text = if text[0]? then text[0] else "Sorry for putting this here, but something went wrong."
     else
@@ -87,15 +85,13 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     mes_id = @fade_in_message text, fade_out, font_size , color,  x, y, ctx
     mes = @get_object mes_id
 
-  queue_messages: (messages = ["hello", "world"], callback = null) =>
+  queue_messages: (messages = ["hello", "world"], callback = null, font_size = 15) =>
     if m = messages.shift()
-      console.log "message '#{m}' still there"
       messages = messages[0..]
-      @fade_in_and_out_message m, => @queue_messages messages
+      @fade_in_and_out_message m, (=> @queue_messages messages, callback, font_size), font_size
     else
       callback() if callback?
 
-    return
 
   message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     buffer = document.createElement('canvas')
