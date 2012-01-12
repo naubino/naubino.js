@@ -11,6 +11,7 @@
   * keep on looking for the 3-way-join-bug
   * naubs kinda jiggle in chromium (due to prerendering)
   * remove 1000/n fps calculation 
+  * touch screens need scrollprevention (example on swipejs.com) and bigger naubs
 
 # wishes
   * simplify the drawing chain
