@@ -60,11 +60,11 @@ Naubino.Graph = class Graph
 
     for inaub, {naub, dfs_num, color} of @dfs_map
       if dfs_num == 0
-        dfs_cycle = @dfs(naub)
+        dfs_cycle = @dfs(naub, null, first)
         cycles = _.union(cycles, dfs_cycle)
     return
 
-  dfs: (naub, pre = null) ->
+  dfs: (naub, pre = null, first = null) ->
     cycles = []
 
     @dfs_map[naub].dfs_num = @seq_num
@@ -73,19 +73,27 @@ Naubino.Graph = class Graph
 
     for partner in @partners(naub,pre)
       if @dfs_map[partner].dfs_num == 0
-        cycles = _.union(cycles, @dfs(partner,naub))
+        cycles = _.union(cycles, @dfs(partner,naub, first))
 
       if @dfs_map[partner].color == 1
-        list =  @cycle_list(naub,partner)
+        list =  @cycle_list(naub,partner,first)
         if list.length > 0
           Naubino.cycle_found.dispatch(list)
     @dfs_map[naub].color = 2
     return cycles
 
-  cycle_list: (v,w) ->
+  cycle_list: (v,w,first = null) ->
     cycle = _.select(@dfs_map, ({dfs_num, color})=> (dfs_num >= @dfs_map[w].dfs_num  && color == 1) )
     cycle.sort( (a,b) -> a.dfs_num - b.dfs_num)
     cycle_naubs = _.pluck(cycle, 'naub')
+    if first? and first in cycle_naubs
+
+      cn = cycle_naubs
+      i = cn.indexOf first
+      cn = cn[i...cn.length].concat(cn[0...i])
+
+      cycle_naubs = cn
+
     return cycle_naubs
 
 

@@ -21,9 +21,9 @@ window.onload = ->
 
     #TODO switch Rulesets via a statemachine
     #@rules = new @RuleSet()
-    @rules  = new @Tutorial()
-    #@rules = new @TestCase()
-    #@menu_play.dispatch() #TODO remove this line
+    #@rules  = new @Tutorial()
+    @rules = new @TestCase()
+    @menu_play.dispatch() #TODO remove this line
     
 
 

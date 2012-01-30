@@ -81,8 +81,8 @@ Naubino.Naub = class Naub
       Naubino.graph.remove_join id
     @layer.unfocus()
     @remove()
-    console.log "replaced #{@number}"
-    Naubino.naub_replaced.dispatch()
+    console.log "replaced #{@number} with #{other.number}"
+    Naubino.naub_replaced.dispatch(@number)
     return 42
 
 
