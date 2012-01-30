@@ -8,8 +8,9 @@ Naubino.RuleSet = class RuleSet
     basket = 150
     Naubino.game.basket_size = basket
     Naubino.background.basket_size = basket
-    Naubino.naub_replaced.add =>
-      Naubino.graph.cycle_test()
+    Naubino.naub_replaced.add (number)=>
+      console.log 'naub_replaced dispatched by ',number
+      Naubino.graph.cycle_test(number)
 
     Naubino.naub_destroyed.add =>
       Naubino.game.points++
@@ -53,7 +54,8 @@ Naubino.TestCase = class TestCase extends RuleSet
   constructor: ->
     super()
     Naubino.Settings.show_numbers = on
-    Naubino.game.create_some_naubs 2
+    #Naubino.game.create_some_naubs 2
+    Naubino.game.create_matching_naubs()
     Naubino.game.toggle_numbers()
     weightless = ->
       Naubino.game.gravity = off
