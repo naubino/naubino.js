@@ -126,19 +126,19 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
     @show_naubs()
     Naubino.game.joining_allowed = yes
     Naubino.naub_replaced.addOnce =>
-      Naubino.overlay.queue_messages([
-        ["nicely done",600]
-        ["now connect more naubs",1100]
-      ], @font_size, => Naubino.game.joining_allowed = yes)
+      Naubino.overlay.fade_in_and_out_message( ["nicely done",600],( => Naubino.game.joining_allowed = yes), @font_size)
       Naubino.game.joining_allowed = no
 
-    m1 = Naubino.overlay.queue_messages([
+    m1 = => Naubino.overlay.queue_messages([
       ["very Good...", 600]
       #["Every Naub has a certain color",1000]
       #["You can connect pairs of Naubs...",1400]
       ["...by dragging on Naub onto\nanother with the same color",3000]
     ], m2, @font_size)
-    m2 = -> Naubino.overlay.fade_in_message("Now try to connect two pairs of naubs", m3, @font_size)
+    m2 = => Naubino.overlay.fade_in_message("Now try to connect two pairs of naubs", m3, @font_size)
+    m3 = ->
+
+    m1()
 
   onclose_circle: ->
 
