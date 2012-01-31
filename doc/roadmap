@@ -21,3 +21,7 @@
 	* simplify : the drawing chain
 	* beauty   : destruction of cycle should start at focused_naub
 	* beauty   : color palettes also handle background and join color (for theming)
+	* feature  : add sound and music https://github.com/jakesgordon/javascript-audio-fx
+
+# tests
+	* test on	: microsoft surface ( or what ever we get during output)
