@@ -31,7 +31,7 @@ sudo bin/cake install
 `
 
 # Node.js:
-  * In case you dont have node.js 0.6.3 in your package manager
+  * In case you dont have a current node.js in your package manager
 `
 git clone https://github.com/joyent/node
 cd node
