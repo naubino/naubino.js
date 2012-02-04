@@ -134,7 +134,6 @@ Naubino.Game = class Game extends Naubino.Layer
 
 
   destroy_naubs: (list)->
-    console.log list
     for naub in list
       @get_object(naub).disable()
 
@@ -143,7 +142,7 @@ Naubino.Game = class Game extends Naubino.Layer
       if i < list.length
         @get_object(list[i]).destroy()
         i++
-      setTimeout one_after_another, 440
+      setTimeout one_after_another, 40
     one_after_another()
 
 

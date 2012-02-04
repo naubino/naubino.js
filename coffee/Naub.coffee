@@ -82,7 +82,7 @@ Naubino.Naub = class Naub
     @layer.unfocus()
     @remove()
     console.log "replaced #{@number} with #{other.number}"
-    Naubino.naub_replaced.dispatch(@number)
+    Naubino.naub_replaced.dispatch(other.number)
     return 42
 
 

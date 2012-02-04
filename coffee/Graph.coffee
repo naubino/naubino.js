@@ -86,15 +86,12 @@ Naubino.Graph = class Graph
     cycle = _.select(@dfs_map, ({dfs_num, color})=> (dfs_num >= @dfs_map[w].dfs_num  && color == 1) )
     cycle.sort( (a,b) -> a.dfs_num - b.dfs_num)
     cycle_naubs = _.pluck(cycle, 'naub')
+
     if first? and first in cycle_naubs
-
-      cn = cycle_naubs
-      i = cn.indexOf first
-      cn = cn[i...cn.length].concat(cn[0...i])
-
-      cycle_naubs = cn
+      cycle_naubs = cycle_naubs
+      i = cycle_naubs.indexOf first
+      cycle_naubs = cycle_naubs[i...cycle_naubs.length].concat(cycle_naubs[0...i])
 
     return cycle_naubs
-
 
 
