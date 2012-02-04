@@ -9,7 +9,7 @@ Naubino.RuleSet = class RuleSet
     Naubino.game.basket_size = basket
     Naubino.background.basket_size = basket
     Naubino.naub_replaced.add (number)=>
-      console.log 'naub_replaced dispatched by ',number
+      #console.log 'naub_replaced dispatched by ',number
       Naubino.graph.cycle_test(number)
 
     Naubino.naub_destroyed.add =>
@@ -34,8 +34,8 @@ Naubino.RuleSet = class RuleSet
       {x,y} = Naubino.game.random_outside()
       Naubino.game.create_naub_pair(x,y)
       basket = Naubino.game.count_basket()
-      console.log basket if basket.length > 0
-      console.log "new naubs!"
+      #console.log basket if basket.length > 0
+      #console.log "new naubs!"
     @inner_clock = (@inner_clock + 1) % 10
 
 
