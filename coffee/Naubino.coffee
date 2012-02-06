@@ -11,9 +11,9 @@ window.onload = ->
   Naubino.constructor()
 
 @Naubino = {
+  VERSION : 'UNSTABLE MASTER BRANCH'
   constructor: () ->
 
-    @VERSION = 'UNSTABLE MASTER BRANCH'
     @graph = new @Graph()
     @colors = @Settings.colors.output
     @fsm = @create_fsm()
