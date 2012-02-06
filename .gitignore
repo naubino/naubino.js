@@ -2,5 +2,6 @@ js/*
 *.swp
 *.swo
 *.js
+Session.vim
 stats/
 node_modules/
