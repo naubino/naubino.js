@@ -32,19 +32,22 @@ window.onload = ->
     @rules = new @TestCase()
     #@menu_play.dispatch() #TODO remove this line
     
-
+  print: ->
+    @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
 
   init_dom: () ->
-    @gamediv           = document.getElementById("gamediv")
-    @overlay_canvas    = document.getElementById("overlay_canvas")
-    @menu_canvas       = document.getElementById("menu_canvas")
-    @game_canvas       = document.getElementById("game_canvas")
-    @background_canvas = document.getElementById("background_canvas")
+    @gamediv           = document.querySelector("#gamediv")
+    @overlay_canvas    = document.querySelector("#overlay_canvas")
+    @menu_canvas       = document.querySelector("#menu_canvas")
+    @game_canvas       = document.querySelector("#game_canvas")
+    @background_canvas = document.querySelector("#background_canvas")
 
-    @overlay_canvas.width  = @menu_canvas.width     = @game_canvas.width  = @background_canvas.width  = @Settings.canvas.width
-    @overlay_canvas.height = @menu_canvas.height    = @game_canvas.height = @background_canvas.height = @Settings.canvas.height
+    for canvas in  @gamediv.querySelectorAll("canvas")
+      canvas.width = @Settings.canvas.width
+      canvas.height = @Settings.canvas.height
+
+
     @gamediv.max-width     = @Settings.canvas.width
-    @gamediv.style.border  = "2px"
 
     @background = new @Background(@background_canvas)
     @game       = new @Game(@game_canvas, @graph)
