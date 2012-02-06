@@ -3,9 +3,9 @@ window.onload = ->
   Naubino.constructor()
 
 @Naubino = {
+  VERSION:  'tutorial branch'
   constructor: () ->
 
-    @VERSION = 'tutorial branch'
 
     @graph = new @Graph()
     @colors = @Settings.colors.output
