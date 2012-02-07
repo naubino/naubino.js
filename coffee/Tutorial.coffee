@@ -1,55 +1,43 @@
 Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
   @name = "Tutorial"
-  constructor: ->
-    super()
-    @font_size = 20
-    
 
   ###
-   states: -> welcome
-   -> show naubs
-       "Thes are Naubs"
-       "Try Moving the Around"
-       "Very Good"
-   -> join naubs
-       "Naubs can be joined if they have the same color..."
-       "Now join two naubs by push one into the other"
-   -> form circle
-   -> success
+  # Lesson 1
+  #   Naubs can be moved
+  #   Naubs can be joined
+  # Lesson 2
+  #   Cycles dissolve
+  # vvvv TODO vvvv
+  #   Single Naubs can be attached to any color TODO: modify create_matching_naubs accordingly
+  # Lesson 3
+  #   Naubs keep bein generated
+  #   Too many Naubs can kill you
   ###
 
   configure: ->
     super()
+    @font_size = 24
     Naubino.menu_focus.active = false
     Naubino.game.joining_allowed = no
+
     StateMachine.create {
       target: this
       initial: 'welcome'
-      initial: 'join_naubs' # TODO: delete this line
       events: [
-        { name: 'click',  from: 'welcome',      to: 'show_naubs'  }
-        { name: 'shown',  from: 'show_naubs',   to: 'move_naubs'  }
-        { name: 'moved',  from: 'move_naubs',   to: 'join_naubs'  }
-        { name: 'joined', from: 'join_naubs',   to: 'close_circle'}
-        { name: 'click',  from: 'close_circle', to: 'success'     }
+        { name: 'click',  from: 'welcome',      to: 'lesson_show'  }
+        { name: 'shown',  from: 'lesson_show',  to: 'lesson_move'  }
+        { name: 'moved',  from: 'lesson_move',  to: 'lesson_join'  }
+        { name: 'joined', from: 'lesson_join',  to: 'lesson_cycle' }
+        { name: 'click',  from: 'lesson_cycle', to: 'success'      }
       ]
     }
-    console.log @current
 
-  ### Each lesson:
-   # [sets preconditions]
-   # [adds listeners
-   # gives instructions
-   # [unsets preconditions]
-  ###
+  onchangestate: ->
+    console.info "Tutorial:", @current
 
-
-  onwelcome: (e, f, t) ->
-    # set preconditions
-    # add listeners
+  onwelcome: (e, f, t) =>
     Naubino.mousedown.active = false
-    Naubino.mousedown.addOnce =>
-      @click()
+    Naubino.mousedown.addOnce => @click()
 
    # give instructions
     Naubino.overlay.fade_in_message("Tutorial", null, @font_size)
@@ -61,12 +49,11 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
       Naubino.overlay.fade_in_and_out_message(
         ["use the menu to restart this tutorial at any time",5000],
         null,
-        9,
+        12,
         'black',
         Naubino.Settings.canvas.width/2,
         Naubino.Settings.canvas.height-10)
     ,3000
-
 
   # fade out and then change state
   onleavewelcome: ->
@@ -74,31 +61,24 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
       @transition()
     false
 
-  onbeforeshow_naubs: ->
-    console.log "onbeforeshow_naubs really has been called"
+  onbeforeshown: =>
+    console.warn "onbeforeshow really has been called"
 
-  show_naubs: ->
-    Naubino.game.create_matching_naubs(2)
-    Naubino.game.start_timer()
-    weightless = -> Naubino.game.gravity = off
-    setTimeout weightless, 5500
 
-  onshow_naubs: =>
-   # [sets preconditions]
-   # adds listeners
-   # gives instructions
-    #m1 = => Naubino.overlay.fade_in_and_out_message(["These are Naubs", 2000], m2, @font_size)
-    m1 = => Naubino.overlay.queue_messages([
-      #'Naubino is all about Naubs'
-      "These are Naubs"
-      #"They always come in pairs"
+  onlesson_show: =>
+    strings = [
+      ["Naubino is all about Naubs",100]
+      ["These are Naubs",100]
+      ["They always come in pairs",100]
+      ["Try to move them around!",100]
     ]
-    , m2, @font_size)
-    m2 = => Naubino.overlay.fade_in_message("Try to move them around!", m3, @font_size)
-    m3 = => @shown()
-    setTimeout m1, 2000
 
-  onmove_naubs: =>
+    @create_naubs()
+    messages = => Naubino.overlay.queue_messages(strings, (=> @shown()), @font_size)
+    setTimeout messages, 2000
+
+
+  onlesson_move: =>
     # remember a naubs original position
     binding1 = Naubino.naub_focused.add (naub) =>
       naub.old_pos = naub.physics.pos.Copy()
@@ -114,31 +94,35 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
         binding2.detach()
         @moved()
 
+    @fallback_warning_timer = setTimeout((=> Naubino.overlay.fade_in_and_out_message(["Just drag one pair across.",3000], null, @font_size)), 10000)
 
   # fade out and then change state
-  onleavemove_naubs: =>
+  onleavelesson_move: =>
+    clearTimeout @fallback_warning_timer
+
     Naubino.overlay.fade_out_messages =>
       @transition()
     false
 
 
-  onjoin_naubs: =>
-    @show_naubs()
+  onlesson_join: =>
     Naubino.game.joining_allowed = yes
     Naubino.naub_replaced.addOnce =>
-      Naubino.overlay.fade_in_and_out_message( ["nicely done",600],( => Naubino.game.joining_allowed = yes), @font_size)
+      Naubino.overlay.fade_in_and_out_message( ["nicely done!",1000],( => Naubino.game.joining_allowed = yes), @font_size)
       Naubino.game.joining_allowed = no
 
-    m1 = => Naubino.overlay.queue_messages([
-      ["very Good...", 600]
-      #["Every Naub has a certain color",1000]
-      #["You can connect pairs of Naubs...",1400]
-      ["...by dragging on Naub onto\nanother with the same color",3000]
-    ], m2, @font_size)
-    m2 = => Naubino.overlay.fade_in_message("Now try to connect two pairs of naubs", m3, @font_size)
-    m3 = ->
+    Naubino.overlay.queue_messages([
+      ["very Good", 100]
+      ["Every Naub has a certain color",100]
+      ["You can connect pairs of Naubs...",140]
+      ["...by dragging on Naub onto\nanother with the same color",300]
+      ["Now try to connect two pairs of naubs!",300]
+    ], null, @font_size)
 
-    m1()
+  lesson_cycle: ->
 
-  onclose_circle: ->
-
+  create_naubs: ->
+    Naubino.game.create_matching_naubs(1)
+    Naubino.game.start_timer()
+    weightless = -> Naubino.game.gravity = off
+    setTimeout weightless, 5500

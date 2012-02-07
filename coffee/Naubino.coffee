@@ -23,7 +23,7 @@ window.onload = ->
     #@rules = new @RuleSet()
     @rules  = new @Tutorial()
     #@rules = new @TestCase()
-    @menu_play.dispatch() #TODO remove this line
+    #@menu_play.dispatch() #TODO remove this line
     
 
 
