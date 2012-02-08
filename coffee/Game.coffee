@@ -20,25 +20,33 @@ Naubino.Game = class Game extends Naubino.Layer
   create_some_naubs: (n = 3) ->
     for [1..n]
       {x,y} = @random_outside()
-      Naubino.background.draw_marker(x,y)
+      #Naubino.background.draw_marker(x,y)
       @create_naub_pair(x,y)
     for [1..n]
       {x,y} = @random_outside()
-      Naubino.background.draw_marker(x,y)
+      #Naubino.background.draw_marker(x,y)
       @create_naub_triple(x,y)
 
 
-  create_matching_naubs: () ->
-    #colors
-    colors = _.shuffle [0..5]
-    colors[5] = colors[0]
-    i = 0
-    while i < (colors.length )-1
-      {x,y} = @random_outside()
-      Naubino.background.draw_marker(x,y)
-      [a,b] = @create_naub_pair(x,y,colors[i],colors[i+1])
-      #console.log "pairing " + [a,b]
-      i++
+  create_matching_naubs: (n=1,extras=0) ->
+    #create n sets of matching pairs
+    for [1..n]
+      colors = _.shuffle [0..5]
+      colors[5] = colors[0]
+      i = 0
+      while i < (colors.length )-1
+        {x,y} = @random_outside()
+        #Naubino.background.draw_marker(x,y)
+        [a,b] = @create_naub_pair(x,y,colors[i],colors[i+1])
+        #console.log "pairing " + [a,b]
+        i++
+
+    #create some extras
+    if extras > 0
+      for [1..extras]
+        {x,y} = @random_outside()
+        #Naubino.background.draw_marker(x,y)
+        @create_naub_pair(x,y)
 
 
   create_naub: (x=@center.x, y=@center.y) ->

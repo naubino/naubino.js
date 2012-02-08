@@ -35,19 +35,25 @@ Naubino.Naub = class Naub
     return
 
 
-  ### organisation ###
+  ## organisation ###
   step: (dt) =>
     @physics.step dt
-    
+
+
+  ### makes a naub unclickable and joinable ###
   enable: ->
     @disabled = false
-    @shape.style.fill = Naubino.colors[@color_id]
     @shape.pre_render()
-
+    
   disable: ->
     @disabled = true
-    @shape.style.fill = [100,100,100,1]
     @shape.pre_render()
+
+  grey_out: ->
+    @shape.style.fill = [100,100,100,1]
+
+  recolor: ->
+    @shape.style.fill = Naubino.colors[@color_id]
 
   remove: =>
     @removed = true
@@ -55,6 +61,8 @@ Naubino.Naub = class Naub
       delete naub.joins[id]
       Naubino.graph.remove_join id
 
+
+  ### animated remove with disabling   ###
   destroy: ->
     for id, partner of @joins
       @drawing_join[id] = true
@@ -62,6 +70,7 @@ Naubino.Naub = class Naub
     @destroying = true
     @shape.destroy(@remove)
     Naubino.naub_destroyed.dispatch(@number)
+    
 
   ### do things a naub is supposed to do ###
   join_with: (other) ->
@@ -73,7 +82,8 @@ Naubino.Naub = class Naub
     Naubino.naub_joined.dispatch()
     join
 
-  
+
+  ### the 'other' naub takes my place  ###
   replace_with: (other) ->
     remove_joins = for id, naub of @joins
       other.join_with(naub)
@@ -100,7 +110,7 @@ Naubino.Naub = class Naub
       list.push naub.number
     @joins
 
-          
+
   distance_to: (other) ->
     unless other.number == @number
       { pos, vel, force } = @physics
