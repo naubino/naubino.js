@@ -71,11 +71,14 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
     if callback?
       callback()
 
+
   fade_in_and_out_message: (text, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     if Array.isArray(text)
       # don't worry - both lines are supposed to do the same...
-      time = text[1] ?  1000
-      text = text[0] ? ""
+      font_size = text[2] ? font_size
+      time      = text[1] ? 1000
+      text      = text[0] ? ""
+      
     else
       time = 2000
 
@@ -85,6 +88,7 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
 
     mes_id = @fade_in_message text, fade_out, font_size , color,  x, y, ctx
     mes = @get_object mes_id
+
 
   queue_messages: (messages = ["hello", "world"], callback = null, font_size = 15) =>
     if m = messages.shift()

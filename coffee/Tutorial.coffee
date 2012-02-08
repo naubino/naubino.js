@@ -10,7 +10,7 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
   # vvvv TODO vvvv
   #   Single Naubs can be attached to any color TODO: modify create_matching_naubs accordingly
   # Lesson 3
-  #   Naubs keep bein generated
+  #   Naubs keep being generated
   #   Too many Naubs can kill you
   ###
 
@@ -32,8 +32,9 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
       ]
     }
 
-  onchangestate: ->
-    console.info "Tutorial:", @current
+  onchangestate:(e,f,t) ->
+    #console.info "Tutorial:", @current
+    console.info "#{f} --(#{e})--> #{t}"
 
   onwelcome: (e, f, t) =>
     Naubino.mousedown.active = false
@@ -61,19 +62,22 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
       @transition()
     false
 
-  onbeforeshown: =>
-    console.warn "onbeforeshow really has been called"
+  onclick: =>
+    setTimeout =>
+      @create_naubs()
+      console.warn "naubs inserted"
+    , 4300
 
 
   onlesson_show: =>
     strings = [
-      ["Naubino is all about Naubs",100]
-      ["These are Naubs",100]
-      ["They always come in pairs",100]
-      ["Try to move them around!",100]
+      ["Lesson 1",1300,@font_size*2]
+      ["Naubino is all about Naubs",1000]
+      ["These are Naubs",1000]
+      ["They always come in pairs",1000]
+      ["Try to move them around!",1000]
     ]
 
-    @create_naubs()
     messages = => Naubino.overlay.queue_messages(strings, (=> @shown()), @font_size)
     setTimeout messages, 2000
 
@@ -105,10 +109,13 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
     false
 
 
+
   onlesson_join: =>
     Naubino.game.joining_allowed = yes
     Naubino.naub_replaced.addOnce =>
-      Naubino.overlay.fade_in_and_out_message( ["nicely done!",1000],( => Naubino.game.joining_allowed = yes), @font_size)
+      Naubino.overlay.fade_in_and_out_message(["nicely done!",2000], =>
+        @joined()
+      , @font_size)
       Naubino.game.joining_allowed = no
 
     Naubino.overlay.queue_messages([
@@ -119,9 +126,24 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
       ["Now try to connect two pairs of naubs!",300]
     ], null, @font_size)
 
-  lesson_cycle: ->
+  onleavelesson_join: =>
+      Naubino.game.joining_allowed = yes
 
+  onlesson_cycle: (e,f,t) ->
+    Naubino.cycle_found.add =>
+      Naubino.overlay.queue_messages([
+        ["Great",4000]
+      ], null, @font_size)
+
+    Naubino.overlay.queue_messages([
+      ["now connect the remaining naubs",2500]
+      ["and see what happens...", 2000]
+    ], null, @font_size)
+
+
+  ### utility ###
   create_naubs: ->
+    Naubino.game.gravity = on
     Naubino.game.create_matching_naubs(1)
     Naubino.game.start_timer()
     weightless = -> Naubino.game.gravity = off
