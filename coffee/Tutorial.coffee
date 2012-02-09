@@ -127,11 +127,11 @@ class Naubino.Tutorial extends Naubino.RuleSet
       @toggle_joining()
 
     Naubino.overlay.queue_messages([
-      ["very Good", 100]
-      ["Every Naub has a certain color",100]
-      ["You can connect pairs of Naubs...",140]
-      ["...by dragging on Naub onto\nanother with the same color",300]
-      ["Now try to connect two pairs of naubs!",300]
+      ["very Good", 1000]
+      ["Every Naub has a certain color",1000]
+      ["You can connect pairs of Naubs...",1400]
+      ["...by dragging on Naub onto\nanother with the same color",3000]
+      ["Now try to connect two pairs of naubs!",3000]
     ], @toggle_joining, @font_size)
 
 
