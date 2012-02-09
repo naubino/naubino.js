@@ -117,6 +117,8 @@ Naubino.Overlay = class Overlay extends Naubino.Layer
 
   render_text: (text, font_size = 15, color = 'black', x = @center.x, y = @center.y, ctx = @ctx) ->
     ctx.fillStyle = color
+    ctx.shadowColor = '#fff'
+    ctx.shadowBlur = 3
     ctx.strokeStyle = color
     ctx.textAlign = 'center'
     ctx.font= "#{font_size}px Helvetica"
