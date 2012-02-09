@@ -8,8 +8,9 @@ class Naubino.RuleSet
     basket = 150
     Naubino.game.basket_size = basket
     Naubino.background.basket_size = basket
-    Naubino.naub_replaced.add =>
-      Naubino.graph.cycle_test()
+    Naubino.naub_replaced.add (number)=>
+      #console.log 'naub_replaced dispatched by ',number
+      Naubino.graph.cycle_test(number)
 
     Naubino.naub_destroyed.add =>
       Naubino.game.points++
@@ -33,8 +34,8 @@ class Naubino.RuleSet
       {x,y} = Naubino.game.random_outside()
       Naubino.game.create_naub_pair(x,y)
       basket = Naubino.game.count_basket()
-      console.log basket if basket.length > 0
-      console.log "new naubs!"
+      #console.log basket if basket.length > 0
+      #console.log "new naubs!"
     @inner_clock = (@inner_clock + 1) % 10
 
 
@@ -54,7 +55,6 @@ class Naubino.TestCase extends Naubino.RuleSet
     super()
     Naubino.Settings.show_numbers = on
     #Naubino.game.create_some_naubs 2
-    Naubino.game.create_matching_naubs()
     Naubino.game.create_matching_naubs()
     Naubino.game.toggle_numbers()
     weightless = ->

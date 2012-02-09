@@ -10,8 +10,9 @@
 	* usability   : play and pause button should have the same color
 	* bug         : keep on looking for the 3-way-join-bug
 	* bug         : naubs kinda jiggle in chromium (due to pre rendering)
-	* convention	: rename all objs into objects
-	* convention	: make names more intuitive (draw,render,pre_render)(buffer)
+	* convention  : rename all objs into objects
+	* convention  : make names more intuitive (draw,render,pre_render)(buffer)
+  * input       : touch screens need scrollprevention (example on swipejs.com) and bigger naubs
 
 # wishes
 	* improve  : decouple step timer and draw timer

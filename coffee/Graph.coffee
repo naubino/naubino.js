@@ -86,7 +86,7 @@ class Naubino.Graph
 
     for inaub, {naub, dfs_num, color} of @dfs_map
       if dfs_num == 0
-        dfs_cycle = @dfs(naub)
+        dfs_cycle = @dfs(naub, null, first)
         cycles = _.union(cycles, dfs_cycle)
     return
 
@@ -94,7 +94,7 @@ class Naubino.Graph
   ###
   recursive part of cycle_test
   ###
-  dfs: (naub, pre = null) ->
+  dfs: (naub, pre = null, first = null) ->
     cycles = []
 
     @dfs_map[naub].dfs_num = @seq_num
@@ -103,10 +103,10 @@ class Naubino.Graph
 
     for partner in @partners(naub,pre)
       if @dfs_map[partner].dfs_num == 0
-        cycles = _.union(cycles, @dfs(partner,naub))
+        cycles = _.union(cycles, @dfs(partner,naub, first))
 
       if @dfs_map[partner].color == 1
-        list =  @cycle_list(naub,partner)
+        list =  @cycle_list(naub,partner,first)
         if list.length > 0
           Naubino.cycle_found.dispatch(list)
     @dfs_map[naub].color = 2
@@ -115,8 +115,16 @@ class Naubino.Graph
   ###
   returns the list for cycle_test
   ###
-  cycle_list: (v,w) ->
+  cycle_list: (v,w,first = null) ->
     cycle = _.select(@dfs_map, ({dfs_num, color})=> (dfs_num >= @dfs_map[w].dfs_num  && color == 1) )
     cycle.sort( (a,b) -> a.dfs_num - b.dfs_num)
     cycle_naubs = _.pluck(cycle, 'naub')
+
+    if first? and first in cycle_naubs
+      cycle_naubs = cycle_naubs
+      i = cycle_naubs.indexOf first
+      cycle_naubs = cycle_naubs[i...cycle_naubs.length].concat(cycle_naubs[0...i])
+
     return cycle_naubs
+
+

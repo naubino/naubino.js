@@ -166,17 +166,12 @@ window.onload = ->
     # TODO mouse events should be handled though Signals
     onmousemove = (e) =>
       @mousemove.dispatch e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
-      #old solution:  @menu.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
-      #old solution:  @game.move_pointer e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmouseup = (e) =>
       @mouseup.dispatch e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
-      #old solution: @game.unfocus e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     onmousedown = (e) =>
       @mousedown.dispatch e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
-      #old solution: @menu.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
-      #old solution: @game.click e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
 
     @overlay_canvas.addEventListener("mousedown"  , onmousedown , false)
     @overlay_canvas.addEventListener("mouseup"    , onmouseup   , false)

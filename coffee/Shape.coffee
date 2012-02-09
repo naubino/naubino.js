@@ -9,6 +9,9 @@ class Naubino.Shape
     @join_style = { fill: [0,0,0,1], width: 6 }
     @life_rendering = false # if true redraw on each frame
 
+  ###
+  * either renders live or draws pre_rendered image
+  ###
   draw: (ctx) ->
     if Naubino.Settings.pre_rendering and not @life_rendering
       ctx.save()
