@@ -23,6 +23,9 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
     StateMachine.create {
       target: this
       initial: 'welcome'
+      error:(e,f,t,a,ec,em) ->
+        console.warn e,f,t,a,ec,em unless e is 'click'
+
       events: [
         { name: 'click',  from: 'welcome',      to: 'lesson_show'  }
         { name: 'shown',  from: 'lesson_show',  to: 'lesson_move'  }
@@ -38,7 +41,7 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
 
   onwelcome: (e, f, t) =>
     Naubino.mousedown.active = false
-    Naubino.mousedown.addOnce => @click()
+    Naubino.mousedown.add => @click()
 
    # give instructions
     Naubino.overlay.fade_in_message("Tutorial", null, @font_size)
@@ -63,13 +66,14 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
     false
 
   onclick: =>
+
+  onlesson_show: =>
     setTimeout =>
       @create_naubs()
+      Naubino.game.for_each (naub) -> naub.disable()
       console.warn "naubs inserted"
     , 4300
 
-
-  onlesson_show: =>
     strings = [
       ["Lesson 1",1300,@font_size*2]
       ["Naubino is all about Naubs",1000]
@@ -83,6 +87,7 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
 
 
   onlesson_move: =>
+    Naubino.game.for_each (naub) -> naub.enable()
     # remember a naubs original position
     binding1 = Naubino.naub_focused.add (naub) =>
       naub.old_pos = naub.physics.pos.Copy()
@@ -109,14 +114,17 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
     false
 
 
+  toggle_joining: ->
+    Naubino.game.joining_allowed = !Naubino.game.joining_allowed
+
 
   onlesson_join: =>
-    Naubino.game.joining_allowed = yes
+    Naubino.game.joining_allowed = no
     Naubino.naub_replaced.addOnce =>
-      Naubino.overlay.fade_in_and_out_message(["nicely done!",2000], =>
+      Naubino.overlay.queue_messages([["nicely done!",2000]], =>
         @joined()
       , @font_size)
-      Naubino.game.joining_allowed = no
+      @toggle_joining()
 
     Naubino.overlay.queue_messages([
       ["very Good", 100]
@@ -124,10 +132,8 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
       ["You can connect pairs of Naubs...",140]
       ["...by dragging on Naub onto\nanother with the same color",300]
       ["Now try to connect two pairs of naubs!",300]
-    ], null, @font_size)
+    ], @toggle_joining, @font_size)
 
-  onleavelesson_join: =>
-      Naubino.game.joining_allowed = yes
 
   onlesson_cycle: (e,f,t) ->
     Naubino.cycle_found.add =>
@@ -138,7 +144,10 @@ Naubino.Tutorial = class Tutorial extends Naubino.RuleSet
     Naubino.overlay.queue_messages([
       ["now connect the remaining naubs",2500]
       ["and see what happens...", 2000]
-    ], null, @font_size)
+    ], @toggle_joining, @font_size)
+
+  onsuccess: =>
+    console.info
 
 
   ### utility ###
