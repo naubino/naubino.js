@@ -44,6 +44,9 @@ class Naubino.Layer
   clear_objs: ->
     @objs = {}
 
+  for_each: (callback) ->
+    for k, v of @objs
+      callback(v)
 
 
 

@@ -35,19 +35,25 @@ class Naubino.Naub
     return
 
 
-  ### organisation ###
+  ## organisation ###
   step: (dt) =>
     @physics.step dt
-    
+
+
+  ### makes a naub unclickable and joinable ###
   enable: ->
     @disabled = false
-    @shape.style.fill = Naubino.colors[@color_id]
     @shape.pre_render()
-
+    
   disable: ->
     @disabled = true
-    @shape.style.fill = [100,100,100,1]
     @shape.pre_render()
+
+  grey_out: ->
+    @shape.style.fill = [100,100,100,1]
+
+  recolor: ->
+    @shape.style.fill = Naubino.colors[@color_id]
 
   remove: =>
     @removed = true
@@ -55,6 +61,8 @@ class Naubino.Naub
       delete naub.joins[id]
       Naubino.graph.remove_join id
 
+
+  ### animated remove with disabling   ###
   destroy: ->
     for id, partner of @joins
       @drawing_join[id] = true
@@ -62,6 +70,7 @@ class Naubino.Naub
     @destroying = true
     @shape.destroy(@remove)
     Naubino.naub_destroyed.dispatch(@number)
+    
 
   ### do things a naub is supposed to do ###
   join_with: (other) ->
@@ -73,7 +82,8 @@ class Naubino.Naub
     Naubino.naub_joined.dispatch()
     join
 
-  
+
+  ### the 'other' naub takes my place  ###
   replace_with: (other) ->
     remove_joins = for id, naub of @joins
       other.join_with(naub)
@@ -81,8 +91,8 @@ class Naubino.Naub
       Naubino.graph.remove_join id
     @layer.unfocus()
     @remove()
-    console.log "replaced #{@number}"
-    Naubino.naub_replaced.dispatch()
+    console.log "replaced #{@number} with #{other.number}"
+    Naubino.naub_replaced.dispatch(other.number)
     return 42
 
 
@@ -100,33 +110,7 @@ class Naubino.Naub
       list.push naub.number
     @joins
 
-  check_joining: (other) ->
-    unless @number == other.number
-      #console.log "checking #{@number}(#{@color_id}) and #{other.number}(#{other.color_id})"
-      far_enough = true
-      naub_partners = for id, partner of @joins
-        partner.number
 
-      for id, partner of other.joins
-        if partner.number in naub_partners
-          far_enough = false
-
-      unjoined = not @is_joined_with other
-      alone = _.keys(@joins).length == 0
-      other_alone = _.keys(other.joins).length == 0
-      same_color = @color_id == other.color_id
-
-      if not @disabled && unjoined && same_color && far_enough && not alone && not other_alone
-        other.replace_with this
-        true
-      else if alone and not (other.disabled or @disabled)
-        @join_with other
-        true
-      else
-        false
-    else
-      false
-          
   distance_to: (other) ->
     unless other.number == @number
       { pos, vel, force } = @physics
