@@ -11,7 +11,8 @@ class Naubino.Menu extends Naubino.Layer
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
     Naubino.naub_destroyed.add -> Naubino.menu.objs.main.shape.pre_render()
-    
+    Naubino.menu_button.active = false
+   
     @position = new b2Vec2(20,25)
     @cube_size = 45
     
@@ -21,7 +22,7 @@ class Naubino.Menu extends Naubino.Layer
     ###
     @buttons = {
       play:
-        function: -> Naubino.menu_play.dispatch()
+        function: -> Naubino.menu_button.dispatch('play')
         position: new b2Vec2(65,35)
         content: (ctx) ->
           ctx.save()
@@ -35,7 +36,7 @@ class Naubino.Menu extends Naubino.Layer
           ctx.fill()
           ctx.restore()
       pause:
-        function: -> Naubino.menu_pause.dispatch()
+        function: -> Naubino.menu_button.dispatch('pause')
         content: (ctx) => @draw_pause_icon(ctx)
         position: new b2Vec2(65,35)
         disabled: true
@@ -49,11 +50,11 @@ class Naubino.Menu extends Naubino.Layer
           ctx.fill()
           ctx.restore()
       help:
-        function: -> Naubino.menu_help.dispatch()
+        function: -> Naubino.menu_button.dispatch('help')
         content: (ctx) -> this.draw_string(ctx, '?')
         position: new b2Vec2(45,65)
       exit:
-        function: -> Naubino.menu_exit.dispatch()
+        function: -> Naubino.menu_button.dispatch('exit')
         content: (ctx) -> this.draw_string(ctx, 'X')
         position: new b2Vec2(14,80)
       }
@@ -156,11 +157,10 @@ class Naubino.Menu extends Naubino.Layer
     @ctx.arc 0, 15, @listener_size, 0, Math.PI*2, true
     if @ctx.isPointInPath(@pointer.x,@pointer.y)
       unless @hovering
-        #@hovering =  true
         Naubino.menu_focus.dispatch()
         @listener_size = 90
     else if @hovering
-      #@hovering = false
+      Naubino.menu_button.active = false
       Naubino.menu_blur.dispatch()
       @listener_size = @default_listener_size
     #@ctx.stroke()

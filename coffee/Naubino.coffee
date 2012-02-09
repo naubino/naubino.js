@@ -72,7 +72,7 @@ window.onload = ->
         {  name: 'retry',     from: 'lost',     to: 'playing' }
       ]
       callbacks:
-        onenterplaying: (event, from, to) ->
+        onplaying: (event, from, to) ->
           @game.start_timer()
           @menu.switch_to_playing()
           @rules.run()
@@ -114,44 +114,36 @@ window.onload = ->
 
 
     # menu
+    @menu_button     = new @Signal()
     @menu_focus      = new @Signal()
     @menu_blur       = new @Signal()
-    @menu_pause      = new @Signal()
-    @menu_play       = new @Signal()
-    @menu_toggle     = new @Signal()
-    @menu_exit       = new @Signal()
-    @menu_help       = new @Signal()
+    #@menu_pause      = new @Signal()
+    #@menu_play       = new @Signal()
+    #@menu_toggle     = new @Signal()
+    #@menu_exit       = new @Signal()
+    #@menu_help       = new @Signal()
 
 
 # TODO: think about making the menu a statemachine too
   add_generic_listeners: ->
-    @menu_pause.add =>
-      @fsm.pause()
-      console.log "menu: pause"
-      @menu_pause.active = false
-      @menu_play.active = true
+    @menu_button.add (button) =>
+      console.info 'menu button', button
+      switch button
+        when 'play'
+          @fsm.play()
+        when 'pause'
+          @fsm.pause()
+        when 'toggle'
+          @fsm.toggle()
+        when 'help'
+          @fsm.show_help()
+          #when 'exit' then 
 
-    @menu_play.add =>
-      @fsm.play()
-      console.log "menu: play"
-      @menu_pause.active = true
-      @menu_play.active = false
-
-    @menu_toggle.add =>
-      @fsm.toggle()
-
-    @menu_exit.add =>
-      @fsm.exit()
-      console.log "menu: exit"
-
-    @menu_help.add =>
-      @fsm.show_help()
-      console.log "menu: help"
     @menu_focus.add =>
-      @menu.hovering = true
+      @menu.hovering = @menu_button.active = true
 
     @menu_blur.add =>
-      @menu.hovering = false
+      @menu.hovering = @menu_button.active = false
 
   add_listeners: ->
 
