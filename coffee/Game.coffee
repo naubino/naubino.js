@@ -174,7 +174,7 @@ class Naubino.Game extends Naubino.Layer
       if i < list.length
         @get_object(list[i]).destroy()
         i++
-      setTimeout one_after_another, 400
+      setTimeout one_after_another, 40
     one_after_another()
 
 
