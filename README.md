@@ -33,9 +33,9 @@ sudo bin/cake install
 # Node.js:
   * In case you dont have a current node.js in your package manager
 `
-git clone https://github.com/joyent/node
-cd node
-./configure
-make
-sudo make install
+git clone https://github.com/joyent/node ;
+cd node ;
+./configure ;
+make ;
+sudo make install ;
 `
