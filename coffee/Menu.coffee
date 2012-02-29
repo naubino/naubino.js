@@ -1,16 +1,17 @@
-# TODO cliean up menu code
+# TODO clean up menu code
 class Naubino.Menu extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
+    @name = "menu"
 
-    @objs = {}
+    @objects = {}
     @hovering = false
     @gravity = Naubino.Settings.gravity.menu
 
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
-    Naubino.naub_destroyed.add -> Naubino.menu.objs.main.shape.pre_render()
+    Naubino.naub_destroyed.add -> Naubino.menu.objects.main.shape.pre_render()
     Naubino.menu_button.active = false
    
     @position = new b2Vec2(20,25)
@@ -22,7 +23,9 @@ class Naubino.Menu extends Naubino.Layer
     ###
     @buttons = {
       play:
-        function: -> Naubino.menu_button.dispatch('play')
+        function: ->
+          console.time("init_play")
+          Naubino.play()
         position: new b2Vec2(65,35)
         content: (ctx) ->
           ctx.save()
@@ -36,7 +39,7 @@ class Naubino.Menu extends Naubino.Layer
           ctx.fill()
           ctx.restore()
       pause:
-        function: -> Naubino.menu_button.dispatch('pause')
+        function: -> Naubino.pause()
         content: (ctx) => @draw_pause_icon(ctx)
         position: new b2Vec2(65,35)
         disabled: true
@@ -50,11 +53,11 @@ class Naubino.Menu extends Naubino.Layer
           ctx.fill()
           ctx.restore()
       help:
-        function: -> Naubino.menu_button.dispatch('help')
+        function: -> Naubino.help()
         content: (ctx) -> this.draw_string(ctx, '?')
         position: new b2Vec2(45,65)
       exit:
-        function: -> Naubino.menu_button.dispatch('exit')
+        function: -> Naubino.exit()
         content: (ctx) -> this.draw_string(ctx, 'X')
         position: new b2Vec2(14,80)
       }
@@ -64,7 +67,19 @@ class Naubino.Menu extends Naubino.Layer
     @dt = @fps/100
 
     @add_buttons()
+
+  # changing the state a little
+
+  oninit: ->
     @start_timer()
+
+  onenterplaying: ->
+    @objects.play.disable()
+    @objects.pause.enable()
+
+  onenterpaused: ->
+    @objects.play.enable()
+    @objects.pause.disable()
 
   mainloop: ()=>
     @draw()
@@ -73,7 +88,7 @@ class Naubino.Menu extends Naubino.Layer
 
 
   step: ->
-    for name, naub of @objs
+    for name, naub of @objects
       naub.step (@dt)
       if @hovering
         naub.physics.gravitate()
@@ -88,45 +103,46 @@ class Naubino.Menu extends Naubino.Layer
 
 
   add_buttons: ->
-    @objs.main = new Naubino.Naub(this, null, @cube_size)
-    @objs.main.physics.pos.Set(@position.x, @position.y)
-    @objs.main.physics.attracted_to = @position.Copy()
-    @objs.main.shape.size = @cube_size
-    @objs.main.shape.render = @draw_main_button
-    @objs.main.shape.pre_render()
-    @objs.main.isClickable = no
+    @objects.main = new Naubino.Naub(this, null, @cube_size)
+    @objects.main.physics.pos.Set(@position.x, @position.y)
+    @objects.main.physics.attracted_to = @position.Copy()
+    @objects.main.shape.size = @cube_size
+    @objects.main.shape.render = @draw_main_button
+    @objects.main.shape.pre_render()
+    @objects.main.isClickable = no
 
     for name, attr of @buttons
-      @objs[name] = new Naubino.Naub(this)
-      @objs[name].physics.pos.Set attr.position.x, attr.position.y
-      @objs[name].physics.attracted_to.Set attr.position.x, attr.position.y
-      @objs[name].content = attr.content
-      #@objs[name].shape.set_color_id 2
-      @objs[name].shape.pre_render()
-      @objs[name].focus = attr.function
-      @objs[name].disable() if attr.disabled
-      join = @objs[name].join_with( @objs.main, name )
+      @objects[name] = new Naubino.Naub(this)
+      @objects[name].physics.pos.Set attr.position.x, attr.position.y
+      @objects[name].physics.attracted_to.Set attr.position.x, attr.position.y
+      @objects[name].content = attr.content
+      #@objects[name].shape.set_color_id 2
+      @objects[name].shape.pre_render()
+      @objects[name].focus = attr.function
+      @objects[name].disable() if attr.disabled
+      @objects[name].isClickable = no
+      join = @objects[name].join_with( @objects.main, name )
       Naubino.graph.remove_join join
 
   switch_to_playing: ->
     console.log 'switching menu to playing mode'
-    @objs.play.disable()
-    @objs.pause.enable()
+    @objects.play.disable()
+    @objects.pause.enable()
 
   switch_to_paused: ->
     console.log 'switching menu to paused mode'
-    @objs.play.enable()
-    @objs.pause.disable()
+    @objects.play.enable()
+    @objects.pause.disable()
 
 
   draw: ->
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
-    for name, naub of @objs
+    for name, naub of @objects
       naub.draw_joins(@ctx)if not naub.disabled
       naub.draw(@ctx) if not naub.disabled
-    @objs.main.draw(@ctx)
-    @objs.main.draw_joins()
+    @objects.main.draw(@ctx)
+    @objects.main.draw_joins()
     @draw_listener_region()
     @ctx.restore()
 
@@ -152,18 +168,20 @@ class Naubino.Menu extends Naubino.Layer
     ctx.restore()
 
   draw_listener_region: ->
+  function: ->
     @ctx.save()
     @ctx.beginPath()
     @ctx.arc 0, 15, @listener_size, 0, Math.PI*2, true
     if @ctx.isPointInPath(@pointer.x,@pointer.y)
       unless @hovering
         Naubino.menu_focus.dispatch()
+        @for_each (b) -> b.isClickable = yes
         @listener_size = 90
     else if @hovering
-      Naubino.menu_button.active = false
       Naubino.menu_blur.dispatch()
+      @for_each (b) -> b.isClickable = no
       @listener_size = @default_listener_size
-    #@ctx.stroke()
+    @ctx.stroke()
     @ctx.closePath()
     @ctx.restore()
 

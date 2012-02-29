@@ -6,6 +6,7 @@
 # /_/ |_/\__,_/\__,_/_.___/_/_/ /_/\____(_)_/ /____/   #
 #                                        /___/         #
 ########################################################
+
 # TODO questionable approach
 window.onload = ->
   Naubino.constructor()
@@ -16,24 +17,24 @@ window.onload = ->
 
     @graph = new @Graph()
     @colors = @Settings.colors.output
-    @fsm = @create_fsm()
+    @create_fsm()
     @Signal = window.signals.Signal
     @add_signals()
-    @add_generic_listeners()
+    @add_listeners()
 
     @init_dom()
+    @init_layers()
 
     @setup_keybindings()
     @setup_cursorbindings()
 
     #TODO switch Rulesets via a statemachine
     #@rules = new @RuleSet()
-    #@rules  = new @Tutorial()
-    @rules = new @TestCase()
+    @rules  = new @Tutorial()
+    #@rules = new @TestCase()
     #@menu_play.dispatch() #TODO remove this line
     
-  print: ->
-    @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
+  print: -> @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
 
   init_dom: () ->
     @gamediv           = document.querySelector("#gamediv")
@@ -46,54 +47,78 @@ window.onload = ->
       canvas.width = @Settings.canvas.width
       canvas.height = @Settings.canvas.height
 
-
+  init_layers: ->
     @gamediv.max-width     = @Settings.canvas.width
 
     @background = new @Background(@background_canvas)
     @game       = new @Game(@game_canvas, @graph)
     @menu       = new @Menu(@menu_canvas)
     @overlay    = new @Overlay(@overlay_canvas)
+    @menu.init()
+    @game.init()
+    @background.init()
+    @overlay.init()
+    @overlay.play()
 
+  ###
+  Everything has to have state
+  ###
   create_fsm: ->
     StateMachine.create {
-      initial: 'menu',
       target: this
-      events:[
-        {  name: 'play',      from: 'menu',     to: 'playing' }
-        {  name: 'pause',     from: 'playing',  to: 'paused'  }
-        {  name: 'play',      from: 'paused',   to: 'playing' }
-        {  name: 'toggle',    from: 'playing',  to: 'paused'  }
-        {  name: 'toggle',    from: 'paused',   to: 'playing' }
-        {  name: 'win',       from: 'playing',  to: 'won'     }
-        {  name: 'lose',      from: 'playing',  to: 'lost'    }
-        {  name: 'exit',      from: 'playing',  to: 'menu'    }
-        {  name: 'show_help', from: 'menu',     to: 'help'    }
-        {  name: 'hide_help', from: 'help',     to: 'menu'    }
-        {  name: 'retry',     from: 'lost',     to: 'playing' }
+      initial: {state : 'none' , event: 'init'}
+      events:[ # TODO stil simplified
+        {  name: 'init',    from: 'none',     to: 'paused' }
+        {  name: 'play',    from: 'paused',   to: 'playing' }
+        {  name: 'pause',   from: 'playing',  to: 'paused' }
+        {  name: 'toggle',  from: ['playing','paused']   }
       ]
-      callbacks:
-        onplaying: (event, from, to) ->
-          @game.start_timer()
-          @menu.switch_to_playing()
-          @rules.run()
-
-        onleaveplaying: (event, from, to) ->
-
-        onpaused: (event, from, to) ->
-          @game.stop_timer()
-          @menu.switch_to_paused()
-          @rules.halt()
-
-        onpause: (event, from, to) ->
-
-        onunpause: (event, from, to) ->
-          @game.start_timer()
-
-        onexit: (event, from, to) ->
     }
 
-  add_signals: ->
+  list_states: ->
+    console.log "menu:", @menu.current
+    console.log "game:", @game.current
+    console.log "background:", @background.current
+    console.log "overlay:", @overlay.current
+    #console.log "rules:", @rules.current
 
+  onchangestate: (e,f,t)->
+    console.warn "Naubino recived #{e}: #{f} -> #{t}"
+    #@list_states()
+    return true
+
+  onbeforeplay: (event, from, to) ->
+    @game.play()
+    @menu.play()
+    #@rules.play()
+    @rules.run()
+
+  ontoggle: (event, from, to) ->
+    console.log "toggled", from
+
+  onbeforepause: (event, from, to) ->
+    console.warn from
+    unless from == "init"
+      @game.pause()
+      #@game.stop_timer()
+      @menu.pause()
+      #@menu.switch_to_paused()
+      #@rules.pause()
+      @rules.halt()
+
+  onenterplaying: ->
+    console.timeEnd("init_play")
+    #if any failes return false ( cancels transition )
+
+  onpause: (event, from, to) ->
+
+  onexit: (event, from, to) ->
+
+  ###
+  Signals connect everything else that does not react to events
+  ###
+
+  add_signals: ->
     # user interface
     @mousedown       = new @Signal()
     @mouseup         = new @Signal()
@@ -112,40 +137,18 @@ window.onload = ->
     @naub_focused    = new @Signal()
     @naub_unfocused  = new @Signal()
 
-
     # menu
     @menu_button     = new @Signal()
     @menu_focus      = new @Signal()
     @menu_blur       = new @Signal()
-    #@menu_pause      = new @Signal()
-    #@menu_play       = new @Signal()
-    #@menu_toggle     = new @Signal()
-    #@menu_exit       = new @Signal()
-    #@menu_help       = new @Signal()
 
 
-# TODO: think about making the menu a statemachine too
-  add_generic_listeners: ->
-    @menu_button.add (button) =>
-      console.info 'menu button', button
-      switch button
-        when 'play'
-          @fsm.play()
-        when 'pause'
-          @fsm.pause()
-        when 'toggle'
-          @fsm.toggle()
-        when 'help'
-          @fsm.show_help()
-          #when 'exit' then 
-
+  add_listeners: ->
     @menu_focus.add =>
       @menu.hovering = @menu_button.active = true
 
     @menu_blur.add =>
       @menu.hovering = @menu_button.active = false
-
-  add_listeners: ->
 
   setup_keybindings: () ->
     @keybindings = new @KeyBindings()

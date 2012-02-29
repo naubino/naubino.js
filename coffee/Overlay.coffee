@@ -1,10 +1,13 @@
 class Naubino.Overlay extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
+    @name = "overlay"
+
     @fps = 1000 / 15 # 5fps
     @drawing = true
-    @start_timer()
     @fade_speed = 40
+
+  oninit: ->
 
 
   draw:  ->
@@ -12,7 +15,7 @@ class Naubino.Overlay extends Naubino.Layer
     @ctx.save()
 
     # objects are all full size buffers
-    for id, buffer of @objs
+    for id, buffer of @objects
       @ctx.globalAlpha = buffer.alpha if buffer.alpha?
       @ctx.drawImage(buffer, 0, 0)
       @ctx.globalAlpha = 1
@@ -66,7 +69,7 @@ class Naubino.Overlay extends Naubino.Layer
 
   ### fading out all messages ###
   fade_out_messages: (callback = null) ->
-    for id, message of @objs
+    for id, message of @objects
       @fade_out_message id
     if callback?
       callback()

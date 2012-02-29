@@ -6,18 +6,26 @@ class Naubino.Layer
     @center = new b2Vec2 @width/2, @height/2
     @ctx = @canvas.getContext('2d')
     @pointer = @center.Copy()
-    @objs = {}
-    @objs_count = 0
+    @objects = {}
+    @objects_count = 0
 
-    @paused = true
-    @fade_queue = new Naubino.Signal()
 
     # fragile calibration! don't fuck it up!
-    
     @fps = 1000 / Naubino.Settings.fps
     @dt = @fps/1500
 
     @show()
+    StateMachine.create {
+
+      target: this
+
+      events:[
+        {  name: 'init'   , from: 'none'    , to: 'paused' }
+        {  name: 'play'   , from: 'paused'  , to: 'playing'}
+        {  name: 'pause'  , from: 'playing' , to: 'paused' }
+        {  name: 'stop'   , from: ['playing','paused'], to: 'stopped'}
+      ]
+    }
 
   ### overwrite these ###
   draw: ->
@@ -26,45 +34,55 @@ class Naubino.Layer
 
 
 
+  ###
+  states (overwrite these)
+  place only onenter*event* here
+  place onenter*state* into the concrete implementation
+  ###
+
+  onbeforeplay:(event, from, to) ->
+    @start_timer()
+
+  onbeforepause: (e,f,t) ->
+    @stop_timer()
+
+  onbeforestop: (e,f,t) ->
+    clear_objects()
+
+  onchangestate: (e,f,t)->
+    console.info "#{@name} recived #{e}: #{f} -> #{t}"
+    #return true
+
 
   ### managing objects ###
   add_object: (obj)->
     obj.center = @center
-    @objs_count++
-    obj.number = @objs_count
-    @objs[@objs_count] = obj
-    @objs_count
+    @objects_count++
+    obj.number = @objects_count
+    @objects[@objects_count] = obj
+    @objects_count
 
   get_object: (id)->
-    @objs[id]
+    @objects[id]
 
   remove_obj: (id) ->
-    delete @objs[id]
+    delete @objects[id]
 
-  clear_objs: ->
-    @objs = {}
+  clear_objects: ->
+    @objects = {}
 
   for_each: (callback) ->
-    for k, v of @objs
+    for k, v of @objects
       callback(v)
 
 
 
-  ## tempus fugit
+
   start_timer: ->
-    if @paused
-      @loop = setInterval(@mainloop, @fps )
-      @paused = false
+    @loop = setInterval(@mainloop, @fps )
 
   stop_timer: ->
     clearInterval @loop
-    @paused = true
-  
-  pause: ->
-      if @paused
-        @start_timer()
-      else
-        @stop_timer()
 
   mainloop: ()=>
     @step(@dt)
@@ -129,7 +147,7 @@ class Naubino.Layer
       [@pointer.x, @pointer.y] = [x,y]
 
   get_obj: (x, y) ->
-    for id, obj of @objs
+    for id, obj of @objects
       if obj.isHit(x, y) and obj.isClickable
         return obj
 
