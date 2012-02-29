@@ -29,8 +29,9 @@ window.onload = ->
     @setup_cursorbindings()
 
     #TODO switch Rulesets via a statemachine
-    #@rules = new @RuleSet()
-    @rules  = new @Tutorial()
+    @rules = new @RuleSet()
+    @rules.init()
+    #@rules  = new @Tutorial()
     #@rules = new @TestCase()
     #@menu_play.dispatch() #TODO remove this line
     
@@ -58,7 +59,6 @@ window.onload = ->
     @game.init()
     @background.init()
     @overlay.init()
-    @overlay.play()
 
   ###
   Everything has to have state
@@ -66,12 +66,12 @@ window.onload = ->
   create_fsm: ->
     StateMachine.create {
       target: this
-      initial: {state : 'none' , event: 'init'}
+      initial: {state : 'stopped' , event: 'init'}
       events:[ # TODO stil simplified
-        {  name: 'init',    from: 'none',     to: 'paused' }
-        {  name: 'play',    from: 'paused',   to: 'playing' }
-        {  name: 'pause',   from: 'playing',  to: 'paused' }
-        {  name: 'toggle',  from: ['playing','paused']   }
+        { name: 'init',   from: 'stopped',  to: 'paused'  }
+        { name: 'play',   from: 'paused',   to: 'playing' }
+        { name: 'pause',  from: 'playing',  to: 'paused'  }
+        { name: 'toggle', from: ['playing','paused']     }
       ]
     }
 
@@ -80,7 +80,7 @@ window.onload = ->
     console.log "game:", @game.current
     console.log "background:", @background.current
     console.log "overlay:", @overlay.current
-    #console.log "rules:", @rules.current
+    console.log "rules:", @rules.current
 
   onchangestate: (e,f,t)->
     console.warn "Naubino recived #{e}: #{f} -> #{t}"
@@ -88,10 +88,8 @@ window.onload = ->
     return true
 
   onbeforeplay: (event, from, to) ->
-    @game.play()
     @menu.play()
-    #@rules.play()
-    @rules.run()
+    @rules.play()
 
   ontoggle: (event, from, to) ->
     console.log "toggled", from
@@ -99,12 +97,7 @@ window.onload = ->
   onbeforepause: (event, from, to) ->
     console.warn from
     unless from == "init"
-      @game.pause()
-      #@game.stop_timer()
-      @menu.pause()
-      #@menu.switch_to_paused()
-      #@rules.pause()
-      @rules.halt()
+      @rules.pause()
 
   onenterplaying: ->
     console.timeEnd("init_play")
