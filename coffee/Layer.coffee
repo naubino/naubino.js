@@ -18,12 +18,13 @@ class Naubino.Layer
     StateMachine.create {
 
       target: this
-
+      initial: 'stopped'
       events:[
-        {  name: 'init'   , from: 'none'    , to: 'paused' }
-        {  name: 'play'   , from: 'paused'  , to: 'playing'}
-        {  name: 'pause'  , from: 'playing' , to: 'paused' }
-        {  name: 'stop'   , from: ['playing','paused'], to: 'stopped'}
+        { name: 'init',   from: 'stopped',  to: 'paused' }
+        { name: 'play',   from: 'paused',   to: 'playing'}
+        { name: 'pause',  from: 'playing',  to: 'paused' }
+        { name: 'stop',   from: 'playing',  to: 'stopped'}
+        { name: 'stop',   from: 'paused',   to: 'stopped'}
       ]
     }
 

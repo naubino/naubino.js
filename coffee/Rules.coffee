@@ -1,10 +1,26 @@
 class Naubino.RuleSet
   constructor: ->
+    StateMachine.create {
+      target: this
+      error:(e,f,t,a,ec,em) ->
+        console.warn e,f,t,a,ec,em unless e is 'click'
+
+      events:[
+        {  name: 'init',   from: 'none',     to: 'paused' }
+        {  name: 'play',   from: 'paused',   to: 'playing'}
+        {  name: 'play',   from: 'stopped',  to: 'playing'}
+        {  name: 'pause',  from: 'playing',  to: 'paused' }
+        {  name: 'stop',   from: 'playing',  to: 'stopped'}
+        {  name: 'stop',   from: 'paused',   to: 'stopped'}
+        {  name: 'unset',  from: 'stopped',  to: 'none'   }
+      ]
+    }
+
+  ### state machine ###
+  oninit: ->
+    Naubino.rules_cleared = false
     @inner_clock = 0 # to avoid resetting timer after pause
     Naubino.game.points = 0
-    @configure()
-
-  configure: ->
     basket = 150
     Naubino.game.basket_size = basket
     Naubino.background.basket_size = basket
@@ -19,16 +35,28 @@ class Naubino.RuleSet
       Naubino.game.destroy_naubs(list)
 
 
+  onunset: ->
+    Naubino.game.clear()
+    Naubino.graph.clear()
+    Naubino.game.points = 0
+    Naubino.rules_cleared = true
+  
 
-  # starts the game
-  run: ->
-    @loop = setInterval(@event, 300 )
-    Naubino.background.draw()
+  onchangestate: (e,f,t)->
+    console.info "ruleset recived #{e}: #{f} -> #{t}"
 
-  halt: ->
+
+  onbeforepause: ->
+    Naubino.game.pause()
     clearInterval(@loop)
 
-  # does whatever
+
+  onbeforeplay: ->
+    @loop = setInterval(@event, 300 )
+    Naubino.background.play()
+    Naubino.game.play()
+
+
   event: =>
     if @inner_clock == 0
       {x,y} = Naubino.game.random_outside()
@@ -39,24 +67,21 @@ class Naubino.RuleSet
     @inner_clock = (@inner_clock + 1) % 10
 
 
-  # called when exiting playing state
-  clear: ->
-    Naubino.game.clear()
-    Naubino.graph.clear()
-    Naubino.game.points = 0
-
 
 
 
 
 
 class Naubino.TestCase extends Naubino.RuleSet
-  constructor: ->
-    super()
+  #  constructor: ->
+  #    super()
+  oninit: ->
     Naubino.Settings.show_numbers = on
     #Naubino.game.create_some_naubs 2
     Naubino.game.create_matching_naubs()
     Naubino.game.toggle_numbers()
+    Naubino.game.gravity = on
+    Naubino.play()
     weightless = ->
       Naubino.game.gravity = off
     setTimeout(weightless, 4000)
@@ -65,9 +90,11 @@ class Naubino.TestCase extends Naubino.RuleSet
     Naubino.background.basket_size = basket
     Naubino.background.draw()
 
+  onunset:->
+    Naubino.Settings.show_numbers = false
+    Naubino.game.clear()
+    Naubino.background.clear()
 
-  run: ->
-    #@loop = setInterval(@event, 3000 )
 
   event:->
     inner_basket = Naubino.game.count_basket()

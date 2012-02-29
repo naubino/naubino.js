@@ -168,7 +168,6 @@ class Naubino.Menu extends Naubino.Layer
     ctx.restore()
 
   draw_listener_region: ->
-  function: ->
     @ctx.save()
     @ctx.beginPath()
     @ctx.arc 0, 15, @listener_size, 0, Math.PI*2, true
@@ -181,7 +180,7 @@ class Naubino.Menu extends Naubino.Layer
       Naubino.menu_blur.dispatch()
       @for_each (b) -> b.isClickable = no
       @listener_size = @default_listener_size
-    @ctx.stroke()
+    #@ctx.stroke()
     @ctx.closePath()
     @ctx.restore()
 
