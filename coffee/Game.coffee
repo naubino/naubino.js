@@ -6,6 +6,7 @@ class Naubino.Game extends Naubino.Layer
   ###
   constructor: (canvas, @graph) ->
     super(canvas)
+    @name = "game"
 
     # display stuff
     @paused = true # changed imidiately after loading by start_timer
@@ -19,7 +20,10 @@ class Naubino.Game extends Naubino.Layer
     Naubino.mousedown.add @click
     Naubino.mouseup.add @unfocus
 
-  
+  ###
+  state machine stuff
+  ###
+
 
   ### 
   the game gives it the game takes it
@@ -118,7 +122,7 @@ class Naubino.Game extends Naubino.Layer
     unless @show_numbers?
       @show_numbers = true
     else @show_numbers = not @show_numbers
-    for id, naub of @objs
+    for id, naub of @objects
       naub.content = if @show_numbers then naub.shape.draw_number else null
       naub.shape.pre_render()
 
@@ -153,7 +157,7 @@ class Naubino.Game extends Naubino.Layer
   count_basket: ->
     count = []
     if @basket_size?
-      for id, naub of @objs
+      for id, naub of @objects
         diff = @center.Copy()
         diff.Subtract naub.physics.pos
         if diff.Length() < @basket_size - naub.size/2
@@ -216,10 +220,10 @@ class Naubino.Game extends Naubino.Layer
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     # draws joins and naubs seperately
     @ctx.save()
-    for id, obj of @objs
+    for id, obj of @objects
       obj.draw_joins @ctx
 
-    for id, obj of @objs
+    for id, obj of @objects
       obj.draw @ctx
     @ctx.restore()
       
@@ -241,13 +245,13 @@ class Naubino.Game extends Naubino.Layer
     # check for joinings
     if @mousedown && @focused_naub
       @focused_naub.physics.follow @pointer.Copy()
-      for id, other of  @objs
+      for id, other of  @objects
         if (@focused_naub.distance_to other) < (@focused_naub.size+10)
           @check_joining(@focused_naub,other)
           break
 
     # delete objects
-    for id, obj of @objs
+    for id, obj of @objects
       if obj.removed
         @remove_obj id
         return 42 # TODO found out if there is a way to have a void function?
@@ -259,7 +263,7 @@ class Naubino.Game extends Naubino.Layer
   moves naubs with every step
   ###
   naub_forces: (dt) ->
-    for id, naub of @objs
+    for id, naub of @objects
 
       # everything moves toward the middle
       naub.physics.gravitate()
@@ -270,7 +274,7 @@ class Naubino.Game extends Naubino.Layer
       
       # collide
       for [0..3]
-        for id, other of @objs
+        for id, other of @objects
           naub.physics.collide other
       
       # use all previously calculated forces and actually move the damn thing 

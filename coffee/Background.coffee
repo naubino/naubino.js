@@ -1,12 +1,17 @@
 class Naubino.Background extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
+    @name = "background"
+
     @fps = 1000 / 5
     @drawing = true
     @basket_size = 170
     @default_thickness = @basket_thickness = 4
     @ttl = 12
     @color = [0,0,0,0.5]
+
+  oninit: ->
+    #@play()
 
   draw: () ->
     width = @canvas.width
@@ -57,7 +62,7 @@ class Naubino.Background extends Naubino.Layer
 
 
   drawTextAlongArc: (str, rot = 0) ->
-    angle = str.length * 0.1 
+    angle = str.length * 0.1
     @ctx.save()
     @ctx.translate(@center.x, @center.y)
     @ctx.rotate(-1 * angle / 2)
