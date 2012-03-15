@@ -28,12 +28,6 @@ window.onload = ->
     @setup_keybindings()
     @setup_cursorbindings()
 
-    #TODO switch Rulesets via a statemachine
-    @rules = new @RuleSet()
-    @rules.init()
-    #@rules  = new @Tutorial()
-    #@rules = new @TestCase()
-    #@menu_play.dispatch() #TODO remove this line
     
   print: -> @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
 
@@ -52,13 +46,17 @@ window.onload = ->
     @gamediv.max-width     = @Settings.canvas.width
 
     @background = new @Background(@background_canvas)
-    @game       = new @Game(@game_canvas, @graph)
+    #@game       = new @Game(@game_canvas, @graph) # old
+    @game       = new @StandartGame(@game_canvas, @graph)
+    #@game       = new @TestCase(@game_canvas, @graph)
+    #@game       = new @Tutorial(@game_canvas, @graph)
     @menu       = new @Menu(@menu_canvas)
     @overlay    = new @Overlay(@overlay_canvas)
-    @menu.init()
-    @game.init()
-    @background.init()
-    @overlay.init()
+    @menu.animation.init()
+    @menu.animation.play()
+    @game.animation.init()
+    @background.animation.init()
+    @overlay.animation.init()
 
   ###
   Everything has to have state
@@ -67,12 +65,7 @@ window.onload = ->
     StateMachine.create {
       target: this
       initial: {state : 'stopped' , event: 'init'}
-      events:[ # TODO stil simplified
-        { name: 'init',   from: 'stopped',  to: 'paused'  }
-        { name: 'play',   from: 'paused',   to: 'playing' }
-        { name: 'pause',  from: 'playing',  to: 'paused'  }
-        { name: 'toggle', from: ['playing','paused']     }
-      ]
+      events: @Settings.events
     }
 
   list_states: ->
@@ -80,7 +73,6 @@ window.onload = ->
     console.log "game:", @game.current
     console.log "background:", @background.current
     console.log "overlay:", @overlay.current
-    console.log "rules:", @rules.current
 
   onchangestate: (e,f,t)->
     console.warn "Naubino recived #{e}: #{f} -> #{t}"
@@ -88,8 +80,8 @@ window.onload = ->
     return true
 
   onbeforeplay: (event, from, to) ->
-    @menu.play()
-    @rules.play()
+    #@menu.play()
+    @game.play()
 
   ontoggle: (event, from, to) ->
     console.log "toggled", from
@@ -97,7 +89,7 @@ window.onload = ->
   onbeforepause: (event, from, to) ->
     console.warn from
     unless from == "init"
-      @rules.pause()
+      @game.pause()
 
   onenterplaying: ->
     console.timeEnd("init_play")

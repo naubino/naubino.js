@@ -10,6 +10,15 @@ Naubino.Settings = {
   canvas:
     width:        600
     height:       400
+  events: [
+        { name: 'init',   from: 'none',     to: 'stopped'}
+        { name: 'unset',  from: '*',        to: 'none'   }
+        { name: 'play',   from: 'stopped',  to: 'playing'}
+        { name: 'play',   from: 'paused',   to: 'playing'}
+        { name: 'pause',  from: 'playing',  to: 'paused' }
+        { name: 'stop',   from: 'playing',  to: 'stopped'}
+        { name: 'stop',   from: 'paused',   to: 'stopped'}
+      ]
 
   colors:
     #please sort colors by

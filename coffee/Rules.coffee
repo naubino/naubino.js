@@ -1,20 +1,6 @@
-class Naubino.RuleSet
-  constructor: ->
-    StateMachine.create {
-      target: this
-      error:(e,f,t,a,ec,em) ->
-        console.warn e,f,t,a,ec,em unless e is 'click'
-
-      events:[
-        {  name: 'init',   from: 'none',     to: 'paused' }
-        {  name: 'play',   from: 'paused',   to: 'playing'}
-        {  name: 'play',   from: 'stopped',  to: 'playing'}
-        {  name: 'pause',  from: 'playing',  to: 'paused' }
-        {  name: 'stop',   from: 'playing',  to: 'stopped'}
-        {  name: 'stop',   from: 'paused',   to: 'stopped'}
-        {  name: 'unset',  from: 'stopped',  to: 'none'   }
-      ]
-    }
+class Naubino.StandartGame extends Naubino.Game
+  constructor: (canvas, graph) ->
+    super(canvas, graph)
 
   ### state machine ###
   oninit: ->
@@ -72,7 +58,7 @@ class Naubino.RuleSet
 
 
 
-class Naubino.TestCase extends Naubino.RuleSet
+class Naubino.TestCase extends Naubino.Game
   #  constructor: ->
   #    super()
   oninit: ->

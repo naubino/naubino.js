@@ -2,7 +2,7 @@
 class Naubino.Menu extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
-    @name = "menu"
+    @animation.name = "menu"
 
     @objects = {}
     @hovering = false
@@ -17,6 +17,10 @@ class Naubino.Menu extends Naubino.Layer
     @position = new b2Vec2(20,25)
     @cube_size = 45
     
+    StateMachine.create {
+      target:this
+      events: Naubino.Settings.events
+    }
 
     ### definition of each button
     TODO: position should be dynamic
@@ -70,8 +74,6 @@ class Naubino.Menu extends Naubino.Layer
 
   # changing the state a little
 
-  oninit: ->
-    @start_timer()
 
   onenterplaying: ->
     @objects.play.disable()
