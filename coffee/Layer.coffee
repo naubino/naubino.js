@@ -15,18 +15,37 @@ class Naubino.Layer
     @dt = @fps/1500
 
     @show()
+
+    @animation = {parent: this}
+
     StateMachine.create {
 
-      target: this
-      initial: 'stopped'
-      events:[
-        { name: 'init',   from: 'stopped',  to: 'paused' }
-        { name: 'play',   from: 'paused',   to: 'playing'}
-        { name: 'pause',  from: 'playing',  to: 'paused' }
-        { name: 'stop',   from: 'playing',  to: 'stopped'}
-        { name: 'stop',   from: 'paused',   to: 'stopped'}
-      ]
+      target: @animation                #♥
+      events: Naubino.Settings.events
+      callbacks:{
+        ###
+        states (overwrite these)
+        place only onenter*event* here
+        place onenter*state* into the concrete implementation
+        ###
+
+        onbeforeplay:(e, f, t) ->
+          console.info "#{@name} recived #{e}: #{f} -> #{t}"
+          @parent.start_timer()
+
+        onbeforepause: (e,f,t) ->
+          console.info "#{@name} recived #{e}: #{f} -> #{t}"
+          @parent.stop_timer()
+
+        onbeforestop: (e,f,t) ->
+          console.info "#{@name} recived #{e}: #{f} -> #{t}"
+
+        onchangestate: (e,f,t)->
+          console.info "#{@name} changed state #{e}: #{f} -> #{t}"
+          #return true
+      }
     }
+
 
   ### overwrite these ###
   draw: ->
@@ -34,25 +53,6 @@ class Naubino.Layer
 
 
 
-
-  ###
-  states (overwrite these)
-  place only onenter*event* here
-  place onenter*state* into the concrete implementation
-  ###
-
-  onbeforeplay:(event, from, to) ->
-    @start_timer()
-
-  onbeforepause: (e,f,t) ->
-    @stop_timer()
-
-  onbeforestop: (e,f,t) ->
-    clear_objects()
-
-  onchangestate: (e,f,t)->
-    console.info "#{@name} recived #{e}: #{f} -> #{t}"
-    #return true
 
 
   ### managing objects ###
@@ -79,10 +79,10 @@ class Naubino.Layer
 
 
 
-  start_timer: ->
+  start_timer: =>
     @loop = setInterval(@mainloop, @fps )
 
-  stop_timer: ->
+  stop_timer: =>
     clearInterval @loop
 
   mainloop: ()=>
@@ -92,11 +92,13 @@ class Naubino.Layer
       @draw()
 
 
+
   show: ->
     @canvas.style.opacity = 1
 
   hide: ->
     @canvas.style.opacity = 0
+
 
 
   fade_in: ->
