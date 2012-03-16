@@ -45,15 +45,18 @@ window.onload = ->
   init_layers: ->
     @gamediv.max-width     = @Settings.canvas.width
 
-    @background = new @Background(@background_canvas)
-    #@game       = new @Game(@game_canvas, @graph) # old
-    @game       = new @StandartGame(@game_canvas, @graph)
-    #@game       = new @TestCase(@game_canvas, @graph)
-    #@game       = new @Tutorial(@game_canvas, @graph)
-    @menu       = new @Menu(@menu_canvas)
-    @overlay    = new @Overlay(@overlay_canvas)
+    @background    = new @Background(@background_canvas)
+    @game_standart = new @StandartGame(@game_canvas, @graph)
+    @game_testcase = new @TestCase(@game_canvas, @graph)
+    @game_tutorial = new @Tutorial(@game_canvas, @graph)
+    @game          = @game_standart
+    @menu          = new @Menu(@menu_canvas)
+    @overlay       = new @Overlay(@overlay_canvas)
+
+    @menu.init()
     @menu.animation.init()
     @menu.animation.play()
+    @game.init()
     @game.animation.init()
     @background.animation.init()
     @overlay.animation.init()
@@ -69,31 +72,31 @@ window.onload = ->
     }
 
   list_states: ->
-    console.log "menu:", @menu.current
-    console.log "game:", @game.current
-    console.log "background:", @background.current
-    console.log "overlay:", @overlay.current
+    @.name = "Naubino"
+    for o in [ @, @menu, @game, @overlay.animation, @menu.animation, @game.animation, @background.animation]
+      switch o.current
+        when 'playing' then console.info o.name, o.current
+        when 'paused'  then console.warn o.name, o.current
+        when 'stopped' then console.warn o.name, o.current
+        else console.error o.current
 
-  onchangestate: (e,f,t)->
-    console.warn "Naubino recived #{e}: #{f} -> #{t}"
-    #@list_states()
-    return true
+  onchangestate: (e,f,t)-> console.info "Naubino changed states #{e}: #{f} -> #{t}"
 
-  onbeforeplay: (event, from, to) ->
-    #@menu.play()
-    @game.play()
+  onbeforeplay: (event, from, to) -> @game.play()
+    
+  onenterplaying: -> @menu.play()
 
   ontoggle: (event, from, to) ->
-    console.log "toggled", from
 
   onbeforepause: (event, from, to) ->
-    console.warn from
     unless from == "init"
+      #console.time('state_paused')
       @game.pause()
+      @menu.pause()
 
-  onenterplaying: ->
-    console.timeEnd("init_play")
-    #if any failes return false ( cancels transition )
+  onenterpaused: ->
+    #console.timeEnd('state_paused')
+    #@game.animation.pause()
 
   onpause: (event, from, to) ->
 

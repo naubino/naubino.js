@@ -1,7 +1,8 @@
 class Naubino.Background extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
-    @animation.name = "background"
+    @name = "background"
+    @animation.name = "background.animation"
 
     @fps = 1000 / 5
     @drawing = true

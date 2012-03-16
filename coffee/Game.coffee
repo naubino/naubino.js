@@ -6,7 +6,8 @@ class Naubino.Game extends Naubino.Layer
   ###
   constructor: (canvas, @graph) ->
     super(canvas)
-    @animation.name = "game"
+    @name = "game"
+    @animation.name = "game.animation"
 
     # display stuff
     @paused = true # changed imidiately after loading by start_timer
@@ -22,15 +23,9 @@ class Naubino.Game extends Naubino.Layer
 
     StateMachine.create {
       target: this
-      error:(e,f,t,a,ec,em) ->
-        console.warn e,f,t,a,ec,em unless e is 'click'
-
+      error:(event,from,to,args,ec,em) -> console.warn "#{event}(#{args}): #{from}->#{to} - #{ec}:\"#{em}\"" unless event is 'click'
       events: Naubino.Settings.events
     }
-
-  ###
-  state machine stuff ... is implemented in RuleSet
-  ###
 
 
   ### 

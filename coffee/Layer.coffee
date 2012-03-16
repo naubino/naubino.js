@@ -29,19 +29,11 @@ class Naubino.Layer
         place onenter*state* into the concrete implementation
         ###
 
-        onbeforeplay:(e, f, t) ->
-          console.info "#{@name} recived #{e}: #{f} -> #{t}"
-          @parent.start_timer()
-
-        onbeforepause: (e,f,t) ->
-          console.info "#{@name} recived #{e}: #{f} -> #{t}"
-          @parent.stop_timer()
-
+        onbeforeplay:(e, f, t) -> @parent.start_timer()
+        onbeforepause: (e,f,t) -> @parent.stop_timer()
         onbeforestop: (e,f,t) ->
-          console.info "#{@name} recived #{e}: #{f} -> #{t}"
-
         onchangestate: (e,f,t)->
-          console.info "#{@name} changed state #{e}: #{f} -> #{t}"
+          #console.info "#{@name} changed state #{e}: #{f} -> #{t}"
           #return true
       }
     }
@@ -53,8 +45,6 @@ class Naubino.Layer
 
 
 
-
-
   ### managing objects ###
   add_object: (obj)->
     obj.center = @center
@@ -63,27 +53,17 @@ class Naubino.Layer
     @objects[@objects_count] = obj
     @objects_count
 
-  get_object: (id)->
-    @objects[id]
-
-  remove_obj: (id) ->
-    delete @objects[id]
-
-  clear_objects: ->
-    @objects = {}
+  get_object: (id)-> @objects[id]
+  remove_obj: (id) -> delete @objects[id]
+  clear_objects: -> @objects = {}
 
   for_each: (callback) ->
     for k, v of @objects
       callback(v)
 
 
-
-
-  start_timer: =>
-    @loop = setInterval(@mainloop, @fps )
-
-  stop_timer: =>
-    clearInterval @loop
+  start_timer: => @animation.loop = setInterval(@mainloop, @fps )
+  stop_timer: => clearInterval @animation.loop
 
   mainloop: ()=>
     @step(@dt)
@@ -92,13 +72,8 @@ class Naubino.Layer
       @draw()
 
 
-
-  show: ->
-    @canvas.style.opacity = 1
-
-  hide: ->
-    @canvas.style.opacity = 0
-
+  show: -> @canvas.style.opacity = 1
+  hide: -> @canvas.style.opacity = 0
 
 
   fade_in: ->
@@ -154,8 +129,7 @@ class Naubino.Layer
       if obj.isHit(x, y) and obj.isClickable
         return obj
 
-  clear: ->
-    @canvas.width = @canvas.width
+  clear: -> @canvas.width = @canvas.width
 
 
   ### utils ###
