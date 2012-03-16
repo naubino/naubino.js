@@ -1,7 +1,8 @@
 class Naubino.Overlay extends Naubino.Layer
   constructor: (canvas) ->
     super(canvas)
-    @animation.name = "overlay"
+    @name = "overlay"
+    @animation.name = "overlay.animation"
 
     @fps = 1000 / 15 # 5fps
     @drawing = true
