@@ -21,8 +21,7 @@ Naubino.Settings = {
       ]
 
   layer_events: [
-        { name: 'play',   from: 'stopped',  to: 'playing'}
-        { name: 'play',   from: 'paused',   to: 'playing'}
+        { name: 'play',   from: '*',  to: 'playing'}
         { name: 'pause',  from: 'playing',  to: 'paused' }
         { name: 'stop',   from: 'playing',  to: 'stopped'}
         { name: 'stop',   from: 'paused',   to: 'stopped'}
