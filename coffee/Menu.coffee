@@ -67,7 +67,7 @@ class Naubino.Menu extends Naubino.Layer
       content: (ctx) -> this.draw_string(ctx, '?')
       position: new b2Vec2(45,65)
     exit:
-      function: -> Naubino.exit()
+      function: -> Naubino.stop()
       content: (ctx) -> this.draw_string(ctx, 'X')
       position: new b2Vec2(14,80)
 

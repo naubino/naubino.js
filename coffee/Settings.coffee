@@ -12,7 +12,15 @@ Naubino.Settings = {
     height:       400
   events: [
         { name: 'init',   from: 'none',     to: 'stopped'}
-        { name: 'unset',  from: '*',        to: 'none'   }
+        { name: 'unset',  from: 'stopped',  to: 'none'   }
+        { name: 'play',   from: 'stopped',  to: 'playing'}
+        { name: 'play',   from: 'paused',   to: 'playing'}
+        { name: 'pause',  from: 'playing',  to: 'paused' }
+        { name: 'stop',   from: 'playing',  to: 'stopped'}
+        { name: 'stop',   from: 'paused',   to: 'stopped'}
+      ]
+
+  layer_events: [
         { name: 'play',   from: 'stopped',  to: 'playing'}
         { name: 'play',   from: 'paused',   to: 'playing'}
         { name: 'pause',  from: 'playing',  to: 'paused' }
@@ -29,14 +37,14 @@ Naubino.Settings = {
     # misc...
     # a palett must have at least 6 colors
     output: [
-    # [RRR, GGG, BBB, , name,    is_background,    is_joincolor]
-      [229,  53,  23, 1, "red"]
-      [151, 190,  13, 1, "green"]
-      [  0, 139, 208, 1, "blue"]
-      [255, 204,   0, 1, "yellow"]
-      [226,   0, 122, 1, "pink"]
-      [100,  31, 128, 1, "purple"]
-      [ 41,  14,   3, 1, "tell me"] # (brown)
+    # [RRR, GGG, BBB, , name,    is_background,    is_joincolor ]
+      [229,  53,  23, 1, "red"      ]
+      [151, 190,  13, 1, "green"    ]
+      [  0, 139, 208, 1, "blue"     ]
+      [255, 204,   0, 1, "yellow"   ]
+      [226,   0, 122, 1, "pink"     ]
+      [100,  31, 128, 1, "purple"   ]
+      [ 41,  14,   3, 1, "tell me"  ] # (brown)
     ]
     high_contrast: [
       [255,   0,   0, 1, "hcred"]

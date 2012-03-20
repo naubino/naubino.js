@@ -19,9 +19,9 @@ class Naubino.Layer
     @animation = {parent: this}
 
     StateMachine.create {
-
-      target: @animation                #♥
-      events: Naubino.Settings.events
+      target: @animation
+      initial: 'stopped'
+      events: Naubino.Settings.layer_events
       callbacks:{
         ###
         states (overwrite these)
@@ -32,6 +32,9 @@ class Naubino.Layer
         onbeforeplay:(e, f, t) -> @parent.start_timer()
         onbeforepause: (e,f,t) -> @parent.stop_timer()
         onbeforestop: (e,f,t) ->
+          @parent.stop_timer()
+          @parent.clear()
+
         onchangestate: (e,f,t)->
           #console.info "#{@name} changed state #{e}: #{f} -> #{t}"
           #return true

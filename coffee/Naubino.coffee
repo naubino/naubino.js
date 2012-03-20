@@ -54,12 +54,10 @@ window.onload = ->
     @overlay       = new @Overlay(@overlay_canvas)
 
     @menu.init()
-    @menu.animation.init()
     @menu.animation.play()
     @game.init()
-    @game.animation.init()
-    @background.animation.init()
-    @overlay.animation.init()
+
+
 
   ###
   Everything has to have state
@@ -78,15 +76,16 @@ window.onload = ->
         when 'playing' then console.info o.name, o.current
         when 'paused'  then console.warn o.name, o.current
         when 'stopped' then console.warn o.name, o.current
-        else console.error o.current
+        else console.error o.name, o.current
 
   onchangestate: (e,f,t)-> console.info "Naubino changed states #{e}: #{f} -> #{t}"
-
   onbeforeplay: (event, from, to) -> @game.play()
-    
   onenterplaying: -> @menu.play()
 
-  ontoggle: (event, from, to) ->
+  toggle: ->
+    switch @current
+      when 'playing' then @pause()
+      when 'paused'  then @play()
 
   onbeforepause: (event, from, to) ->
     unless from == "init"
@@ -100,7 +99,13 @@ window.onload = ->
 
   onpause: (event, from, to) ->
 
-  onexit: (event, from, to) ->
+  onbeforestop: (event, from, to) ->
+    @game.stop()
+    @menu.stop()
+
+
+
+
 
   ###
   Signals connect everything else that does not react to events
@@ -138,12 +143,13 @@ window.onload = ->
     @menu_blur.add =>
       @menu.hovering = @menu_button.active = false
 
+
+
   setup_keybindings: () ->
     @keybindings = new @KeyBindings()
     window.onkeydown = (key) => @keybindings.keydown(key)
     window.onkeyup = (key) => @keybindings.keyup(key)
-    @keybindings.enable 32, => @menu_toggle.dispatch()
-
+    @keybindings.enable 32, => @toggle()
 
   setup_cursorbindings: () ->
     # TODO mouse events should be handled though Signals
