@@ -23,7 +23,7 @@ class Naubino.Game extends Naubino.Layer
 
     StateMachine.create {
       target: this
-      error:(event,from,to,args,ec,em) -> console.warn "#{event}(#{args}): #{from}->#{to} - #{ec}:\"#{em}\"" unless event is 'click'
+      #error:(event,from,to,args,ec,em) -> console.warn "#{event}(#{args}): #{from}->#{to} - #{ec}:\"#{em}\"" unless event is 'click'
       events: Naubino.Settings.events
     }
 
@@ -236,12 +236,14 @@ class Naubino.Game extends Naubino.Layer
   clears the graph as well, just in case
   ###
   clear: ->
+    console.log("game clear")
     super()
+    @clear_objects()
     Naubino.graph.clear()
 
 
-  # work and have everybody else do their work as well
   step: (dt) ->
+    ### work and have everybody else do their work as well ###
     # physics
     @naub_forces dt
     

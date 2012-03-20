@@ -22,22 +22,28 @@ class Naubino.StandartGame extends Naubino.Game
     Naubino.rules_cleared = true
   
 
-  onchangestate: (e,f,t)->
-    #console.info "ruleset recived #{e}: #{f} -> #{t}"
-
-
-  onbeforepause: =>
-    clearInterval @loop
+  onchangestate: (e,f,t)-> #console.info "ruleset recived #{e}: #{f} -> #{t}"
 
   onbeforeplay: ->
     Naubino.background.animation.play()
-
-  onplaying: =>
-    @loop = setInterval(@event, 300 )
     @animation.play()
 
-  onpaused: =>
+  onplaying: -> @loop = setInterval(@event, 300 )
+
+
+  onbeforepause: -> clearInterval @loop
+  onbeforestop:  -> clearInterval @loop
+
+  onpaused:      ->
+    Naubino.background.animation.pause()
     @animation.pause()
+
+  onstopped: (e,f,t) ->
+    unless e is 'init'
+      Naubino.background.animation.stop()
+      @animation.stop()
+      return true
+    return true
 
   event: =>
     if @inner_clock == 0
@@ -78,6 +84,7 @@ class Naubino.TestCase extends Naubino.Game
     @animation.pause()
 
   onunset:->
+    console.log("standart_game clear")
     Naubino.Settings.show_numbers = false
     @clear()
     Naubino.background.clear()
