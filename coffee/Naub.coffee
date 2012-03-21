@@ -44,7 +44,7 @@ class Naubino.Naub
   enable: ->
     @disabled = false
     @shape.pre_render()
-    
+
   disable: ->
     @disabled = true
     @shape.pre_render()
@@ -70,7 +70,7 @@ class Naubino.Naub
     @destroying = true
     @shape.destroy(@remove)
     Naubino.naub_destroyed.dispatch(@number)
-    
+
 
   ### do things a naub is supposed to do ###
   join_with: (other) ->
@@ -123,9 +123,7 @@ class Naubino.Naub
       NaN
 
 
-  partners: ->
-    _.values @joins
-
+  partners: -> x for x in @joins
 
   ### user interaction ###
   focus: ->

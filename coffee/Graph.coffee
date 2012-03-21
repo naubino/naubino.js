@@ -61,7 +61,7 @@ class Naubino.Graph
       join[0] + " -- " + join[1]
     dot += joins.join("\n") + "}"
     console.log dot
-  
+
   ###
   returns list of joined naubs expect a certain predecessor
   ###
@@ -87,7 +87,7 @@ class Naubino.Graph
     for inaub, {naub, dfs_num, color} of @dfs_map
       if dfs_num == 0
         dfs_cycle = @dfs(naub, null, first)
-        cycles = _.union(cycles, dfs_cycle)
+        cycles = cycles.filter (x) -> x in dfs_cycle
     return
 
 
@@ -103,7 +103,7 @@ class Naubino.Graph
 
     for partner in @partners(naub,pre)
       if @dfs_map[partner].dfs_num == 0
-        cycles = _.union(cycles, @dfs(partner,naub, first))
+        cycles = @dfs(partner,naub, first).filter (x) -> x in cycles
 
       if @dfs_map[partner].color == 1
         list =  @cycle_list(naub,partner,first)
@@ -116,9 +116,10 @@ class Naubino.Graph
   returns the list for cycle_test
   ###
   cycle_list: (v,w,first = null) ->
-    cycle = _.select(@dfs_map, ({dfs_num, color})=> (dfs_num >= @dfs_map[w].dfs_num  && color == 1) )
-    cycle.sort( (a,b) -> a.dfs_num - b.dfs_num)
-    cycle_naubs = _.pluck(cycle, 'naub')
+    cycle = @dfs_map.filter ({dfs_num, color}) =>
+      dfs_num >= @dfs_map[w].dfs_num && color == 1
+    cycle.sort (a,b) -> a.dfs_num - b.dfs_num
+    cycle_naubs = (x.naub for x in cycle)
 
     if first? and first in cycle_naubs
       cycle_naubs = cycle_naubs
