@@ -46,7 +46,7 @@ class Naubino.Game extends Naubino.Layer
   create_matching_naubs: (n=1,extras=0) ->
     #create n sets of matching pairs
     for [1..n]
-      colors = _.shuffle [0..5]
+      colors = Util.shuffle [0..5]
       colors[5] = colors[0]
       i = 0
       while i < (colors.length )-1

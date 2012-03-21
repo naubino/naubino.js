@@ -3,6 +3,7 @@ NAUBINO_UGLIFIED_TARGET = Naubino.min.js
 
 # the order is crucial
 NAUBINO_TMP = \
+							js/Util.js \
 							js/Naubino.js \
 							js/Settings.js \
 							js/Rules.js \

@@ -1,6 +1,3 @@
-[submodule "lib/underscore"]
-	path = lib/underscore
-	url = https://github.com/documentcloud/underscore
 [submodule "lib/signals"]
 	path = lib/signals
 	url = https://github.com/millermedeiros/js-signals
