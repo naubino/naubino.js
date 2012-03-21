@@ -1,8 +1,8 @@
 # controlls everything that has to do with logic and gameplay or menus
 class Naubino.Game extends Naubino.Layer
-  
+
   ###
-  * get this started 
+  * get this started
   ###
   constructor: (canvas, @graph) ->
     super(canvas)
@@ -28,7 +28,7 @@ class Naubino.Game extends Naubino.Layer
     }
 
 
-  ### 
+  ###
   the game gives it the game takes it
   methods that create naubs
   ###
@@ -187,33 +187,24 @@ class Naubino.Game extends Naubino.Layer
 
   # is one naub allowed to join with another
   check_joining: (naub, other) ->
-    allowed = no
-    unless naub.number == other.number or not @joining_allowed
-      #console.log "checking #{@number}(#{@color_id}) and #{other.number}(#{other.color_id})"
+    return no if naub.number == other.number or not @joining_allowed
 
-      close_related = false
-      naub_partners = for id, partner of naub.joins
-        partner.number
+    naub_partners = (partner.number for id, partner of naub.joins)
+    other_partners = (partner.number for id, partner of other.joins)
+    close_related = naub_partners.some (x) -> x in other_partners
 
-      for id, partner of other.joins
-        if partner.number in naub_partners
-          close_related = true
+    joined = naub.is_joined_with other
+    alone = Object.keys(naub.joins).length == 0
+    other_alone = Object.keys(other.joins).length == 0
+    same_color = naub.color_id == other.color_id
 
-      joined = naub.is_joined_with other
-      alone = _.keys(naub.joins).length == 0
-      other_alone = _.keys(other.joins).length == 0
-      same_color = naub.color_id == other.color_id
-
-      if !naub.disabled && not joined && same_color && not close_related && not alone && not other_alone
-        other.replace_with naub
-        allowed = yes
-      else if alone and not (other.disabled or naub.disabled)
-        naub.join_with other
-        allowed = yes
-    allowed
-
-    
-
+    if !naub.disabled && not joined && same_color && not close_related && not alone && not other_alone
+      other.replace_with naub
+      return yes
+    else if alone and not (other.disabled or naub.disabled)
+      naub.join_with other
+      return yes
+    no
 
   ###
   draws everything that happens inside the field
@@ -229,7 +220,7 @@ class Naubino.Game extends Naubino.Layer
     for id, obj of @objects
       obj.draw @ctx
     @ctx.restore()
-      
+
 
 
   ###
@@ -246,7 +237,7 @@ class Naubino.Game extends Naubino.Layer
     ### work and have everybody else do their work as well ###
     # physics
     @naub_forces dt
-    
+
     # check for joinings
     if @mousedown && @focused_naub
       @focused_naub.physics.follow @pointer.Copy()
@@ -273,15 +264,15 @@ class Naubino.Game extends Naubino.Layer
       # everything moves toward the middle
       naub.physics.gravitate()
 
-      # joined naubs have spring forces 
+      # joined naubs have spring forces
       for id, other of naub.joins
         naub.physics.join_springs other
-      
+
       # collide
       for [0..3]
         for id, other of @objects
           naub.physics.collide other
-      
-      # use all previously calculated forces and actually move the damn thing 
+
+      # use all previously calculated forces and actually move the damn thing
       naub.step(dt)
 
