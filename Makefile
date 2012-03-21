@@ -1,24 +1,6 @@
 NAUBINO_TARGET = Naubino.full.js
 NAUBINO_UGLIFIED_TARGET = Naubino.min.js
 
-
-NAUBINO_SOURCE = coffee/Ball.coffee \
-								 coffee/Keybindings.coffee \
-								 coffee/Naub.coffee \
-								 coffee/Rules.coffee \
-								 coffee/Tutorial.coffee \
-								 coffee/Game.coffee \
-								 coffee/Layer.coffee \
-								 coffee/Overlay.coffee \
-								 coffee/Background.coffee \
-								 coffee/Naubino.coffee \
-								 coffee/Settings.coffee \
-								 coffee/Vector.coffee \
-								 coffee/Graph.coffee \
-								 coffee/Menu.coffee \
-								 coffee/PhysicsModel.coffee \
-								 coffee/Shape.coffee
-
 # the order is crucial
 NAUBINO_TMP = \
 							js/Naubino.js \
@@ -38,6 +20,7 @@ NAUBINO_TMP = \
 							js/Game.js \
 							js/Graph.js \
 
+NAUBINO_SOURCE = $(NAUBINO_TMP,js/%.js=coffee/%.coffee)
 
 all: $(NAUBINO_TARGET)
 
