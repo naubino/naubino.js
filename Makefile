@@ -64,5 +64,5 @@ clean:
 
 .PHONY: loc
 loc:
-	cat $(NAUBINO_SOURCE) | grep -v '^\s*#' | grep -v "^\s*$$" | wc -l
+	@cat $(NAUBINO_SOURCE) | grep -v '^\s*#' | grep -v "^\s*$$" | wc -l
 
