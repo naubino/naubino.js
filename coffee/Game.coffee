@@ -67,7 +67,7 @@ class Naubino.Game extends Naubino.Layer
   create_naub: (x = @center.x, y = @center.y) ->
       naub_a = new Naubino.Naub this
       @add_object naub_a
-      naub_a.shape.pre_render() # again just to get the numbers
+      naub_a.pre_render() # again just to get the numbers
       naub_a.physics.pos.Set x, y
 
 
@@ -79,8 +79,8 @@ class Naubino.Game extends Naubino.Layer
 
       @add_object naub_a
       @add_object naub_b
-      naub_a.shape.pre_render() # again just to get the numbers
-      naub_b.shape.pre_render() # again just to get the numbers
+      naub_a.pre_render() # again just to get the numbers
+      naub_b.pre_render() # again just to get the numbers
 
       dir = Math.random() * Math.PI
 
@@ -102,9 +102,9 @@ class Naubino.Game extends Naubino.Layer
       @add_object naub_a
       @add_object naub_b
       @add_object naub_c
-      naub_a.shape.pre_render() # again just to get the numbers
-      naub_b.shape.pre_render() # again just to get the numbers
-      naub_c.shape.pre_render() # again just to get the numbers
+      naub_a.pre_render() # again just to get the numbers
+      naub_b.pre_render() # again just to get the numbers
+      naub_c.pre_render() # again just to get the numbers
 
       dir = Math.random() * Math.PI
 
@@ -126,8 +126,8 @@ class Naubino.Game extends Naubino.Layer
       @show_numbers = true
     else @show_numbers = not @show_numbers
     for id, naub of @objects
-      naub.content = if @show_numbers then naub.shape.draw_number else null
-      naub.shape.pre_render()
+      naub.content = if @show_numbers then naub.draw_number else null
+      naub.pre_render()
 
 
 
