@@ -21,7 +21,7 @@ NAUBINO_TMP = \
 							js/Game.js \
 							js/Graph.js \
 
-NAUBINO_SOURCE = $(NAUBINO_TMP,js/%.js=coffee/%.coffee)
+NAUBINO_SOURCE = $(NAUBINO_TMP:js/%.js=coffee/%.coffee)
 
 all: $(NAUBINO_TARGET)
 
