@@ -12,8 +12,6 @@ NAUBINO_TMP = \
 							js/Keybindings.js \
 							js/Vector.js \
 							js/Naub.js \
-							js/Shape.js \
-							js/Ball.js \
 							js/Layer.js \
 							js/Overlay.js \
 							js/Background.js \
@@ -50,3 +48,5 @@ clean:
 loc:
 	@cat $(NAUBINO_SOURCE) | grep -v '^\s*#' | grep -v "^\s*$$" | wc -l
 
+doc: docs/*
+	codo coffee/* -o docs/

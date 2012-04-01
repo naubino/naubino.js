@@ -1,9 +1,7 @@
 # controlls everything that has to do with logic and gameplay or menus
 class Naubino.Game extends Naubino.Layer
 
-  ###
-  * get this started
-  ###
+  # get this started
   constructor: (canvas, @graph) ->
     super(canvas)
     @name = "game"
@@ -28,10 +26,11 @@ class Naubino.Game extends Naubino.Layer
     }
 
 
-  ###
-  the game gives it the game takes it
-  methods that create naubs
-  ###
+  # the game gives it the game takes it
+  
+  # methods that create naubs
+  #
+  # @param [int] n number of pairs and triples
   create_some_naubs: (n = 3) ->
     for [1..n]
       {x,y} = @random_outside()
@@ -43,8 +42,11 @@ class Naubino.Game extends Naubino.Layer
       @create_naub_triple(x,y)
 
 
+  #create n sets of matching pairs and some leftovers
+  #
+  # @param n [int] number of matching pairs
+  # @param extras [int] number of leftovers
   create_matching_naubs: (n=1,extras=0) ->
-    #create n sets of matching pairs
     for [1..n]
       colors = Util.shuffle [0..5]
       colors[5] = colors[0]
@@ -64,6 +66,11 @@ class Naubino.Game extends Naubino.Layer
         @create_naub_pair(x,y)
 
 
+  # create a naub at x,y
+  #
+  # used in create_naub_pair, create_naub_triple and create_some_naubs
+  # @param x [int] x-ordinate
+  # @param y [int] y-ordinate
   create_naub: (x = @center.x, y = @center.y) ->
       naub_a = new Naubino.Naub this
       @add_object naub_a
@@ -71,6 +78,12 @@ class Naubino.Game extends Naubino.Layer
       naub_a.physics.pos.Set x, y
 
 
+  # create a pair of joined naubs
+  #
+  # @param x [int] x-ordinate
+  # @param y [int] y-ordinate
+  # @param color [int] color id of naub 1
+  # @param color [int] color id of naub 2
   create_naub_pair: (x, y, color_a = null, color_b = null) ->
       naub_a = new Naubino.Naub this, color_a
       naub_b = new Naubino.Naub this, color_b
@@ -94,6 +107,11 @@ class Naubino.Game extends Naubino.Layer
       [color_a, color_b]
 
 
+  # create a triple of joined naubs
+  #
+  # works almost like create_naub_pair
+  # @param x [int] x-ordinate
+  # @param y [int] y-ordinate
   create_naub_triple: (x, y) ->
       naub_a = new Naubino.Naub this
       naub_b = new Naubino.Naub this
@@ -118,9 +136,7 @@ class Naubino.Game extends Naubino.Layer
       naub_a.join_with naub_b
       naub_b.join_with naub_c
 
-  ###
-  makes every naub show its own id
-  ###
+  # makes every naub show its own id
   toggle_numbers: () ->
     unless @show_numbers?
       @show_numbers = true
@@ -131,9 +147,7 @@ class Naubino.Game extends Naubino.Layer
 
 
 
-  ###
-  produces a random set of coordinates outside the field
-  ###
+  # produces a random set of coordinates outside the field
   random_outside: ->
     offset = 100
     seed = Math.round (Math.random() * 3)+1
@@ -152,11 +166,9 @@ class Naubino.Game extends Naubino.Layer
         y = 0 - offset
     {x,y}
 
-  ###
-  counts howmany naubs would be inside the circle
-  important for gameplay
-  TODO: need a function that determines how many actually fit inside the 'basket'
-  ###
+  # counts howmany naubs would be inside the circle
+  # important for gameplay
+  # TODO need a function that determines how many actually fit inside the 'basket'
   count_basket: ->
     count = []
     if @basket_size?
@@ -168,10 +180,8 @@ class Naubino.Game extends Naubino.Layer
     count
 
 
-  ###
-  destroys every naub in a list of IDs by calling its own destroy function
-  TODO: need a start id, so the animation starts at a specific point
-  ###
+  # destroys every naub in a list of IDs by calling its own destroy function
+  # @TODO: need a start id, so the animation starts at a specific point
   destroy_naubs: (list)->
     for naub in list
       @get_object(naub).disable()
@@ -206,9 +216,7 @@ class Naubino.Game extends Naubino.Layer
       return yes
     no
 
-  ###
-  draws everything that happens inside the field
-  ###
+  # draws everything that happens inside the field
   draw:  ->
     # clears the canvas before drawing
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
@@ -223,9 +231,7 @@ class Naubino.Game extends Naubino.Layer
 
 
 
-  ###
-  clears the graph as well, just in case
-  ###
+  # clears the graph as well, just in case
   clear: ->
     console.log("game clear")
     super()
@@ -233,9 +239,10 @@ class Naubino.Game extends Naubino.Layer
     Naubino.graph.clear()
 
 
+  # work and have everybody else do their work as well
+
+  # run naub_forces, check for joinings and clean up
   step: (dt) ->
-    ### work and have everybody else do their work as well ###
-    # physics
     @naub_forces dt
 
     # check for joinings
@@ -255,9 +262,9 @@ class Naubino.Game extends Naubino.Layer
 
 
 
-  ###
-  moves naubs with every step
-  ###
+  # moves naubs on every step
+  #
+  # @param [float] time-difference determines step size
   naub_forces: (dt) ->
     for id, naub of @objects
 
