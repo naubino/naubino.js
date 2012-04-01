@@ -12,7 +12,7 @@ class Naubino.Menu extends Naubino.Layer
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
-    Naubino.naub_destroyed.add -> Naubino.menu.objects.main.shape.pre_render()
+    Naubino.naub_destroyed.add -> Naubino.menu.objects.main.pre_render()
     Naubino.menu_button.active = false
    
     @position = new b2Vec2(20,25)
@@ -109,10 +109,10 @@ class Naubino.Menu extends Naubino.Layer
     @objects.main = new Naubino.Naub(this, null, @cube_size)
     @objects.main.physics.pos.Set(@position.x, @position.y)
     @objects.main.physics.attracted_to = @position.Copy()
-    @objects.main.shape.size = @cube_size
-    @objects.main.shape.render = @draw_main_button
-    @objects.main.shape.life_rendering = yes
-    @objects.main.shape.pre_render()
+    @objects.main.size = @cube_size
+    @objects.main.render = @draw_main_button
+    @objects.main.life_rendering = yes
+    @objects.main.pre_render()
     @objects.main.isClickable = no
 
     for name, attr of @buttons
@@ -120,8 +120,8 @@ class Naubino.Menu extends Naubino.Layer
       @objects[name].physics.pos.Set attr.position.x, attr.position.y
       @objects[name].physics.attracted_to.Set attr.position.x, attr.position.y
       @objects[name].content = attr.content
-      #@objects[name].shape.set_color_id 2
-      @objects[name].shape.pre_render()
+      #@objects[name].set_color_id 2
+      @objects[name].pre_render()
       @objects[name].focus = attr.function
       @objects[name].disable() if attr.disabled
       @objects[name].isClickable = no
