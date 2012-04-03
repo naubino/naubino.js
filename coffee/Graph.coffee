@@ -1,14 +1,10 @@
 class Naubino.Graph
-  # TODO make more use of _
   constructor: () ->
     @join_id_sequence = 0 # sequential join id
     @naubs = []
     @joins = {}
 
-  ###
-  updateing naub list from joins
-  since joins are more up to date
-  ###
+  # updating naub list from joins since joins are more up to date
   update_naub_list: () ->
     @naubs = []
     for id, join of @joins
@@ -16,10 +12,11 @@ class Naubino.Graph
         unless join[i] in @naubs
           @naubs.push join[i]
 
-  ###
-  adds the join between naub a and naub b
-  TODO: simplify update_naub_list
-  ###
+  # adds the join between naub a and naub b
+  #
+  # @todo simplify update_naub_list
+  # @param [Naub] a first and ...
+  # @param [Naub] b ... second naub that connected
   add_join: (a,b) ->
     @join_id_sequence++
     join = [ a.number, b.number ]
@@ -27,34 +24,27 @@ class Naubino.Graph
     @update_naub_list()
     @join_id_sequence
 
-  ###
-  a comment explaining this function would require more bytes than the actuall function it self
-  so I decided not to explain the function after all, I guess you got to figure it out by yourself
-  ###
+  # one of those functions where documentation yould require more time than reading the actuall code
+  #
+  # @param [id] naub naub to be removed
+  #
   remove_join: (id)->
     delete @joins[id]
     @update_naub_list()
 
-  ###
-  another one of those functions where documentation yould require more time than reading the actuall code
-  good look
-  ###
+  # another one of those functions where documentation yould require more time than reading the actuall code
   clear: ->
     @join_id_sequence = 0
     @naubs = []
     @joins = {}
 
-  ###
-  logs a list of all joins ( for debugging )
-  ###
+  # prints a list of all joins to console
   join_list: ->
     console.log "joinList"
     for id, join of @joins
       console.log id + " " + join
 
-  ###
-  creates a dot file from graph :D
-  ###
+  # prints a dot file from graph :D to console
   dotty: -> # :D
     dot =  "graph G {\n"
     joins = for id, join of @joins
@@ -62,9 +52,12 @@ class Naubino.Graph
     dot += joins.join("\n") + "}"
     console.log dot
 
-  ###
-  returns list of joined naubs expect a certain predecessor
-  ###
+  # returns a list of naubs connected to the parameter
+  #
+  # @return [array] list of naubs connected to the parameter
+  # @param [id] naub naub in question
+  #
+  # returns list of joined naubs expect a certain predecessor
   partners: (naub, pre = null) ->
     partners = []
     for id, join of @joins
@@ -73,10 +66,10 @@ class Naubino.Graph
           partners.push join[(join.indexOf(naub))^1]
     partners
 
-  ###
-  this is the smartes function in the entire programm
-  searches for cycles in the graph and returns a list of all naubs within a cycle
-  ###
+  # searches for cycles in the graph and returns a list of all naubs within a cycle
+  #
+  # this is the smartest in the entire programm
+  # @param first [id] in order to remember which naub if the first in the cycle
   cycle_test: (first) =>
     cycles = []
 
@@ -91,9 +84,9 @@ class Naubino.Graph
     return
 
 
-  ###
-  recursive part of cycle_test
-  ###
+  # recursive part of cycle_test
+  #
+  # @param [id] naub naub in question
   dfs: (naub, pre = null, first = null) ->
     cycles = []
 
@@ -112,9 +105,9 @@ class Naubino.Graph
     @dfs_map[naub].color = 2
     return cycles
 
-  ###
-  returns the list for cycle_test
-  ###
+  # returns all naubs that are part of a cycle in order of connection to the active naub
+  #
+  # @return [array] list of naubs
   cycle_list: (v,w,first = null) ->
     cycle = @dfs_map.filter ({dfs_num, color}) =>
       dfs_num >= @dfs_map[w].dfs_num && color == 1
