@@ -32,9 +32,7 @@ class Naubino.Naub
 
 
 
-  ###
-  * either renders live or draws pre_rendered image
-  ###
+  # either renders live or draws pre_rendered image
   draw: (ctx) ->
     if Naubino.Settings.pre_rendering and not @life_rendering
       ctx.save()
@@ -46,7 +44,7 @@ class Naubino.Naub
     else
       @render ctx, @pos.x, @pos.y
 
-  ### draws a frame around the buffered image for analysis ###
+  # draws a frame around the buffered image for analysis
   draw_frame: (ctx) ->
     x = @pos.x-@frame/2
     y = @pos.y-@frame/2
@@ -62,14 +60,14 @@ class Naubino.Naub
     #ctx.fill()
     ctx.closePath()
     
-  ### Renders the shape into a buffer ###
+  # Renders the shape into a buffer
   pre_render: (ctx) ->
     @buffer = document.createElement('canvas')
     @buffer.width = @buffer.height = @frame*2
     b_ctx = @buffer.getContext('2d')
     @render b_ctx, @frame, @frame
 
-  ### actual painting routines ###
+  # actual painting routines
   render: (ctx, x = 42, y = x) ->
     ctx.save()
     pos = @pos
@@ -166,7 +164,7 @@ class Naubino.Naub
 
 
 
-  ## organisation ###
+  ## organisation
   step: (dt) =>
     @physics.step dt
 
@@ -176,7 +174,7 @@ class Naubino.Naub
 
 
 
-  ### makes a naub unclickable and joinable ###
+  # makes a naub unclickable and joinable
   enable: ->
     @disabled = false
     @pre_render()
@@ -198,7 +196,7 @@ class Naubino.Naub
       Naubino.graph.remove_join id
 
 
-  ### animated remove with disabling   ###
+  # animated remove with disabling  
   destroy: ->
     for id, partner of @joins
       @drawing_join[id] = true
@@ -208,7 +206,7 @@ class Naubino.Naub
     Naubino.naub_destroyed.dispatch(@number)
 
 
-  ### animates the destruction of a naub ###
+  # animates the destruction of a naub
   destroy_animation: (callback) ->
     @life_rendering = true
     shrink = =>
@@ -228,7 +226,7 @@ class Naubino.Naub
 
 
 
-  ### do things a naub is supposed to do ###
+  # do things a naub is supposed to do
   join_with: (other) ->
     join = Naubino.graph.add_join this, other
     @joins[join] = other
@@ -239,7 +237,7 @@ class Naubino.Naub
     join
 
 
-  ### the 'other' naub takes my place  ###
+  # the 'other' naub takes my place 
   replace_with: (other) ->
     remove_joins = for id, naub of @joins
       other.join_with(naub)
@@ -291,7 +289,7 @@ class Naubino.Naub
 
 
 
-  ### user interaction ###
+  # user interaction
   focus: ->
     @focused = true
     @pre_render()
@@ -314,7 +312,7 @@ class Naubino.Naub
 
 
 
-  ### utils ###
+  # utils
   color_to_rgba: (color, shift = 0) =>
     r = Math.round((color[0] + shift))
     g = Math.round((color[1] + shift))
@@ -322,7 +320,7 @@ class Naubino.Naub
     a = color[3]
     "rgba(#{r},#{g},#{b},#{a})"
 
-  ## change color
+  # change color
   set_color_id:(id)->
     palette = Naubino.colors
     pick = palette[id]
@@ -331,13 +329,13 @@ class Naubino.Naub
 
 
 
-  ## colors the shape randomly and returns color id for comparison
+  # colors the shape randomly and returns color id for comparison
   random_palette_color: ->
     palette = Naubino.colors
     id = Math.round(Math.random() * (palette.length-1))
     @set_color_id id
     
-  ## colors the shape randomly and returns color id for comparison
+  # colors the shape randomly and returns color id for comparison
   random_color: ->
     r = Math.random()
     g = Math.random()
