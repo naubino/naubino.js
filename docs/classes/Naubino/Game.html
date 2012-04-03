@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>CoffeeScript API Documentation</title>
+  <link rel='stylesheet' href='../../assets/codo.css' type='text/css'>
+  <script src='../../assets/codo.js'></script>
+</head>
+  <body>
+    <div id='header'>
+  <div id='menu'>
+    <a href='../../class_index.html' title='Index'>Index</a>
+    &raquo;
+    <span class='title'>Naubino</span>
+    &raquo;
+    <span class='title'>Game</span>
+    <nav>
+      <ul>
+        <li class='frames'>
+          (<a class='frames' href='../../frames.html'>frames</a>)
+        </li>
+        <li class='noframes'>
+          (<a class='noframes' href='#'>no frames</a>)
+        </li>
+      </ul>
+    </nav>
+    <div id='search'>
+      <a id='class_list_link' href='../../class_list.html'>Class List</a>
+      <a id='method_list_link' href='../../method_list.html'>Method List</a>
+      <a id='file_list_link' href='../../file_list.html'>File List</a>
+    </div>
+  </div>
+  <iframe id='search_frame'></iframe>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        Naubino.Game
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Inherits:</td>
+          <td>
+            <a href="../../classes/Naubino/Layer.html">Naubino.Layer</a>
+          </td>
+        </tr>
+        <tr>
+          <td>Defined in:</td>
+          <td>coffee/Game.coffee</td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>controlls everything that has to do with logic and gameplay or menus
+</p>
+
+</div>
+<div class='tags'>
+</div>
+      <h2>Direct Known Subclasses</h2>
+      <p class='children'>
+                <a href="undefinedclasses/Naubino/StandartGame.html">Naubino.StandartGame</a>,
+        <a href="../../classes/Naubino/Tutorial.html">Naubino.Tutorial</a>
+      </p>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#constructor-instance'>
+        - (void) <strong>constructor</strong>(canvas, graph)
+      </a>
+    </span>
+    <span class='constructor note title'>Constructor</span>
+    <span class='desc'>
+      get this started
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#create_some_naubs-instance'>
+        - (void) <strong>create_some_naubs</strong>(n = 3)
+      </a>
+    </span>
+    <span class='desc'>
+      methods that create naubs
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#create_matching_naubs-instance'>
+        - (void) <strong>create_matching_naubs</strong>(n = 1, extras = 0)
+      </a>
+    </span>
+    <span class='desc'>
+      create n sets of matching pairs and some leftovers
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#create_naub-instance'>
+        - (void) <strong>create_naub</strong>(x = @center, y = @center)
+      </a>
+    </span>
+    <span class='desc'>
+      create a naub at x,y used in create_naub_pair, create_naub_triple and create_some_naubs
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#create_naub_pair-instance'>
+        - (void) <strong>create_naub_pair</strong>(x, y, color_a = null, color_b = null)
+      </a>
+    </span>
+    <span class='desc'>
+      create a pair of joined naubs
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#create_naub_triple-instance'>
+        - (void) <strong>create_naub_triple</strong>(x, y)
+      </a>
+    </span>
+    <span class='desc'>
+      create a triple of joined naubs works almost like create_naub_pair
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#toggle_numbers-instance'>
+        - (void) <strong>toggle_numbers</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      makes every naub show its own id
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#random_outside-instance'>
+        - (void) <strong>random_outside</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      produces a random set of coordinates outside the field
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#count_basket-instance'>
+        - (void) <strong>count_basket</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      counts howmany naubs would be inside the circle important for gameplay TODO need a function that determines how many actually fit inside the 'basket'
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#destroy_naubs-instance'>
+        - (void) <strong>destroy_naubs</strong>(list)
+      </a>
+    </span>
+    <span class='desc'>
+      destroys every naub in a list of IDs by calling its own destroy function @TODO: need a start id, so the animation starts at a specific point
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#check_joining-instance'>
+        - (void) <strong>check_joining</strong>(naub, other)
+      </a>
+    </span>
+    <span class='desc'>
+      is one naub allowed to join with another
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#draw-instance'>
+        - (void) <strong>draw</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      draws everything that happens inside the field
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#clear-instance'>
+        - (void) <strong>clear</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      clears the graph as well, just in case
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#step-instance'>
+        - (void) <strong>step</strong>(dt)
+      </a>
+    </span>
+    <span class='desc'>
+      run naub_forces, check for joinings and clean up
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#naub_forces-instance'>
+        - (void) <strong>naub_forces</strong>(dt)
+      </a>
+    </span>
+    <span class='desc'>
+      moves naubs on every step
+    </span>
+  </li>
+</ul>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-instance'>
+      - (void) <strong>constructor</strong>(canvas, graph)
+    </p>
+    <div class='docstring'>
+  <p>get this started
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='create_some_naubs-instance'>
+      - (void) <strong>create_some_naubs</strong>(n = 3)
+    </p>
+    <div class='docstring'>
+  <p>methods that create naubs
+
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>n</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>number of pairs and triples</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='create_matching_naubs-instance'>
+      - (void) <strong>create_matching_naubs</strong>(n = 1, extras = 0)
+    </p>
+    <div class='docstring'>
+  <p>create n sets of matching pairs and some leftovers
+
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>n</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>number of matching pairs</span>
+    </li>
+    <li>
+      <span class='name'>extras</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>number of leftovers</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='create_naub-instance'>
+      - (void) <strong>create_naub</strong>(x = @center, y = @center)
+    </p>
+    <div class='docstring'>
+  <p>create a naub at x,y
+
+</p>
+<p>used in create_naub_pair, create_naub_triple and create_some_naubs
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>x</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>x-ordinate</span>
+    </li>
+    <li>
+      <span class='name'>y</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>y-ordinate</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='create_naub_pair-instance'>
+      - (void) <strong>create_naub_pair</strong>(x, y, color_a = null, color_b = null)
+    </p>
+    <div class='docstring'>
+  <p>create a pair of joined naubs
+
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>x</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>x-ordinate</span>
+    </li>
+    <li>
+      <span class='name'>y</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>y-ordinate</span>
+    </li>
+    <li>
+      <span class='name'>color</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>color id of naub 1</span>
+    </li>
+    <li>
+      <span class='name'>color</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>color id of naub 2</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='create_naub_triple-instance'>
+      - (void) <strong>create_naub_triple</strong>(x, y)
+    </p>
+    <div class='docstring'>
+  <p>create a triple of joined naubs
+
+</p>
+<p>works almost like create_naub_pair
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>x</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>x-ordinate</span>
+    </li>
+    <li>
+      <span class='name'>y</span>
+      <span class='type'>
+        (<tt>int</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>y-ordinate</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='toggle_numbers-instance'>
+      - (void) <strong>toggle_numbers</strong>()
+    </p>
+    <div class='docstring'>
+  <p>makes every naub show its own id
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='random_outside-instance'>
+      - (void) <strong>random_outside</strong>()
+    </p>
+    <div class='docstring'>
+  <p>produces a random set of coordinates outside the field
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='count_basket-instance'>
+      - (void) <strong>count_basket</strong>()
+    </p>
+    <div class='docstring'>
+  <p>counts howmany naubs would be inside the circle
+important for gameplay
+TODO need a function that determines how many actually fit inside the &#39;basket&#39;
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='destroy_naubs-instance'>
+      - (void) <strong>destroy_naubs</strong>(list)
+    </p>
+    <div class='docstring'>
+  <p>destroys every naub in a list of IDs by calling its own destroy function
+@TODO: need a start id, so the animation starts at a specific point
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='check_joining-instance'>
+      - (void) <strong>check_joining</strong>(naub, other)
+    </p>
+    <div class='docstring'>
+  <p>is one naub allowed to join with another
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='draw-instance'>
+      - (void) <strong>draw</strong>()
+    </p>
+    <div class='docstring'>
+  <p>draws everything that happens inside the field
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='clear-instance'>
+      - (void) <strong>clear</strong>()
+    </p>
+    <div class='docstring'>
+  <p>clears the graph as well, just in case
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='step-instance'>
+      - (void) <strong>step</strong>(dt)
+    </p>
+    <div class='docstring'>
+  <p>run naub_forces, check for joinings and clean up
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='naub_forces-instance'>
+      - (void) <strong>naub_forces</strong>(dt)
+    </p>
+    <div class='docstring'>
+  <p>moves naubs on every step
+
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>time-difference</span>
+      <span class='type'>
+        (<tt>float</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>determines step size</span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  Generated on
+  Sun Apr 01 2012 22:51:26 GMT+0200 (CEST)
+  by
+  <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>codo</a>
+  v0.5.0
+  (Node.js v0.6.12).
+  &#10034;
+  <a href='http://twitter.com/#!/netzpirat'>@netzpirat</a>
+  &#10034;
+  <a href='https://mksoft.ch'>mksoft.ch</a>
+</div>
+  </body>
+</html>

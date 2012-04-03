@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title>CoffeeScript API Documentation</title>
+  <link rel='stylesheet' href='../../assets/codo.css' type='text/css'>
+  <script src='../../assets/codo.js'></script>
+</head>
+  <body>
+    <div id='header'>
+  <div id='menu'>
+    <a href='../../class_index.html' title='Index'>Index</a>
+    &raquo;
+    <span class='title'>Naubino</span>
+    &raquo;
+    <span class='title'>Graph</span>
+    <nav>
+      <ul>
+        <li class='frames'>
+          (<a class='frames' href='../../frames.html'>frames</a>)
+        </li>
+        <li class='noframes'>
+          (<a class='noframes' href='#'>no frames</a>)
+        </li>
+      </ul>
+    </nav>
+    <div id='search'>
+      <a id='class_list_link' href='../../class_list.html'>Class List</a>
+      <a id='method_list_link' href='../../method_list.html'>Method List</a>
+      <a id='file_list_link' href='../../file_list.html'>File List</a>
+    </div>
+  </div>
+  <iframe id='search_frame'></iframe>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        Naubino.Graph
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>coffee/Graph.coffee</td>
+        </tr>
+      </table>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#constructor-instance'>
+        - (void) <strong>constructor</strong>()
+      </a>
+    </span>
+    <span class='constructor note title'>Constructor</span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#update_naub_list-instance'>
+        - (void) <strong>update_naub_list</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      updating naub list from joins since joins are more up to date
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#add_join-instance'>
+        - (void) <strong>add_join</strong>(a, b)
+      </a>
+    </span>
+    <span class='desc'>
+      adds the join between naub a and naub b
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#remove_join-instance'>
+        - (void) <strong>remove_join</strong>(id)
+      </a>
+    </span>
+    <span class='desc'>
+      one of those functions where documentation yould require more time than reading the actuall code
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#clear-instance'>
+        - (void) <strong>clear</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      another one of those functions where documentation yould require more time than reading the actuall code
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#join_list-instance'>
+        - (void) <strong>join_list</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      prints a list of all joins to console
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#dotty-instance'>
+        - (void) <strong>dotty</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      prints a dot file from graph :D to console
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#partners-instance'>
+        - (array) <strong>partners</strong>(naub, pre = null)
+      </a>
+    </span>
+    <span class='desc'>
+      returns a list of naubs connected to the parameter returns list of joined naubs expect a certain predecessor
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#cycle_test-instance'>
+        - (void) <strong>cycle_test</strong>(first)
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
+    <span class='desc'>
+      searches for cycles in the graph and returns a list of all naubs within a cycle this is the smartest in the entire programm
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#dfs-instance'>
+        - (void) <strong>dfs</strong>(naub, pre = null, first = null)
+      </a>
+    </span>
+    <span class='desc'>
+      recursive part of cycle_test
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#cycle_list-instance'>
+        - (array) <strong>cycle_list</strong>(v, w, first = null)
+      </a>
+    </span>
+    <span class='desc'>
+      returns all naubs that are part of a cycle in order of connection to the active naub
+    </span>
+  </li>
+</ul>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-instance'>
+      - (void) <strong>constructor</strong>()
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='update_naub_list-instance'>
+      - (void) <strong>update_naub_list</strong>()
+    </p>
+    <div class='docstring'>
+  <p>updating naub list from joins since joins are more up to date
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='add_join-instance'>
+      - (void) <strong>add_join</strong>(a, b)
+    </p>
+    <div class='docstring'>
+  <div class='note todo'>
+    <strong>TODO:</strong>
+    simplify update_naub_list
+  </div>
+  <p>adds the join between naub a and naub b
+
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>a</span>
+      <span class='type'>
+        (<tt>Naub</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>first and ...</span>
+    </li>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (<tt>Naub</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>... second naub that connected</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='remove_join-instance'>
+      - (void) <strong>remove_join</strong>(id)
+    </p>
+    <div class='docstring'>
+  <p>one of those functions where documentation yould require more time than reading the actuall code
+
+
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>naub</span>
+      <span class='type'>
+        (<tt>id</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>naub to be removed</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='clear-instance'>
+      - (void) <strong>clear</strong>()
+    </p>
+    <div class='docstring'>
+  <p>another one of those functions where documentation yould require more time than reading the actuall code
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='join_list-instance'>
+      - (void) <strong>join_list</strong>()
+    </p>
+    <div class='docstring'>
+  <p>prints a list of all joins to console
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='dotty-instance'>
+      - (void) <strong>dotty</strong>()
+    </p>
+    <div class='docstring'>
+  <p>prints a dot file from graph :D to console
+</p>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='partners-instance'>
+      - (array) <strong>partners</strong>(naub, pre = null)
+    </p>
+    <div class='docstring'>
+  <p>returns a list of naubs connected to the parameter
+
+
+</p>
+<p>returns list of joined naubs expect a certain predecessor
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>naub</span>
+      <span class='type'>
+        (<tt>id</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>naub in question</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>array</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>list of naubs connected to the parameter</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='cycle_test-instance'>
+      - (void) <strong>cycle_test</strong>(first)
+      (bound)
+    </p>
+    <div class='docstring'>
+  <p>searches for cycles in the graph and returns a list of all naubs within a cycle
+
+</p>
+<p>this is the smartest in the entire programm
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>first</span>
+      <span class='type'>
+        (<tt>id</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>in order to remember which naub if the first in the cycle</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='dfs-instance'>
+      - (void) <strong>dfs</strong>(naub, pre = null, first = null)
+    </p>
+    <div class='docstring'>
+  <p>recursive part of cycle_test
+
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>naub</span>
+      <span class='type'>
+        (<tt>id</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>naub in question</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='cycle_list-instance'>
+      - (array) <strong>cycle_list</strong>(v, w, first = null)
+    </p>
+    <div class='docstring'>
+  <p>returns all naubs that are part of a cycle in order of connection to the active naub
+
+</p>
+
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>array</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>list of naubs</span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  Generated on
+  Sun Apr 01 2012 22:51:26 GMT+0200 (CEST)
+  by
+  <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>codo</a>
+  v0.5.0
+  (Node.js v0.6.12).
+  &#10034;
+  <a href='http://twitter.com/#!/netzpirat'>@netzpirat</a>
+  &#10034;
+  <a href='https://mksoft.ch'>mksoft.ch</a>
+</div>
+  </body>
+</html>
