@@ -1,71 +1,52 @@
-class Naubino.Naub
-  constructor: (@layer, @color_id = null, @size = 14) ->
-    @physics = new Naubino.PhysicsModel this
-
-    # previous constructor of shape
-    @pos = @physics.pos
-    @frame = @size*2.5
-    @style = { fill: [0,0,0,1] }
-    @join_style = { fill: [0,0,0,1], width: 6 }
-    @life_rendering = false # if true redraw on each frame
-    # previous constructor of shape
-
-    @content = null
-    unless @color_id?
-      @color_id = @random_palette_color()
-    else
-      @set_color_id @color_id
-
-    @physics.attracted_to = @layer.center.Copy() # gravity center
-
-    @removed = false # soon to be deleted by game
-    @focused = false # currently activated by pointer
-    @disabled = false # cannot join with another
-
-    @joins = {} # {id: opposing naub}
-    @drawing_join = {} # {id: true/false if this naub draws the join}
-    @pre_render()
-    @isClickable = yes
 
 
 
+Naubino.Naub_Square= {
 
+  setup: (naub) ->
+    naub.rot = 0
+    #@loop = setInternval (), 400
+    @life_rendering = true # if true redraw on each frame
 
+  rotation: =>
 
-  # either renders live or draws pre_rendered image
-  draw: (ctx) ->
-    if Naubino.Settings.pre_rendering and not @life_rendering
-      ctx.save()
-      x = @pos.x-@frame
-      y = @pos.y-@frame
-      #@draw_frame(ctx)
-      ctx.drawImage(@buffer, x, y)
-      ctx.restore()
-    else
-      @render ctx, @pos.x, @pos.y
+  # actual painting routines
+  render: (ctx, x = 42, y = x, pointer=[]) ->
+    ctx.save()
+    pos = @pos
+    size= @size
+    width= @size * 2
 
-  # draws a frame around the buffered image for analysis
-  draw_frame: (ctx) ->
-    x = @pos.x-@frame/2
-    y = @pos.y-@frame/2
-
+    @rot = @rot + 0.1
+    ctx.translate( x, y)
+    ctx.rotate @rot
+      
     ctx.beginPath()
-    ctx.moveTo x, y
-    ctx.lineTo x, @frame+y
-    ctx.lineTo @frame+x, @frame+y
-    ctx.lineTo @frame+x, y
-    ctx.lineTo x, y
-    ctx.stroke()
-    #ctx.fillStyle = "beige"
-    #ctx.fill()
+    ctx.rect(-width/2,-width/2,width,width)
+
+    ctx.fillStyle = @color_to_rgba(@style.fill)
+    ctx.fill()
     ctx.closePath()
+
+
+    if @content?
+      @content.call(this, ctx, 0)
+
+    ctx.restore()
+
+  isHit:(x,y) ->
+    width = @size * 2
+    @layer.ctx.beginPath()
+    @layer.ctx.rect(@pos.x-width/2,@pos.y-width/2,width,width)
+    @layer.ctx.closePath()
+    @layer.ctx.isPointInPath(x,y)
     
-  # Renders the shape into a buffer
-  pre_render: (ctx) ->
-    @buffer = document.createElement('canvas')
-    @buffer.width = @buffer.height = @frame*2
-    b_ctx = @buffer.getContext('2d')
-    @render b_ctx, @frame, @frame
+}
+
+Naubino.Naub_Ball = {
+
+  setup: (naub) ->
+
 
   # actual painting routines
   render: (ctx, x = 42, y = x) ->
@@ -100,17 +81,99 @@ class Naubino.Naub
     #ctx.shadowOffsetY = 1
 
     ctx.fill()
-
     ctx.closePath()
 
     if @content?
       @content.call(this, ctx, offset)
 
     ctx.restore()
+}
+
+class Naubino.Naub
+  constructor: (@layer, @color_id = null, @size = 14) ->
+    @physics = new Naubino.PhysicsModel this
+
+    # previous constructor of shape
+    @pos = @physics.pos
+    @frame = @size*2.5
+    @style = { fill: [0,0,0,1] }
+    @join_style = { fill: [0,0,0,1], width: 6 }
+    @life_rendering = false # if true redraw on each frame
+    # previous constructor of shape
+
+    @content = null
+    unless @color_id?
+      @color_id = @random_palette_color()
+    else
+      @set_color_id @color_id
+
+    @physics.attracted_to = @layer.center.Copy() # gravity center
+
+    @removed = false # soon to be deleted by game
+    @focused = false # currently activated by pointer
+    @disabled = false # cannot join with another
+
+    @joins = {} # {id: opposing naub}
+    @drawing_join = {} # {id: true/false if this naub draws the join}
+    @update()
+    @isClickable = yes
 
 
 
-  ## actual painting routines
+  implement:  (mixin) ->
+    for name, method of mixin
+      @[name] = method
+    if mixin.setup?
+      mixin.setup this
+
+
+
+
+  # either renders live or draws updateed image
+  #
+  # @param ctx [canvas.context] context of the target layer
+  # set @life_rendering to true if you want to have an animated naub
+  draw: (ctx) ->
+    if Naubino.Settings.updateing and not @life_rendering
+      ctx.save()
+      x = @pos.x-@frame
+      y = @pos.y-@frame
+      #@draw_frame(ctx)
+      ctx.drawImage(@buffer, x, y)
+      ctx.restore()
+    else
+      @render ctx, @pos.x, @pos.y
+
+  # draws a frame around the buffered image for analysis
+  # @param ctx [canvas.context] context of the target layer
+  draw_frame: (ctx) ->
+    x = @pos.x-@frame/2
+    y = @pos.y-@frame/2
+
+    ctx.beginPath()
+    ctx.moveTo x, y
+    ctx.lineTo x, @frame+y
+    ctx.lineTo @frame+x, @frame+y
+    ctx.lineTo @frame+x, y
+    ctx.lineTo x, y
+    ctx.stroke()
+    #ctx.fillStyle = "beige"
+    #ctx.fill()
+    ctx.closePath()
+    
+  # Renders the shape into a buffer
+  # @param ctx [canvas.context] context of the target layer
+  update: (ctx) ->
+    @buffer = document.createElement('canvas')
+    @buffer.width = @buffer.height = @frame*2
+    b_ctx = @buffer.getContext('2d')
+    @render b_ctx, @frame, @frame
+
+  render: (ctx, x = 42, y = x) ->
+
+  # actual painting routines
+  # @param ctx [canvas.context] context of the target layer
+  # @param partner [naub] target naub
   draw_join: (ctx, partner) ->
     pos = @physics.pos
     pos2 = partner.physics.pos
@@ -174,21 +237,25 @@ class Naubino.Naub
 
 
 
+  # makes a naub clickable and joinable again
+  disable: ->
+    @disabled = true
+    @update()
+
   # makes a naub unclickable and joinable
   enable: ->
     @disabled = false
-    @pre_render()
+    @update()
 
-  disable: ->
-    @disabled = true
-    @pre_render()
-
+  # change fill to gray
   grey_out: ->
     @style.fill = [100,100,100,1]
 
+  # sets color from @color_id
   recolor: ->
     @style.fill = Naubino.colors[@color_id]
 
+  # removes the reference to this naub from all its partners
   remove: =>
     @removed = true
     for id, naub of @joins
@@ -207,6 +274,7 @@ class Naubino.Naub
 
 
   # animates the destruction of a naub
+  # @params callback [function] function that will be called after the animation has ended
   destroy_animation: (callback) ->
     @life_rendering = true
     shrink = =>
@@ -258,12 +326,14 @@ class Naubino.Naub
     return joined
 
 
+  # @return [array] list of all neighboring naub_ids
   joined_naubs: ->
     list = []
     for id, naub of @joins
       list.push naub.number
     @joins
 
+  # @return [array] list of all neighboring naubs
   partners: -> x for x in @joins
 
 
@@ -271,6 +341,7 @@ class Naubino.Naub
 
 
 
+  # @params other (naub) other naub
   distance_to: (other) ->
     unless other.number == @number
       { pos, vel, force } = @physics
@@ -292,14 +363,14 @@ class Naubino.Naub
   # user interaction
   focus: ->
     @focused = true
-    @pre_render()
-    @physics.friction = 10
+    @update()
+    #@physics.friction = 10
     Naubino.naub_focused.dispatch(@)
 
   unfocus: ->
     @focused = false
-    @pre_render()
-    @physics.friction = @physics.default_friction
+    @update()
+    #@physics.friction = @physics.default_friction
     Naubino.naub_unfocused.dispatch(@)
 
   isHit: (x, y) ->
@@ -324,7 +395,8 @@ class Naubino.Naub
   set_color_id:(id)->
     palette = Naubino.colors
     pick = palette[id]
-    @style.fill = [pick[0],pick[1],pick[2], 1]# TODO automatically assume 1 if alpha is unset (pick[3])
+    @style.fill = [pick[0],pick[1],pick[2], 1]
+    # TODO automatically assume 1 if alpha is unset (pick[3])
     id
 
 

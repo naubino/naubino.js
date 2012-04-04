@@ -19,6 +19,8 @@ class Naubino.Game extends Naubino.Layer
     Naubino.mousedown.add @click
     Naubino.mouseup.add @unfocus
 
+    
+
     StateMachine.create {
       target: this
       #error:(event,from,to,args,ec,em) -> console.warn "#{event}(#{args}): #{from}->#{to} - #{ec}:\"#{em}\"" unless event is 'click'
@@ -72,10 +74,10 @@ class Naubino.Game extends Naubino.Layer
   # @param x [int] x-ordinate
   # @param y [int] y-ordinate
   create_naub: (x = @center.x, y = @center.y) ->
-      naub_a = new Naubino.Naub this
-      @add_object naub_a
-      naub_a.pre_render() # again just to get the numbers
-      naub_a.physics.pos.Set x, y
+    naub_a = new Naubino.Naub this
+    @add_object naub_a
+    naub_a.update() # again just to get the numbers
+    naub_a.physics.pos.Set x, y
 
 
   # create a pair of joined naubs
@@ -85,26 +87,28 @@ class Naubino.Game extends Naubino.Layer
   # @param color [int] color id of naub 1
   # @param color [int] color id of naub 2
   create_naub_pair: (x, y, color_a = null, color_b = null) ->
-      naub_a = new Naubino.Naub this, color_a
-      naub_b = new Naubino.Naub this, color_b
-      color_a = naub_a.color_id
-      color_b = naub_b.color_id
+    naub_a = new Naubino.Naub this, color_a
+    naub_b = new Naubino.Naub this, color_b
+    naub_a.implement Naubino.Naub_Ball
+    naub_b.implement Naubino.Naub_Square
+    color_a = naub_a.color_id
+    color_b = naub_b.color_id
 
-      @add_object naub_a
-      @add_object naub_b
-      naub_a.pre_render() # again just to get the numbers
-      naub_b.pre_render() # again just to get the numbers
+    @add_object naub_a
+    @add_object naub_b
+    naub_a.update() # again just to get the numbers
+    naub_b.update() # again just to get the numbers
 
-      dir = Math.random() * Math.PI
+    dir = Math.random() * Math.PI
 
-      naub_a.physics.pos.Set x, y
-      naub_b.physics.pos.Set x, y
+    naub_a.physics.pos.Set x, y
+    naub_b.physics.pos.Set x, y
 
-      naub_a.physics.pos.AddPolar(dir, 15)
-      naub_b.physics.pos.AddPolar(dir, -15)
+    naub_a.physics.pos.AddPolar(dir, 15)
+    naub_b.physics.pos.AddPolar(dir, -15)
 
-      naub_a.join_with naub_b
-      [color_a, color_b]
+    naub_a.join_with naub_b
+    [color_a, color_b]
 
 
   # create a triple of joined naubs
@@ -120,9 +124,9 @@ class Naubino.Game extends Naubino.Layer
       @add_object naub_a
       @add_object naub_b
       @add_object naub_c
-      naub_a.pre_render() # again just to get the numbers
-      naub_b.pre_render() # again just to get the numbers
-      naub_c.pre_render() # again just to get the numbers
+      naub_a.update() # again just to get the numbers
+      naub_b.update() # again just to get the numbers
+      naub_c.update() # again just to get the numbers
 
       dir = Math.random() * Math.PI
 
@@ -143,7 +147,7 @@ class Naubino.Game extends Naubino.Layer
     else @show_numbers = not @show_numbers
     for id, naub of @objects
       naub.content = if @show_numbers then naub.draw_number else null
-      naub.pre_render()
+      naub.update()
 
 
 

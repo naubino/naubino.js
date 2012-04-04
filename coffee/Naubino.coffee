@@ -49,15 +49,15 @@ window.onload = ->
     @game_standart = new @StandartGame(@game_canvas, @graph)
     @game_testcase = new @TestCase(@game_canvas, @graph)
     @game_tutorial = new @Tutorial(@game_canvas, @graph)
-    @game          = @game_standart
-    #@game          = @game_testcase
+    #@game          = @game_standart
+    @game          = @game_testcase
     @menu          = new @Menu(@menu_canvas)
     @overlay       = new @Overlay(@overlay_canvas)
 
     @menu.init()
     @menu.animation.play()
     @game.init()
-    #@play() # testcase
+    @play() # testcase
 
 
 
