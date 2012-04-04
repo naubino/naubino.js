@@ -12,7 +12,7 @@ class Naubino.Menu extends Naubino.Layer
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
-    Naubino.naub_destroyed.add -> Naubino.menu.objects.main.pre_render()
+    Naubino.naub_destroyed.add -> Naubino.menu.objects.main.update()
     Naubino.menu_button.active = false
    
     @position = new b2Vec2(20,25)
@@ -112,7 +112,7 @@ class Naubino.Menu extends Naubino.Layer
     @objects.main.size = @cube_size
     @objects.main.render = @draw_main_button
     @objects.main.life_rendering = yes
-    @objects.main.pre_render()
+    @objects.main.update()
     @objects.main.isClickable = no
 
     for name, attr of @buttons
@@ -121,7 +121,7 @@ class Naubino.Menu extends Naubino.Layer
       @objects[name].physics.attracted_to.Set attr.position.x, attr.position.y
       @objects[name].content = attr.content
       #@objects[name].set_color_id 2
-      @objects[name].pre_render()
+      @objects[name].update()
       @objects[name].focus = attr.function
       @objects[name].disable() if attr.disabled
       @objects[name].isClickable = no
