@@ -87,10 +87,13 @@ class Naubino.Game extends Naubino.Layer
   # @param color [int] color id of naub 1
   # @param color [int] color id of naub 2
   create_naub_pair: (x, y, color_a = null, color_b = null) ->
+
     naub_a = new Naubino.Naub this, color_a
     naub_b = new Naubino.Naub this, color_b
-    naub_a.implement Naubino.Naub_Ball
-    naub_b.implement Naubino.Naub_Square
+
+    naub_a.add_shape(new Naubino.Shapes.Ball)
+    naub_b.add_shape(new Naubino.Shapes.Ball)
+
     color_a = naub_a.color_id
     color_b = naub_b.color_id
 
@@ -205,7 +208,7 @@ class Naubino.Game extends Naubino.Layer
 
     naub_partners = (partner.number for id, partner of naub.joins)
     other_partners = (partner.number for id, partner of other.joins)
-    close_related = naub_partners.some (x) -> x in other_partners
+    close_related = naub_partners.some (x) -> x in other_partners # "some" is standard js and means "filter"
 
     joined = naub.is_joined_with other
     alone = Object.keys(naub.joins).length == 0

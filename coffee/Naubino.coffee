@@ -51,11 +51,11 @@ window.onload = ->
     @game_tutorial = new @Tutorial(@game_canvas, @graph)
     #@game          = @game_standart
     @game          = @game_testcase
-    @menu          = new @Menu(@menu_canvas)
+    #@menu          = new @Menu(@menu_canvas)
     @overlay       = new @Overlay(@overlay_canvas)
 
-    @menu.init()
-    @menu.animation.play()
+    #@menu.init()
+    #@menu.animation.play()
     @game.init()
     @play() # testcase
 
@@ -82,7 +82,7 @@ window.onload = ->
 
   onchangestate: (e,f,t)-> console.info "Naubino changed states #{e}: #{f} -> #{t}"
   onbeforeplay: (event, from, to) -> @game.play()
-  onenterplaying: -> @menu.play()
+  #onenterplaying: -> @menu.play()
 
   toggle: ->
     switch @current
