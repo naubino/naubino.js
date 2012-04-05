@@ -1,7 +1,7 @@
 # all colors (except color_output) found at colorlovers.com
 Naubino.Settings = {
 
-  pre_rendering:  on
+  updating:  off
   gravity:
     menu:         on
     game:         on

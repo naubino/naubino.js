@@ -1,0 +1,72 @@
+info it worked if it ends with ok
+verbose cli [ 'node', '/usr/bin/npm', 'install', '-g', 'codo' ]
+info using npm@1.1.12
+info using node@v0.6.14
+verbose config file /root/.npmrc
+verbose config file /usr/etc/npmrc
+verbose config file /usr/lib/node_modules/npm/npmrc
+silly exec /usr/bin/node "/usr/lib/node_modules/npm/bin/npm-get-uid-gid.js" "nobody" 100
+silly spawning [ '/usr/bin/node',
+silly spawning   [ '/usr/lib/node_modules/npm/bin/npm-get-uid-gid.js',
+silly spawning     'nobody',
+silly spawning     100 ],
+silly spawning   null ]
+silly output from getuid/gid {"uid":99,"gid":100}
+silly output from getuid/gid 
+verbose cache add [ 'codo', null ]
+silly cache add: name, spec, args [ undefined, 'codo', [ 'codo', null ] ]
+verbose parsed url { pathname: 'codo', path: 'codo', href: 'codo' }
+verbose addNamed [ 'codo', '' ]
+verbose addNamed [ null, '' ]
+silly name, range, hasData [ 'codo', '', false ]
+verbose raw, before any munging codo
+verbose url resolving [ 'https://registry.npmjs.org/', './codo' ]
+verbose url resolved https://registry.npmjs.org/codo
+verbose etag "6KC7YM0Q5UJULUI9BQ548LZMO"
+http GET https://registry.npmjs.org/codo
+silly get cb [ 304, undefined ]
+verbose etag codo from cache
+silly name, range, hasData 2 [ 'codo', '', true ]
+silly versions [ 'codo',
+silly versions   [ '0.1.0',
+silly versions     '0.2.0',
+silly versions     '0.2.1',
+silly versions     '0.3.0',
+silly versions     '0.4.0',
+silly versions     '0.4.1',
+silly versions     '0.4.2',
+silly versions     '0.5.0' ] ]
+verbose bin dist [ '0.6-ares1.7.5-DEV-evundefined-openssl1.0.1-v83.6.6.24-linux-x64-3.2.9-1-ARCH',
+verbose bin dist   { shasum: '4fc07192ee75c0a6ba6271eb4789067b703bab3f',
+verbose bin dist     tarball: 'http://registry.npmjs.org/codo/-/codo-0.5.0.tgz' } ]
+verbose addRemoteTarball [ 'https://registry.npmjs.org/codo/-/codo-0.5.0.tgz',
+verbose addRemoteTarball   '4fc07192ee75c0a6ba6271eb4789067b703bab3f' ]
+verbose mkdir (expected) error ENOENT, stat '/tmp/npm-1333466046258'
+verbose mkdir (expected) error ENOENT, stat '/tmp/npm-1333466046258/1333466046258-0.8318967346567661'
+verbose mkdir done: /tmp/npm-1333466046258/1333466046258-0.8318967346567661 755
+verbose fetch to /tmp/npm-1333466046258/1333466046258-0.8318967346567661/tmp.tgz
+http GET https://registry.npmjs.org/codo/-/codo-0.5.0.tgz
+ERR! failed to fetch https://registry.npmjs.org/codo/-/codo-0.5.0.tgz
+ERR! Error: SSL Error: CERT_UNTRUSTED
+ERR!     at ClientRequest.<anonymous> (/usr/lib/node_modules/npm/node_modules/request/main.js:483:26)
+ERR!     at ClientRequest.emit (events.js:67:17)
+ERR!     at HTTPParser.onIncoming (http.js:1261:11)
+ERR!     at HTTPParser.onHeadersComplete (http.js:102:31)
+ERR!     at CleartextStream.ondata (http.js:1150:24)
+ERR!     at CleartextStream._push (tls.js:375:27)
+ERR!     at SecurePair.cycle (tls.js:734:20)
+ERR!     at EncryptedStream.write (tls.js:130:13)
+ERR!     at Socket.ondata (stream.js:38:26)
+ERR!     at Socket.emit (events.js:67:17)
+ERR! You may report this log at:
+ERR!     <http://github.com/isaacs/npm/issues>
+ERR! or email it to:
+ERR!     <npm-@googlegroups.com>
+ERR! 
+ERR! System Linux 3.2.9-1-ARCH
+ERR! command "node" "/usr/bin/npm" "install" "-g" "codo"
+ERR! cwd /home/hendrik/code/naubino.js
+ERR! node -v v0.6.14
+ERR! npm -v 1.1.12
+ERR! message SSL Error: CERT_UNTRUSTED
+verbose exit [ 1, true ]
