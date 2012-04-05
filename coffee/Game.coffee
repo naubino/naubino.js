@@ -91,14 +91,18 @@ class Naubino.Game extends Naubino.Layer
     naub_a = new Naubino.Naub this, color_a
     naub_b = new Naubino.Naub this, color_b
 
-    naub_a.add_shape(new Naubino.Shapes.Ball)
-    naub_b.add_shape(new Naubino.Shapes.Ball)
+    naub_a.add_shape new Naubino.Shapes.Ball
+    naub_b.add_shape new Naubino.Shapes.Square
+    naub_b.add_shape new Naubino.Shapes.Clock
 
     color_a = naub_a.color_id
     color_b = naub_b.color_id
 
     @add_object naub_a
     @add_object naub_b
+
+    naub_a.add_shape new Naubino.Shapes.Number
+
     naub_a.update() # again just to get the numbers
     naub_b.update() # again just to get the numbers
 

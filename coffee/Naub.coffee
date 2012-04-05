@@ -5,6 +5,7 @@ class Naubino.Shape
 
   setup: (@naub) ->
     @pos = @naub.pos
+    @size= @naub.size
     @ctx = @naub.ctx
     @set_color_from_id @naub.color_id
 
@@ -35,34 +36,31 @@ class Naubino.Shape
     return -1
 
 class Naubino.Shapes.Square extends Naubino.Shape
-
+  constructor: ->
+    super()
+    @rot = 0
   area: ->
     @width^2
 
 
   # actual painting routines
-  render: () ->
-    @ctx.save()
-    pos = @pos
+  render: (ctx,x,y) ->
+    ctx.save()
     size= @size
     width= @size * 2
 
     @rot = @rot + 0.1
-    @ctx.translate( x, y)
-    @ctx.rotate @rot
-      
-    @ctx.beginPath()
-    @ctx.rect(-width/2,-width/2,width,width)
+    ctx.translate( x, y)
+    ctx.rotate @rot
+     
+    ctx.beginPath()
+    ctx.rect(-width/2,-width/2,width,width)
 
-    @ctx.fillStyle = @color_to_rgba(@style.fill)
-    @ctx.fill()
-    @ctx.closePath()
+    ctx.fillStyle = @color_to_rgba(@style.fill)
+    ctx.fill()
+    ctx.closePath()
 
-
-    if @content?
-      @content.call(this, ctx, 0)
-
-    @ctx.restore()
+    ctx.restore()
 
   isHit:(x,y) ->
     width = @size * 2
@@ -77,17 +75,17 @@ class Naubino.Shapes.Ball extends Naubino.Shape
     Math.PI * size * size
 
   # actual painting routines
+  # !IMPORTANT: needs to recieve ctx, x and y directly because those could also point into a buffer
   render: (ctx, x = 42, y = x) ->
-    @ctx.save()
-    pos = @pos
+    ctx.save()
     size= @size
 
     offset = 0
-    @ctx.translate( x, y)
-      
-    @ctx.beginPath()
-    @ctx.arc(offset, offset, size, 0, Math.PI * 2, false)
-    @ctx.closePath()
+    ctx.translate( x, y)
+     
+    ctx.beginPath()
+    ctx.arc(offset, offset, size, 0, Math.PI * 2, false)
+    ctx.closePath()
 
     ## border
     #ctx.lineWidth = 2
@@ -100,21 +98,49 @@ class Naubino.Shapes.Ball extends Naubino.Shape
       gradient.addColorStop 1, @color_to_rgba(@style.fill, 50)
       ctx.fillStyle = gradient
     else
-      @ctx.fillStyle = @color_to_rgba(@style.fill)
+      ctx.fillStyle = @color_to_rgba(@style.fill)
 
     # shadow
-    #ctx.shadowColor = "#333"
-    #ctx.shadowBlur = 3
-    #ctx.shadowOffsetX = 1
-    #ctx.shadowOffsetY = 1
+    ctx.shadowColor = "#333"
+    ctx.shadowBlur = 3
+    ctx.shadowOffsetX = 1
+    ctx.shadowOffsetY = 1
 
-    @ctx.fill()
-    @ctx.closePath()
+    ctx.fill()
+    ctx.closePath()
 
-    if @content?
-      @content.call(this, ctx, offset)
+    ctx.restore()
 
-    @ctx.restore()
+class Naubino.Shapes.Clock extends Naubino.Shape
+  constructor: ->
+    super()
+    @rot = 0
+  area: ->
+    # TODO consolder the margin of each naub
+    Math.PI * size * size
+
+  # actual painting routines
+  # !IMPORTANT: needs to recieve ctx, x and y directly because those could also point into a buffer
+  render: (ctx, x = 42, y = x) ->
+    ctx.save()
+    size= @size
+    @rot = (@rot + 0.1)
+    opening = Math.sin(@rot) * Math.PI % Math.PI + Math.PI
+
+    offset = 0
+    ctx.translate( x, y)
+     
+    ctx.beginPath()
+    ctx.arc(offset, offset, size, 0, opening, false)
+    #ctx.closePath()
+
+
+    ctx.lineWidth = 4
+    ctx.stroke()
+
+    ctx.closePath()
+
+    ctx.restore()
 
 class Naubino.Shapes.Frame extends Naubino.Shape
   # draws a frame around the buffered image for analysis
@@ -133,16 +159,27 @@ class Naubino.Shapes.Frame extends Naubino.Shape
     #ctx.fillStyle = "beige"
     #ctx.fill()
     ctx.closePath()
+
 class Naubino.Shapes.String extends Naubino.Shape
-  render: (ctx, string, color = 'white') ->
-    ctx.fillStyle = color
+  constructor: (@string) ->
+    super()
+
+  render: (ctx, x,y) ->
+    ctx.save()
+    ctx.translate x,y
+    ctx.fillStyle = "white"
     ctx.textAlign = 'center'
     ctx.font= "#{@size+4}px Helvetica"
-    ctx.fillText(string, 0, 6)
+    ctx.fillText(@string, 0, 6)
+    ctx.restore()
 
-class Naubino.Shapes.Number extends Naubino.Shape
-  render: (ctx, offset = 0) ->
-    @draw_string ctx, this.number
+class Naubino.Shapes.Number extends Naubino.Shapes.String
+  constructor: ()->
+    super("")
+
+  setup: (@naub)->
+    super(@naub)
+    @string = @naub.number
 
 
 # a Naub is everything in the game that you can move around
@@ -155,6 +192,7 @@ class Naubino.Naub
   constructor: (@layer, @color_id = null, @size = 14) ->
     @physics = new Naubino.PhysicsModel this
     @pos = @physics.pos
+    @ctx = @layer.ctx
     @frame = @size*2.5
     @join_style = { fill: [0,0,0,1], width: 6 }
     @life_rendering = false # if true redraw on each frame
@@ -183,15 +221,15 @@ class Naubino.Naub
   # @param ctx [canvas.context] context of the target layer
   # set @life_rendering to true if you want to have an animated naub
   draw: () ->
-    if Naubino.Settings.updateing and not @life_rendering
+    unless Naubino.Settings.updating or @life_rendering
       @ctx.save()
       x = @pos.x-@frame
       y = @pos.y-@frame
       #@draw_frame(ctx)
       @ctx.drawImage(@buffer, x, y)
       @ctx.restore()
-    else
-      @render()
+    else # render life
+      @render(@ctx, @pos.x,@pos.y)
 
     
   # Renders the shape into a buffer
@@ -203,9 +241,9 @@ class Naubino.Naub
     @render b_ctx, @frame, @frame
 
   # executes the render method of all shapes
-  render: () ->
+  render: (ctx,x,y) ->
     for shape in @shapes
-      shape.render()
+      shape.render(ctx,x,y)
 
   # adds a shape and runs its setup
   add_shape: (shape)->
