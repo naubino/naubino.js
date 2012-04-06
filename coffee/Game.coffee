@@ -93,7 +93,7 @@ class Naubino.Game extends Naubino.Layer
 
     naub_a.add_shape new Naubino.Shapes.Ball
     naub_b.add_shape new Naubino.Shapes.Square
-    naub_b.add_shape new Naubino.Shapes.Clock
+    naub_a.add_shape new Naubino.Shapes.Clock
 
     color_a = naub_a.color_id
     color_b = naub_b.color_id
@@ -102,6 +102,7 @@ class Naubino.Game extends Naubino.Layer
     @add_object naub_b
 
     naub_a.add_shape new Naubino.Shapes.Number
+    naub_b.add_shape new Naubino.Shapes.Number
 
     naub_a.update() # again just to get the numbers
     naub_b.update() # again just to get the numbers
@@ -146,15 +147,6 @@ class Naubino.Game extends Naubino.Layer
 
       naub_a.join_with naub_b
       naub_b.join_with naub_c
-
-  # makes every naub show its own id
-  toggle_numbers: () ->
-    unless @show_numbers?
-      @show_numbers = true
-    else @show_numbers = not @show_numbers
-    for id, naub of @objects
-      naub.content = if @show_numbers then naub.draw_number else null
-      naub.update()
 
 
 

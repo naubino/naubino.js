@@ -67,7 +67,6 @@ class Naubino.TestCase extends Naubino.Game
     Naubino.Settings.show_numbers = on
     #@create_some_naubs 2
     @create_matching_naubs()
-    @toggle_numbers()
     @gravity = on
 
   onplaying: ->
