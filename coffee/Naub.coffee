@@ -114,28 +114,31 @@ class Naubino.Shapes.Ball extends Naubino.Shape
 class Naubino.Shapes.Clock extends Naubino.Shape
   constructor: ->
     super()
-    @rot = 0
-  area: ->
-    # TODO consolder the margin of each naub
-    Math.PI * size * size
+    @start = 0
+  setup: (@naub) ->
+    super(@naub)
+    @naub.clock_progress = 0
 
   # actual painting routines
   # !IMPORTANT: needs to recieve ctx, x and y directly because those could also point into a buffer
   render: (ctx, x = 42, y = x) ->
     ctx.save()
-    size= @size
-    @rot = (@rot + 0.1)
-    opening = Math.sin(@rot) * Math.PI % Math.PI + Math.PI
+    size= @size - 5
+
+    end = @naub.clock_progress * Math.PI/100
 
     offset = 0
     ctx.translate( x, y)
      
     ctx.beginPath()
-    ctx.arc(offset, offset, size, 0, opening, false)
+    ctx.arc(offset, offset, size, @start, end, false)
     #ctx.closePath()
 
+    ctx.fillStyle = @color_to_rgba ([255,255,255,0.5])
+    #ctx.fill()
 
-    ctx.lineWidth = 4
+    ctx.strokeStyle = ctx.fillStyle
+    ctx.lineWidth = size+3
     ctx.stroke()
 
     ctx.closePath()
