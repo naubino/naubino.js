@@ -6,7 +6,6 @@ class Naubino.Background extends Naubino.Layer
 
     @fps = 1000 / 5
     @drawing = true
-    @basket_size = 170
     @default_thickness = @basket_thickness = 4
     @ttl = 12
     @color = [0,0,0,0.5]
@@ -17,6 +16,7 @@ class Naubino.Background extends Naubino.Layer
     height = @canvas.height
     centerX = width/2
     centerY = height/2
+    @basket_size = Naubino.game.basket_size or 10
 
     @ctx.clearRect(0, 0, width, height)
 

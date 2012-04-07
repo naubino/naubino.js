@@ -5,7 +5,6 @@ class Naubino.Shape
 
   setup: (@naub) ->
     @pos = @naub.pos
-    @size= @naub.size
     @ctx = @naub.ctx
     @set_color_from_id @naub.color_id
 
@@ -40,21 +39,26 @@ class Naubino.Shapes.Square extends Naubino.Shape
     super()
     @rot = 0
   area: ->
-    @width^2
+    @width/2 * @width/2
 
 
   # actual painting routines
   render: (ctx,x,y) ->
     ctx.save()
-    size= @size
-    width= @size * 2
+    @width= @naub.size * 2
 
     @rot = @rot + 0.1
     ctx.translate( x, y)
     ctx.rotate @rot
      
     ctx.beginPath()
-    ctx.rect(-width/2,-width/2,width,width)
+    ctx.rect(-@width/2,-@width/2,@width,@width)
+
+    # shadow
+    ctx.shadowColor = "#333"
+    ctx.shadowBlur = 3
+    ctx.shadowOffsetX = 1
+    ctx.shadowOffsetY = 1
 
     ctx.fillStyle = @color_to_rgba(@style.fill)
     ctx.fill()
@@ -63,22 +67,21 @@ class Naubino.Shapes.Square extends Naubino.Shape
     ctx.restore()
 
   isHit:(x,y) ->
-    width = @size * 2
     @layer.ctx.beginPath()
-    @layer.ctx.rect(@pos.x-width/2,@pos.y-width/2,width,width)
+    @layer.ctx.rect(@pos.x-@width/2,@pos.y-@width/2,@width,@width)
     @layer.ctx.closePath()
     @layer.ctx.isPointInPath(x,y)
 
 class Naubino.Shapes.Ball extends Naubino.Shape
   area: ->
     # TODO consolder the margin of each naub
-    Math.PI * size * size
+    Math.PI * (@naub.size/2)*(@naub.size/2)
 
   # actual painting routines
   # !IMPORTANT: needs to recieve ctx, x and y directly because those could also point into a buffer
   render: (ctx, x = 42, y = x) ->
     ctx.save()
-    size= @size
+    size= @naub.size
 
     offset = 0
     ctx.translate( x, y)
@@ -123,7 +126,7 @@ class Naubino.Shapes.Clock extends Naubino.Shape
   # !IMPORTANT: needs to recieve ctx, x and y directly because those could also point into a buffer
   render: (ctx, x = 42, y = x) ->
     ctx.save()
-    size= @size - 5
+    size= @naub.size - 5
 
     end = @naub.clock_progress * Math.PI/100
 
@@ -148,10 +151,17 @@ class Naubino.Shapes.Clock extends Naubino.Shape
 class Naubino.Shapes.Frame extends Naubino.Shape
   # draws a frame around the buffered image for analysis
   # @param ctx [canvas.context] context of the target layer
-  render: (ctx) ->
-    x = @pos.x-@frame/2
-    y = @pos.y-@frame/2
+  constructor: (@margin = 5) ->
+    super()
+  setup: (@naub) ->
+    super(@naub)
+    @frame = @margin + @naub.size*2
 
+  render: (ctx, x = 42, y = x) ->
+    x = x-@frame/2
+    y = y-@frame/2
+
+    ctx.save()
     ctx.beginPath()
     ctx.moveTo x, y
     ctx.lineTo x, @frame+y
@@ -159,20 +169,31 @@ class Naubino.Shapes.Frame extends Naubino.Shape
     ctx.lineTo @frame+x, y
     ctx.lineTo x, y
     ctx.stroke()
-    #ctx.fillStyle = "beige"
-    #ctx.fill()
     ctx.closePath()
+    ctx.restore()
+
+class Naubino.Shapes.FrameCircle extends Naubino.Shapes.Frame
+  render: (ctx, x = 42, y = x) ->
+    ctx.save()
+    ctx.beginPath()
+    ctx.arc(x, y, @frame/2, 0, Math.PI * 2, false)
+    ctx.closePath()
+    ctx.strokeStyle = ctx.fillStyle
+    ctx.stroke()
+    ctx.closePath()
+    ctx.restore()
+
 
 class Naubino.Shapes.String extends Naubino.Shape
-  constructor: (@string) ->
+  constructor: (@string, @color = "black") ->
     super()
 
   render: (ctx, x,y) ->
     ctx.save()
     ctx.translate x,y
-    ctx.fillStyle = "white"
+    ctx.fillStyle = @color
     ctx.textAlign = 'center'
-    ctx.font= "#{@size+4}px Helvetica"
+    ctx.font= "#{@naub.size+4}px Helvetica"
     ctx.fillText(@string, 0, 6)
     ctx.restore()
 
@@ -196,7 +217,7 @@ class Naubino.Naub
     @physics = new Naubino.PhysicsModel this
     @pos = @physics.pos
     @ctx = @layer.ctx
-    @frame = @size*2.5
+    @frame = @size*1.5
     @join_style = { fill: [0,0,0,1], width: 6 }
     @life_rendering = false # if true redraw on each frame
     # previous constructor of shape
@@ -219,7 +240,7 @@ class Naubino.Naub
 
 
 
-  # either renders live or draws updateed image
+  # Either renders shapes or draws buffer 
   #
   # @param ctx [canvas.context] context of the target layer
   # set @life_rendering to true if you want to have an animated naub
@@ -239,11 +260,11 @@ class Naubino.Naub
   # @param ctx [canvas.context] context of the target layer
   update: () ->
     @buffer = document.createElement('canvas')
-    @buffer.width = @buffer.height = @frame*2
+    @buffer.width = @buffer.height = @frame *2
     b_ctx = @buffer.getContext('2d')
     @render b_ctx, @frame, @frame
 
-  # executes the render method of all shapes
+  # Executes the render method of all shapes
   render: (ctx,x,y) ->
     for shape in @shapes
       shape.render(ctx,x,y)
@@ -253,8 +274,33 @@ class Naubino.Naub
     shape.setup this
     @shapes.push shape
 
+  # Returns the area value of the first shape that implements it,
+  area: ->
+    kd = @physics.keep_distance
+    Math.ceil kd*kd*Math.PI
 
-  # actual painting routines
+  # Returns the area value of the first shape that implements it,
+  # assuming the bottom shape is the biggest shape.
+  # This is not exact science.
+  real_area: ->
+    for shape in @shapes
+      if shape.area
+        return shape.area()
+    return 0
+
+
+
+  # runs draw_join on all partners, if this naub is the one drawing the join
+  # Otherwise the partner will draw the join.
+  draw_joins: (context) =>
+    # drawing joins
+    for id, partner of @joins
+      if @drawing_join[id]
+        @draw_join context, partner
+    return
+
+
+  # Renders join between this naub and the partner
   # @param ctx [canvas.context] context of the target layer
   # @param partner [naub] target naub
   draw_join: (ctx, partner) ->
@@ -286,14 +332,6 @@ class Naubino.Naub
       console.log [pos.x, pos.y]
       Naubino.menu_pause.dispatch()
 
-
-
-  draw_joins: (context) =>
-    # drawing joins
-    for id, partner of @joins
-      if @drawing_join[id]
-        @draw_join context, partner
-    return
 
 
   ## organisation

@@ -50,12 +50,9 @@ class Naubino.StandartGame extends Naubino.Game
       {x,y} = @random_outside()
       @create_naub_pair(x,y)
       basket = @count_basket()
-      #console.log basket if basket.length > 0
+      console.log basket if basket.length > 0
       console.log "new naubs! (#{@objects_count})"
     @inner_clock = (@inner_clock + 1) % 10
-
-
-
 
 
 
@@ -93,3 +90,10 @@ class Naubino.TestCase extends Naubino.Game
     inner_basket = @count_basket()
     @destroy_naubs inner_basket
 
+  filling_level: ->
+    bs = @basket_size
+    console.info bs * bs * Math.PI
+    @filling =0
+    for naub in @count_basket()
+      @filling += naub.area()
+    console.warn @filling
