@@ -87,13 +87,11 @@ class Naubino.Game extends Naubino.Layer
   # @param color [int] color id of naub 1
   # @param color [int] color id of naub 2
   create_naub_pair: (x, y, color_a = null, color_b = null) ->
-
     naub_a = new Naubino.Naub this, color_a
     naub_b = new Naubino.Naub this, color_b
 
-    naub_a.add_shape new Naubino.Shapes.Ball
-    naub_b.add_shape new Naubino.Shapes.Square
-    naub_a.add_shape new Naubino.Shapes.Clock
+    naub_a.add_shape new Naubino.Shapes.FrameCircle(naub_a.physics.keep_distance)
+    naub_b.add_shape new Naubino.Shapes.FrameCircle(naub_b.physics.keep_distance)
 
     color_a = naub_a.color_id
     color_b = naub_b.color_id
@@ -179,7 +177,7 @@ class Naubino.Game extends Naubino.Layer
         diff = @center.Copy()
         diff.Subtract naub.physics.pos
         if diff.Length() < @basket_size - naub.size/2
-          count.push naub.number
+          count.push naub
     count
 
 
