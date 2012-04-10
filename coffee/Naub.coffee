@@ -199,7 +199,7 @@ class Naubino.Shapes.String extends Naubino.Shape
 
 class Naubino.Shapes.Number extends Naubino.Shapes.String
   constructor: ()->
-    super("")
+    super("", "white")
 
   setup: (@naub)->
     super(@naub)
@@ -276,8 +276,8 @@ class Naubino.Naub
 
   # Returns the area value of the first shape that implements it,
   area: ->
-    kd = @physics.keep_distance
-    Math.ceil kd*kd*Math.PI
+    sz = @size
+    sz*sz*Math.PI
 
   # Returns the area value of the first shape that implements it,
   # assuming the bottom shape is the biggest shape.

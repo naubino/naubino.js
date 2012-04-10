@@ -68,7 +68,8 @@ class Naubino.TestCase extends Naubino.Game
 
   onplaying: ->
     weightless = => @gravity = off
-    setTimeout(weightless, 4000)
+    #setTimeout(weightless, 4000)
+    Naubino.Settings.updating = off
 
     basket = 150
     @animation.play()
@@ -91,8 +92,8 @@ class Naubino.TestCase extends Naubino.Game
     @destroy_naubs inner_basket
 
   filling_level: ->
-    bs = @basket_size
-    console.info bs * bs * Math.PI
+    bs = @basket_size/2
+    console.info Math.ceil bs * bs * Math.PI
     @filling =0
     for naub in @count_basket()
       @filling += naub.area()
