@@ -1,5 +1,5 @@
 # controlls everything that has to do with logic and gameplay or menus
-class Naubino.Game extends Naubino.Layer
+define ["Layer", "Settings", "Naub"], (Layer,Settings,Naub) -> class Game extends Layer
 
   # get this started
   constructor: (canvas, @graph) ->
@@ -11,10 +11,11 @@ class Naubino.Game extends Naubino.Layer
     @paused = true # changed imidiately after loading by start_timer
     @drawing = true # for debugging
     @focused_naub = null # points to the naub you click on
-    @gravity = Naubino.Settings.gravity.game
+    @gravity = Settings.gravity.game
 
     @points = -1
     @joining_allowed = yes
+    console.log "mousemove"
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
     Naubino.mouseup.add @unfocus
@@ -22,7 +23,7 @@ class Naubino.Game extends Naubino.Layer
     StateMachine.create {
       target: this
       #error:(event,from,to,args,ec,em) -> console.warn "#{event}(#{args}): #{from}->#{to} - #{ec}:\"#{em}\"" unless event is 'click'
-      events: Naubino.Settings.events
+      events: Settings.events
     }
 
 
@@ -72,7 +73,7 @@ class Naubino.Game extends Naubino.Layer
   # @param x [int] x-ordinate
   # @param y [int] y-ordinate
   create_naub: (x = @center.x, y = @center.y) ->
-      naub_a = new Naubino.Naub this
+      naub_a = new Naub this
       @add_object naub_a
       naub_a.pre_render() # again just to get the numbers
       naub_a.physics.pos.Set x, y
@@ -85,8 +86,8 @@ class Naubino.Game extends Naubino.Layer
   # @param color [int] color id of naub 1
   # @param color [int] color id of naub 2
   create_naub_pair: (x, y, color_a = null, color_b = null) ->
-      naub_a = new Naubino.Naub this, color_a
-      naub_b = new Naubino.Naub this, color_b
+      naub_a = new Naub this, color_a
+      naub_b = new Naub this, color_b
       color_a = naub_a.color_id
       color_b = naub_b.color_id
 
@@ -113,9 +114,9 @@ class Naubino.Game extends Naubino.Layer
   # @param x [int] x-ordinate
   # @param y [int] y-ordinate
   create_naub_triple: (x, y) ->
-      naub_a = new Naubino.Naub this
-      naub_b = new Naubino.Naub this
-      naub_c = new Naubino.Naub this
+      naub_a = new Naub this
+      naub_b = new Naub this
+      naub_c = new Naub this
 
       @add_object naub_a
       @add_object naub_b

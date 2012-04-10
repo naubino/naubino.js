@@ -1,4 +1,4 @@
-class Naubino.Overlay extends Naubino.Layer
+define ["Layer", "Settings"], (Layer, Settings) -> class Overlay extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "overlay"
@@ -102,8 +102,8 @@ class Naubino.Overlay extends Naubino.Layer
 
   message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     buffer = document.createElement('canvas')
-    buffer.width = Naubino.Settings.canvas.width
-    buffer.height = Naubino.Settings.canvas.height
+    buffer.width = Settings.canvas.width
+    buffer.height = Settings.canvas.height
     buffer.alpha = 1
 
     ctx = buffer.getContext('2d')
