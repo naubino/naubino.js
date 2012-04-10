@@ -90,8 +90,10 @@ class Naubino.Game extends Naubino.Layer
     naub_a = new Naubino.Naub this, color_a
     naub_b = new Naubino.Naub this, color_b
 
-    naub_a.add_shape new Naubino.Shapes.FrameCircle(naub_a.physics.keep_distance)
-    naub_b.add_shape new Naubino.Shapes.FrameCircle(naub_b.physics.keep_distance)
+    naub_a.add_shape new Naubino.Shapes.FrameCircle(naub_a.size/2)
+    naub_a.add_shape new Naubino.Shapes.Ball
+    naub_b.add_shape new Naubino.Shapes.FrameCircle(naub_b.size/2)
+    naub_b.add_shape new Naubino.Shapes.Ball
 
     color_a = naub_a.color_id
     color_b = naub_b.color_id
