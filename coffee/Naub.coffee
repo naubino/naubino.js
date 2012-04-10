@@ -1,6 +1,6 @@
-class Naubino.Naub
+define ["Settings", "PhysicsModel"], (Settings, PhysicsModel) -> class Naub
   constructor: (@layer, @color_id = null, @size = 14) ->
-    @physics = new Naubino.PhysicsModel this
+    @physics = new PhysicsModel this
 
     # previous constructor of shape
     @pos = @physics.pos
@@ -34,7 +34,7 @@ class Naubino.Naub
 
   # either renders live or draws pre_rendered image
   draw: (ctx) ->
-    if Naubino.Settings.pre_rendering and not @life_rendering
+    if Settings.pre_rendering and not @life_rendering
       ctx.save()
       x = @pos.x-@frame
       y = @pos.y-@frame
