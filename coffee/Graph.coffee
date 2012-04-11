@@ -1,4 +1,4 @@
-class Naubino.Graph
+define -> class Graph
   constructor: () ->
     @join_id_sequence = 0 # sequential join id
     @naubs = []

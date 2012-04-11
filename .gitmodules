@@ -4,3 +4,6 @@
 [submodule "lib/state-machine"]
 	path = lib/state-machine
 	url = https://github.com/jakesgordon/javascript-state-machine
+[submodule "lib/requirejs"]
+	path = lib/requirejs
+	url = https://github.com/jrburke/requirejs

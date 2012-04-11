@@ -8,20 +8,22 @@
 ########################################################
 
 # TODO questionable approach
-window.onload = ->
-  Naubino.constructor()
+# window.onload = ->
+#   Naubino.constructor()
 
-@Naubino = {
-  VERSION : 'UNSTABLE MASTER BRANCH'
+
+define "Background Game Graph Keybindings Menu Overlay StandardGame TestCase Settings Tutorial".split(" "), (Background, Game, Graph, KeyBindings, Menu, Overlay, StandardGame, TestCase, Settings, Tutorial) -> console.log "Über das define"; class Naubino
   constructor: () ->
+    console.log "Naubino Constructor"
 
-    @graph = new @Graph()
-    @colors = @Settings.colors.output
+    @graph = new Graph()
+    @colors = Settings.colors.output
     @create_fsm()
     @Signal = window.signals.Signal
     @add_signals()
     @add_listeners()
 
+  setup: ->
     @init_dom()
     @init_layers()
 
@@ -39,20 +41,20 @@ window.onload = ->
     @background_canvas = document.querySelector("#background_canvas")
 
     for canvas in  @gamediv.querySelectorAll("canvas")
-      canvas.width = @Settings.canvas.width
-      canvas.height = @Settings.canvas.height
+      canvas.width = Settings.canvas.width
+      canvas.height = Settings.canvas.height
 
   init_layers: ->
-    @gamediv.max-width     = @Settings.canvas.width
+    @gamediv.max-width     = Settings.canvas.width
 
-    @background    = new @Background(@background_canvas)
-    @game_standart = new @StandartGame(@game_canvas, @graph)
-    @game_testcase = new @TestCase(@game_canvas, @graph)
-    @game_tutorial = new @Tutorial(@game_canvas, @graph)
+    @background    = new Background(@background_canvas)
+    @game_standart = new StandardGame(@game_canvas, @graph)
+    @game_testcase = new TestCase(@game_canvas, @graph)
+    @game_tutorial = new Tutorial(@game_canvas, @graph)
     #@game          = @game_standart
     @game          = @game_testcase
-    #@menu          = new @Menu(@menu_canvas)
-    @overlay       = new @Overlay(@overlay_canvas)
+    #@menu          = new Menu(@menu_canvas)
+    @overlay       = new Overlay(@overlay_canvas)
 
     #@menu.init()
     #@menu.animation.play()
@@ -68,7 +70,7 @@ window.onload = ->
     StateMachine.create {
       target: this
       initial: {state : 'stopped' , event: 'init'}
-      events: @Settings.events
+      events: Settings.events
     }
 
   list_states: ->
@@ -148,7 +150,7 @@ window.onload = ->
 
 
   setup_keybindings: () ->
-    @keybindings = new @KeyBindings()
+    @keybindings = new KeyBindings()
     window.onkeydown = (key) => @keybindings.keydown(key)
     window.onkeyup = (key) => @keybindings.keyup(key)
     @keybindings.enable 32, => @toggle()
@@ -172,4 +174,3 @@ window.onload = ->
     @overlay_canvas.addEventListener("touchstart" , onmousedown , false)
     @overlay_canvas.addEventListener("touchend"   , onmouseup   , false)
     @overlay_canvas.addEventListener("touchmove"  , onmousemove , false)
-}
