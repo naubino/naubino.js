@@ -4,15 +4,15 @@
 # @param layer [Layer] the layer on which to draw
 # @param color_id [int] representing the color from color palett, also neccessary for joining
 # @param size [int] size, what else
-define ["Shapes"], ({Ball, Square, Frame, FrameCircle, Clock, NumberShape, StringShape}) -> class Naubino.Naub
+define ["Settings", "PhysicsModel","Shapes"], (Settings, PhysicsModel) -> class Naub
   constructor: (@layer, @color_id = null, @size = 14) ->
-    @physics = new Naubino.PhysicsModel this
+    @physics = new PhysicsModel this
+
     @pos = @physics.pos
     @ctx = @layer.ctx
     @frame = @size*1.5
     @join_style = { fill: [0,0,0,1], width: 6 }
     @life_rendering = false # if true redraw on each frame
-    # previous constructor of shape
 
     # unless a color_id has been give pick a randome color
     @color_id = @random_palette_color() unless @color_id?
@@ -36,9 +36,10 @@ define ["Shapes"], ({Ball, Square, Frame, FrameCircle, Clock, NumberShape, Strin
   #
   # @param ctx [canvas.context] context of the target layer
   # set @life_rendering to true if you want to have an animated naub
-  draw: () ->
-    unless Naubino.Settings.updating or @life_rendering
-      @ctx.save()
+  # either renders live or draws pre_rendered image
+  draw: (ctx) ->
+    if Settings.pre_rendering and not @life_rendering
+      ctx.save()
       x = @pos.x-@frame
       y = @pos.y-@frame
       #@draw_frame(ctx)

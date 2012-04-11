@@ -1,4 +1,4 @@
-define Shapes -> {
+define -> Shapes = {
 Shape: class Shape
   constructor: ->
     @style = { fill: [0,0,0,1] }

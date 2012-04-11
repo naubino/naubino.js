@@ -1,4 +1,4 @@
-class Naubino.Layer
+define ["Settings" ], (Settings) -> class Layer
 
   constructor: (@canvas) ->
     @width = @canvas.width
@@ -11,7 +11,7 @@ class Naubino.Layer
 
 
     # fragile calibration! don't fuck it up!
-    @fps = 1000 / Naubino.Settings.fps
+    @fps = 1000 / Settings.fps
     @dt = @fps/1500
 
     @show()
@@ -21,7 +21,7 @@ class Naubino.Layer
     StateMachine.create {
       target: @animation
       initial: 'stopped'
-      events: Naubino.Settings.layer_events
+      events: Settings.layer_events
       callbacks:{
         ###
         states (overwrite these)

@@ -5,12 +5,13 @@ define ["Game", "Settings"], (Game, Settings) -> class TestCase extends Game
     Settings.show_numbers = on
     #@create_some_naubs 2
     @create_matching_naubs()
+
     @gravity = on
 
   onplaying: ->
     weightless = => @gravity = off
     #setTimeout(weightless, 4000)
-    Naubino.Settings.updating = off
+    Settings.updating = off
 
     basket = 150
     @animation.play()
@@ -23,7 +24,7 @@ define ["Game", "Settings"], (Game, Settings) -> class TestCase extends Game
 
   onunset:->
     console.log("standart_game clear")
-    Naubino.Settings.show_numbers = false
+    Settings.show_numbers = false
     @clear()
     Naubino.background.clear()
 

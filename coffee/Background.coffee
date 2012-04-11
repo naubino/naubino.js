@@ -1,4 +1,4 @@
-class Naubino.Background extends Naubino.Layer
+define ["Layer"], (Layer) -> class Background extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "background"

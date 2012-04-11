@@ -1,5 +1,5 @@
-# TODO clean up menu code
-class Naubino.Menu extends Naubino.Layer
+# TODO clean up menu code -- will do in naub_rethought
+define ["Menu", "Layer", "Naub", "Settings"], (Menu, Layer, Naub, Settings) -> class Menu extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "menu"
@@ -7,7 +7,7 @@ class Naubino.Menu extends Naubino.Layer
 
     @objects = {}
     @hovering = false
-    @gravity = Naubino.Settings.gravity.menu
+    @gravity = Settings.gravity.menu
 
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer
@@ -20,7 +20,7 @@ class Naubino.Menu extends Naubino.Layer
     
     StateMachine.create {
       target:this
-      events: Naubino.Settings.events
+      events: Settings.events
     }
 
     ### definition of each button
@@ -106,7 +106,7 @@ class Naubino.Menu extends Naubino.Layer
 
 
   add_buttons: ->
-    @objects.main = new Naubino.Naub(this, null, @cube_size)
+    @objects.main = new Naub(this, null, @cube_size)
     @objects.main.physics.pos.Set(@position.x, @position.y)
     @objects.main.physics.attracted_to = @position.Copy()
     @objects.main.size = @cube_size
@@ -116,7 +116,7 @@ class Naubino.Menu extends Naubino.Layer
     @objects.main.isClickable = no
 
     for name, attr of @buttons
-      @objects[name] = new Naubino.Naub(this)
+      @objects[name] = new Naub(this)
       @objects[name].physics.pos.Set attr.position.x, attr.position.y
       @objects[name].physics.attracted_to.Set attr.position.x, attr.position.y
       @objects[name].content = attr.content

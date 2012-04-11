@@ -55,5 +55,3 @@ define ["Game", "Settings"], (Game, Settings) -> class StandardGame extends Game
     @inner_clock = (@inner_clock + 1) % 10
 
 
-
-
