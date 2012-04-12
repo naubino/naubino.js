@@ -12,7 +12,7 @@
 #   Naubino.constructor()
 
 
-define "Background Game Graph Keybindings Menu Overlay StandardGame TestCase Settings Tutorial".split(" "), (Background, Game, Graph, KeyBindings, Menu, Overlay, StandardGame, TestCase, Settings, Tutorial) -> console.log "Über das define"; class Naubino
+define ["Background", "Game", "Graph", "Keybindings", "Menu", "Overlay", "StandardGame", "TestCase", "Settings", "Tutorial"], (Background, Game, Graph, KeyBindings, Menu, Overlay, StandardGame, TestCase, Settings, Tutorial) -> class Naubino
   constructor: () ->
     console.log "Naubino Constructor"
 
