@@ -1,4 +1,4 @@
-define ["Game", "Settings"], (Game, Settings) -> class StandardGame extends Game
+define ["Game"], (Game) -> class StandardGame extends Game
   constructor: (canvas, graph) ->
     super(canvas, graph)
 

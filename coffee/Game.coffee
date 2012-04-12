@@ -1,5 +1,5 @@
 # controlls everything that has to do with logic and gameplay or menus
-define ["Layer", "Settings", "Naub","Shapes"], (Layer,Settings,Naub,{Ball, Square, Frame, FrameCircle, Clock, NumberShape, StringShape}) -> class Game extends Layer
+define ["Layer", "Naub","Shapes"], (Layer,Naub,{Ball, Square, Frame, FrameCircle, Clock, NumberShape, StringShape}) -> class Game extends Layer
 
   # get this started
   constructor: (canvas, @graph) ->
@@ -11,7 +11,7 @@ define ["Layer", "Settings", "Naub","Shapes"], (Layer,Settings,Naub,{Ball, Squar
     @paused = true # changed imidiately after loading by start_timer
     @drawing = true # for debugging
     @focused_naub = null # points to the naub you click on
-    @gravity = Settings.gravity.game
+    @gravity = Naubino.settings.gravity.game
 
     @points = -1
     @joining_allowed = yes
@@ -25,7 +25,7 @@ define ["Layer", "Settings", "Naub","Shapes"], (Layer,Settings,Naub,{Ball, Squar
     StateMachine.create {
       target: this
       #error:(event,from,to,args,ec,em) -> console.warn "#{event}(#{args}): #{from}->#{to} - #{ec}:\"#{em}\"" unless event is 'click'
-      events: Settings.events
+      events: Naubino.settings.events
     }
 
 
