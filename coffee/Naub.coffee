@@ -4,7 +4,7 @@
 # @param layer [Layer] the layer on which to draw
 # @param color_id [int] representing the color from color palett, also neccessary for joining
 # @param size [int] size, what else
-define ["Settings", "PhysicsModel","Shapes"], (Settings, PhysicsModel) -> class Naub
+define ["PhysicsModel"], (PhysicsModel) -> class Naub
   constructor: (@layer, @color_id = null, @size = 14) ->
     @physics = new PhysicsModel this
 
@@ -38,7 +38,7 @@ define ["Settings", "PhysicsModel","Shapes"], (Settings, PhysicsModel) -> class 
   # set @life_rendering to true if you want to have an animated naub
   # either renders live or draws pre_rendered image
   draw: (ctx) ->
-    if Settings.pre_rendering and not @life_rendering
+    if Naubino.settings.updating and not @life_rendering
       ctx.save()
       x = @pos.x-@frame
       y = @pos.y-@frame

@@ -17,7 +17,8 @@ define "Background Game Graph Keybindings Menu Overlay StandardGame TestCase Set
     console.log "Naubino Constructor"
 
     @graph = new Graph()
-    @colors = Settings.colors.output
+    @settings = Settings
+    @colors = @settings.colors.output
     @create_fsm()
     @Signal = window.signals.Signal
     @add_signals()
@@ -29,6 +30,7 @@ define "Background Game Graph Keybindings Menu Overlay StandardGame TestCase Set
 
     @setup_keybindings()
     @setup_cursorbindings()
+    console.timeEnd("loading")
 
     
   print: -> @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
@@ -41,11 +43,11 @@ define "Background Game Graph Keybindings Menu Overlay StandardGame TestCase Set
     @background_canvas = document.querySelector("#background_canvas")
 
     for canvas in  @gamediv.querySelectorAll("canvas")
-      canvas.width = Settings.canvas.width
-      canvas.height = Settings.canvas.height
+      canvas.width = @settings.canvas.width
+      canvas.height = @settings.canvas.height
 
   init_layers: ->
-    @gamediv.max-width     = Settings.canvas.width
+    @gamediv.max-width     = @settings.canvas.width
 
     @background    = new Background(@background_canvas)
     @game_standart = new StandardGame(@game_canvas, @graph)
@@ -70,7 +72,7 @@ define "Background Game Graph Keybindings Menu Overlay StandardGame TestCase Set
     StateMachine.create {
       target: this
       initial: {state : 'stopped' , event: 'init'}
-      events: Settings.events
+      events: @settings.events
     }
 
   list_states: ->

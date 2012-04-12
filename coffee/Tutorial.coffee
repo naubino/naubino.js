@@ -1,4 +1,4 @@
-define ["Game", "Settings"], (Game, Settings) -> class Tutorial extends Game
+define ["Game"], (Game) -> class Tutorial extends Game
   @name = "Tutorial"
 
   ###
@@ -55,8 +55,8 @@ define ["Game", "Settings"], (Game, Settings) -> class Tutorial extends Game
               null,
               12,
               'black',
-              Settings.canvas.width/2,
-              Settings.canvas.height-10)
+              Naubino.settings.canvas.width/2,
+              Naubino.settings.canvas.height-10)
           ,3000
 
         # fade out and then change state

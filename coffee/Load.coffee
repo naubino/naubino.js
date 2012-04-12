@@ -1,3 +1,4 @@
+console.time("loading")
 define ["Naubino"], (Naubino) ->
   console.log Naubino
   window.onload = ->

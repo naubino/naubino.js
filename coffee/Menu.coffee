@@ -1,5 +1,5 @@
 # TODO clean up menu code -- will do in naub_rethought
-define ["Menu", "Layer", "Naub", "Settings"], (Menu, Layer, Naub, Settings) -> class Menu extends Layer
+define ["Menu", "Layer", "Naub"], (Menu, Layer, Naub) -> class Menu extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "menu"
@@ -7,7 +7,7 @@ define ["Menu", "Layer", "Naub", "Settings"], (Menu, Layer, Naub, Settings) -> c
 
     @objects = {}
     @hovering = false
-    @gravity = Settings.gravity.menu
+    @gravity = Naubino.settings.gravity.menu
 
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer
@@ -20,7 +20,7 @@ define ["Menu", "Layer", "Naub", "Settings"], (Menu, Layer, Naub, Settings) -> c
     
     StateMachine.create {
       target:this
-      events: Settings.events
+      events: Naubino.settings.events
     }
 
     ### definition of each button
