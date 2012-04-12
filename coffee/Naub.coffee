@@ -38,7 +38,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   # set @life_rendering to true if you want to have an animated naub
   # either renders live or draws pre_rendered image
   draw: (ctx) ->
-    if Naubino.settings.updating and not @life_rendering
+    unless Naubino.settings.updating or @life_rendering
       ctx.save()
       x = @pos.x-@frame
       y = @pos.y-@frame
