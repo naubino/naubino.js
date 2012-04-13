@@ -17,6 +17,13 @@ Shape: class Shape
     a = color[3]
     "rgba(#{r},#{g},#{b},#{a})"
 
+  draw_shadow: (ctx) ->
+    if Naubino.settings.graphics.draw_shadows
+      ctx.shadowColor = "#333"
+      ctx.shadowBlur = 3
+      ctx.shadowOffsetX = 1
+      ctx.shadowOffsetY = 1
+
   # change color
   set_color_from_id:(id)->
     palette = Naubino.colors
@@ -54,11 +61,7 @@ Square: class Square extends Shape
     ctx.beginPath()
     ctx.rect(-@width/2,-@width/2,@width,@width)
 
-    # shadow
-    ctx.shadowColor = "#333"
-    ctx.shadowBlur = 3
-    ctx.shadowOffsetX = 1
-    ctx.shadowOffsetY = 1
+    @draw_shadow(ctx)
 
     ctx.fillStyle = @color_to_rgba(@style.fill)
     ctx.fill()
@@ -103,11 +106,7 @@ Ball: class Ball extends Shape
     else
       ctx.fillStyle = @color_to_rgba(@style.fill)
 
-    # shadow
-    ctx.shadowColor = "#333"
-    ctx.shadowBlur = 3
-    ctx.shadowOffsetX = 1
-    ctx.shadowOffsetY = 1
+    @draw_shadow(ctx)
 
     ctx.fill()
     ctx.closePath()
@@ -183,17 +182,71 @@ FrameCircle: class FrameCircle extends Frame
     ctx.closePath()
     ctx.restore()
 
+PlayButton: class PlayButton extends Shape
+  render: (ctx, x,y) ->
+    ctx.save()
+    ctx.beginPath()
+    ctx.fillStyle = "#ffffff"
+    ctx.moveTo(x-5,y-5)
+    ctx.lineTo(x-5,y+5)
+    ctx.lineTo(x+7,y+0)
+    ctx.lineTo(x-5,y-5)
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+PauseButton: class PauseButton extends Shape
+  render: (ctx, x,y) ->
+    ctx.save()
+    ctx.fillStyle = "#ffffff"
+    ctx.beginPath()
+    ctx.rect(x-5,y-6,4,12)
+    ctx.rect(x+1,y-6,4,12)
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+
+MainButton: class MainButton extends Square
+  render: (ctx, x, y) ->
+    text = Naubino.game.points ? ""
+    @width = @naub.size*2.5
+    ctx.save()
+    ctx.translate(x,y)
+    ctx.rotate(Math.PI/6)
+    ctx.beginPath()
+    ctx.rect(-@width/2,-@width/2,@width,@width)
+
+    @draw_shadow(ctx)
+
+    ctx.fillStyle = @color_to_rgba @style.fill
+    ctx.fill()
+    ctx.closePath()
+    ctx.restore()
+
+    ctx.save()
+    ctx.translate(x,y)
+    ctx.fillStyle = 'white'
+    ctx.textAlign = 'center'
+    ctx.font= 'bold 33px Helvetica'
+    ctx.fillText(text, 0,10, @width*1.1)
+    ctx.restore()
 
 StringShape: class StringShape extends Shape
-  constructor: (@string, @color = "black") ->
+  constructor: (@string, @color = "black", @font_size) ->
     super()
+
+  setup: (@naub) ->
+    super(@naub)
+    unless @font_size?
+      console.log @naub.size
+      @font_size = @naub.size+4
+    
 
   render: (ctx, x,y) ->
     ctx.save()
     ctx.translate x,y
     ctx.fillStyle = @color
     ctx.textAlign = 'center'
-    ctx.font= "#{@naub.size+4}px Helvetica"
+    ctx.font= "#{@font_size}px Helvetica"
     ctx.fillText(@string, 0, 6)
     ctx.restore()
 

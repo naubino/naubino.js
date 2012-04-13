@@ -1,5 +1,5 @@
 # TODO clean up menu code -- will do in naub_rethought
-define ["Menu", "Layer", "Naub"], (Menu, Layer, Naub) -> class Menu extends Layer
+define ["Menu", "Layer", "Naub","Shapes"], (Menu, Layer, Naub,{ Ball, StringShape, PlayButton, PauseButton, MainButton }) -> class Menu extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "menu"
@@ -21,6 +21,7 @@ define ["Menu", "Layer", "Naub"], (Menu, Layer, Naub) -> class Menu extends Laye
     StateMachine.create {
       target:this
       events: Naubino.settings.events
+      error: (e, from, to, args, code, msg) -> console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
     }
 
     ### definition of each button
@@ -32,63 +33,62 @@ define ["Menu", "Layer", "Naub"], (Menu, Layer, Naub) -> class Menu extends Laye
     @dt = @fps/100
 
 
-  buttons:
-    play:
-      function: ->
-        console.time("init_play")
-        Naubino.play()
-      position: new b2Vec2(65,35)
-      content: (ctx) ->
-        ctx.save()
-        ctx.beginPath()
-        ctx.fillStyle = "#ffffff"
-        ctx.moveTo(-5,-5)
-        ctx.lineTo(-5, 5)
-        ctx.lineTo( 7, 0)
-        ctx.lineTo(-5,-5)
-        ctx.closePath()
-        ctx.fill()
-        ctx.restore()
-    pause:
-      function: -> Naubino.pause()
-      position: new b2Vec2(65,35)
-      disabled: true
-      content: (ctx) ->
-        ctx.save()
-        ctx.fillStyle = "#ffffff"
-        ctx.beginPath()
-        ctx.rect(-5,-6,4,12)
-        ctx.rect( 1,-6,4,12)
-        ctx.closePath()
-        ctx.fill()
-        ctx.restore()
-    help:
-      function: -> Naubino.help()
-      content: (ctx) -> this.draw_string(ctx, '?')
-      position: new b2Vec2(45,65)
-    exit:
-      function: -> Naubino.stop()
-      content: (ctx) -> this.draw_string(ctx, 'X')
-      position: new b2Vec2(14,80)
-
   # changing the state a little
 
   oninit: ->
     @add_buttons()
 
+  buttons:
+    main:
+      position:  new b2Vec2(20,25)
+      shapes: [new MainButton]
+    play:
+      function: -> Naubino.play()
+      position: new b2Vec2(65,35)
+      shapes: [new Ball, new PlayButton]
+    help:
+      function: ->
+      position: new b2Vec2(45,65)
+      shapes: [new Ball, new StringShape "?", "white"]
+    exit:
+      function: ->
+      position: new b2Vec2(14,80)
+      shapes: [new Ball, new StringShape "X", "white"]
+
+  add_buttons: ->
+    for name, button of @buttons
+      @objects[name] = new Naub(this)
+      for shape in button.shapes
+        @objects[name].add_shape shape
+      @objects[name].update()
+      @objects[name].focus = button.function
+      @objects[name].disabled = button.disabled
+      @objects[name].isClickable = no
+      @objects[name].physics.pos.Set button.position.x, button.position.y
+      @objects[name].physics.attracted_to.Set button.position.x, button.position.y
+      Naubino.graph.remove_join @objects[name].join_with( @objects.main, name ) # add the object without managing the join
+
+    @objects.main.life_rendering = on
+
+
   onenterplaying: ->
-    @objects.play.disable()
-    @objects.pause.enable()
+    @objects.play.focus = -> Naubino.pause()
+    @objects.play.shapes.pop()
+    @objects.play.add_shape new PauseButton
+    @objects.play.update()
+
 
   onenterpaused: ->
-    @objects.play.enable()
-    @objects.pause.disable()
+    @objects.play.focus = -> Naubino.play()
+    @objects.play.shapes.pop()
+    @objects.play.add_shape new PlayButton
+    @objects.play.update()
+
 
   mainloop: ()=>
     @draw()
     @draw_listener_region()
     @step()
-
 
   step: ->
     for name, naub of @objects
@@ -101,43 +101,8 @@ define ["Menu", "Layer", "Naub"], (Menu, Layer, Naub) -> class Menu extends Laye
 
   ## can I touch this?
 
-  move_pointer: (x,y) ->
-    [@pointer.x, @pointer.y] = [x,y]
+  move_pointer: (x,y) -> [@pointer.x, @pointer.y] = [x,y]
 
-
-  add_buttons: ->
-    @objects.main = new Naub(this, null, @cube_size)
-    @objects.main.physics.pos.Set(@position.x, @position.y)
-    @objects.main.physics.attracted_to = @position.Copy()
-    @objects.main.size = @cube_size
-    @objects.main.render = @draw_main_button
-    @objects.main.life_rendering = yes
-    @objects.main.update()
-    @objects.main.isClickable = no
-
-    for name, attr of @buttons
-      @objects[name] = new Naub(this)
-      @objects[name].physics.pos.Set attr.position.x, attr.position.y
-      @objects[name].physics.attracted_to.Set attr.position.x, attr.position.y
-      @objects[name].content = attr.content
-      #@objects[name].set_color_id 2
-      @objects[name].update()
-      @objects[name].focus = attr.function
-      @objects[name].disable() if attr.disabled
-      @objects[name].isClickable = no
-      @objects[name].isClickable = no
-      join = @objects[name].join_with( @objects.main, name )
-      Naubino.graph.remove_join join
-
-  switch_to_playing: ->
-    console.log 'switching menu to playing mode'
-    @objects.play.disable()
-    @objects.pause.enable()
-
-  switch_to_paused: ->
-    console.log 'switching menu to paused mode'
-    @objects.play.enable()
-    @objects.pause.disable()
 
 
   draw: ->
@@ -150,27 +115,6 @@ define ["Menu", "Layer", "Naub"], (Menu, Layer, Naub) -> class Menu extends Laye
     @objects.main.draw_joins()
     @draw_listener_region()
     @ctx.restore()
-
-
-  draw_main_button: (ctx, x, y) ->
-
-    ctx.save()
-    ctx.translate(x,y)
-    ctx.rotate(Math.PI/6)
-    ctx.beginPath()
-    ctx.rect( -@size/2, -@size/2, @size, @size)
-    ctx.fillStyle = @color_to_rgba @style.fill
-    ctx.fill()
-    ctx.closePath()
-    ctx.restore()
-
-    ctx.save()
-    ctx.translate(x,y)
-    ctx.fillStyle = 'white'
-    ctx.textAlign = 'center'
-    ctx.font= 'bold 33px Helvetica'
-    ctx.fillText(Naubino.game.points, 0,10, @size)
-    ctx.restore()
 
   draw_listener_region: ->
     @ctx.save()
@@ -185,7 +129,7 @@ define ["Menu", "Layer", "Naub"], (Menu, Layer, Naub) -> class Menu extends Laye
       Naubino.menu_blur.dispatch()
       @for_each (b) -> b.isClickable = no
       @listener_size = @default_listener_size
-    #@ctx.stroke()
+    #@ctx.stroke() # like to see it
     @ctx.closePath()
     @ctx.restore()
 

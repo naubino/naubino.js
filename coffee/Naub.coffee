@@ -5,7 +5,7 @@
 # @param color_id [int] representing the color from color palett, also neccessary for joining
 # @param size [int] size, what else
 define ["PhysicsModel"], (PhysicsModel) -> class Naub
-  constructor: (@layer, @color_id = null, @size = 14) ->
+  constructor: (@layer, @color_id = null, @size = Naubino.settings.graphics.naub_size) ->
     @physics = new PhysicsModel this
 
     @pos = @physics.pos
@@ -196,7 +196,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
 
   # do things a naub is supposed to do
   join_with: (other) ->
-    join = Naubino.graph.add_join this, other
+    join = Naubino.graph.add_join this, other # returns the id of this join in the graph
     @joins[join] = other
     @drawing_join[join] = true
     other.joins[join] = this
@@ -261,16 +261,21 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
 
 
   # user interaction
+  onclick: ->
+  onfocus: ->
+
   focus: ->
     @focused = true
     @update()
     #@physics.friction = 10
+    @onfocus()
     Naubino.naub_focused.dispatch(@)
 
   unfocus: ->
     @focused = false
     @update()
     #@physics.friction = @physics.default_friction
+    @onclick()
     Naubino.naub_unfocused.dispatch(@)
 
   isHit: (x, y) ->
