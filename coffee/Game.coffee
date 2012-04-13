@@ -1,15 +1,5 @@
 # controlls everything that has to do with logic and gameplay or menus
-define ["Layer", "Naub","Shapes"], (Layer,Naub,{
-  Ball
-  Square
-  Frame
-  FrameCircle
-  Clock
-  NumberShape
-  StringShape
-  PlayButton
-  PauseButton
-}) -> class Game extends Layer
+define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }) -> class Game extends Layer
 
   # get this started
   constructor: (canvas, @graph) ->
@@ -106,8 +96,22 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{
     naub_a.add_shape new Ball
     naub_b.add_shape new Ball
 
+<<<<<<< HEAD
     color_a = naub_a.color_id
     color_b = naub_b.color_id
+=======
+  # create a pair of joined naubs
+  #
+  # @param x [int] x-ordinate
+  # @param y [int] y-ordinate
+  # @param color [int] color id of naub 1
+  # @param color [int] color id of naub 2
+  create_naub_pair: (x, y, color_a = null, color_b = null) ->
+      naub_a = new Naubino.Naub this, color_a
+      naub_b = new Naubino.Naub this, color_b
+      color_a = naub_a.color_id
+      color_b = naub_b.color_id
+>>>>>>> master
 
     @add_object naub_a
     @add_object naub_b
@@ -129,7 +133,10 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{
     naub_a.join_with naub_b
     [color_a, color_b]
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
   # create a triple of joined naubs
   #
   # works almost like create_naub_pair
@@ -164,6 +171,18 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{
       naub_a.join_with naub_b
       naub_b.join_with naub_c
 
+<<<<<<< HEAD
+=======
+  # makes every naub show its own id
+  toggle_numbers: () ->
+    unless @show_numbers?
+      @show_numbers = true
+    else @show_numbers = not @show_numbers
+    for id, naub of @objects
+      naub.content = if @show_numbers then naub.draw_number else null
+      naub.pre_render()
+
+>>>>>>> master
 
 
   # produces a random set of coordinates outside the field
