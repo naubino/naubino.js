@@ -3,5 +3,6 @@ js/*
 *.swo
 *.js
 Session.vim
+docs/*
 stats/
 node_modules/
