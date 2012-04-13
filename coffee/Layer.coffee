@@ -29,6 +29,7 @@ define -> class Layer
         place onenter*state* into the concrete implementation
         ###
 
+        error: (e, from, to, args, code, msg) -> console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
         onbeforeplay:(e, f, t) -> @parent.start_timer()
         onbeforepause: (e,f,t) -> @parent.stop_timer()
         onbeforestop: (e,f,t) ->

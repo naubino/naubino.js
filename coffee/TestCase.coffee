@@ -5,7 +5,6 @@ define ["Game"], (Game) -> class TestCase extends Game
     Naubino.settings.show_numbers = on
     #@create_some_naubs 2
     @create_matching_naubs()
-
     @gravity = on
 
   onplaying: ->

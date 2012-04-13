@@ -6,7 +6,11 @@ define -> Settings = {
     menu:         on
     game:         on
   fps:            20
-  show_numbers:   off
+
+  graphics:
+    draw_shadows:   on
+    naub_size:      14
+
   canvas:
     width:        600
     height:       400

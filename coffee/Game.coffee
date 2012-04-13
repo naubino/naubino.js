@@ -1,5 +1,15 @@
 # controlls everything that has to do with logic and gameplay or menus
-define ["Layer", "Naub","Shapes"], (Layer,Naub,{Ball, Square, Frame, FrameCircle, Clock, NumberShape, StringShape}) -> class Game extends Layer
+define ["Layer", "Naub","Shapes"], (Layer,Naub,{
+  Ball
+  Square
+  Frame
+  FrameCircle
+  Clock
+  NumberShape
+  StringShape
+  PlayButton
+  PauseButton
+}) -> class Game extends Layer
 
   # get this started
   constructor: (canvas, @graph) ->
@@ -13,7 +23,7 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{Ball, Square, Frame, FrameCircle
     @focused_naub = null # points to the naub you click on
     @gravity = Naubino.settings.gravity.game
 
-    @points = -1
+    #@points = -1
     @joining_allowed = yes
     console.log "mousemove"
     Naubino.mousemove.add @move_pointer
@@ -102,8 +112,8 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{Ball, Square, Frame, FrameCircle
     @add_object naub_a
     @add_object naub_b
 
-    naub_a.add_shape new NumberShape
-    naub_b.add_shape new NumberShape
+    naub_a.add_shape new PauseButton
+    naub_b.add_shape new PlayButton
 
     naub_a.update() # again just to get the numbers
     naub_b.update() # again just to get the numbers

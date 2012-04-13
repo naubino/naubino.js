@@ -16,6 +16,7 @@ define ["Background", "Game", "Graph", "Keybindings", "Menu", "Overlay", "Standa
   constructor: () ->
     console.log "Naubino Constructor"
 
+    @name = "Naubino"
     @graph = new Graph()
     @settings = Settings
     @colors = @settings.colors.output
@@ -53,15 +54,15 @@ define ["Background", "Game", "Graph", "Keybindings", "Menu", "Overlay", "Standa
     @game_standart = new StandardGame(@game_canvas, @graph)
     @game_testcase = new TestCase(@game_canvas, @graph)
     @game_tutorial = new Tutorial(@game_canvas, @graph)
-    #@game          = @game_standart
-    @game          = @game_testcase
-    #@menu          = new Menu(@menu_canvas)
+    @game          = @game_standart
+    #@game          = @game_testcase
+    @menu          = new Menu(@menu_canvas)
     @overlay       = new Overlay(@overlay_canvas)
 
-    #@menu.init()
-    #@menu.animation.play()
+    @menu.init()
+    @menu.animation.play()
     @game.init()
-    @play() # testcase
+    #@play() # testcase
 
 
 
@@ -73,6 +74,7 @@ define ["Background", "Game", "Graph", "Keybindings", "Menu", "Overlay", "Standa
       target: this
       initial: {state : 'stopped' , event: 'init'}
       events: @settings.events
+      error: (e, from, to, args, code, msg) -> console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
     }
 
   list_states: ->
@@ -86,7 +88,7 @@ define ["Background", "Game", "Graph", "Keybindings", "Menu", "Overlay", "Standa
 
   onchangestate: (e,f,t)-> console.info "Naubino changed states #{e}: #{f} -> #{t}"
   onbeforeplay: (event, from, to) -> @game.play()
-  #onenterplaying: -> @menu.play()
+  onenterplaying: -> @menu.play()
 
   toggle: ->
     switch @current
