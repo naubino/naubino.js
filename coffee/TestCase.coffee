@@ -2,10 +2,12 @@ define ["Game"], (Game) -> class TestCase extends Game
   #  constructor: ->
   #    super()
   oninit: ->
-    Naubino.settings.show_numbers = on
     #@create_some_naubs 2
     @create_matching_naubs()
     @gravity = on
+    Naubino.naub_replaced.add (number)=> Naubino.graph.cycle_test(number)
+    Naubino.cycle_found.add (list) => @destroy_naubs(list)
+    Naubino.play()
 
   onplaying: ->
     weightless = => @gravity = off
@@ -22,6 +24,7 @@ define ["Game"], (Game) -> class TestCase extends Game
     @animation.pause()
 
   onunset:->
+    Naubino.add_signals()
     console.log("standart_game clear")
     Naubino.settings.show_numbers = false
     @clear()

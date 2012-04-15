@@ -169,24 +169,9 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
       @drawing_join[id] = true
       partner.drawing_join[id] = false
     @destroying = true
-    @destroy_animation(@remove)
+    @shapes[0].destroy_animation(@remove)
     Naubino.naub_destroyed.dispatch(@number)
 
-
-  # animates the destruction of a naub
-  # @params callback [function] function that will be called after the animation has ended
-  destroy_animation: (callback) ->
-    @life_rendering = true
-    shrink = =>
-      @size *= 0.6
-      @join_style.width *= 0.6
-      @join_style.fill[3] *= 0.6
-      @style.fill[3] *= 0.6
-      if @size <= 0.1
-        clearInterval @loop
-        callback.call()
-
-    @loop = setInterval shrink, 40
 
 
 
