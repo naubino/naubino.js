@@ -1,0 +1,22 @@
+{
+  "author": "hoodie, payload",
+  "name": "naubino.js",
+  "description": "A fun browser game with touch in mind",
+  "version": "0.0.0",
+  "homepage": "github.com/hoodie/naubino.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hoodie/naubino.js.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "coffee-script": ">= 1.2.0",
+    "codo": ">= 0.5.0",
+    "requirejs": ">= 1.0.7",
+    "uglify-js": ">= 1.1.1"
+  },
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
