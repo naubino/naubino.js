@@ -20,6 +20,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
     Naubino.graph.clear()
     @points = 0
     Naubino.rules_cleared = true
+    Naubino.add_signals()
   
 
   onchangestate: (e,f,t)-> #console.info "ruleset recived #{e}: #{f} -> #{t}"
@@ -49,7 +50,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
     if @inner_clock == 0
       {x,y} = @random_outside()
       @create_naub_pair(x,y)
-      basket = @count_basket()
+      basket = @count_basket().length
       console.log basket if basket.length > 0
       console.log "new naubs! (#{@objects_count})"
     @inner_clock = (@inner_clock + 1) % 10

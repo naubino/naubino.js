@@ -99,11 +99,13 @@ define ["Menu", "Layer", "Naub","Shapes"], (Menu, Layer, Naub,{ Ball, StringShap
         naub.physics.gravitate(@position)
 
 
+  #utility for Game
+  update:->
+    @objects.main.update()
+
   ## can I touch this?
 
   move_pointer: (x,y) -> [@pointer.x, @pointer.y] = [x,y]
-
-
 
   draw: ->
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)

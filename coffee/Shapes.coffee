@@ -9,8 +9,8 @@ Shape: class Shape
     @set_color_from_id @naub.color_id
 
 
-  # utils
-  color_to_rgba: (color, shift = 0) =>
+  # turns the internal color init a string that applies to canvas
+  color_to_rgba: (color = @style.fill, shift = 0) =>
     r = Math.round((color[0] + shift))
     g = Math.round((color[1] + shift))
     b = Math.round((color[2] + shift))
@@ -24,6 +24,12 @@ Shape: class Shape
       ctx.shadowOffsetX = 1
       ctx.shadowOffsetY = 1
 
+  # sets opacity
+  # @param alpha (int) value between 0 and 1
+  set_opacity: (value) ->
+    @style.fill[3] = value
+
+
   # change color
   set_color_from_id:(id)->
     palette = Naubino.colors
@@ -32,7 +38,6 @@ Shape: class Shape
     # TODO automatically assume 1 if alpha is unset (pick[3])
     id
 
-    
   # colors the shape randomly and returns color id for comparison
   random_color: ->
     r = Math.random()
@@ -40,6 +45,22 @@ Shape: class Shape
     b = Math.random()
     @style.fill = [r,g,b,1]
     return -1
+
+  # animates the destruction of a naub
+  # @params callback [function] function that will be called after the animation has ended
+  destroy_animation: (callback) ->
+    @naub.life_rendering = on
+    shrink = =>
+      @naub.size *= 0.6
+      @naub.join_style.width *= 0.6
+      @naub.join_style.fill[3] *= 0.6
+      @style.fill[3] *= 0.6
+      if @naub.size <= 1
+        clearInterval @loop
+        callback.call()
+
+    @loop = setInterval shrink, 40
+
 
 Square: class Square extends Shape
   constructor: ->
@@ -74,6 +95,7 @@ Square: class Square extends Shape
     @layer.ctx.rect(@pos.x-@width/2,@pos.y-@width/2,@width,@width)
     @layer.ctx.closePath()
     @layer.ctx.isPointInPath(x,y)
+
 
 Ball: class Ball extends Shape
   area: ->
@@ -113,6 +135,7 @@ Ball: class Ball extends Shape
 
     ctx.restore()
 
+
 Clock: class Clock extends Shape
   constructor: ->
     super()
@@ -147,6 +170,7 @@ Clock: class Clock extends Shape
 
     ctx.restore()
 
+
 Frame: class Frame extends Shape
   # draws a frame around the buffered image for analysis
   # @param ctx [canvas.context] context of the target layer
@@ -171,6 +195,7 @@ Frame: class Frame extends Shape
     ctx.closePath()
     ctx.restore()
 
+
 FrameCircle: class FrameCircle extends Frame
   render: (ctx, x = 42, y = x) ->
     ctx.save()
@@ -181,6 +206,7 @@ FrameCircle: class FrameCircle extends Frame
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
+
 
 PlayButton: class PlayButton extends Shape
   render: (ctx, x,y) ->
@@ -194,6 +220,8 @@ PlayButton: class PlayButton extends Shape
     ctx.closePath()
     ctx.fill()
     ctx.restore()
+
+
 PauseButton: class PauseButton extends Shape
   render: (ctx, x,y) ->
     ctx.save()
@@ -204,6 +232,7 @@ PauseButton: class PauseButton extends Shape
     ctx.closePath()
     ctx.fill()
     ctx.restore()
+
 
 MainButton: class MainButton extends Square
   render: (ctx, x, y) ->
@@ -230,6 +259,7 @@ MainButton: class MainButton extends Square
     ctx.fillText(text, 0,10, @width*1.1)
     ctx.restore()
 
+
 StringShape: class StringShape extends Shape
   constructor: (@string, @color = "black", @font_size) ->
     super()
@@ -249,6 +279,7 @@ StringShape: class StringShape extends Shape
     ctx.font= "#{@font_size}px Helvetica"
     ctx.fillText(@string, 0, 6)
     ctx.restore()
+
 
 NumberShape: class NumberShape extends StringShape
   constructor: ()->
