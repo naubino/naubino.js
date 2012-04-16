@@ -1,9 +1,9 @@
-define ["Game"], (Game) -> class TestCase extends Game
+define ["Naub","Game","Shapes"], (Naub,Game,{NumberShape, Ball, FrameCircle}) -> class TestCase extends Game
   #  constructor: ->
   #    super()
   oninit: ->
     #@create_some_naubs 2
-    @create_matching_naubs()
+    #@create_matching_naubs()
     @gravity = on
     Naubino.naub_replaced.add (number)=> Naubino.graph.cycle_test(number)
     Naubino.cycle_found.add (list) => @destroy_naubs(list)
@@ -35,7 +35,12 @@ define ["Game"], (Game) -> class TestCase extends Game
     inner_basket = @count_basket()
     @destroy_naubs inner_basket
 
-  create_naub_pair: (x, y, color_a = null, color_b = null) ->
+  create_naub_pair: (x=null, y=x, color_a = null, color_b = null) ->
+
+    console.log x,y
+    {x,y} = @random_outside() unless x?
+    console.log x,y
+
     naub_a = new Naub this, color_a
     naub_b = new Naub this, color_b
     color_a = naub_a.color_id

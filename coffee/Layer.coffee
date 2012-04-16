@@ -23,11 +23,9 @@ define -> class Layer
       initial: 'stopped'
       events: Naubino.settings.layer_events
       callbacks:{
-        ###
-        states (overwrite these)
-        place only onenter*event* here
-        place onenter*state* into the concrete implementation
-        ###
+        # states (overwrite these)
+        # place only onenterevent here
+        # place onenterstate into the concrete implementation
 
         error: (e, from, to, args, code, msg) -> console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
         onbeforeplay:(e, f, t) -> @parent.start_timer()
@@ -106,7 +104,9 @@ define -> class Layer
 
 
 
-  ## can I touch this? (pointer interaction)
+  # can I touch this? (pointer interaction)
+
+
   # callback for mousedown signal
   click: (x, y) =>
     @mousedown = true
