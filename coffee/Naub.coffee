@@ -75,8 +75,8 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
 
   # Returns the area value of the first shape that implements it,
   area: ->
-    sz = @size
-    sz*sz*Math.PI
+    r = @size*@physics.margin
+    Math.floor r*r*Math.PI
 
   # Returns the area value of the first shape that implements it,
   # assuming the bottom shape is the biggest shape.

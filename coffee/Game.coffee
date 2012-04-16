@@ -96,14 +96,12 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircl
     naub_a.add_shape new Ball
     naub_b.add_shape new Ball
 
+
     color_a = naub_a.color_id
     color_b = naub_b.color_id
 
     @add_object naub_a
     @add_object naub_b
-
-    naub_a.add_shape new NumberShape
-    naub_b.add_shape new NumberShape
 
     naub_a.update() # again just to get the numbers
     naub_b.update() # again just to get the numbers
@@ -175,7 +173,6 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircl
 
   # counts howmany naubs would be inside the circle
   # important for gameplay
-  # TODO need a function that determines how many actually fit inside the 'basket'
   count_basket: ->
     count = []
     if @basket_size?
@@ -187,8 +184,16 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircl
     count
 
 
+  # shows how much room is available in the basket
+  capacity: ->
+    r = @basket_size
+    size= Math.ceil r * r * Math.PI * 0.75 # don't ask me why
+    filling =0
+    for naub in @count_basket()
+      filling += naub.area()
+    100-Math.ceil(filling*100 / size)
+
   # destroys every naub in a list of IDs by calling its own destroy function
-  # @TODO: need a start id, so the animation starts at a specific point
   destroy_naubs: (list)->
     for naub in list
       @get_object(naub).disable()

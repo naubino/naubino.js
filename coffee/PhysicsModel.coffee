@@ -44,7 +44,7 @@ define -> class PhysicsModel
 
   # keep naubs from overlapping
   collide: (other) ->
-    if (@naub.number != other.number)
+    unless @naub.number == other.number #or @naub.is_joined_with other
       { pos: opos, vel: ovel, force: oforce } = other.physics
       keep_distance = (@naub.size + other.size) * @margin
 
@@ -56,7 +56,7 @@ define -> class PhysicsModel
         v = diff.Copy()
         v.Normalize()
         v.Multiply(keep_distance - l)
-        v.Multiply(0.6)
+        v.Multiply(0.6) # agains chaotic shaking of naubs
         @pos.Subtract(v)
         opos.Add(v)
         @force.Subtract(v)
@@ -82,7 +82,7 @@ define -> class PhysicsModel
       v = diff.Copy()
       v.Normalize()
       v.Multiply(keep_distance - l)
-      v.Multiply(0.3)
+      v.Multiply(0.6) # agains chaotic shaking of naubs
       @vel.Subtract(v)
       ovel.Add(v)
       @force.Subtract(v)
