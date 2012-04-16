@@ -129,7 +129,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
       ctx.closePath()
       ctx.restore()
     catch e
-      console.log [pos.x, pos.y]
+      #console.log [pos.x, pos.y]
       Naubino.menu_pause.dispatch()
 
 
@@ -207,7 +207,6 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
       Naubino.graph.remove_join id
     @layer.unfocus()
     @remove()
-    console.log "replaced #{@number} with #{other.number}"
     Naubino.naub_replaced.dispatch(other.number)
     return 42
 

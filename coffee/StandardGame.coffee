@@ -1,3 +1,4 @@
+# @extends Game
 define ["Game"], (Game) -> class StandardGame extends Game
   constructor: (canvas, graph) ->
     super(canvas, graph)
@@ -14,6 +15,21 @@ define ["Game"], (Game) -> class StandardGame extends Game
     Naubino.naub_destroyed.add => @points++
     Naubino.cycle_found.add (list) => @destroy_naubs(list)
 
+    # game parameters
+    @spammer_interval = 300
+    @number_of_colors = 3
+    @spam_methods = {
+      pair:   {method: @create_naub_pair,   probability: 5}
+      triple: {method: @create_naub_triple, probability: 1}
+      pigs_fly: {method: (-> console.warn("this is impossible")), probability: 0}
+    }
+
+  spam: ->
+    probabilites = for name, spam of @spam_methods
+      spam.probability
+    max = probabilites.reduce (f,s) -> f+s
+    min = 1
+    Math.floor(Math.random() * (max - min + 1)) + min
 
   onunset: ->
     @clear()
@@ -50,9 +66,8 @@ define ["Game"], (Game) -> class StandardGame extends Game
     if @inner_clock == 0
       {x,y} = @random_outside()
       @create_naub_pair(x,y)
-      basket = @count_basket().length
-      console.log basket if basket.length > 0
-      console.log "new naubs! (#{@objects_count})"
+      basket = @count_basket()
+      console.log @capacity() if basket.length > 0
     @inner_clock = (@inner_clock + 1) % 10
 
 

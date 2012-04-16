@@ -1,5 +1,6 @@
 NAUBINO_TARGET = Naubino.full.js
 NAUBINO_UGLIFIED_TARGET = Naubino.min.js
+NAUBINO_DOC = docs/
 
 # the order is no longer crucial
 NAUBINO_TMP = \
@@ -56,4 +57,4 @@ loc:
 	@cat $(NAUBINO_SOURCE) | grep -v '^\s*#' | grep -v "^\s*$$" | wc -l
 
 doc: docs/*
-	codo coffee/* -o docs/
+	codo -o docs coffee

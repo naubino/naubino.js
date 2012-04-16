@@ -4,14 +4,26 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @name = "background"
     @animation.name = "background.animation"
 
-    @fps = 1000 / 5
     @drawing = true
     @default_thickness = @basket_thickness = 4
     @ttl = 12
     @color = [0,0,0,0.5]
+    @pulsating = off
+    @seed = 0
 
 
   draw: () ->
+    @draw_basket()
+
+  # TODO ISSUE #38 Make every animation framerate aware
+  step: (dt) ->
+    if @pulsating
+      @pulse()
+
+
+
+
+  draw_basket: () ->
     width = @canvas.width
     height = @canvas.height
     centerX = width/2
@@ -30,34 +42,33 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @ctx.closePath()
     @ctx.restore()
 
+
+
+
+  start_pulse: ->
+    if @animation.current != "playing"
+      @animation.play()
+    @pulsating = on
+
   stop_pulse: ->
     @pulse_ends = true
 
   pulse: () ->
-    @default_fps = @fps
-    @seed = 0
-    @fps = 1000 / 20
-    @start_timer()
-    if @animation?
-      clearInterval(@animation)
+    if @pulse_ends and Math.abs(@default_thickness - @basket_thickness) < 1
+      @pulsating = off
+      @pulse_ends = false
+      @basket_thickness = @default_thickness
+      @color[0] = 0
+      @color[3] = 0.5
+      @animation.pause()
 
-    animate = =>
-      if @pulse_ends and Math.abs(@default_thickness - @basket_thickness) < 1
-        clearInterval(@animation)
-        delete @animation
-        @pulse_ends = false
-        @basket_thickness = @default_thickness
-        @color[0] = 0
-        @color[3] = 0.5
+    @basket_thickness = Math.abs(Math.sin(@seed/@ttl))  * 2 *   @default_thickness + @default_thickness
+    rot = Math.sin(@seed/@ttl)
+    @color[0] = Math.abs(rot) * 200
+    @color[3] = Math.abs(rot) * 0.5 + 0.5
+    #@drawTextAlongArc("naub warning", -@seed/30)
+    @seed++
 
-      @basket_thickness = Math.abs(Math.sin(@seed/@ttl))  * 2 *   @default_thickness + @default_thickness
-      rot = Math.sin(@seed/@ttl)
-      @color[0] = Math.abs(rot) * 200
-      @color[3] = Math.abs(rot) * 0.5 + 0.5
-      #@drawTextAlongArc("naub warning", -@seed/30)
-      @seed++
-
-    @animation = setInterval animate, 50
 
 
   drawTextAlongArc: (str, rot = 0) ->

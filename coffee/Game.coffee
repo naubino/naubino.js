@@ -1,4 +1,5 @@
 # controlls everything that has to do with logic and gameplay or menus
+# @extends Layer
 define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }) -> class Game extends Layer
 
   # get this started
@@ -33,16 +34,11 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircl
   
   # methods that create naubs
   #
-  # @param [int] n number of pairs and triples
-  create_some_naubs: (n = 3) ->
+  # @param [int] n number of pairs or triples
+  create_some_naubs: (n = 1) ->
     for [1..n]
-      {x,y} = @random_outside()
-      #Naubino.background.draw_marker(x,y)
-      @create_naub_pair(x,y)
-    for [1..n]
-      {x,y} = @random_outside()
-      #Naubino.background.draw_marker(x,y)
-      @create_naub_triple(x,y)
+      @create_naub_pair()
+      @create_naub_triple()
 
 
   #create n sets of matching pairs and some leftovers
@@ -69,25 +65,19 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircl
         @create_naub_pair(x,y)
 
 
-  # create a naub at x,y
-  #
-  # used in create_naub_pair, create_naub_triple and create_some_naubs
-  # @param x [int] x-ordinate
-  # @param y [int] y-ordinate
-  create_naub: (x = @center.x, y = @center.y) ->
-    naub_a = new Naub this
-    @add_object naub_a
-    naub_a.pre_render() # again just to get the numbers
-    naub_a.physics.pos.Set x, y
-
-
   # create a pair of joined naubs
   #
+  # @default
   # @param x [int] x-ordinate
   # @param y [int] y-ordinate
   # @param color [int] color id of naub 1
   # @param color [int] color id of naub 2
-  create_naub_pair: (x, y, color_a = null, color_b = null) ->
+  create_naub_pair: (x=null, y=x, color_a = null, color_b = null) =>
+
+    console.log x,y
+    {x,y} = @random_outside() unless x?
+    console.log x,y
+
     naub_a = new Naub this, color_a
     naub_b = new Naub this, color_b
     color_a = naub_a.color_id
@@ -122,7 +112,7 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircl
   # works almost like create_naub_pair
   # @param x [int] x-ordinate
   # @param y [int] y-ordinate
-  create_naub_triple: (x, y) ->
+  create_naub_triple: (x=null, y=x ) =>
       naub_a = new Naub this
       naub_b = new Naub this
       naub_c = new Naub this
