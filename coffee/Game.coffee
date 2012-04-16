@@ -102,8 +102,8 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircl
     @add_object naub_a
     @add_object naub_b
 
-    naub_a.add_shape new PauseButton
-    naub_b.add_shape new PlayButton
+    naub_a.add_shape new NumberShape
+    naub_b.add_shape new NumberShape
 
     naub_a.update() # again just to get the numbers
     naub_b.update() # again just to get the numbers

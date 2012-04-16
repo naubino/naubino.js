@@ -11,7 +11,7 @@ define -> class Layer
 
 
     # fragile calibration! don't fuck it up!
-    @fps = 1000 / Naubino.settings.fps
+    @fps = 1000 / Naubino.settings.graphics.fps
     @dt = @fps/1500
 
     @show()

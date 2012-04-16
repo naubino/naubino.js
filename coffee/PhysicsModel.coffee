@@ -3,13 +3,14 @@ define -> class PhysicsModel
     @pos = new b2Vec2(0, 0)
     @vel = new b2Vec2(0, 0)
     @force = new b2Vec2(0, 0) # acceleration TODO Rename force -> acceleration
-    @radius = @naub.size
     @attracted_to = new b2Vec2 0, 0 # gravity center
 
-    @mass = 0.2
-    @friction = @default_friction = 2.0
-    @spring_force = 0.03
-    @keep_distance = @radius*2 + 10
+    @mass = @default_mass = Naubino.settings.naub.mass
+    @friction = @default_friction = Naubino.settings.physics.friction
+    @spring_force = Naubino.settings.physics.spring_force
+    @margin = Naubino.settings.physics.margin
+    @join_length = Naubino.settings.physics.join_length
+
  
   step: (dt) ->
     v = @force.Copy()
@@ -22,7 +23,7 @@ define -> class PhysicsModel
     unless @naub.focused or not @naub.layer.gravity
       diff = to.Copy()
       diff.Subtract(@pos)
-      diff.Multiply(@mass)
+      diff.Multiply(@mass/100)
       @accelerate(diff)
 
   accelerate: (diff) ->
@@ -45,15 +46,16 @@ define -> class PhysicsModel
   collide: (other) ->
     if (@naub.number != other.number)
       { pos: opos, vel: ovel, force: oforce } = other.physics
+      keep_distance = (@naub.size + other.size) * @margin
 
       diff = opos.Copy()
       diff.Subtract(@pos)
       l = diff.Length()
 
-      if @naub.number < other.number &&  l < @keep_distance # TODO replace with obj size
+      if @naub.number < other.number &&  l < keep_distance
         v = diff.Copy()
         v.Normalize()
-        v.Multiply(@keep_distance - l)
+        v.Multiply(keep_distance - l)
         v.Multiply(0.6)
         @pos.Subtract(v)
         opos.Add(v)
@@ -64,6 +66,7 @@ define -> class PhysicsModel
   join_springs: (other) ->
     # XXX causes slight rotation when crossing to pairs
     { pos: opos, vel: ovel, force: oforce } = other.physics
+    keep_distance = (@naub.size + other.size) * @join_length
 
     diff = opos.Copy()
     diff.Subtract(@pos)
@@ -71,14 +74,14 @@ define -> class PhysicsModel
     v = diff.Copy()
 
     v.Normalize()
-    v.Multiply( -1/100 * @spring_force * l * l * l % 1000)
+    v.Multiply( -1/1000 * @spring_force * l * l * l % 1000)
     @force.Subtract(v)
     oforce.Add(v)
 
-    if (l < @keep_distance) # TODO replace with obj size
+    if (l < keep_distance)
       v = diff.Copy()
       v.Normalize()
-      v.Multiply(@keep_distance - l)
+      v.Multiply(keep_distance - l)
       v.Multiply(0.3)
       @vel.Subtract(v)
       ovel.Add(v)
