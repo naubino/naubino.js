@@ -174,11 +174,15 @@ Clock: class Clock extends Shape
 Frame: class Frame extends Shape
   # draws a frame around the buffered image for analysis
   # @param ctx [canvas.context] context of the target layer
-  constructor: (@margin = 5) ->
+  constructor: (@margin = null) ->
     super()
   setup: (@naub) ->
     super(@naub)
-    @frame = @margin + @naub.size*2
+    if @margin?
+      @frame = @margin + @naub.size
+    else
+      @frame = @naub.frame+ @naub.size*2
+
 
   render: (ctx, x = 42, y = x) ->
     x = x-@frame/2
@@ -200,10 +204,15 @@ FrameCircle: class FrameCircle extends Frame
   render: (ctx, x = 42, y = x) ->
     ctx.save()
     ctx.beginPath()
-    ctx.arc(x, y, @frame/2, 0, Math.PI * 2, false)
+    r = @naub.physics.margin * @naub.size
+    ctx.arc(x, y, r, 0, Math.PI * 2, false)
     ctx.closePath()
-    ctx.strokeStyle = ctx.fillStyle
+    ctx.strokeStyle  = "black"
+    fill = @style.fill
+    fill[3] = 0.3
+    ctx.fillStyle  = @color_to_rgba(fill)
     ctx.stroke()
+    ctx.fill()
     ctx.closePath()
     ctx.restore()
 

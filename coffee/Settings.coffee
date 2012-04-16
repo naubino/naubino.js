@@ -8,7 +8,7 @@ define -> Settings = {
 
   graphics:
     fps:           20
-    draw_shadows:  on
+    draw_shadows:  off
 
   naub:
     size:       14
@@ -16,7 +16,7 @@ define -> Settings = {
     border:     off  # not yet implemented
 
   physics:
-    margin:       1.5 # margin between naubs (n* avg size)
+    margin:       1.4 # margin between naubs (n* avg size)
     join_length:  3.0 # margin between joined naubs (n* avg size)
     spring_force: 0.6
     friction:     4.0
