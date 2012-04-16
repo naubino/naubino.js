@@ -48,18 +48,18 @@ Shape: class Shape
 
   # animates the destruction of a naub
   # @params callback [function] function that will be called after the animation has ended
-  destroy_animation: (callback) ->
+  destroy_animation: (callback = null) ->
     @naub.life_rendering = on
     shrink = =>
-      @naub.size *= 0.6
+      @naub.size *= 0.8
       @naub.join_style.width *= 0.6
       @naub.join_style.fill[3] *= 0.6
       @style.fill[3] *= 0.6
-      if @naub.size <= 1
+      if callback? and @naub.size <= 0.1
         clearInterval @loop
         callback.call()
 
-    @loop = setInterval shrink, 40
+    @loop = setInterval shrink, 50
 
 
 Square: class Square extends Shape
@@ -119,7 +119,7 @@ Ball: class Ball extends Shape
     #ctx.lineWidth = 2
     #ctx.stroke()
 
-    if @focused
+    if @naub.focused
       # gradient
       gradient = ctx.createRadialGradient(offset, offset, size/3, offset, offset, size)
       gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
@@ -227,8 +227,10 @@ PauseButton: class PauseButton extends Shape
     ctx.save()
     ctx.fillStyle = "#ffffff"
     ctx.beginPath()
-    ctx.rect(x-5,y-6,4,12)
-    ctx.rect(x+1,y-6,4,12)
+
+    ctx.rect(x-5, y-6, 4, 12)
+    ctx.rect(x+1, y-6, 4,12)
+
     ctx.closePath()
     ctx.fill()
     ctx.restore()
@@ -261,22 +263,20 @@ MainButton: class MainButton extends Square
 
 
 StringShape: class StringShape extends Shape
-  constructor: (@string, @color = "black", @font_size) ->
+  constructor: (@string, @color = "black") ->
     super()
 
   setup: (@naub) ->
     super(@naub)
-    unless @font_size?
-      console.log @naub.size
-      @font_size = @naub.size+4
-    
 
   render: (ctx, x,y) ->
+    size = @naub.size * 1.3
+
     ctx.save()
     ctx.translate x,y
     ctx.fillStyle = @color
     ctx.textAlign = 'center'
-    ctx.font= "#{@font_size}px Helvetica"
+    ctx.font= "#{size}px Helvetica"
     ctx.fillText(@string, 0, 6)
     ctx.restore()
 

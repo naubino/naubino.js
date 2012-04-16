@@ -5,31 +5,27 @@
 # @param color_id [int] representing the color from color palett, also neccessary for joining
 # @param size [int] size, what else
 define ["PhysicsModel"], (PhysicsModel) -> class Naub
-  constructor: (@layer, @color_id = null, @size = Naubino.settings.graphics.naub_size) ->
+  constructor: (@layer, @color_id = null, @size = Naubino.settings.naub.size) ->
     @physics = new PhysicsModel this
-
-    @pos = @physics.pos
-    @ctx = @layer.ctx
-    @frame = @size*1.5
-    @join_style = { fill: [0,0,0,1], width: 6 }
-    @life_rendering = false # if true redraw on each frame
-
-    # unless a color_id has been give pick a randome color
-    @color_id = @random_palette_color() unless @color_id?
-
     @physics.attracted_to = @layer.center.Copy() # gravity center
+
+    @ctx = @layer.ctx
+    @frame = @size*1.5 # defines buffer canvas
+
+    @color_id = @random_palette_color() unless @color_id?  # unless a color_id has been give pick a randome color
+    @life_rendering = false # if true redraw on each frame
 
     @removed = false # soon to be deleted by game, garbage collector
     @focused = false # currently activated by pointer
     @disabled = false # cannot join with another
-    @isClickable = yes # cannot
+    @isClickable = yes # influences @layer.isHit()
 
     @shapes = [] # shapes this naub draws in order from bottom to top
-
     @joins = {} # {id: opposing naub}
     @drawing_join = {} # {id: true/false if this naub draws the join}
-    @update() #renders it for the first time
+    @join_style = { fill: [0,0,0,1], width: 6 }
 
+    @update() #renders it for the first time
 
 
   # Either renders shapes or draws buffer 
@@ -38,24 +34,34 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   # set @life_rendering to true if you want to have an animated naub
   # either renders live or draws pre_rendered image
   draw: (ctx) ->
+    pos = @physics.pos
     unless Naubino.settings.updating or @life_rendering
       ctx.save()
-      x = @pos.x-@frame
-      y = @pos.y-@frame
+      x = pos.x-@frame
+      y = pos.y-@frame
       #@draw_frame(ctx)
       @ctx.drawImage(@buffer, x, y)
       @ctx.restore()
     else # render life
-      @render(@ctx, @pos.x,@pos.y)
+      @render(@ctx, pos.x,pos.y)
 
     
   # Renders the shape into a buffer
-  # @param ctx [canvas.context] context of the target layer
   update: () ->
     @buffer = document.createElement('canvas')
     @buffer.width = @buffer.height = @frame *2
     b_ctx = @buffer.getContext('2d')
     @render b_ctx, @frame, @frame
+
+  # adjusts size and everything that is affected by it
+  resize: (size = null) ->
+    @size = size ? Naubino.settings.naub.size
+    @frame = @size*1.5 # defines buffer canvas
+    { pos, vel, force, attracted_to } = @physics
+    @physics = new PhysicsModel this
+    Util.extend @physics, { pos, vel, force, attracted_to }
+    @update()
+
 
   # Executes the render method of all shapes
   render: (ctx,x,y) ->
@@ -104,9 +110,10 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     diff = pos2.Copy()
     diff.Subtract(pos)
     l = diff.Length()
-    kd = @physics.keep_distance
+    m = @physics.margin*25
     fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
-    stretch = Math.round(((kd + fiber) / (l + fiber))*10)/10
+    stretch = (m + fiber) / (l + fiber)
+    stretch = Math.round((stretch)*10)/10 # rounding
     #@join_style.fill[3] = stretch
     stretched_width = @join_style.width * stretch
 
@@ -116,7 +123,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
       ctx.beginPath()
       ctx.moveTo pos.x, pos.y
       ctx.lineTo pos2.x, pos2.y
-      ctx.lineWidth =  stretched_width
+      ctx.lineWidth = stretched_width
       ctx.lineCap = "round"
       ctx.stroke()
       ctx.closePath()
@@ -169,7 +176,9 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
       @drawing_join[id] = true
       partner.drawing_join[id] = false
     @destroying = true
-    @shapes[0].destroy_animation(@remove)
+    @shapes[0].destroy_animation(@remove) # when this one is done the naub is removed
+    for shape in @shapes[1..]
+      shape.destroy_animation() # these are just for fun
     Naubino.naub_destroyed.dispatch(@number)
 
 
@@ -252,14 +261,12 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   focus: ->
     @focused = true
     @update()
-    #@physics.friction = 10
     @onfocus()
     Naubino.naub_focused.dispatch(@)
 
   unfocus: ->
     @focused = false
     @update()
-    #@physics.friction = @physics.default_friction
     @onclick()
     Naubino.naub_unfocused.dispatch(@)
 

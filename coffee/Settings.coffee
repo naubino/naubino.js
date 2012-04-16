@@ -5,15 +5,26 @@ define -> Settings = {
   gravity:
     menu:         on
     game:         on
-  fps:            20
 
   graphics:
-    draw_shadows:   on
-    naub_size:      14
+    fps:           20
+    draw_shadows:  on
+
+  naub:
+    size:       14
+    mass:       15
+    border:     off  # not yet implemented
+
+  physics:
+    margin:       1.5 # margin between naubs (n* avg size)
+    join_length:  3.0 # margin between joined naubs (n* avg size)
+    spring_force: 0.6
+    friction:     4.0
 
   canvas:
-    width:        600
-    height:       400
+    width:    800
+    height:   480
+
   events: [
         { name: 'init',   from: 'none',     to: 'stopped'}
         { name: 'unset',  from: 'stopped',  to: 'none'   }
