@@ -12,7 +12,7 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircl
     @paused = true # changed imidiately after loading by start_timer
     @drawing = true # for debugging
     @focused_naub = null # points to the naub you click on
-    @gravity = Naubino.settings.gravity.game
+    @gravity = Naubino.settings.physics.gravity.game
 
     #@points = -1
     @joining_allowed = yes

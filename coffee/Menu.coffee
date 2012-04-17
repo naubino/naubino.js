@@ -7,7 +7,7 @@ define ["Menu", "Layer", "Naub","Shapes"], (Menu, Layer, Naub,{ Ball, StringShap
 
     @objects = {}
     @hovering = false
-    @gravity = Naubino.settings.gravity.menu
+    @gravity = Naubino.settings.physics.gravity.menu
 
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer
