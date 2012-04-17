@@ -35,7 +35,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   # either renders live or draws pre_rendered image
   draw: (ctx) ->
     pos = @physics.pos
-    unless Naubino.settings.updating or @life_rendering
+    unless Naubino.settings.graphics.updating or @life_rendering
       ctx.save()
       x = pos.x-@frame
       y = pos.y-@frame

@@ -1,14 +1,10 @@
 # all colors (except color_output) found at colorlovers.com
 define -> Settings = {
 
-  updating:  on
-  gravity:
-    menu:         on
-    game:         on
-
   graphics:
     fps:           20
     draw_shadows:  off
+    updating:  on
 
   naub:
     size:       14
@@ -16,12 +12,16 @@ define -> Settings = {
     border:     off  # not yet implemented
 
   physics:
+    gravity:
+      menu:         on
+      game:         on
     margin:       1.4 # margin between naubs (n* avg size)
     join_length:  3.0 # margin between joined naubs (n* avg size)
     spring_force: 0.6
     friction:     4.0
 
   canvas:
+    scale: 1 # not yet implemented
     width:    800
     height:   480
 
@@ -61,26 +61,26 @@ define -> Settings = {
       [ 41,  14,   3, 1, "tell me"  ] # (brown)
     ]
     high_contrast: [
-      [255,   0,   0, 1, "hcred"]
-      [  0, 224,   0, 1, "hcgreen"]
-      [  0, 128, 224, 1, "hcblue"]
-      [255, 255,   0, 1, "hcyellow"]
-      [  0,   0,   0, 1, "hcblack"]
-      [128,   0, 128, 1, "hcpurple"]
+      [255,   0,   0, 1, "hcred"    ]
+      [  0, 224,   0, 1, "hcgreen"  ]
+      [  0, 128, 224, 1, "hcblue"   ]
+      [255, 255,   0, 1, "hcyellow" ]
+      [  0,   0,   0, 1, "hcblack"  ]
+      [128,   0, 128, 1, "hcpurple" ]
     ]
     normal_colors: [
-      [255,   0,   0, 1, "red"]
-      [255, 153,   0, 1, "Vitamin C"]
-      [  0, 153, 204, 1, "Office Blue"]
-      [  0, 204,   0, 1, "Astroturf"]
-      [255, 255,   0, 1, "Yellow"]
+      [255,   0,   0, 1, "red"         ]
+      [255, 153,   0, 1, "Vitamin C"   ]
+      [  0, 153, 204, 1, "Office Blue" ]
+      [  0, 204,   0, 1, "Astroturf"   ]
+      [255, 255,   0, 1, "Yellow"      ]
     ]
     cuddle_bunny: [ # http://www.colourlovers.com/palette/124912/Cuddle_Bunny
-      [174,  49,  45, 1, "cuddling red"]
-      [ 75, 136,  95, 1, "cuddling green"]
-      [ 73,  37,  13, 1, "midnight fudge"]
-      [173, 165,  64, 1, "cuddling yellow"]
-      [202, 202, 182, 1, "ill beige"]
+      [174,  49,  45, 1, "cuddling red"    ]
+      [ 75, 136,  95, 1, "cuddling green"  ]
+      [ 73,  37,  13, 1, "midnight fudge"  ]
+      [173, 165,  64, 1, "cuddling yellow" ]
+      [202, 202, 182, 1, "ill beige"       ]
     ]
     '70': [ # http://www.colourlovers.com/palette/1712615/70
       [191,  73,  73, 1]

@@ -12,7 +12,7 @@ define ["Naub","Game","Shapes"], (Naub,Game,{NumberShape, Ball, FrameCircle}) ->
   onplaying: ->
     weightless = => @gravity = off
     #setTimeout(weightless, 4000)
-    Naubino.settings.updating = off
+    Naubino.settings.graphics.updating = off
 
     basket = 150
     @animation.play()
