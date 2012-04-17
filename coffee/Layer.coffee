@@ -94,7 +94,6 @@ define -> class Layer
       if (@canvas.style.opacity *= 0.8) <= 0.05
         clearInterval @fadeloop
         @hide()
-        @clear()
         #@canvas.style.opacity = 1
         if callback?
           callback.call()
