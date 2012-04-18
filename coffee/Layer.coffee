@@ -78,18 +78,24 @@ define -> class Layer
   hide: -> @canvas.style.opacity = 0
 
 
-  fade_in: ->
+
+  fade_in: (callback = null) ->
     console.log "fade in"
     @canvas.style.opacity = 0.01
+    @restore() if @backup_ctx?
     fade = =>
       if (@canvas.style.opacity *= 1.2) >= 1
         clearInterval @fadeloop
         @show()
+        if callback?
+          callback.call()
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
 
+
   fade_out: (callback = null)->
     console.log "fade out"
+    @cache()
     fade = =>
       if (@canvas.style.opacity *= 0.8) <= 0.05
         clearInterval @fadeloop
@@ -100,6 +106,13 @@ define -> class Layer
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
       
+
+  clear: -> @canvas.width = @canvas.width
+  cache: -> @backup_ctx = @ctx
+  restore: ->
+    @ctx = @backup_ctx
+    unset = null
+
 
 
 
@@ -131,9 +144,6 @@ define -> class Layer
     for id, obj of @objects
       if obj.isHit(x, y) and obj.isClickable
         return obj
-
-  clear: -> @canvas.width = @canvas.width
-
 
   ### utils ###
   color_to_rgba: (color, shift = 0) =>

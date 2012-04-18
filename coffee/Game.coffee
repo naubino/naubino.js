@@ -234,10 +234,8 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircl
 
 
   # clears the graph as well, just in case
-  clear: ->
-    console.log("game clear")
+  clear_objects: ->
     super()
-    @clear_objects()
     Naubino.graph.clear()
 
 
