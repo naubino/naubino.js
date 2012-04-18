@@ -37,9 +37,7 @@ define ["Naub","Game","Shapes"], (Naub,Game,{NumberShape, Ball, FrameCircle}) ->
 
   create_naub_pair: (x=null, y=x, color_a = null, color_b = null) ->
 
-    console.log x,y
     {x,y} = @random_outside() unless x?
-    console.log x,y
 
     naub_a = new Naub this, color_a
     naub_b = new Naub this, color_b

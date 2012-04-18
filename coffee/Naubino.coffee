@@ -111,13 +111,17 @@ define ["Background", "Game", "Graph", "Keybindings", "Menu", "Overlay", "Standa
     @menu.stop()
 
   soft_switch: (new_game) ->
-    @pause()
+    if @current == "playing"
+      @pause()
+
     sswitch = =>
+      @game.clear()
       @game = new_game
       if @game.current == "none"
         @game.init()
         #@game.hide()
-      @game.fade_in => @play()
+      @game.fade_in =>
+        @play()
       
     @game.fade_out(sswitch)
 
