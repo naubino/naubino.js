@@ -18,18 +18,31 @@ define ["Game"], (Game) -> class StandardGame extends Game
     # game parameters
     @spammer_interval = 300
     @number_of_colors = 3
-    @spam_methods = {
+    @spammers = {
       pair:   {method: @create_naub_pair,   probability: 5}
       triple: {method: @create_naub_triple, probability: 1}
-      pigs_fly: {method: (-> console.warn("this is impossible")), probability: 0}
     }
 
+  map_spammers: ->
+    sum = 0
+    for name, spammer of @spammers
+      sum += spammer.probability
+      {range:sum,  name, method:spammer.method}
+      
+
   spam: ->
-    probabilites = for name, spam of @spam_methods
+    probabilites = for name, spam of @spammers
       spam.probability
     max = probabilites.reduce (f,s) -> f+s
-    min = 1
-    Math.floor(Math.random() * (max - min + 1)) + min
+    min = 0
+    dart = Math.floor(Math.random() * (max - min )) + min
+    for spammer in @map_spammers()
+      if dart < spammer.range
+        console.log spammer.name
+        spammer.method()
+        return
+
+
 
   onunset: ->
     @clear()
@@ -64,8 +77,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
   event: =>
     if @inner_clock == 0
-      {x,y} = @random_outside()
-      @create_naub_pair(x,y)
+      @spam()
       basket = @count_basket()
       console.log @capacity() if basket.length > 0
     @inner_clock = (@inner_clock + 1) % 10
