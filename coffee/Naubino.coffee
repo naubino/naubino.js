@@ -51,10 +51,10 @@ define ["Background", "Game", "Graph", "Keybindings", "Menu", "Overlay", "Standa
     @gamediv.max-width     = @settings.canvas.width
 
     @background    = new Background(@background_canvas)
-    @game_standart = new StandardGame(@game_canvas, @graph)
+    @game_standard = new StandardGame(@game_canvas, @graph)
     @game_testcase = new TestCase(@game_canvas, @graph)
     @game_tutorial = new Tutorial(@game_canvas, @graph)
-    @game          = @game_standart
+    @game          = @game_standard
     #@game          = @game_testcase
     @menu          = new Menu(@menu_canvas)
     @overlay       = new Overlay(@overlay_canvas)
