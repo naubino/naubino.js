@@ -1,31 +1,28 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-  <title>naubino.js</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" href="css/naubino.css" type="text/css">
-  <link rel="stylesheet" href="css/github-badge.css" type="text/css">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>naubino.js</title>
+    <link rel="stylesheet" href="css/naubino.css" type="text/css" />
+    <link rel="stylesheet" href="css/github-badge.css" type="text/css" />
 
-  <script type="text/javascript" src="lib/signals/dist/signals.min.js"></script>
-  <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
-  <script type="text/javascript" src="lib/b2Vec2.js"></script>
-  <script type="text/javascript" src="js/Util.js"></script>
-  <script type="text/javascript" src="lib/requirejs/require.js" data-main="js/Load"></script>
+    <script type="text/javascript" src="lib/signals/dist/signals.min.js"></script>
+    <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
+    <script type="text/javascript" src="lib/b2Vec2.js"></script>
+    <script type="text/javascript" src="js/Util.js"></script>
+    <script type="text/javascript" src="lib/requirejs/require.js" data-main="js/Load"></script>
+  </head>
+  <body>
 
-</head>
-<body>
-
-  <div id="footerdiv">
-  </div>
   <input type="button" onclick="window.Naubino.play();Naubino.list_states()" value="play"/>
   <input type="button" onclick="window.Naubino.pause();Naubino.list_states()" value="pause"/>
   <input type="button" onclick="window.Naubino.stop();Naubino.list_states()" value="stop"/>
   <input type="button" onclick="window.Naubino.game.gravity = !window.Naubino.game.gravity " value="gravity on/off"/>
   <input type="button" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
-<!--  <input type="button" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
-  <input type="button" onclick="window.Naubino.settings.updating = !window.Naubino.settings.updating" value="prerendering on/off"/>
+  <!--  <input type="button" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
+  <input type="button" onclick="window.Naubino.settings.graphics.updating = !window.Naubino.settings.graphics.updating" value="prerendering on/off"/>
   <a href="https://github.com/hoodie/naubino.js/issues/new">write and issue</a>
-<!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
+  <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
 
   <div id="gamediv">
     <canvas id="background_canvas" style="position: absolute; z-index:0;" width="10" height="10"></canvas>
@@ -34,8 +31,7 @@
     <canvas id="overlay_canvas"    style="position: absolute; z-index:2;" width="10" height="10"></canvas>
   </div> 
 
-
-
-</body>
+  <div id="footerdiv">test </div>
+  </body>
 </html>
 

@@ -7,7 +7,7 @@ define ["Naub","Game","Shapes"], (Naub,Game,{NumberShape, Ball, FrameCircle}) ->
     @gravity = on
     Naubino.naub_replaced.add (number)=> Naubino.graph.cycle_test(number)
     Naubino.cycle_found.add (list) => @destroy_naubs(list)
-    Naubino.play()
+    #Naubino.play()
 
   onplaying: ->
     weightless = => @gravity = off

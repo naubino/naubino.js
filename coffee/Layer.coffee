@@ -80,12 +80,13 @@ define -> class Layer
 
 
   fade_in: (callback = null) ->
-    console.log "fade in"
+    console.log "fade in", @fadeloop
     @canvas.style.opacity = 0.01
     @restore() if @backup_ctx?
     fade = =>
       if (@canvas.style.opacity *= 1.2) >= 1
         clearInterval @fadeloop
+        console.log "done"
         @show()
         if callback?
           callback.call()
@@ -94,7 +95,7 @@ define -> class Layer
 
 
   fade_out: (callback = null)->
-    console.log "fade out"
+    console.log "fade out", @fadeloop
     @cache()
     fade = =>
       if (@canvas.style.opacity *= 0.8) <= 0.05
