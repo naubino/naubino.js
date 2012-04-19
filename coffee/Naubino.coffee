@@ -114,16 +114,13 @@ define ["Background", "Game", "Graph", "Keybindings", "Menu", "Overlay", "Standa
     if @current == "playing"
       @pause()
 
-    sswitch = =>
+    @game.fade_out =>
       @game.clear()
       @game = new_game
-      if @game.current == "none"
-        @game.init()
-        #@game.hide()
-      @game.fade_in =>
-        @play()
+      @game.draw()
+      @game.init() if @game.current == "none"
+      @game.fade_in => @play()
       
-    @game.fade_out(sswitch)
 
 
 
