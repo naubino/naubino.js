@@ -1,7 +1,7 @@
 # @extends Game
 define ["Game"], (Game) -> class StandardGame extends Game
-  constructor: (canvas, graph) ->
-    super(canvas, graph)
+  constructor: (canvas) ->
+    super(canvas)
 
   ### state machine ###
   oninit: ->
@@ -11,7 +11,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
     basket = 150
     @basket_size = basket
     Naubino.background.basket_size = basket
-    Naubino.naub_replaced.add (number)=> Naubino.graph.cycle_test(number)
+    Naubino.naub_replaced.add (number)=> @graph.cycle_test(number)
     Naubino.naub_destroyed.add => @points++
     Naubino.cycle_found.add (list) => @destroy_naubs(list)
 
@@ -46,7 +46,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
   onunset: ->
     @clear()
-    Naubino.graph.clear()
+    @graph.clear()
     @points = 0
     Naubino.rules_cleared = true
     Naubino.add_signals()

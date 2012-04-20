@@ -1,8 +1,9 @@
 # TODO clean up menu code -- will do in naub_rethought
-define ["Menu", "Layer", "Naub","Shapes"], (Menu, Layer, Naub,{ Ball, StringShape, PlayButton, PauseButton, MainButton }) -> class Menu extends Layer
+define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, { Ball, StringShape, PlayButton, PauseButton, MainButton }) -> class Menu extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "menu"
+    @graph = new Graph()
     @animation.name = "menu.animation"
 
     @objects = {}
@@ -66,7 +67,7 @@ define ["Menu", "Layer", "Naub","Shapes"], (Menu, Layer, Naub,{ Ball, StringShap
       @objects[name].isClickable = no
       @objects[name].physics.pos.Set button.position.x, button.position.y
       @objects[name].physics.attracted_to.Set button.position.x, button.position.y
-      Naubino.graph.remove_join @objects[name].join_with( @objects.main, name ) # add the object without managing the join
+      @graph.remove_join @objects[name].join_with( @objects.main, name ) # add the object without managing the join
 
     @objects.main.life_rendering = on
 
