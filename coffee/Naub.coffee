@@ -167,7 +167,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     @removed = true
     for id, naub of @joins
       delete naub.joins[id]
-      Naubino.graph.remove_join id
+      @layer.graph.remove_join id
 
 
   # animated remove with disabling  
@@ -190,7 +190,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
 
   # do things a naub is supposed to do
   join_with: (other) ->
-    join = Naubino.graph.add_join this, other # returns the id of this join in the graph
+    join = @layer.graph.add_join this, other # returns the id of this join in the graph
     @joins[join] = other
     @drawing_join[join] = true
     other.joins[join] = this
@@ -204,7 +204,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     remove_joins = for id, naub of @joins
       other.join_with(naub)
       delete naub.joins[id]
-      Naubino.graph.remove_join id
+      @layer.graph.remove_join id
     @layer.unfocus()
     @remove()
     Naubino.naub_replaced.dispatch(other.number)

@@ -5,7 +5,7 @@ define ["Naub","Game","Shapes"], (Naub,Game,{NumberShape, Ball, FrameCircle}) ->
     #@create_some_naubs 2
     @create_matching_naubs()
     @gravity = on
-    Naubino.naub_replaced.add (number)=> Naubino.graph.cycle_test(number)
+    Naubino.naub_replaced.add (number)=> @graph.cycle_test(number)
     Naubino.cycle_found.add (list) => @destroy_naubs(list)
     #Naubino.play()
 

@@ -1,11 +1,12 @@
 # controlls everything that has to do with logic and gameplay or menus
 # @extends Layer
-define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }) -> class Game extends Layer
+define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }) -> class Game extends Layer
 
   # get this started
   constructor: (canvas, @graph) ->
     super(canvas)
     @name = "game"
+    @graph = new Graph()
     @animation.name = "game.animation"
 
     # display stuff
@@ -236,7 +237,7 @@ define ["Layer", "Naub","Shapes"], (Layer,Naub,{ Ball, Square, Frame, FrameCircl
   # clears the graph as well, just in case
   clear_objects: ->
     super()
-    Naubino.graph.clear()
+    @graph.clear()
 
 
   # work and have everybody else do their work as well

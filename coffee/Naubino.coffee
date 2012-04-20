@@ -12,12 +12,11 @@
 #   Naubino.constructor()
 
 
-define ["Background", "Game", "Graph", "Keybindings", "Menu", "Overlay", "StandardGame", "TestCase", "Settings", "Tutorial"], (Background, Game, Graph, KeyBindings, Menu, Overlay, StandardGame, TestCase, Settings, Tutorial) -> class Naubino
+define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", "TestCase", "Settings", "Tutorial"], (Background, Game, KeyBindings, Menu, Overlay, StandardGame, TestCase, Settings, Tutorial) -> class Naubino
   constructor: () ->
     console.log "Naubino Constructor"
 
     @name = "Naubino"
-    @graph = new Graph()
     @settings = Settings
     @colors = @settings.colors.output
     @create_fsm()
@@ -51,9 +50,9 @@ define ["Background", "Game", "Graph", "Keybindings", "Menu", "Overlay", "Standa
     @gamediv.max-width     = @settings.canvas.width
 
     @background    = new Background(@background_canvas)
-    @game_standard = new StandardGame(@game_canvas, @graph)
-    @game_testcase = new TestCase(@game_canvas, @graph)
-    @game_tutorial = new Tutorial(@game_canvas, @graph)
+    @game_standard = new StandardGame(@game_canvas)
+    @game_testcase = new TestCase(@game_canvas)
+    @game_tutorial = new Tutorial(@game_canvas)
     @game          = @game_standard
     #@game          = @game_testcase
     @menu          = new Menu(@menu_canvas)
