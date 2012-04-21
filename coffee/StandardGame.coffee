@@ -11,9 +11,9 @@ define ["Game"], (Game) -> class StandardGame extends Game
     basket = 150
     @basket_size = basket
     Naubino.background.basket_size = basket
-    Naubino.naub_replaced.add (number)=> @graph.cycle_test(number)
-    Naubino.naub_destroyed.add => @points++
-    Naubino.cycle_found.add (list) => @destroy_naubs(list)
+    @naub_replaced.add (number) => @graph.cycle_test(number)
+    @naub_destroyed.add => @points++
+    @cycle_found.add (list) => @destroy_naubs(list)
 
     # game parameters
     @spammer_interval = 300

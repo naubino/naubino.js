@@ -3,10 +3,10 @@
 define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }) -> class Game extends Layer
 
   # get this started
-  constructor: (canvas, @graph) ->
+  constructor: (canvas) ->
     super(canvas)
     @name = "game"
-    @graph = new Graph()
+    @graph = new Graph(this)
     @animation.name = "game.animation"
 
     # display stuff
@@ -23,6 +23,14 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     Naubino.mouseup.add @unfocus
 
     
+    # gameplay
+    @naub_replaced   = new Naubino.Signal()
+    @naub_joined     = new Naubino.Signal()
+    @naub_destroyed  = new Naubino.Signal()
+    @cycle_found     = new Naubino.Signal()
+    @naub_focused    = new Naubino.Signal()
+    @naub_unfocused  = new Naubino.Signal()
+
 
     StateMachine.create {
       target: this
@@ -75,9 +83,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # @param color [int] color id of naub 2
   create_naub_pair: (x=null, y=x, color_a = null, color_b = null) =>
 
-    console.log x,y
     {x,y} = @random_outside() unless x?
-    console.log x,y
 
     naub_a = new Naub this, color_a
     naub_b = new Naub this, color_b

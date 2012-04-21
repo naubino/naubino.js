@@ -130,7 +130,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
       ctx.restore()
     catch e
       #console.log [pos.x, pos.y]
-      Naubino.menu_pause.dispatch()
+      @layer.menu_pause.dispatch()
 
 
 
@@ -179,7 +179,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     @shapes[0].destroy_animation(@remove) # when this one is done the naub is removed
     for shape in @shapes[1..]
       shape.destroy_animation() # these are just for fun
-    Naubino.naub_destroyed.dispatch(@number)
+    @layer.naub_destroyed.dispatch(@number)
 
 
 
@@ -195,7 +195,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     @drawing_join[join] = true
     other.joins[join] = this
     other.drawing_join[join] = false
-    Naubino.naub_joined.dispatch()
+    @layer.naub_joined.dispatch() if @layer.naub_joined?
     join
 
 
@@ -207,7 +207,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
       @layer.graph.remove_join id
     @layer.unfocus()
     @remove()
-    Naubino.naub_replaced.dispatch(other.number)
+    @layer.naub_replaced.dispatch(other.number)
     return 42
 
 
@@ -261,13 +261,13 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     @focused = true
     @update()
     @onfocus()
-    Naubino.naub_focused.dispatch(@)
+    @layer.naub_focused.dispatch(@)
 
   unfocus: ->
     @focused = false
     @update()
     @onclick()
-    Naubino.naub_unfocused.dispatch(@)
+    @layer.naub_unfocused.dispatch(@)
 
   isHit: (x, y) ->
     click = new b2Vec2(x,y)

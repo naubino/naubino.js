@@ -1,5 +1,5 @@
 define -> class Graph
-  constructor: () ->
+  constructor: (@layer) ->
     @join_id_sequence = 0 # sequential join id
     @naubs = []
     @joins = {}
@@ -101,7 +101,7 @@ define -> class Graph
       if @dfs_map[partner].color == 1
         list =  @cycle_list(naub,partner,first)
         if list.length > 0
-          Naubino.cycle_found.dispatch(list)
+          @layer.cycle_found.dispatch(list)
     @dfs_map[naub].color = 2
     return cycles
 

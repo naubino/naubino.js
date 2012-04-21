@@ -138,14 +138,6 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @touchend        = new @Signal()
     @touchmove       = new @Signal()
 
-    # gameplay
-    @naub_replaced   = new @Signal()
-    @naub_joined     = new @Signal()
-    @naub_destroyed  = new @Signal()
-    @cycle_found     = new @Signal()
-    @naub_focused    = new @Signal()
-    @naub_unfocused  = new @Signal()
-
     # menu
     @menu_button     = new @Signal()
     @menu_focus      = new @Signal()
