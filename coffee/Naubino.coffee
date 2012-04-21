@@ -52,9 +52,10 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @background    = new Background(@background_canvas)
     @game_standard = new StandardGame(@game_canvas)
     @game_testcase = new TestCase(@game_canvas)
-    @game_tutorial = new Tutorial(@game_canvas)
+    #@game_tutorial = new Tutorial(@game_canvas)
     @game          = @game_standard
     #@game          = @game_testcase
+    #@game          = @game_tutorial
     @menu          = new Menu(@menu_canvas)
     @overlay       = new Overlay(@overlay_canvas)
 
@@ -92,6 +93,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     switch @current
       when 'playing' then @pause()
       when 'paused'  then @play()
+      when 'stopped'  then @play()
 
   onbeforepause: (event, from, to) ->
     unless from == "init"
@@ -108,6 +110,10 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
   onbeforestop: (event, from, to) ->
     @game.stop()
     @menu.stop()
+
+  tutorial: ->
+    @game_tutorial = new Tutorial(@game_canvas)
+    @soft_switch @game_tutorial
 
   soft_switch: (new_game) ->
     if @current == "playing"
