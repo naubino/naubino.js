@@ -61,8 +61,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
         # fade out and then change state
         onleavewelcome: ->
-          Naubino.overlay.fade_out_messages =>
-            @transition()
+          Naubino.overlay.fade_out_messages => @transition()
           false
 
         onclick: =>
@@ -89,11 +88,11 @@ define ["Game"], (Game) -> class Tutorial extends Game
         onlesson_move: =>
           Naubino.game.for_each (naub) -> naub.enable()
           # remember a naubs original position
-          binding1 = Naubino.naub_focused.add (naub) =>
+          binding1 = @naub_focused.add (naub) =>
             naub.old_pos = naub.physics.pos.Copy()
 
           # compare it with the new position
-          binding2 = Naubino.naub_unfocused.add (naub) =>
+          binding2 = @naub_unfocused.add (naub) =>
             new_pos = naub.physics.pos.Copy()
             new_pos.Subtract naub.old_pos
             dragged_distance = new_pos.Length()
@@ -106,21 +105,18 @@ define ["Game"], (Game) -> class Tutorial extends Game
           @fallback_warning_timer = setTimeout((=> Naubino.overlay.fade_in_and_out_message(["Just drag one pair across.",3000], null, @font_size)), 10000)
 
         # fade out and then change state
-        onleavelesson_move: =>
+        onleavelesson_move: ->
           clearTimeout @fallback_warning_timer
-
-          Naubino.overlay.fade_out_messages =>
-            @transition()
+          Naubino.overlay.fade_out_messages => @transition()
           false
 
 
         onlesson_join: =>
           Naubino.game.joining_allowed = no
-          Naubino.naub_replaced.addOnce =>
+          @naub_replaced.addOnce =>
             Naubino.overlay.queue_messages([["nicely done!",2000]], =>
               @lessons.joined()
             , @font_size)
-            @toggle_joining()
 
           Naubino.overlay.queue_messages([
             ["very Good", 1000]
@@ -132,7 +128,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
 
         onlesson_cycle: (e,f,t) =>
-          Naubino.cycle_found.add =>
+          @cycle_found.add =>
             Naubino.overlay.queue_messages([
               ["Great",4000]
             ], null, @font_size)
@@ -154,7 +150,9 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
   ### utility ###
 
-  toggle_joining: -> @joining_allowed = !@joining_allowed
+  toggle_joining: ->
+    @joining_allowed = !@joining_allowed
+    console.log "joining_allowed", @joining_allowed
 
   create_naubs: ->
     Naubino.game.gravity = on

@@ -3,7 +3,7 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
   constructor: (canvas) ->
     super(canvas)
     @name = "menu"
-    @graph = new Graph()
+    @graph = new Graph(this)
     @animation.name = "menu.animation"
 
     @objects = {}
@@ -13,7 +13,6 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
-    Naubino.naub_destroyed.add -> Naubino.menu.objects.main.update()
     Naubino.menu_button.active = false
    
     @position = new b2Vec2(20,25)
