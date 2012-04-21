@@ -105,7 +105,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
           @fallback_warning_timer = setTimeout((=> Naubino.overlay.fade_in_and_out_message(["Just drag one pair across.",3000], null, @font_size)), 10000)
 
         # fade out and then change state
-        onleavelesson_move: ->
+        onleavelesson_move: =>
           clearTimeout @fallback_warning_timer
           Naubino.overlay.fade_out_messages => @transition()
           false
@@ -117,6 +117,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
             Naubino.overlay.queue_messages([["nicely done!",2000]], =>
               @lessons.joined()
             , @font_size)
+            @toggle_joining()
 
           Naubino.overlay.queue_messages([
             ["very Good", 1000]
@@ -128,7 +129,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
 
         onlesson_cycle: (e,f,t) =>
-          @cycle_found.add =>
+          Naubino.game.cycle_found.add =>
             Naubino.overlay.queue_messages([
               ["Great",4000]
             ], null, @font_size)
@@ -150,7 +151,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
   ### utility ###
 
-  toggle_joining: ->
+  toggle_joining: =>
     @joining_allowed = !@joining_allowed
     console.log "joining_allowed", @joining_allowed
 
