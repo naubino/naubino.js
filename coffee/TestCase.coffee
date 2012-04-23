@@ -28,12 +28,6 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
     inner_basket = @count_basket()
     @destroy_naubs inner_basket
 
-  naubs: () ->
-    {x,y} = @random_outside() unless x?
-    naub = new Naub this
-    naub.add_shape new FrameCircle
-    @add_object naub
-
   create_naub_pair: (x=null, y=x, color_a = null, color_b = null) ->
 
     {x,y} = @random_outside() unless x?

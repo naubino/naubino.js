@@ -53,8 +53,8 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @game_standard = new StandardGame(@game_canvas)
     @game_testcase = new TestCase(@game_canvas)
     #@game_tutorial = new Tutorial(@game_canvas)
-    @game          = @game_standard
-    #@game          = @game_testcase
+    #@game          = @game_standard
+    @game          = @game_testcase
     #@game          = @game_tutorial
     @menu          = new Menu(@menu_canvas)
     @overlay       = new Overlay(@overlay_canvas)
@@ -127,6 +127,17 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
       @game.fade_in => @play()
       
 
+  scale: (nscale) ->
+    console.log oscale = 1
+    @settings.canvas.scale = nscale
+    console.log ratio = nscale/oscale
+    for canvas in  @gamediv.querySelectorAll("canvas")
+      #canvas.width = @settings.canvas.width * ratio
+      #canvas.height = @settings.canvas.height * ratio
+      canvas.width = canvas.width
+      canvas.getContext('2d').scale ratio, ratio
+      canvas.getContext('2d').restore()
+
 
 
   ###
@@ -164,13 +175,19 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
   setup_cursorbindings: () ->
     # TODO mouse events should be handled though Signals
     onmousemove = (e) =>
-      @mousemove.dispatch e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      x = (e.pageX - @overlay_canvas.offsetLeft) / @settings.canvas.scale
+      y = (e.pageY - @overlay_canvas.offsetTop) / @settings.canvas.scale
+      @mousemove.dispatch x,y
 
     onmouseup = (e) =>
-      @mouseup.dispatch e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      x = (e.pageX - @overlay_canvas.offsetLeft) / @settings.canvas.scale
+      y = (e.pageY - @overlay_canvas.offsetTop) / @settings.canvas.scale
+      @mouseup.dispatch x,y
 
     onmousedown = (e) =>
-      @mousedown.dispatch e.pageX - @overlay_canvas.offsetLeft, e.pageY - @overlay_canvas.offsetTop
+      x = (e.pageX - @overlay_canvas.offsetLeft) / @settings.canvas.scale
+      y = (e.pageY - @overlay_canvas.offsetTop) / @settings.canvas.scale
+      @mousedown.dispatch x,y
 
     @overlay_canvas.addEventListener("mousedown"  , onmousedown , false)
     @overlay_canvas.addEventListener("mouseup"    , onmouseup   , false)

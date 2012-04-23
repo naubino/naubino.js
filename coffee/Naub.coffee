@@ -269,6 +269,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     @layer.naub_unfocused.dispatch(@)
 
   isHit: (x, y) ->
+    s = Naubino.settings.canvas.scale
     click = new b2Vec2(x,y)
     click.Subtract(@physics.pos)
     (click.Length() < @size) and not @removed and not @disabled
