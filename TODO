@@ -1,9 +1,8 @@
-removed unset state transition
 split stepping and animation
 more little naub animations
 finish tutorial
 finish standard game
 more flexible collision detection
 scaling
-splitting joins
-splicing naubs
+splitting joins (unjoin, unjoin_from)
+splicing naubs (duplicate)

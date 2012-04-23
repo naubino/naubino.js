@@ -7,7 +7,8 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
     @animation.name = "menu.animation"
 
     @objects = {}
-    @hovering = false
+    @hovering = off
+    @drawing = on
     @gravity = Naubino.settings.physics.gravity.menu
 
     @listener_size = @default_listener_size = 45
@@ -15,6 +16,7 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
     Naubino.mousedown.add @click
     Naubino.menu_button.active = false
    
+    @physics_fps = 35
     @position = new b2Vec2(20,25)
     @cube_size = 45
     
@@ -28,15 +30,11 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
     TODO: position should be dynamic
     ###
 
-    # fragile calibration! don't fuck it up!
-    @fps = 1000 / 20
-    @dt = @fps/100
-
 
   # changing the state a little
-
   oninit: ->
     @add_buttons()
+    @start_stepper()
 
   buttons:
     main:
@@ -65,6 +63,7 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
       @objects[name].disabled = button.disabled
       @objects[name].isClickable = no
       @objects[name].physics.pos.Set button.position.x, button.position.y
+      @objects[name].physics.mass = Naubino.settings.naub.mass_menu
       @objects[name].physics.attracted_to.Set button.position.x, button.position.y
       @graph.remove_join @objects[name].join_with( @objects.main, name ) # add the object without managing the join
 
@@ -85,29 +84,27 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
     @objects.play.update()
 
 
-  mainloop: ()=>
-    @draw()
-    @draw_listener_region()
-    @step()
-
-  step: ->
+  step: (dt) ->
     for name, naub of @objects
-      naub.step (@dt)
+      naub.step (dt)
       if @hovering
-        naub.physics.gravitate()
+        naub.physics.gravitate(dt)
       else
-        naub.physics.gravitate(@position)
+        naub.physics.gravitate(dt, @position)
 
 
   #utility for Game
-  update:->
-    @objects.main.update()
+  update:-> @objects.main.update()
 
   ## can I touch this?
 
   move_pointer: (x,y) -> [@pointer.x, @pointer.y] = [x,y]
 
   draw: ->
+    @draw_menu()
+    @draw_listener_region()
+
+  draw_menu: ->
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
     for name, naub of @objects
@@ -127,10 +124,12 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
         Naubino.menu_focus.dispatch()
         @for_each (b) -> b.isClickable = yes
         @listener_size = 90
+        @start_stepper()
     else if @hovering
       Naubino.menu_blur.dispatch()
       @for_each (b) -> b.isClickable = no
       @listener_size = @default_listener_size
+      setTimeout (@stop_stepper ),1000
     #@ctx.stroke() # like to see it
     @ctx.closePath()
     @ctx.restore()

@@ -38,7 +38,6 @@ body {
     background-color:rgb(88%,88%,88%);
 }
 canvas, .canvas {
-    margin:auto;
     display:block;
     border:1px solid gray;
     background-color: rgba(255,255,255,0);

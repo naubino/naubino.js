@@ -10,7 +10,6 @@ define -> class PhysicsModel
     @spring_force = Naubino.settings.physics.spring_force
     @margin = Naubino.settings.physics.margin
     @join_length = Naubino.settings.physics.join_length
-
  
   step: (dt) ->
     v = @force.Copy()
@@ -19,18 +18,17 @@ define -> class PhysicsModel
     @acceleration = new b2Vec2(0, 0)
     @apply_friction()
 
-  gravitate: (to = @attracted_to) ->
+  gravitate: (dt,to = @attracted_to) ->
     unless @naub.focused or not @naub.layer.gravity
       diff = to.Copy()
       diff.Subtract(@pos)
-      diff.Multiply(@mass/100)
+      diff.Multiply(dt)
+      diff.Multiply(@mass)
       @accelerate(diff)
 
-  accelerate: (diff) ->
-    @force.Add(diff)
+  accelerate: (diff) -> @force.Add(diff)
 
-  apply_friction: ->
-    @force.Multiply(0.4)
+  apply_friction: -> @force.Multiply(1/@friction)
 
   follow: (v = @attracted_to) -> # except when you are held by the pointer
       pl = v.Copy()
