@@ -110,9 +110,7 @@ define -> class Layer
 
   clear: -> @canvas.width = @canvas.width
   cache: -> @backup_ctx = @ctx
-  restore: ->
-    @ctx = @backup_ctx
-    unset = null
+  restore: -> @ctx = @backup_ctx
 
 
 

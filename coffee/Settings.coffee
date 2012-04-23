@@ -27,7 +27,7 @@ define -> Settings = {
 
   events: [
         { name: 'init',   from: 'none',     to: 'stopped'}
-        { name: 'unset',  from: 'stopped',  to: 'none'   }
+        # { name: 'unset',  from: 'stopped',  to: 'none'   } # TODO REMOVE THIS 
         { name: 'play',   from: 'stopped',  to: 'playing'}
         { name: 'play',   from: 'paused',   to: 'playing'}
         { name: 'pause',  from: 'playing',  to: 'paused' }

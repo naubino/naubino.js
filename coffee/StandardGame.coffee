@@ -43,15 +43,6 @@ define ["Game"], (Game) -> class StandardGame extends Game
         return
 
 
-
-  onunset: ->
-    @clear()
-    @graph.clear()
-    @points = 0
-    Naubino.rules_cleared = true
-    Naubino.add_signals()
-  
-
   onchangestate: (e,f,t)-> #console.info "ruleset recived #{e}: #{f} -> #{t}"
 
   onbeforeplay: ->
@@ -72,7 +63,9 @@ define ["Game"], (Game) -> class StandardGame extends Game
     unless e is 'init'
       Naubino.background.animation.stop()
       @animation.stop()
-      return true
+      @clear()
+      @clear_objects()
+      @points = 0
     return true
 
   event: =>
