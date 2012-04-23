@@ -23,12 +23,13 @@ define ["Naub","Game","Shapes"], (Naub,Game,{NumberShape, Ball, FrameCircle}) ->
   onpaused: ->
     @animation.pause()
 
-  onunset:->
-    Naubino.add_signals()
-    console.log("standart_game clear")
-    Naubino.settings.show_numbers = false
-    @clear()
-    Naubino.background.clear()
+  onstopped: (e,f,t) ->
+    unless e is 'init'
+      Naubino.add_signals()
+      console.log("standart_game clear")
+      Naubino.settings.show_numbers = false
+      @clear()
+      Naubino.background.clear()
 
 
   event:->

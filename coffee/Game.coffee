@@ -245,7 +245,6 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     super()
     @graph.clear()
 
-
   # work and have everybody else do their work as well
 
   # run naub_forces, check for joinings and clean up

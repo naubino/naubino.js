@@ -151,12 +151,8 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
 
 
   add_listeners: ->
-    @menu_focus.add =>
-      @menu.hovering = @menu_button.active = true
-
-    @menu_blur.add =>
-      @menu.hovering = @menu_button.active = false
-
+    @menu_focus.add => @menu.hovering = @menu_button.active = true
+    @menu_blur.add => @menu.hovering = @menu_button.active = false
 
 
   setup_keybindings: () ->
