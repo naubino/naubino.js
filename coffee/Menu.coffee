@@ -45,11 +45,11 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
       position: new b2Vec2(65,35)
       shapes: [new Ball, new PlayButton]
     help:
-      function: ->
+      function: -> Naubino.tutorial()
       position: new b2Vec2(45,65)
       shapes: [new Ball, new StringShape "?", "white"]
     exit:
-      function: ->
+      function: -> Naubino.stop()
       position: new b2Vec2(14,80)
       shapes: [new Ball, new StringShape "X", "white"]
 
