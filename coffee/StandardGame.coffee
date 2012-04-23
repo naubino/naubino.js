@@ -49,14 +49,17 @@ define ["Game"], (Game) -> class StandardGame extends Game
     Naubino.background.animation.play()
     @animation.play()
 
-  onplaying: -> @loop = setInterval(@event, 300 )
+  onplaying: ->
+    @spamming= setInterval(@event, 300 )
+    @start_stepper()
 
 
-  onbeforepause: -> clearInterval @loop
-  onbeforestop:  -> clearInterval @loop
+  onbeforepause: -> clearInterval @spamming
+  onbeforestop:  -> clearInterval @spamming
 
   onpaused:      ->
     Naubino.background.animation.pause()
+    @stop_stepper()
     @animation.pause()
 
   onstopped: (e,f,t) ->

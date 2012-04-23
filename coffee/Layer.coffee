@@ -11,12 +11,20 @@ define -> class Layer
 
 
     # fragile calibration! don't fuck it up!
-    @fps = 1000 / Naubino.settings.graphics.fps
-    @dt = @fps/1500
+    @physics_fps = Naubino.settings.physics.fps
+    @fps         = Naubino.settings.graphics.fps
+    @dt          = Naubino.settings.physics.fps/1000 * Naubino.settings.physics.calming_const
+    @time        = Date.now()
+    @cut         = 0
 
     @show()
 
-    @animation = {parent: this}
+    @animation = {
+      parent: this
+      start_timer: => @draw_loop = setInterval(@do_draw, 1000 / @fps )
+      stop_timer: => clearInterval @draw_loop
+
+    }
 
     StateMachine.create {
       target: @animation
@@ -28,10 +36,10 @@ define -> class Layer
         # place onenterstate into the concrete implementation
 
         error: (e, from, to, args, code, msg) -> console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
-        onbeforeplay:(e, f, t) -> @parent.start_timer()
-        onbeforepause: (e,f,t) -> @parent.stop_timer()
+        onbeforeplay:(e, f, t) -> @start_timer()
+        onbeforepause: (e,f,t) -> @stop_timer()
         onbeforestop: (e,f,t) ->
-          @parent.stop_timer()
+          @stop_timer()
           @parent.clear()
 
         onchangestate: (e,f,t)->
@@ -44,6 +52,19 @@ define -> class Layer
   ### overwrite these ###
   draw: ->
   step: (dt) ->
+
+  get_dt: ->
+    old_time = @time
+    @time = Date.now()
+    @time - old_time
+
+  start_stepper: =>
+    @loop = setInterval(@do_step, 1000 / @physics_fps )
+  stop_stepper: =>
+    clearInterval @loop
+
+  do_step: () => @step(@dt)
+  do_draw: => @draw() if @drawing
 
 
 
@@ -64,20 +85,8 @@ define -> class Layer
       callback(v)
 
 
-  start_timer: => @animation.loop = setInterval(@mainloop, @fps )
-  stop_timer: => clearInterval @animation.loop
 
-  mainloop: ()=>
-    @step(@dt)
-    #@keybindings.step(@dt) #
-    if @drawing
-      @draw()
-
-
-  show: -> @canvas.style.opacity = 1
-  hide: -> @canvas.style.opacity = 0
-
-
+  #visibility
 
   fade_in: (callback = null) ->
     console.log "fade in", @fadeloop
@@ -93,7 +102,6 @@ define -> class Layer
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
 
-
   fade_out: (callback = null)->
     console.log "fade out", @fadeloop
     @cache()
@@ -106,7 +114,9 @@ define -> class Layer
           callback.call()
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
-      
+
+  show: -> @canvas.style.opacity = 1
+  hide: -> @canvas.style.opacity = 0
 
   clear: -> @canvas.width = @canvas.width
   cache: -> @backup_ctx = @ctx
@@ -139,10 +149,12 @@ define -> class Layer
     if @mousedown
       [@pointer.x, @pointer.y] = [x,y]
 
+  # asks all objects whether they have been hit by pointer
   get_obj: (x, y) ->
     for id, obj of @objects
       if obj.isHit(x, y) and obj.isClickable
         return obj
+
 
   ### utils ###
   color_to_rgba: (color, shift = 0) =>

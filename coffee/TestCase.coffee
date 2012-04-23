@@ -1,4 +1,4 @@
-define ["Naub","Game","Shapes"], (Naub,Game,{NumberShape, Ball, FrameCircle}) -> class TestCase extends Game
+define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, FrameCircle}, StandardGame) -> class TestCase extends StandardGame
   #  constructor: ->
   #    super()
   oninit: ->
@@ -7,7 +7,7 @@ define ["Naub","Game","Shapes"], (Naub,Game,{NumberShape, Ball, FrameCircle}) ->
     @gravity = on
     @naub_replaced.add (number)=> @graph.cycle_test(number)
     @cycle_found.add (list) => @destroy_naubs(list)
-    #Naubino.play()
+    Naubino.play()
 
   onplaying: ->
     weightless = => @gravity = off
@@ -15,26 +15,24 @@ define ["Naub","Game","Shapes"], (Naub,Game,{NumberShape, Ball, FrameCircle}) ->
     Naubino.settings.graphics.updating = off
 
     basket = 150
-    @animation.play()
+    @start_stepper()
     @basket_size = basket
     Naubino.background.basket_size = basket
     Naubino.background.draw()
 
   onpaused: ->
     @animation.pause()
-
-  onstopped: (e,f,t) ->
-    unless e is 'init'
-      Naubino.add_signals()
-      console.log("standart_game clear")
-      Naubino.settings.show_numbers = false
-      @clear()
-      Naubino.background.clear()
-
+    @stop_stepper()
 
   event:->
     inner_basket = @count_basket()
     @destroy_naubs inner_basket
+
+  naubs: () ->
+    {x,y} = @random_outside() unless x?
+    naub = new Naub this
+    naub.add_shape new FrameCircle
+    @add_object naub
 
   create_naub_pair: (x=null, y=x, color_a = null, color_b = null) ->
 

@@ -135,8 +135,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
 
 
   ## organisation
-  step: (dt) =>
-    @physics.step dt
+  step: (dt) -> @physics.step dt
 
 
 

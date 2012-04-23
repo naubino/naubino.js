@@ -10,7 +10,6 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     @animation.name = "game.animation"
 
     # display stuff
-    @paused = true # changed imidiately after loading by start_timer
     @drawing = true # for debugging
     @focused_naub = null # points to the naub you click on
     @gravity = Naubino.settings.physics.gravity.game
@@ -249,6 +248,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
   # run naub_forces, check for joinings and clean up
   step: (dt) ->
+    
     @naub_forces dt
 
     # check for joinings
@@ -275,7 +275,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     for id, naub of @objects
 
       # everything moves toward the middle
-      naub.physics.gravitate()
+      naub.physics.gravitate(dt)
 
       # joined naubs have spring forces
       for id, other of naub.joins

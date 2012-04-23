@@ -2,28 +2,32 @@
 define -> Settings = {
 
   graphics:
-    fps:           20
+    fps:           35 # mind physics.fps
+    fps_menu:      20
     draw_shadows:  off
-    updating:  on
+    updating:      on
 
   naub:
-    size:       14
-    mass:       15
-    border:     off  # not yet implemented
+    size:          14
+    mass:          4
+    mass_menu:     40
+    border:        off  # not yet implemented
 
   physics:
+    fps:           60
+    calming_const: 0.5
     gravity:
-      menu:         on
-      game:         on
-    margin:       1.4 # margin between naubs (n* avg size)
-    join_length:  3.0 # margin between joined naubs (n* avg size)
-    spring_force: 0.6
-    friction:     4.0
+      menu:        on
+      game:        on
+    margin:        1.4 # margin between naubs (n* avg size)
+    join_length:   3.0 # margin between joined naubs (n* avg size)
+    spring_force:  0.6
+    friction:      5.0
 
   canvas:
-    scale: 1 # not yet implemented
-    width:    640
-    height:   400
+    scale:         1 # not yet implemented
+    width:         640
+    height:        400
 
   events: [
         { name: 'init',   from: 'none',     to: 'stopped'}
