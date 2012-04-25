@@ -83,6 +83,10 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
     @objects.play.add_shape new PlayButton
     @objects.play.update()
 
+  onenterstopped: (e,f,t) ->
+    unless e is 'init'
+      @onenterpaused()
+
 
   step: (dt) ->
     for name, naub of @objects

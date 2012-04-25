@@ -1,3 +1,8 @@
+# TODO LEVEL UP
+#   number of colors
+#   number of naubs per spam
+#   speed up
+#
 # @extends Game
 define ["Game"], (Game) -> class StandardGame extends Game
   constructor: (canvas) ->
@@ -50,32 +55,49 @@ define ["Game"], (Game) -> class StandardGame extends Game
     @animation.play()
 
   onplaying: ->
-    @spamming= setInterval(@event, 300 )
+    @spamming = setInterval(@event, 300 )
+    @checking = setInterval(@check, 300 )
     @start_stepper()
+    Naubino.background.start_stepper()
 
+  onbeforepause: ->
+    clearInterval @spamming
+    clearInterval @checking
 
-  onbeforepause: -> clearInterval @spamming
-  onbeforestop:  -> clearInterval @spamming
+  onbeforestop:  ->
+    clearInterval @spamming
+    clearInterval @checking
 
   onpaused:      ->
+    @animation.pause()
     Naubino.background.animation.pause()
     @stop_stepper()
-    @animation.pause()
+    Naubino.background.stop_stepper()
 
   onstopped: (e,f,t) ->
     unless e is 'init'
       Naubino.background.animation.stop()
+      Naubino.background.stop_stepper()
       @animation.stop()
       @clear()
       @clear_objects()
       @points = 0
     return true
 
+  check: =>
+    basket = @count_basket()
+    if @capacity() < 75
+      console.log @capacity()
+      if Naubino.background.pulsating == off
+        Naubino.background.start_pulse()
+    else if Naubino.background.pulsating == on
+      Naubino.background.stop_pulse()
+
+
+
   event: =>
     if @inner_clock == 0
       @spam()
-      basket = @count_basket()
-      console.log @capacity() if basket.length > 0
     @inner_clock = (@inner_clock + 1) % 10
 
 
