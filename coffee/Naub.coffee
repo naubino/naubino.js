@@ -72,6 +72,9 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   add_shape: (shape)->
     shape.setup this
     @shapes.push shape
+  update_shapes: ->
+    for shape in @shapes
+      shape.setup this
 
   # Returns the area value of the first shape that implements it,
   area: ->
