@@ -80,6 +80,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # @param y [int] y-ordinate
   # @param color [int] color id of naub 1
   # @param color [int] color id of naub 2
+  # IMPLICIT if game has a @max_colors int random colors will only be picked out range [1..@max_colors]
   create_naub_pair: (x=null, y=x, color_a = null, color_b = null) =>
 
     {x,y} = @random_outside() unless x?
@@ -91,7 +92,6 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
     naub_a.add_shape new Ball
     naub_b.add_shape new Ball
-
 
     color_a = naub_a.color_id
     color_b = naub_b.color_id
@@ -227,7 +227,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # draws everything that happens inside the field
   draw:  ->
     # clears the canvas before drawing
-    @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
+    @ctx.clearRect(0, 0, Naubino.settings.canvas.width, Naubino.settings.canvas.height)
     # draws joins and naubs seperately
     @ctx.save()
     for id, obj of @objects

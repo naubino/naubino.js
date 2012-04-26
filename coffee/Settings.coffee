@@ -19,15 +19,15 @@ define -> Settings = {
     gravity:
       menu:        on
       game:        on
-    margin:        1.4 # margin between naubs (n* avg size)
+    margin:        1.2 # margin between naubs (n* avg size)
     join_length:   3.0 # margin between joined naubs (n* avg size)
     spring_force:  0.6
     friction:      5.0
 
   canvas:
     scale:         1 # not yet implemented
-    width:         640
-    height:        400
+    width:         460
+    height:        300
 
   events: [
         { name: 'init',   from: 'none',     to: 'stopped'}
