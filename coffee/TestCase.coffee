@@ -10,19 +10,13 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
     Naubino.play()
 
   onplaying: ->
+    @animation.play()
+    @start_stepper()
+    Naubino.background.animation.play()
+    Naubino.background.start_stepper()
+
     weightless = => @gravity = off
     #setTimeout(weightless, 4000)
-    Naubino.settings.graphics.updating = off
-
-    basket = 150
-    @start_stepper()
-    @basket_size = basket
-    Naubino.background.basket_size = basket
-    Naubino.background.draw()
-
-  onpaused: ->
-    @animation.pause()
-    @stop_stepper()
 
   event:->
     inner_basket = @count_basket()

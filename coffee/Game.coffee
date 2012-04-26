@@ -38,6 +38,16 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     }
 
 
+
+  #default state change actions
+  onplaying: ->
+    @animation.play()
+    @start_stepper()
+
+  onleaveplaying: (e,f,t) -> @stop_stepper()
+  onpaused: (e,f,t) -> @animation.pause()
+  onstopped: (e,f,t) ->
+
   # the game gives it the game takes it
   
   # methods that create naubs
