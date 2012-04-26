@@ -22,11 +22,18 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
     # game parameters
     @spammer_interval = 300
-    @number_of_colors = 3
+    @number_of_colors = 2
+
     @spammers = {
-      pair:   {method: @create_naub_pair,   probability: 5}
-      triple: {method: @create_naub_triple, probability: 1}
+      pair:
+        method: => @create_naub_pair(null, null, @max_color(), @max_color() )
+        probability: 5
+      triple:
+        method: @create_naub_triple
+        probability: 0
     }
+
+  max_color: -> Math.floor(Math.random() * (@number_of_colors))
 
   map_spammers: ->
     sum = 0
@@ -50,10 +57,10 @@ define ["Game"], (Game) -> class StandardGame extends Game
   onchangestate: (e,f,t)-> #console.info "ruleset recived #{e}: #{f} -> #{t}"
 
   onbeforeplay: ->
-    Naubino.background.animation.play()
-    @animation.play()
 
   onplaying: ->
+    Naubino.background.animation.play()
+    @animation.play()
     @spamming = setInterval(@event, 300 )
     @checking = setInterval(@check, 300 )
     @start_stepper()
