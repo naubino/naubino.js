@@ -1,7 +1,7 @@
-split stepping and animation
+correct physics
+finish standard game ( loosing, level up)
+finish tutorial (buggy switching, more lessons)
 more little naub animations
-finish tutorial
-finish standard game
 more flexible collision detection
 scaling
 splitting joins (unjoin, unjoin_from)
