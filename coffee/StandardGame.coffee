@@ -47,7 +47,6 @@ define ["Game"], (Game) -> class StandardGame extends Game
         spammer.method()
         return
 
-
   onchangestate: (e,f,t)-> #console.info "ruleset recived #{e}: #{f} -> #{t}"
 
   onbeforeplay: ->
@@ -60,25 +59,24 @@ define ["Game"], (Game) -> class StandardGame extends Game
     @start_stepper()
     Naubino.background.start_stepper()
 
-  onbeforepause: ->
-    clearInterval @spamming
-    clearInterval @checking
-
-  onbeforestop:  ->
+  onleaveplaying:->
+    @stop_stepper()
     clearInterval @spamming
     clearInterval @checking
 
   onpaused:      ->
     @animation.pause()
     Naubino.background.animation.pause()
-    @stop_stepper()
     Naubino.background.stop_stepper()
+
+  onbeforestop: (e,f,t) -> confirm "do you realy want to stop the game?"
 
   onstopped: (e,f,t) ->
     unless e is 'init'
       Naubino.background.animation.stop()
       Naubino.background.stop_stepper()
       @animation.stop()
+      @stop_stepper()
       @clear()
       @clear_objects()
       @points = 0

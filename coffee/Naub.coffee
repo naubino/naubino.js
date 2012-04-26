@@ -1,4 +1,4 @@
-# a Naub is everything in the game that you can move around
+#u a Naub is everything in the game that you can move around
 # Naubs can be joined under certain circumstances 
 # Naubs can be given shapes 
 # @param layer [Layer] the layer on which to draw
