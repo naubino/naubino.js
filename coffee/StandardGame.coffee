@@ -10,7 +10,6 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
   ### state machine ###
   oninit: ->
-    Naubino.rules_cleared = false
     @inner_clock = 0 # to avoid resetting timer after pause
     @points = 0
     basket = 150
@@ -54,25 +53,28 @@ define ["Game"], (Game) -> class StandardGame extends Game
         spammer.method()
         return
 
+
+
+
+
   onchangestate: (e,f,t)-> #console.info "ruleset recived #{e}: #{f} -> #{t}"
 
   onbeforeplay: ->
 
   onplaying: ->
+    super() #takes care of starting animation and physics
     Naubino.background.animation.play()
-    @animation.play()
-    @spamming = setInterval(@event, 300 )
-    @checking = setInterval(@check, 300 )
-    @start_stepper()
     Naubino.background.start_stepper()
+    @spamming = setInterval @event, 300
+    @checking = setInterval @check, 300
 
   onleaveplaying:->
-    @stop_stepper()
+    super() # takes care of halting physics
     clearInterval @spamming
     clearInterval @checking
 
   onpaused:      ->
-    @animation.pause()
+    super() # takes care of halting animation
     Naubino.background.animation.pause()
     Naubino.background.stop_stepper()
 
