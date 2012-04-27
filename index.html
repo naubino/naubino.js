@@ -1,37 +1,51 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-  <title>naubino.js</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" href="css/naubino.css" type="text/css">
-  <link rel="stylesheet" href="css/github-badge.css" type="text/css">
-  <meta name="viewport" content="width=device-width, maximum-scale=1.2,user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="css/naubino.css" type="text/css">
+    <link rel="stylesheet" href="css/github-badge.css" type="text/css">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.2,user-scalable=no" />
 
-  <script type="text/javascript" src="lib/signals/dist/signals.min.js"></script>
-  <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
-  <script type="text/javascript" src="lib/b2Vec2.js"></script>
-  <script type="text/javascript" src="js/Util.js"></script>
-  <script type="text/javascript" src="lib/requirejs/require.js" data-main="Naubino.min"></script>
-</head>
-<body>
-  <a id="github" href="https://github.com/hoodie/naubino.js">
-    <span>Watch me on Github!</span>
-    <span>Stay tuned!</span>
-  </a>
+    <script type="text/javascript" src="lib/signals/dist/signals.min.js"></script>
+    <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
+    <script type="text/javascript" src="lib/b2Vec2.js"></script>
+    <script type="text/javascript" src="lib/requirejs/require.js" data-main="Naubino.min"></script>
+  </head>
+  <body>
+    <a id="github" href="https://github.com/hoodie/naubino.js">
+      <span>Watch me on Github!</span>
+      <span>Stay tuned!</span>
+    </a>
 
+    <header>
 
-  <div id="gamediv">
-    <canvas id="background_canvas" style="position: absolute; z-index:0;" width="20" height="15"></canvas>
-    <canvas id="game_canvas"       style="position: absolute; z-index:1;" width="20" height="15"></canvas>
-    <canvas id="menu_canvas"       style="position: absolute; z-index:2;" width="20" height="15"></canvas>
-    <canvas id="overlay_canvas"    style="position: absolute; z-index:2;" width="20" height="15"></canvas>
-  </div> 
+    <div class="row-fluid">
+      <div class="span4"> </div>
+      <div class="span4">
+        <h1>naubino <sub>ålpha<sup>1</sup></sub></h1>
+    <hr/>
+      </div>
+      <div class="span4"> </div>
+    </div>
+    </header>
 
-  <script>
-    document.ontouchmove = function(event) {
-      event.preventDefault();
-    }
-  </script>
-</body>
+    <section class="row">
+      <div id="gamediv">
+        <canvas id="background_canvas" style="position: absolute; z-index:0;" width="20" height="15"></canvas>
+        <canvas id="game_canvas"       style="position: absolute; z-index:1;" width="20" height="15"></canvas>
+        <canvas id="menu_canvas"       style="position: absolute; z-index:2;" width="20" height="15"></canvas>
+        <canvas id="overlay_canvas"    style="position: absolute; z-index:2;" width="20" height="15"></canvas>
+      </div> 
+    </section>
+    <section class="row">
+    </section>
+
+    <script>
+      document.ontouchmove = function(event) {
+        event.preventDefault();
+      }
+    </script>
+  </body>
 </html>
 

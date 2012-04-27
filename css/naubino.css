@@ -45,6 +45,10 @@ canvas, .canvas {
 #background_canvas {
     background-color: #fff;
 }
+header{
+    margin:auto;
+    align:center;
+}
 h1 {
     font-family: "Comfortaa";
     font-size:32pt;
