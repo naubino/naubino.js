@@ -107,9 +107,9 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
 
   onpause: (event, from, to) ->
 
-  onbeforestop: (event, from, to) ->
-    if @game.stop()
-      console.log "stop"
+  onbeforestop: (event, from, to, @override = off) ->
+    @game.stop()
+    if @game.current == "stopped"
       @menu.stop()
     else
       false
