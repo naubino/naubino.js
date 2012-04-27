@@ -128,34 +128,35 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # works almost like create_naub_pair
   # @param x [int] x-ordinate
   # @param y [int] y-ordinate
-  create_naub_triple: (x=null, y=x ) =>
-      naub_a = new Naub this
-      naub_b = new Naub this
-      naub_c = new Naub this
+  create_naub_triple: (x=null, y=x, color_a = null, color_b = null, color_c = null) =>
+    {x,y} = @random_outside() unless x?
+    naub_a = new Naub this, color_a
+    naub_b = new Naub this, color_b
+    naub_c = new Naub this, color_c
 
-      naub_a.add_shape new Ball
-      naub_b.add_shape new Ball
-      naub_c.add_shape new Ball
+    naub_a.add_shape new Ball
+    naub_b.add_shape new Ball
+    naub_c.add_shape new Ball
 
-      @add_object naub_a
-      @add_object naub_b
-      @add_object naub_c
+    @add_object naub_a
+    @add_object naub_b
+    @add_object naub_c
 
-      naub_a.update() # again just to get the numbers
-      naub_b.update() # again just to get the numbers
-      naub_c.update() # again just to get the numbers
+    naub_a.update() # again just to get the numbers
+    naub_b.update() # again just to get the numbers
+    naub_c.update() # again just to get the numbers
 
-      dir = Math.random() * Math.PI
+    dir = Math.random() * Math.PI
 
-      naub_a.physics.pos.Set x, y
-      naub_b.physics.pos.Set x, y
-      naub_c.physics.pos.Set x, y
+    naub_a.physics.pos.Set x, y
+    naub_b.physics.pos.Set x, y
+    naub_c.physics.pos.Set x, y
 
-      naub_a.physics.pos.AddPolar(dir, 30)
-      naub_c.physics.pos.AddPolar(dir, -30)
+    naub_a.physics.pos.AddPolar(dir, 30)
+    naub_c.physics.pos.AddPolar(dir, -30)
 
-      naub_a.join_with naub_b
-      naub_b.join_with naub_c
+    naub_a.join_with naub_b
+    naub_b.join_with naub_c
 
 
   # produces a random set of coordinates outside the field
@@ -265,7 +266,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     if @mousedown && @focused_naub
       @focused_naub.physics.follow @pointer.Copy()
       for id, other of  @objects
-        if (@focused_naub.distance_to other) < (@focused_naub.size+10)
+        if (@focused_naub.distance_to other) < (@focused_naub.size+Naubino.settings.naub.fondness)
           @check_joining(@focused_naub,other)
           break
 

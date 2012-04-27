@@ -12,6 +12,7 @@ define -> Settings = {
     mass:          4
     mass_menu:     40
     border:        off  # not yet implemented
+    fondness:      12  # determines how hard it is to join two naubs
 
   physics:
     fps:           60
@@ -26,8 +27,8 @@ define -> Settings = {
 
   canvas:
     scale:         1 # not yet implemented
-    width:         460
-    height:        300
+    width:         800
+    height:        480
 
   events: [
         { name: 'init',   from: 'none',     to: 'stopped'}
