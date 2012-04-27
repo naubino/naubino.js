@@ -1,23 +1,59 @@
 @font-face {
-  font-style: normal;
-  font-weight: normal;
+    font-family: 'ComfortaaThin';
+    src: url('comfortaa/Comfortaa_Thin-webfont.eot');
+    src: url('comfortaa/Comfortaa_Thin-webfont.eot?#iefix') format('embedded-opentype'),
+         url('comfortaa/Comfortaa_Thin-webfont.woff') format('woff'),
+         url('comfortaa/Comfortaa_Thin-webfont.ttf') format('truetype'),
+         url('comfortaa/Comfortaa_Thin-webfont.svg#ComfortaaThin') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
 }
+
+@font-face {
+    font-family: 'Comfortaa';
+    src: url('comfortaa/Comfortaa_Regular-webfont.eot');
+    src: url('comfortaa/Comfortaa_Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('comfortaa/Comfortaa_Regular-webfont.woff') format('woff'),
+         url('comfortaa/Comfortaa_Regular-webfont.ttf') format('truetype'),
+         url('comfortaa/Comfortaa_Regular-webfont.svg#ComfortaaRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'Comfortaa';
+    src: url('comfortaa/Comfortaa_Bold-webfont.eot');
+    src: url('comfortaa/Comfortaa_Bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('comfortaa/Comfortaa_Bold-webfont.woff') format('woff'),
+         url('comfortaa/Comfortaa_Bold-webfont.ttf') format('truetype'),
+         url('comfortaa/Comfortaa_Bold-webfont.svg#ComfortaaBold') format('svg');
+    font-weight: Bold;
+    font-style: normal;
+}
+
 body {
-    width:100%;
     margin:0;
     background-color:rgb(88%,88%,88%);
 }
-canvas {
-    margin:auto;
+canvas, .canvas {
     display:block;
     border:1px solid gray;
     background-color: rgba(255,255,255,0);
 }
-canvas#background_canvas {
+#background_canvas {
     background-color: #fff;
 }
+header{
+    margin:auto;
+    align:center;
+}
 h1 {
-    font-size:1.2em;
+    font-family: "Comfortaa";
+    font-size:32pt;
+    color: white;
+    text-shadow: hsl(0,0%,022%) 2px 2px 4px;
 }
 #gamediv {
     text-align:center;
