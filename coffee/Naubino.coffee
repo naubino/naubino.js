@@ -52,7 +52,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @background    = new Background(@background_canvas)
     @game_standard = new StandardGame(@game_canvas)
     @game_testcase = new TestCase(@game_canvas)
-    #@game_tutorial = new Tutorial(@game_canvas)
+    @game_tutorial = new Tutorial(@game_canvas)
     @game          = @game_standard
     #@game          = @game_testcase
     #@game          = @game_tutorial
