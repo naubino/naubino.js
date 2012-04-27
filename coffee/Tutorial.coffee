@@ -19,9 +19,10 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
   configure: ->
     Naubino.overlay.animation.play()
+    Naubino.background.animation.stop() unless Naubino.background.animation.current == "stopped"
     @font_size = 24
     Naubino.menu_focus.active = false
-    Naubino.game.joining_allowed = no
+    @joining_allowed = no
 
     @lessons = StateMachine.create {
       initial: 'welcome'
@@ -69,7 +70,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
         onlesson_show: =>
           setTimeout =>
             @create_naubs()
-            Naubino.game.for_each (naub) -> naub.disable()
+            @for_each (naub) -> naub.disable()
             console.warn "naubs inserted"
           , 4300
 
@@ -86,7 +87,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
 
         onlesson_move: =>
-          Naubino.game.for_each (naub) -> naub.enable()
+          @for_each (naub) -> naub.enable()
           # remember a naubs original position
           binding1 = @naub_focused.add (naub) =>
             naub.old_pos = naub.physics.pos.Copy()
@@ -112,7 +113,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
 
         onlesson_join: =>
-          Naubino.game.joining_allowed = no
+          @joining_allowed = no
           @naub_replaced.addOnce =>
             Naubino.overlay.queue_messages([["nicely done!",2000]], =>
               @lessons.joined()
@@ -129,7 +130,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
 
         onlesson_cycle: (e,f,t) =>
-          Naubino.game.cycle_found.add =>
+          @cycle_found.add =>
             Naubino.overlay.queue_messages([
               ["Great",4000]
             ], null, @font_size)
@@ -147,6 +148,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
     }
 
   onplaying: ->
+    super()
     @configure()
 
   ### utility ###
@@ -156,8 +158,8 @@ define ["Game"], (Game) -> class Tutorial extends Game
     console.log "joining_allowed", @joining_allowed
 
   create_naubs: ->
-    Naubino.game.gravity = on
-    Naubino.game.create_matching_naubs(1)
-    Naubino.game.start_timer()
-    weightless = -> Naubino.game.gravity = off
+    @gravity = on
+    @create_matching_naubs(1)
+    @start_stepper()
+    weightless = -> @gravity = off
     setTimeout weightless, 5500
