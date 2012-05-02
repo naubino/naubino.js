@@ -23,7 +23,6 @@ define -> class Layer
       parent: this
       start_timer: => @draw_loop = setInterval(@do_draw, 1000 / @fps )
       stop_timer: => clearInterval @draw_loop
-
     }
 
     StateMachine.create {

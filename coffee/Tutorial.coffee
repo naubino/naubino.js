@@ -16,15 +16,15 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
   constructor: (canvas, graph) ->
     super(canvas, graph)
+    @multiplicator = 10 # 100
 
   configure: ->
     Naubino.overlay.animation.play()
     Naubino.background.animation.stop() unless Naubino.background.animation.current == "stopped"
     @font_size = 24
-    Naubino.menu_focus.active = false
     @joining_allowed = no
 
-    @lessons = StateMachine.create {
+    @lessons = StateMachine.create @lesson_steps = {
       initial: 'welcome'
       error:(e,f,t,a,ec,em) -> console.warn e,f,t,a,ec,em unless e is 'click'
 
@@ -49,16 +49,16 @@ define ["Game"], (Game) -> class Tutorial extends Game
           setTimeout ->
             Naubino.overlay.fade_in_message("\n\nclick to continue", null ,12)
             Naubino.mousedown.active = true
-          ,1000
+          ,10*@multiplicator
           setTimeout ->
             Naubino.overlay.fade_in_and_out_message(
-              ["use the menu to restart this tutorial at any time",5000],
+              ["use the menu to restart this tutorial at any time",50*@multiplicator],
               null,
               12,
               'black',
               Naubino.settings.canvas.width/2,
               Naubino.settings.canvas.height-10)
-          ,3000
+          ,30*@multiplicator
 
         # fade out and then change state
         onleavewelcome: ->
@@ -72,18 +72,18 @@ define ["Game"], (Game) -> class Tutorial extends Game
             @create_naubs()
             @for_each (naub) -> naub.disable()
             console.warn "naubs inserted"
-          , 4300
+          , 43*@multiplicator
 
           strings = [
-            ["Lesson 1",1300,@font_size*2]
-            ["Naubino is all about Naubs",1000]
-            ["These are Naubs",1000]
-            ["They always come in pairs",1000]
-            ["Try to move them around!",1000]
+            ["Lesson 1",13*@multiplicator,@font_size*2]
+            ["Naubino is all about Naubs",10*@multiplicator]
+            ["These are Naubs",10*@multiplicator]
+            ["They always come in pairs",10*@multiplicator]
+            ["Try to move them around!",10*@multiplicator]
           ]
 
           messages = => Naubino.overlay.queue_messages(strings, (=> @lessons.shown()), @font_size)
-          setTimeout messages, 2000
+          setTimeout messages, 20*@multiplicator
 
 
         onlesson_move: =>
@@ -103,7 +103,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
               binding2.detach()
               @lessons.moved()
 
-          @fallback_warning_timer = setTimeout((=> Naubino.overlay.fade_in_and_out_message(["Just drag one pair across.",3000], null, @font_size)), 10000)
+          @fallback_warning_timer = setTimeout((=> Naubino.overlay.fade_in_and_out_message(["Just drag one pair across.",30*@multiplicator], null, @font_size)), 100*@multiplicator)
 
         # fade out and then change state
         onleavelesson_move: =>
@@ -115,29 +115,29 @@ define ["Game"], (Game) -> class Tutorial extends Game
         onlesson_join: =>
           @joining_allowed = no
           @naub_replaced.addOnce =>
-            Naubino.overlay.queue_messages([["nicely done!",2000]], =>
+            Naubino.overlay.queue_messages([["nicely done!",20*@multiplicator]], =>
               @lessons.joined()
             , @font_size)
             @toggle_joining()
 
           Naubino.overlay.queue_messages([
-            ["very Good", 1000]
-            ["Every Naub has a certain color",1000]
-            ["You can connect pairs of Naubs...",1400]
-            ["...by dragging on Naub onto\nanother with the same color",3000]
-            ["Now try to connect two pairs of naubs!",3000]
+            ["very Good", 10*@multiplicator]
+            ["Every Naub has a certain color",10*@multiplicator]
+            ["You can connect pairs of Naubs...",14*@multiplicator]
+            ["...by dragging on Naub onto\nanother with the same color",30*@multiplicator]
+            ["Now try to connect two pairs of naubs!",30*@multiplicator]
           ], @toggle_joining, @font_size)
 
 
         onlesson_cycle: (e,f,t) =>
           @cycle_found.add =>
             Naubino.overlay.queue_messages([
-              ["Great",4000]
+              ["Great",40*@multiplicator]
             ], null, @font_size)
 
           Naubino.overlay.queue_messages([
-            ["now connect the remaining naubs",2500]
-            ["and see what happens...", 2000]
+            ["now connect the remaining naubs",25*@multiplicator]
+            ["and see what happens...", 20*@multiplicator]
           ], @toggle_joining, @font_size)
 
         onsuccess: =>
@@ -147,9 +147,25 @@ define ["Game"], (Game) -> class Tutorial extends Game
       }
     }
 
-  onplaying: ->
-    super()
-    @configure()
+  onbeforestop: (e,f,t) ->
+    Naubino.leave_tutorial()
+
+  onstopped: (e,f,t) ->
+    unless e is 'init'
+      Naubino.overlay.animation.stop()
+      @animation.stop()
+      @levels.reset()
+      @stop_stepper()
+      @clear()
+      @clear_objects()
+      @points = 0
+      console.info "Tutorial stopped"
+    else
+      console.info "Tutorial initialized"
+      @configure()
+    return true
+
+
 
   ### utility ###
 
@@ -159,7 +175,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
   create_naubs: ->
     @gravity = on
-    @create_matching_naubs(1)
+    @create_matching_naubs(1,1)
     @start_stepper()
     weightless = -> @gravity = off
-    setTimeout weightless, 5500
+    setTimeout weightless, 55*@multiplicator

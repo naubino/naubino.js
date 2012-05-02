@@ -118,9 +118,15 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @game_tutorial = new Tutorial(@game_canvas)
     @soft_switch @game_tutorial
 
+  leave_tutorial: ->
+    @soft_switch @oldgame
+    @overlay       = new Overlay(@overlay_canvas)
+    delete @game_tutorial
+    delete @oldgame
+
   soft_switch: (new_game) ->
-    if @current == "playing"
-      @pause()
+    @pause() if @current == "playing"
+    @oldgame = @game
 
     @game.fade_out =>
       @game.clear()
@@ -172,6 +178,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     window.onkeydown = (key) => @keybindings.keydown(key)
     window.onkeyup = (key) => @keybindings.keyup(key)
     @keybindings.enable 32, => @toggle()
+    @keybindings.enable 27, => @stop()
 
   setup_cursorbindings: () ->
     # TODO mouse events should be handled though Signals

@@ -27,8 +27,8 @@ define -> Settings = {
 
   canvas:
     scale:         1 # not yet implemented
-    width:         800
-    height:        480
+    width:         500#800
+    height:        300#480
 
   events: [
         { name: 'init',   from: 'none',     to: 'stopped'}
