@@ -147,6 +147,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
   onbeforestop: (e,f,t) ->
     if Naubino.override
       console.log "killed"
+      delete Naubino.override
       return true
     else
       confirm "do you realy want to stop the game?"
