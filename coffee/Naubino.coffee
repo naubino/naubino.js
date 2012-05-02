@@ -32,19 +32,22 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @setup_cursorbindings()
     console.timeEnd("loading")
 
-    
+
   print: -> @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
 
   init_dom: () ->
     @gamediv           = document.querySelector("#gamediv")
-    @overlay_canvas    = document.querySelector("#overlay_canvas")
-    @menu_canvas       = document.querySelector("#menu_canvas")
-    @game_canvas       = document.querySelector("#game_canvas")
-    @background_canvas = document.querySelector("#background_canvas")
-
-    for canvas in  @gamediv.querySelectorAll("canvas")
-      canvas.width = @settings.canvas.width
-      canvas.height = @settings.canvas.height
+    @canvases = []
+    { width, height } = @settings.canvas
+    for name in 'background game menu overlay'.split ' '
+      name += '_canvas'
+      c = document.createElement 'canvas'
+      c.width = width
+      c.height = height
+      c.setAttribute 'id', name
+      @[name] = c
+      @gamediv.appendChild c
+      @canvases.push c
 
   init_layers: ->
     @gamediv.max-width     = @settings.canvas.width
@@ -134,13 +137,14 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
       @game.draw()
       @game.init() if @game.current == "none"
       @game.fade_in => @play()
-      
+
 
   scale: (nscale) ->
     console.log oscale = 1
     @settings.canvas.scale = nscale
     console.log ratio = nscale/oscale
-    for canvas in  @gamediv.querySelectorAll("canvas")
+    for canvas in  @canvases
+      # doesnt work
       #canvas.width = @settings.canvas.width * ratio
       #canvas.height = @settings.canvas.height * ratio
       canvas.getContext('2d').scale ratio, ratio

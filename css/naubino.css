@@ -68,3 +68,7 @@ h1 {
     max-width:1024px;
     padding:0 1em;
 }
+
+canvas {
+    position: absolute;
+}
