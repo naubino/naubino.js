@@ -36,7 +36,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
   print: -> @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
 
   init_dom: () ->
-    @gamediv           = document.querySelector("#gamediv")
+    @gamediv = document.querySelector("#gamediv")
     @canvases = []
     { width, height } = @settings.canvas
     for name in 'background game menu overlay'.split ' '
