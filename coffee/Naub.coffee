@@ -34,8 +34,8 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     mass = 1
     momentum = cp.momentForCircle( mass, 0, @radius, offset )
     @physical_body = new cp.Body( mass, momentum )
-    @physical_body.setPos( cp.v(50,50) ) # remember to set position
     @physical_body.setAngle( 0 ) # remember to set position
+
     @physical_shape = new cp.CircleShape( @physical_body, @radius , offset )
     @physical_shape.setElasticity 0
     @physical_shape.setFriction 0.7
