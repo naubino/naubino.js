@@ -22,10 +22,12 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
     @basket_size = @default_basket_size = 160
     @spammers = @default_spammers = {
-
       pair:
         method: => @create_naub_pair(null, null, @max_color(), @max_color() )
         probability: 5
+      mixed_pair:
+        method: => @create_naub_pair(null, null, @max_color(), @max_color(), true )
+        probability: 0
       triple:
         method: => @create_naub_triple(null, null, @max_color(), @max_color(), @max_color() )
         probability: 0
@@ -49,19 +51,20 @@ define ["Game"], (Game) -> class StandardGame extends Game
       ]
       callbacks:
         onchangestate:->
+          console.log @current
           unless @current == "level1"
             Naubino.overlay.animation.play()
             Naubino.overlay.fade_in_and_out_message @current,( -> Naubino.overlay.animation.stop()), 35
 
         onlevel1: ->
-          console.log @current
           @game.spammers = @game.default_spammers
           @game.basket_size = @game.default_basket_size
+
           @game.number_of_colors = 3
-          @game.spammer_interval = 40 # 4 secons
+          @game.spammer_interval = 40 # 4 seconds
           @game.level_up_limit = 20
 
-        onlevel2:->
+        onlevel2: ->
           @game.number_of_colors = 4
           @game.spammer_interval = 35
           @game.level_up_limit = 45
@@ -83,6 +86,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
         onlevel6:->
           @game.number_of_colors = Naubino.colors.length
           @game.level_up_limit = 140
+
         onlevel7:->
           @game.spammer_interval = 20
           @game.level_up_limit = 165
@@ -91,6 +95,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
           @game.spammers.triple.probability = 2
           @game.basket_size = 140
           @game.level_up_limit = 200
+
         onlevel9:->
           Naubino.overlay.animation.play()
           Naubino.overlay.fade_in_and_out_message "you got further than we implemented", Naubino.stop(yes)

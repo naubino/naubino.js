@@ -48,17 +48,17 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   onpaused: (e,f,t) -> @animation.pause()
   onstopped: (e,f,t) ->
 
+
+
+
+
+
+
+
+
   # the game gives it the game takes it
+  # FACTORIES
   
-  # methods that create naubs
-  #
-  # @param [int] n number of pairs or triples
-  create_some_naubs: (n = 1) ->
-    for [1..n]
-      @create_naub_pair()
-      @create_naub_triple()
-
-
   #create n sets of matching pairs and some leftovers
   #
   # @param n [int] number of matching pairs
@@ -82,6 +82,42 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
         #Naubino.background.draw_marker(x,y)
         @create_naub_pair(x,y)
 
+  # factory for a naub ball
+  # 
+  # @param pos [b2Vec2] position
+  # @param color [int]  color_id
+  add_ball: (pos = b2Vec2(0,0), color = null) =>
+    naub = new Naub this, color
+    naub.add_shape new Ball
+    naub.physics.pos = pos
+    naub.kind = 'ball'
+    @add_object naub
+    #naub.update() # again just to get the numbers
+    naub
+
+
+  # factory for a naub box
+  # 
+  # @param pos [b2Vec2] position
+  # @param color [int]  color_id
+  add_box: (pos = b2Vec2(0,0), color = null) =>
+    naub = new Naub this, color
+    naub.add_shape new Square
+    naub.physics.pos = pos
+    naub.kind = 'box'
+    @add_object naub
+
+    #naub.update() # again just to get the numbers
+    naub
+
+  #returns a random 
+  random_factory: ->
+    factories = [
+      @add_ball
+      @add_box
+    ]
+    console.log 'i', i = Math.floor(Math.random() * (factories.length))
+    factories[i]
 
   # create a pair of joined naubs
   #
@@ -91,37 +127,26 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # @param color [int] color id of naub 1
   # @param color [int] color id of naub 2
   # IMPLICIT if game has a @max_colors int random colors will only be picked out range [1..@max_colors]
-  create_naub_pair: (x=null, y=x, color_a = null, color_b = null) =>
-
+  create_naub_pair: (x=null, y=x, color_a = null, color_b = null, mixed = off) =>
     {x,y} = @random_outside() unless x?
-
-    naub_a = new Naub this, color_a
-    naub_b = new Naub this, color_b
-    color_a = naub_a.color_id
-    color_b = naub_b.color_id
-
-    naub_a.add_shape new Ball
-    naub_b.add_shape new Ball
-
-    color_a = naub_a.color_id
-    color_b = naub_b.color_id
-
-    @add_object naub_a
-    @add_object naub_b
-
-    naub_a.update() # again just to get the numbers
-    naub_b.update() # again just to get the numbers
-
     dir = Math.random() * Math.PI
+    pos_a = new b2Vec2 x, y
+    pos_b = new b2Vec2 x, y
 
-    naub_a.physics.pos.Set x, y
-    naub_b.physics.pos.Set x, y
+    pos_a.AddPolar(dir,  15)
+    pos_b.AddPolar(dir, -15)
 
-    naub_a.physics.pos.AddPolar(dir, 15)
-    naub_b.physics.pos.AddPolar(dir, -15)
+    if mixed
+      factory1 = @random_factory()
+      factory2 = @random_factory()
+    else
+      factory1 = factory2 = @add_ball
+
+    naub_a = factory1 pos_a, color_a
+    naub_b = factory2 pos_b, color_b
 
     naub_a.join_with naub_b
-    [color_a, color_b]
+    [naub_a.color_id, naub_b.color_id]
 
   # create a triple of joined naubs
   #
@@ -129,34 +154,34 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # @param x [int] x-ordinate
   # @param y [int] y-ordinate
   create_naub_triple: (x=null, y=x, color_a = null, color_b = null, color_c = null) =>
+
     {x,y} = @random_outside() unless x?
-    naub_a = new Naub this, color_a
-    naub_b = new Naub this, color_b
-    naub_c = new Naub this, color_c
-
-    naub_a.add_shape new Ball
-    naub_b.add_shape new Ball
-    naub_c.add_shape new Ball
-
-    @add_object naub_a
-    @add_object naub_b
-    @add_object naub_c
-
-    naub_a.update() # again just to get the numbers
-    naub_b.update() # again just to get the numbers
-    naub_c.update() # again just to get the numbers
-
     dir = Math.random() * Math.PI
+    pos_a = new b2Vec2 x, y
+    pos_b = new b2Vec2 x, y
+    pos_c = new b2Vec2 x, y
 
-    naub_a.physics.pos.Set x, y
-    naub_b.physics.pos.Set x, y
-    naub_c.physics.pos.Set x, y
+    pos_a.AddPolar(dir,  30)
+    pos_c.AddPolar(dir, -30)
 
-    naub_a.physics.pos.AddPolar(dir, 30)
-    naub_c.physics.pos.AddPolar(dir, -30)
+    naub_a = @add_ball pos_a, color_a
+    naub_b = @add_ball pos_b, color_b
+    naub_c = @add_ball pos_c, color_c
 
     naub_a.join_with naub_b
     naub_b.join_with naub_c
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   # produces a random set of coordinates outside the field
@@ -218,19 +243,17 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   check_joining: (naub, other) ->
     return no if naub.number == other.number or not @joining_allowed
 
-    naub_partners = (partner.number for id, partner of naub.joins)
-    other_partners = (partner.number for id, partner of other.joins)
-    close_related = naub_partners.some (x) -> x in other_partners # "some" is standard js and means "filter"
+    close_related = naub.close_related other # prohibits folding of pairs
+    joined = naub.is_joined_with other # can't join what's already joined
 
-    joined = naub.is_joined_with other
-    alone = Object.keys(naub.joins).length == 0
-    other_alone = Object.keys(other.joins).length == 0
-    same_color = naub.color_id == other.color_id
+    agrees = naub.agrees_with(other) and other.agrees_with(naub)
 
-    if !naub.disabled && not joined && same_color && not close_related && not alone && not other_alone
+    if !naub.disabled && not joined && agrees && not close_related && not naub.alone() && not other.alone()
+      console.info 'replace'
       other.replace_with naub
       return yes
-    else if alone and not (other.disabled or naub.disabled)
+    else if naub.alone() and not (other.disabled or naub.disabled)
+      console.info 'join'
       naub.join_with other
       return yes
     no
