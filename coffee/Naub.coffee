@@ -1,4 +1,4 @@
-#u a Naub is everything in the game that you can move around
+# a Naub is everything in the game that you can move around
 # Naubs can be joined under certain circumstances 
 # Naubs can be given shapes 
 # @param layer [Layer] the layer on which to draw
@@ -72,6 +72,8 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   add_shape: (shape)->
     shape.setup this
     @shapes.push shape
+    @update()
+
   update_shapes: ->
     for shape in @shapes
       shape.setup this
@@ -80,17 +82,6 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   area: ->
     r = @size*@physics.margin
     Math.floor r*r*Math.PI
-
-  # Returns the area value of the first shape that implements it,
-  # assuming the bottom shape is the biggest shape.
-  # This is not exact science.
-  real_area: ->
-    for shape in @shapes
-      if shape.area
-        return shape.area()
-    return 0
-
-
 
   # runs draw_join on all partners, if this naub is the one drawing the join
   # Otherwise the partner will draw the join.
@@ -139,9 +130,6 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
 
   ## organisation
   step: (dt) -> @physics.step dt
-
-
-
 
 
 
@@ -212,6 +200,22 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     @layer.naub_replaced.dispatch(other.number)
     return 42
 
+  # checks whether naub shares a common partner with other naub
+  # prohibits folding of pairs
+  close_related: (other)->
+    naub_partners = (partner.number for id, partner of @joins)
+    other_partners = (partner.number for id, partner of other.joins)
+    close_related = naub_partners.some (x) -> x in other_partners # "some" is standard js and means "filter"
+
+  # is this naub not joined with any other naub?
+  alone: -> Object.keys(@joins).length == 0
+
+  # checks whether this naub wants to join with the other
+  # OVERWRITE ME
+  agrees_with: (other) ->
+    @color_id? and @kind? and
+    @color_id == other.color_id and
+    @kind     == other.kind
 
   is_joined_with: (other) ->
     joined = false
