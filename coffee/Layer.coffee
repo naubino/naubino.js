@@ -10,14 +10,10 @@ define -> class Layer
     @objects_count = 0
 
 
-    # fragile calibration! don't fuck it up!
-    @physics_fps = Naubino.settings.physics.fps
     @fps         = Naubino.settings.graphics.fps
+    @physics_fps = Naubino.settings.physics.fps
     @dt          = Naubino.settings.physics.fps/1000 * Naubino.settings.physics.calming_const
     @time        = Date.now()
-    @cut         = 0
-
-    @show()
 
     @animation = {
       parent: this
@@ -47,28 +43,32 @@ define -> class Layer
       }
     }
 
+    # set opacity
+    # TODO perhaps have zepto do it
+    @show()
 
-  ### overwrite these ###
-  draw: ->
-  step: (dt) ->
+    #chipmunk
+    @remainder = 0
+    @space = new cp.Space() # so far so good
 
-  get_dt: ->
-    old_time = @time
-    @time = Date.now()
-    @time - old_time
 
-  start_stepper: =>
-    @loop = setInterval(@do_step, 1000 / @physics_fps )
-  stop_stepper: =>
-    clearInterval @loop
+  # take some inspiration from chipmunk
+  chip_step: ->
+    #TODO checkout all that stepping rating crap in chipmunk demo
+    @space.step(1/60)
+    @space.gravity = cp.v 4,4
 
-  do_step: () => @step(@dt)
-  do_draw: => @draw() if @drawing
+    #TODO the pointer now has a mass
 
 
 
   ### managing objects ###
   add_object: (obj)->
+    #chipmunk
+    @space.addShape obj.physical_shape if obj.physical_shape?
+    @space.addBody obj.physical_body if obj.physical_body?
+
+
     obj.center = @center
     @objects_count++
     obj.number = @objects_count
@@ -83,6 +83,19 @@ define -> class Layer
     for k, v of @objects
       callback(v)
 
+
+
+  ### overwrite these ###
+  draw: ->
+  step: (dt) ->
+
+  start_stepper: =>
+    @loop = setInterval(@do_step, 1000 / @physics_fps )
+  stop_stepper: =>
+    clearInterval @loop
+
+  do_step: () => @step(@dt)
+  do_draw: => @draw() if @drawing
 
 
   #visibility

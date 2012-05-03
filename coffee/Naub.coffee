@@ -27,6 +27,22 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
 
     @update() #renders it for the first time
 
+    #
+    #chipmunk
+    @radius = @size # for now
+    offset = cp.v(0,0)
+    mass = 1
+    momentum = cp.momentForCircle( mass, 0, @radius, offset )
+    @physical_body = new cp.Body( mass, momentum )
+    @physical_body.setPos( cp.v(50,50) ) # remember to set position
+    @physical_body.setAngle( 0 ) # remember to set position
+    @physical_shape = new cp.CircleShape( @physical_body, @radius , offset )
+    @physical_shape.setElasticity 0
+    @physical_shape.setFriction 0.7
+
+
+
+
 
   # Either renders shapes or draws buffer 
   #
@@ -34,6 +50,11 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   # set @life_rendering to true if you want to have an animated naub
   # either renders live or draws pre_rendered image
   draw: (ctx) ->
+    #chipmunk test
+    cpos = @physical_body.p
+    @draw_point ctx, cpos.x, cpos.y
+    
+
     pos = @physics.pos
     unless Naubino.settings.graphics.updating or @life_rendering
       ctx.save()
@@ -44,6 +65,15 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
       @ctx.restore()
     else # render life
       @render(@ctx, pos.x,pos.y)
+
+  draw_point: (ctx, x, y, color = "black") ->
+    ctx.beginPath()
+    ctx.arc(x, y, 4, 0, 2 * Math.PI, false)
+    ctx.arc(x, y, 1, 0, 2 * Math.PI, false)
+    ctx.lineWidth = 1
+    ctx.strokeStyle = color
+    ctx.stroke()
+    ctx.closePath()
 
     
   # Renders the shape into a buffer
@@ -138,7 +168,8 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
 
 
   ## organisation
-  step: (dt) -> @physics.step dt
+  step: (dt) ->
+    @physics.step dt
 
 
 

@@ -30,13 +30,12 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     @naub_focused    = new Naubino.Signal()
     @naub_unfocused  = new Naubino.Signal()
 
-
+    #state machine
     StateMachine.create {
       target: this
       #error:(event,from,to,args,ec,em) -> console.warn "#{event}(#{args}): #{from}->#{to} - #{ec}:\"#{em}\"" unless event is 'click'
       events: Naubino.settings.events
     }
-
 
 
   #default state change actions
@@ -255,10 +254,10 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     super()
     @graph.clear()
 
-  # work and have everybody else do their work as well
 
   # run naub_forces, check for joinings and clean up
   step: (dt) ->
+    @chip_step()
     
     @naub_forces dt
 
