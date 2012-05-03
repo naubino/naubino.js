@@ -50,13 +50,13 @@ define -> class Layer
     #chipmunk
     @remainder = 0
     @space = new cp.Space() # so far so good
+    @space.gravity = cp.v 4,4
 
 
   # take some inspiration from chipmunk
   chip_step: ->
     #TODO checkout all that stepping rating crap in chipmunk demo
     @space.step(1/60)
-    @space.gravity = cp.v 4,4
 
     #TODO the pointer now has a mass
 
@@ -88,6 +88,7 @@ define -> class Layer
   ### overwrite these ###
   draw: ->
   step: (dt) ->
+    @chip_step()
 
   start_stepper: =>
     @loop = setInterval(@do_step, 1000 / @physics_fps )

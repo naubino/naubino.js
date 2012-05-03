@@ -90,7 +90,9 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     naub = new Naub this, color
     naub.add_shape new Ball
     naub.physics.pos = pos
+    naub.physical_body.setPos( cp.v(pos.x,pos.y) ) # remember to set position
     naub.kind = 'ball'
+
     @add_object naub
     #naub.update() # again just to get the numbers
     naub
@@ -280,11 +282,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
   # run naub_forces, check for joinings and clean up
   step: (dt) ->
-    @chip_step()
-  # work and have everybody else do their work as well
-
-  # run naub_forces, check for joinings and clean up
-  step: (dt) ->
+    super()
     
     @naub_forces dt
 
