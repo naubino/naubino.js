@@ -1,0 +1,45 @@
+Stay Alive Mode
+  (Original Mode)
+  Naubs keep comming faster and faster
+  -> Try to keep field from filling
+
+Empty the Field Mode
+  New Naubs appear as you destroy them
+  Perhaps the become more over time
+  -> Try to Destroy all
+  -> predeterment colors try to solve bigger and bigger cycles at once
+
+
+
+Level Ups:
+  More Colors
+  Different shapes
+
+
+Speciel Naubs:
+  "Time Bomb" starts selfdestruct when joined
+  "Big Time Bomb" selfdestructs too and takes joined naubs with him (think about special points for blasting naubs)
+  "Color Shifter" changes color every n seconds
+  "Grow Naub" grows extensions
+  "Decay Naub" unjoin after n seconds
+  "Glue Naub" Joins with any color ( up to n times)
+  "Mythosis Naub" replecates itself
+  "Coin Naubs" extra points if destroyed quickly
+
+
+### Plans for after 1.0
+
+
+ * achievments
+ * growing number of colors
+ * speciel rules
+  * coin naubs ? with countdown
+  * exponential points per cycle length
+  * destroy things inside a cycle?
+  * glue naub ? (binds first 6 naubs )
+  * slow down time
+  * mythosis naub vs. naubs that die if joined
+  * different colorthemes as rewards?
+
+matching naubs puzzeling ?
+

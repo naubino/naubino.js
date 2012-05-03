@@ -1,0 +1,28 @@
+# vim:set ft=changelog:
+# Roadmap:
+	* restore original gameplay ( 1.0 )
+	  * circle for naub overflow
+	  * menu
+	* alternating game modes
+
+# Known Issues
+	* performance : need to look over every single floating point operation
+	* usability   : play and pause button should have the same color
+	* bug         : keep on looking for the 3-way-join-bug
+	* bug         : naubs kinda jiggle in chromium (due to pre rendering)
+	* convention  : rename all objs into objects
+	* convention  : make names more intuitive (draw,render,pre_render)(buffer)
+  * input       : touch screens need scrollprevention (example on swipejs.com) and bigger naubs
+
+# wishes
+	* improve  : decouple step timer and draw timer
+	* improve  : global object size handling ( keep_distance, spring length and so on)
+	* improve  : more canvas performance optimization posible
+	* improve  : replace 1000/n fps calculation with requestAnimationFrame
+	* simplify : the drawing chain
+	* beauty   : destruction of cycle should start at focused_naub
+	* beauty   : color palettes also handle background and join color (for theming)
+	* feature  : add sound and music https://github.com/jakesgordon/javascript-audio-fx
+
+# tests
+	* test on	: microsoft surface ( or what ever we get during output)
