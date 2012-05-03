@@ -65,7 +65,8 @@ Shape: class Shape
 Square: class Square extends Shape
   constructor: ->
     super()
-    @rot = 0
+    @rot = Math.random() * Math.PI
+
   area: ->
     @width/2 * @width/2
 
@@ -73,9 +74,9 @@ Square: class Square extends Shape
   # actual painting routines
   render: (ctx,x,y) ->
     ctx.save()
-    @width= @naub.size * 2
+    @width= @naub.size * 1.8
 
-    @rot = @rot + 0.1
+    #@rot = @rot + 0.1
     ctx.translate( x, y)
     ctx.rotate @rot
      
@@ -248,7 +249,7 @@ PauseButton: class PauseButton extends Shape
 MainButton: class MainButton extends Square
   render: (ctx, x, y) ->
     text = Naubino.game.points ? ""
-    @width = @naub.size*2.5
+    @width = @naub.size*3
     ctx.save()
     ctx.translate(x,y)
     ctx.rotate(Math.PI/6)

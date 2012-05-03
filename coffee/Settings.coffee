@@ -5,17 +5,17 @@ define -> Settings = {
     fps:           35 # mind physics.fps
     fps_menu:      20
     draw_shadows:  off
-    updating:      on
+    updating:      off
 
   naub:
     size:          14
-    mass:          4
+    mass:          14
     mass_menu:     40
     border:        off  # not yet implemented
     fondness:      12  # determines how hard it is to join two naubs
 
   physics:
-    fps:           60
+    fps:           35 # bug: slows down if high cpu usage
     calming_const: 0.5
     gravity:
       menu:        on
