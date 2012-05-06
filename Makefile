@@ -1,60 +1,61 @@
-NAUBINO_TARGET = Naubino.full.js
-NAUBINO_UGLIFIED_TARGET = Naubino.min.js
-NAUBINO_DOC = docs/
+ful_TARGET = Naubino.full.js
+min_TARGET = Naubino.min.js
+all_TARGETS := $(ful_TARGET) $(min_TARGET)
 
-# the order is no longer crucial
-NAUBINO_TMP = \
-							js/Background.js \
-							js/Game.js \
-							js/Graph.js \
-							js/Keybindings.js \
-							js/Layer.js \
-							js/Load.js \
-							js/Menu.js \
-							js/Naubino.js \
-							js/Naub.js \
-							js/Overlay.js \
-							js/PhysicsModel.js \
-							js/Settings.js \
-							js/Shapes.js \
-							js/StandardGame.js \
-							js/TestCase.js \
-							js/Tutorial.js \
-							js/Util.js
+SRC_DIR = coffee/
+DOC_DIR = docs/
+LIB_DIR = lib/
+TMP_DIR = js/
+
+SRC := $(shell find $(SRC_DIR) -type f )
+TMP := $(SRC:$(SRC_DIR)%.coffee=js/%.js)
 
 
-NAUBINO_SOURCE = $(NAUBINO_TMP:js/%.js=coffee/%.coffee)
-
-all: $(NAUBINO_TARGET)
-
-
-ugly: $(NAUBINO_UGLIFIED_TARGET)
-
-
-$(NAUBINO_TARGET) : $(NAUBINO_TMP)
-	r.js -o name=Load out=./$@ baseUrl=js optimize=none
-	cp $@ $(NAUBINO_UGLIFIED_TARGET)
+all:       $(min_TARGET)
+js:        $(TMP)
+libs:      $(LIB_DIR)
+doc:       $(DOC_DIR)
+readable:  $(ful_TARGET)
 
 
-$(NAUBINO_UGLIFIED_TARGET): $(NAUBINO_TMP)
+$(min_TARGET): $(TMP)
 	r.js -o name=Load out=./$@ baseUrl=js
 
+$(ful_TARGET) : $(TMP)
+	r.js -o name=Load out=./$@ baseUrl=js optimize=none
+	cp $@ $(min_TARGET)
 
-js/%.js: coffee/%.coffee
+$(SRC): $(TMP_DIR)
+
+$(TMP): $(SRC)
 	coffee -p -c $< > $@
 
+$(DOC_DIR): $(SRC_DIR)
+	codo -o $@ $<
+
+$(TMP_DIR):
+	mkdir $(TMP_DIR)
+
+watch: $(TMP_DIR)
+	coffee -o $(TMP_DIR) -cw $(SRC_DIR)
+
+$(LIB_DIR):
+	git submodule update --init
+
+
+libs: $(LIB_DIR)
+	cd lib/zepto; rake
+
+.PHONY:
+todo:
+	cat doc/TODO
 
 .PHONY: clean
 clean:
-	rm -f $(NAUBINO_TARGET) $(NAUBINO_UGLIFIED_TARGET)
-
-.PHONY: clean-all
-clean-all:
-	rm -f $(NAUBINO_TARGET) $(NAUBINO_UGLIFIED_TARGET) js/*
+	rm -f  $(all_TARGETS)
+	rm -rf $(TMP_DIR)
+	rm -rf $(DOC_DIR)
 
 .PHONY: loc
 loc:
-	@cat $(NAUBINO_SOURCE) | grep -v '^\s*#' | grep -v "^\s*$$" | wc -l
-
-doc: docs/*
-	codo -o docs coffee
+	@cat $(SRC) | grep -v '^\s*#' | grep -v "^\s*$$" | wc -l
