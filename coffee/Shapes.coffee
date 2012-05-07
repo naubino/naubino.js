@@ -92,10 +92,10 @@ Square: class Square extends Shape
     ctx.restore()
 
   isHit:(x,y) ->
-    @layer.ctx.beginPath()
-    @layer.ctx.rect(@pos.x-@width/2,@pos.y-@width/2,@width,@width)
-    @layer.ctx.closePath()
-    @layer.ctx.isPointInPath(x,y)
+    @naub.layer.ctx.beginPath()
+    @naub.layer.ctx.rect(@pos.x-@width/2,@pos.y-@width/2,@width,@width)
+    @naub.layer.ctx.closePath()
+    @naub.layer.ctx.isPointInPath(x,y)
 
 
 Ball: class Ball extends Shape
@@ -135,6 +135,12 @@ Ball: class Ball extends Shape
     ctx.closePath()
 
     ctx.restore()
+
+  isHit:(x,y) ->
+    @naub.layer.ctx.beginPath()
+    @naub.layer.ctx.arc(0, 0, @naub.size, 0, Math.PI * 2, false)
+    @naub.layer.ctx.closePath()
+    @naub.layer.ctx.isPointInPath(x,y)
 
 
 Clock: class Clock extends Shape

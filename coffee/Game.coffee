@@ -56,12 +56,16 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
   add_object:(obj) ->
     super obj
-    @add_physical_object obj
 
-
-
-
-
+   
+    # attach it to its center
+    if @space?
+      #restLength, stiffness, damping
+      joint = new cp.DampedSpring(
+        obj.physical_body, @space.staticBody, cp.v(0,0), obj.center, 1, 3, 20 
+      )
+      @space.addConstraint( joint)
+      obj.constraints.push joint
 
   
   # the game gives it the game takes it
@@ -103,6 +107,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     naub.kind = 'ball'
 
     @add_object naub
+    naub.add_shape new NumberShape
     #naub.update() # again just to get the numbers
     naub
 
@@ -193,7 +198,33 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
 
 
+  # callback for mousedown signal
+  click: (x, y) =>
+    @mousedown = true
+    @pointer = new cp.v x,y
 
+    shape = @space.pointQueryFirst(@pointer, @GRABABLE_MASK_BIT, cp.NO_GROUP) if @space?
+    naub = @get_object shape.naub_number if shape?
+    if naub
+      naub.focus()
+      @focused_naub = naub
+
+      @mouseBody.p = @pointer
+      @mouseJoint = new cp.PivotJoint(@mouseBody, naub.physical_body, cp.v(0,0), naub.physical_body.world2Local(@pointer))
+      @mouseJoint.maxForce = 50000
+      @mouseJoint.errorBias = Math.pow(1 - 0.15, 60)
+      @space.addConstraint(@mouseJoint)
+
+  # callback for mouseup signal
+  unfocus: =>
+    if @mousedown
+      @mousedown = false
+      if @focused_naub
+        @focused_naub.unfocus()
+      @focused_naub = null
+      if @space? && @mouseJoint?
+        @space.removeConstraint @mouseJoint
+        @mouseJoint = null
 
 
 
@@ -282,6 +313,9 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
     for id, obj of @objects
       obj.draw @ctx
+
+    @draw_point @pointer
+    @draw_point @mouseBody.p, "red"
     @ctx.restore()
 
 
@@ -294,7 +328,6 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # run naub_forces, check for joinings and clean up
   step: (dt) ->
     super()
-    @chip_step()
     
     #@naub_forces dt
 
