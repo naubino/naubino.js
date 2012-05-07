@@ -38,6 +38,10 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     }
 
 
+  oninit: ->
+    #chipmunk
+    @setup_physics()
+
 
   #default state change actions
   onplaying: ->
@@ -49,6 +53,10 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   onstopped: (e,f,t) ->
 
 
+
+  add_object:(obj) ->
+    super obj
+    @add_physical_object obj
 
 
 
@@ -84,12 +92,13 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
   # factory for a naub ball
   # 
-  # @param pos [b2Vec2] position
+  # @param pos [cp.v] position
   # @param color [int]  color_id
-  add_ball: (pos = b2Vec2(0,0), color = null) =>
+  add_ball: (pos = cp.v(0,0), color = null) =>
     naub = new Naub this, color
     naub.add_shape new Ball
-    naub.physics.pos = pos
+    naub.physical_body.p = pos
+    #naub.physics.pos = pos
     naub.physical_body.setPos( cp.v(pos.x,pos.y) ) # remember to set position
     naub.kind = 'ball'
 
@@ -100,9 +109,9 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
   # factory for a naub box
   # 
-  # @param pos [b2Vec2] position
+  # @param pos [cp.v] position
   # @param color [int]  color_id
-  add_box: (pos = b2Vec2(0,0), color = null) =>
+  add_box: (pos = cp.v(0,0), color = null) =>
     naub = new Naub this, color
     naub.add_shape new Square
     naub.physics.pos = pos
@@ -132,11 +141,12 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   create_naub_pair: (x=null, y=x, color_a = null, color_b = null, mixed = off) =>
     {x,y} = @random_outside() unless x?
     dir = Math.random() * Math.PI
-    pos_a = new b2Vec2 x, y
-    pos_b = new b2Vec2 x, y
+    pos_a = new cp.v x, y
+    pos_b = new cp.v x, y
 
-    pos_a.AddPolar(dir,  15)
-    pos_b.AddPolar(dir, -15)
+    #TODO auskommentiert
+    #pos_a.AddPolar(dir,  15)
+    #pos_b.AddPolar(dir, -15)
 
     if mixed
       factory1 = @random_factory()
@@ -159,12 +169,13 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
     {x,y} = @random_outside() unless x?
     dir = Math.random() * Math.PI
-    pos_a = new b2Vec2 x, y
-    pos_b = new b2Vec2 x, y
-    pos_c = new b2Vec2 x, y
+    pos_a = new cp.v x, y
+    pos_b = new cp.v x, y
+    pos_c = new cp.v x, y
 
-    pos_a.AddPolar(dir,  30)
-    pos_c.AddPolar(dir, -30)
+    # TODO auskommentiert
+    #pos_a.AddPolar(dir,  30)
+    #pos_c.AddPolar(dir, -30)
 
     naub_a = @add_ball pos_a, color_a
     naub_b = @add_ball pos_b, color_b
@@ -211,9 +222,9 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     count = []
     if @basket_size?
       for id, naub of @objects
-        diff = @center.Copy()
-        diff.Subtract naub.physics.pos
-        if diff.Length() < @basket_size - naub.size/2
+        diff = new cp.v @center.x, @center.y
+        diff.sub naub.physical_body.p
+        if cp.v.len(diff) < @basket_size - naub.size/2
           count.push naub
     count
 
@@ -283,16 +294,18 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # run naub_forces, check for joinings and clean up
   step: (dt) ->
     super()
+    @chip_step()
     
-    @naub_forces dt
+    #@naub_forces dt
 
-    # check for joinings
-    if @mousedown && @focused_naub
-      @focused_naub.physics.follow @pointer.Copy()
-      for id, other of  @objects
-        if (@focused_naub.distance_to other) < (@focused_naub.size+Naubino.settings.naub.fondness)
-          @check_joining(@focused_naub,other)
-          break
+    # TODO auskommentiert
+    # # check for joinings
+    # if @mousedown && @focused_naub
+    #   @focused_naub.physics.follow @pointer.Copy()
+    #   for id, other of  @objects
+    #     if (@focused_naub.distance_to other) < (@focused_naub.size+Naubino.settings.naub.fondness)
+    #       @check_joining(@focused_naub,other)
+    #       break
 
     # delete objects
     for id, obj of @objects

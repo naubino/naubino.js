@@ -3,9 +3,9 @@ define -> class Layer
   constructor: (@canvas) ->
     @width = @canvas.width
     @height = @canvas.height
-    @center = new b2Vec2 @width/2, @height/2
     @ctx = @canvas.getContext('2d')
-    @pointer = @center.Copy()
+    @center = new cp.v @width/2, @height/2
+    @pointer = new cp.v @width/2, @height/2
     @objects = {}
     @objects_count = 0
 
@@ -47,10 +47,14 @@ define -> class Layer
     # TODO perhaps have zepto do it
     @show()
 
+  setup_physics: ->
+    console.info "setup physics", @name
     #chipmunk
     @remainder = 0
     @space = new cp.Space() # so far so good
-    @space.gravity = cp.v 4,4
+ 
+    # add center
+
 
 
   # take some inspiration from chipmunk
@@ -63,12 +67,18 @@ define -> class Layer
 
 
   ### managing objects ###
-  add_object: (obj)->
+  add_physical_object: (obj)->
     #chipmunk
-    @space.addShape obj.physical_shape if obj.physical_shape?
-    @space.addBody obj.physical_body if obj.physical_body?
+    if @space?
+      @space.addShape obj.physical_shape if obj.physical_shape?
+      @space.addBody obj.physical_body if obj.physical_body?
+
+      joint_to_center = new cp.DampedSpring(obj.physical_body, @space.staticBody, cp.v(15,0), @center, 20, 5, 0.3)
+      @space.addConstraint( joint_to_center)
 
 
+
+  add_object: (obj)->
     obj.center = @center
     @objects_count++
     obj.number = @objects_count
@@ -88,12 +98,9 @@ define -> class Layer
   ### overwrite these ###
   draw: ->
   step: (dt) ->
-    @chip_step()
 
-  start_stepper: =>
-    @loop = setInterval(@do_step, 1000 / @physics_fps )
-  stop_stepper: =>
-    clearInterval @loop
+  start_stepper: => @loop = setInterval(@do_step, 1000 / @physics_fps )
+  stop_stepper: => clearInterval @loop
 
   do_step: () => @step(@dt)
   do_draw: => @draw() if @drawing
