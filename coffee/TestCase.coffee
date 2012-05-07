@@ -2,6 +2,7 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
   #  constructor: ->
   #    super()
   oninit: ->
+    super()
     #@create_some_naubs 2
     @create_matching_naubs()
     @gravity = on
@@ -10,8 +11,7 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
     Naubino.play()
 
   onplaying: ->
-    @animation.play()
-    @start_stepper()
+    super()
     #Naubino.background.animation.play()
     #Naubino.background.start_stepper()
 
@@ -19,6 +19,4 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
     #setTimeout(weightless, 4000)
 
   event:->
-    inner_basket = @count_basket()
-    @destroy_naubs inner_basket
 

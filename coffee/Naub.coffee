@@ -6,8 +6,10 @@
 # @param size [int] size, what else
 define ["PhysicsModel"], (PhysicsModel) -> class Naub
   constructor: (@layer, @color_id = null, @size = Naubino.settings.naub.size) ->
-    @physics = new PhysicsModel this
-    @physics.attracted_to = @layer.center.Copy() # gravity center
+    #@physics = new PhysicsModel this
+   
+    # gravity center
+    #@physics.attracted_to = new cp.v @layer.center.x,@layer.center.y
 
     @ctx = @layer.ctx
     @frame = @size*1.5 # defines buffer canvas
@@ -55,7 +57,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     @draw_point ctx, cpos.x, cpos.y
     
 
-    pos = @physics.pos
+    pos = @physical_body.p
     unless Naubino.settings.graphics.updating or @life_rendering
       ctx.save()
       x = pos.x-@frame
@@ -110,7 +112,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
 
   # Returns the area value of the first shape that implements it,
   area: ->
-    r = @size*@physics.margin
+    r = @size
     Math.floor r*r*Math.PI
 
   # runs draw_join on all partners, if this naub is the one drawing the join
@@ -127,20 +129,22 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   # @param ctx [canvas.context] context of the target layer
   # @param partner [naub] target naub
   draw_join: (ctx, partner) ->
-    pos = @physics.pos
-    pos2 = partner.physics.pos
+    pos = @physical_body.p
+    pos2 = partner.physical_body.p
 
-    # joins getting thinner by stretching
-    diff = pos2.Copy()
-    diff.Subtract(pos)
-    l = diff.Length()
-    m = @physics.margin*25
-    fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
-    stretch = (m + fiber) / (l + fiber)
-    stretch = Math.round((stretch)*10)/10 # rounding
-    #@join_style.fill[3] = stretch
-    stretched_width = @join_style.width * stretch
+    # TODO auskommentiert
+    # # joins getting thinner by stretching
+    # diff = pos2.Copy()
+    # diff.Subtract(pos)
+    # l = diff.Length()
+    # m = @physics.margin*25
+    # fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
+    # stretch = (m + fiber) / (l + fiber)
+    # stretch = Math.round((stretch)*10)/10 # rounding
+    # #@join_style.fill[3] = stretch
+    # stretched_width = @join_style.width * stretch
 
+    stretched_width = 3
     ctx.save()
     ctx.strokeStyle = @color_to_rgba @join_style.fill
     try
@@ -159,8 +163,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
 
 
   ## organisation
-  step: (dt) ->
-    @physics.step dt
+  step: (dt) -> #@physics.step dt
 
 
 
@@ -279,8 +282,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     unless other.number == @number
       { pos, vel, force } = @physics
       { pos: opos, vel: ovel, force: oforce } = other.physics
-
-      diff = opos.Copy()
+      diff = new cp.v opos.x, opos.y
       diff.Subtract(pos)
       l = diff.Length()
     else

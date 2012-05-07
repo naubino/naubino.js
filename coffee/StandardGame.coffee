@@ -10,6 +10,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
   ### state machine ###
   oninit: ->
+    super()
     @inner_clock = 0 # to avoid resetting timer after pause
     @points = 0
 

@@ -59,11 +59,11 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     #@game          = @game_standard
     @game          = @game_testcase
     #@game          = @game_tutorial
-    @menu          = new Menu(@menu_canvas)
+    #@menu          = new Menu(@menu_canvas)
     @overlay       = new Overlay(@overlay_canvas)
 
-    @menu.init()
-    @menu.animation.play()
+    #@menu.init()
+    #@menu.animation.play()
     @game.init()
 
 
@@ -90,7 +90,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
 
   onchangestate: (e,f,t)-> console.info "Naubino changed states #{e}: #{f} -> #{t}"
   onbeforeplay: (event, from, to) -> @game.play()
-  onenterplaying: -> @menu.play()
+  onenterplaying: -> #@menu.play()
 
   toggle: ->
     switch @current
@@ -102,7 +102,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     unless from == "init"
       #console.time('state_paused')
       @game.pause()
-      @menu.pause()
+      #@menu.pause()
 
   onenterpaused: ->
     #console.timeEnd('state_paused')
@@ -113,7 +113,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
   onbeforestop: (event, from, to, @override = off) ->
     @game.stop()
     if @game.current == "stopped"
-      @menu.stop()
+      #@menu.stop()
     else
       false
 
