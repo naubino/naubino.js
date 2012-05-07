@@ -48,45 +48,51 @@ define -> class Layer
     @show()
 
   setup_physics: ->
+    @GRABABLE_MASK_BIT = 1<<31
     console.info "setup physics", @name
     #chipmunk
     @remainder = 0
     @space = new cp.Space() # so far so good
+    @mouseBody = new cp.Body(Infinity, Infinity)
+    @mouseBody.p = new cp.v 0,0
+    @space.addBody @mouseBody
  
     # add center
 
+  step: (dt) ->
+    @space.step(1/40)
+
+    # Move mouse body toward the mouse
+    newPoint = cp.v.lerp(@mouseBody.p, @pointer, 0.25)
+    @mouseBody.v = cp.v.mult(cp.v.sub(newPoint, @mouseBody.p), 60)
+    @mouseBody.p = newPoint
 
 
-  # take some inspiration from chipmunk
-  chip_step: ->
-    #TODO checkout all that stepping rating crap in chipmunk demo
-    @space.step(1/60)
+  start_stepper: => @loop = setInterval((=> @step(@dt)),  1000 / @physics_fps )
+  stop_stepper: => clearInterval @loop
 
-    #TODO the pointer now has a mass
-
-
-
-  ### managing objects ###
-  add_physical_object: (obj)->
+  add_object: (obj)->
     #chipmunk
     if @space?
       @space.addShape obj.physical_shape if obj.physical_shape?
       @space.addBody obj.physical_body if obj.physical_body?
 
-      joint_to_center = new cp.DampedSpring(obj.physical_body, @space.staticBody, cp.v(15,0), @center, 20, 5, 0.3)
-      @space.addConstraint( joint_to_center)
-
-
-
-  add_object: (obj)->
     obj.center = @center
-    @objects_count++
-    obj.number = @objects_count
+    obj.set_number ++@objects_count
     @objects[@objects_count] = obj
     @objects_count
 
+  remove_obj: (id) ->
+    obj = @get_object id
+    if @space?
+      @space.removeShape obj.physical_shape if obj.physical_shape?
+      @space.removeBody obj.physical_body if obj.physical_body?
+      for constraint in obj.constraints
+        @space.removeConstraint constraint
+    delete @objects[id]
+
+
   get_object: (id)-> @objects[id]
-  remove_obj: (id) -> delete @objects[id]
   clear_objects: -> @objects = {}
 
   for_each: (callback) ->
@@ -96,13 +102,18 @@ define -> class Layer
 
 
   ### overwrite these ###
+  draw_point: (pos, color = "black") ->
+    @ctx.beginPath()
+    @ctx.arc(pos.x, pos.y, 4, 0, 2 * Math.PI, false)
+    @ctx.arc(pos.x, pos.y, 1, 0, 2 * Math.PI, false)
+    @ctx.lineWidth = 1
+    @ctx.strokeStyle = color
+    @ctx.stroke()
+    @ctx.closePath()
+
+    
   draw: ->
-  step: (dt) ->
 
-  start_stepper: => @loop = setInterval(@do_step, 1000 / @physics_fps )
-  stop_stepper: => clearInterval @loop
-
-  do_step: () => @step(@dt)
   do_draw: => @draw() if @drawing
 
 
@@ -144,18 +155,18 @@ define -> class Layer
 
 
 
-
-  # can I touch this? (pointer interaction)
-
-
   # callback for mousedown signal
   click: (x, y) =>
     @mousedown = true
     [@pointer.x, @pointer.y] = [x,y]
-    naub = @get_obj x, y
+
+    shape = @space.pointQueryFirst(@pointer, @GRABABLE_MASK_BIT, cp.NO_GROUP) if @space?
+    naub = @get_object shape.naub_number if shape?
     if naub
       naub.focus()
       @focused_naub = naub
+
+
 
   # callback for mouseup signal
   unfocus: =>
@@ -170,10 +181,13 @@ define -> class Layer
       [@pointer.x, @pointer.y] = [x,y]
 
   # asks all objects whether they have been hit by pointer
-  get_obj: (x, y) ->
-    for id, obj of @objects
-      if obj.isHit(x, y) and obj.isClickable
-        return obj
+  get_obj_in_pos: (pos) ->
+    if @space?
+      shape = @space.pointQueryFirst(pos, @GRABABLE_MASK_BIT, cp.NO_GROUP)
+      console.log shape
+      for id, obj of @objects
+        if obj.isHit(pos.x, pos.y) and obj.isClickable
+          return obj
 
 
   ### utils ###

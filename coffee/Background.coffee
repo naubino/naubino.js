@@ -89,17 +89,7 @@ define ["Layer"], (Layer) -> class Background extends Layer
       @ctx.restore()
     @ctx.restore()
     
-  draw_marker: (x,y, color = 'black') ->
-    @ctx.beginPath()
-    @ctx.arc(x, y, 4, 0, 2 * Math.PI, false)
-    @ctx.arc(x, y, 1, 0, 2 * Math.PI, false)
-    @ctx.lineWidth = 1
-    @ctx.strokeStyle = color
-    @ctx.stroke()
-    @ctx.closePath()
-
   draw_line: (x0, y0, x1 = @center.x, y1 = @center.y, color = 'black') ->
-
     @ctx.beginPath()
     @ctx.moveTo(x0, y0)
     @ctx.lineTo(x1, y1)

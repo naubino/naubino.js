@@ -7,7 +7,7 @@ DOC_DIR = docs/
 LIB_DIR = lib/
 TMP_DIR = js/
 
-SRC := $(shell find $(SRC_DIR) -type f )
+SRC := $(shell find $(SRC_DIR) -type f -iname \*.coffee)
 TMP := $(SRC:$(SRC_DIR)%.coffee=js/%.js)
 
 

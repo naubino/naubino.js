@@ -4,12 +4,11 @@
 # @param layer [Layer] the layer on which to draw
 # @param color_id [int] representing the color from color palett, also neccessary for joining
 # @param size [int] size, what else
-define ["PhysicsModel"], (PhysicsModel) -> class Naub
+define -> class Naub
   constructor: (@layer, @color_id = null, @size = Naubino.settings.naub.size) ->
     #@physics = new PhysicsModel this
    
     # gravity center
-    #@physics.attracted_to = new cp.v @layer.center.x,@layer.center.y
 
     @ctx = @layer.ctx
     @frame = @size*1.5 # defines buffer canvas
@@ -28,12 +27,14 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     @join_style = { fill: [0,0,0,1], width: 6 }
 
     @update() #renders it for the first time
+    @setup_physics()
 
-    #
-    #chipmunk
+  setup_physics: ->
+
+    @constraints = []
     @radius = @size # for now
     offset = cp.v(0,0)
-    mass = 1
+    mass = 5
     momentum = cp.momentForCircle( mass, 0, @radius, offset )
     @physical_body = new cp.Body( mass, momentum )
     @physical_body.setAngle( 0 ) # remember to set position
@@ -43,7 +44,15 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     @physical_shape.setFriction 0.7
 
 
+  set_number: (@number) ->
+    @physical_shape.naub_number = @number
+    @physical_body.naub_number = @number
 
+
+  # Returns the area value of the first shape that implements it,
+  area: ->
+    r = @size
+    Math.floor r*r*Math.PI
 
 
   # Either renders shapes or draws buffer 
@@ -54,7 +63,6 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   draw: (ctx) ->
     #chipmunk test
     cpos = @physical_body.p
-    @draw_point ctx, cpos.x, cpos.y
     
 
     pos = @physical_body.p
@@ -68,16 +76,6 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     else # render life
       @render(@ctx, pos.x,pos.y)
 
-  draw_point: (ctx, x, y, color = "black") ->
-    ctx.beginPath()
-    ctx.arc(x, y, 4, 0, 2 * Math.PI, false)
-    ctx.arc(x, y, 1, 0, 2 * Math.PI, false)
-    ctx.lineWidth = 1
-    ctx.strokeStyle = color
-    ctx.stroke()
-    ctx.closePath()
-
-    
   # Renders the shape into a buffer
   update: () ->
     @buffer = document.createElement('canvas')
@@ -89,9 +87,6 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   resize: (size = null) ->
     @size = size ? Naubino.settings.naub.size
     @frame = @size*1.5 # defines buffer canvas
-    { pos, vel, force, attracted_to } = @physics
-    @physics = new PhysicsModel this
-    Util.extend @physics, { pos, vel, force, attracted_to }
     @update()
 
 
@@ -109,11 +104,6 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
   update_shapes: ->
     for shape in @shapes
       shape.setup this
-
-  # Returns the area value of the first shape that implements it,
-  area: ->
-    r = @size
-    Math.floor r*r*Math.PI
 
   # runs draw_join on all partners, if this naub is the one drawing the join
   # Otherwise the partner will draw the join.
@@ -159,15 +149,6 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     catch e
       #console.log [pos.x, pos.y]
       @layer.menu_pause.dispatch()
-
-
-
-  ## organisation
-  step: (dt) -> #@physics.step dt
-
-
-
-
 
 
 
@@ -311,12 +292,7 @@ define ["PhysicsModel"], (PhysicsModel) -> class Naub
     @onclick()
     @layer.naub_unfocused.dispatch(@)
 
-  isHit: (x, y) ->
-    s = Naubino.settings.canvas.scale
-    click = new b2Vec2(x,y)
-    click.Subtract(@physics.pos)
-    (click.Length() < @size) and not @removed and not @disabled
-  
+
 
   # utils
   color_to_rgba: (color, shift = 0) =>
