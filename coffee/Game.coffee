@@ -83,7 +83,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
       while i < (colors.length )-1
         {x,y} = @random_outside()
         #Naubino.background.draw_marker(x,y)
-        [a,b] = @create_naub_pair(x,y,colors[i],colors[i+1], off)
+        [a,b] = @create_naub_pair(x,y,colors[i],colors[i+1], on)
         #console.log "pairing " + [a,b]
         i++
 
@@ -100,9 +100,11 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # @param color [int]  color_id
   add_ball: (pos = cp.v(0,0), color = null) =>
     naub = new Naub this, color
-    naub.add_shape new Ball
-    naub.physical_body.p = pos
-    naub.physical_body.setPos( cp.v(pos.x,pos.y) ) # remember to set position
+    ball = new Ball
+
+    naub.add_shape ball
+    ball.setup_physics()
+    naub.physical_body.setPos( pos.Copy() ) # remember to set position
     naub.kind = 'ball'
 
     @add_object naub
@@ -117,9 +119,11 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # @param color [int]  color_id
   add_box: (pos = cp.v(0,0), color = null) =>
     naub = new Naub this, color
-    naub.add_shape new Square
-    naub.physical_body.p = pos
-    naub.physical_body.setPos( cp.v(pos.x,pos.y) ) # remember to set position
+    box = new Square
+
+    naub.add_shape box
+    naub.setup_physics() # TODO have box do this
+    naub.physical_body.setPos( pos.Copy() ) # remember to set position
     naub.kind = 'box'
     @add_object naub
 

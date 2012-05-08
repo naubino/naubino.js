@@ -8,7 +8,7 @@ define -> Settings = {
     updating:      off
 
   naub:
-    size:          14
+    size:          28
     mass:          1
     border:        off  # not yet implemented
     fondness:      12  # determines how hard it is to join two naubs
