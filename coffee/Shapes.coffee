@@ -62,42 +62,6 @@ Shape: class Shape
     @loop = setInterval shrink, 50
 
 
-Square: class Square extends Shape
-  constructor: ->
-    super()
-    @rot = Math.random() * Math.PI
-
-  area: ->
-    @width/2 * @width/2
-
-
-  # actual painting routines
-  render: (ctx,x,y) ->
-    ctx.save()
-    @width= @naub.size * 1.8
-
-    #@rot = @rot + 0.1
-    ctx.translate( x, y)
-    ctx.rotate @rot
-     
-    ctx.beginPath()
-    ctx.rect(-@width/2,-@width/2,@width,@width)
-
-    @draw_shadow(ctx)
-
-    ctx.fillStyle = @color_to_rgba(@style.fill)
-    ctx.fill()
-    ctx.closePath()
-
-    ctx.restore()
-
-  isHit:(x,y) ->
-    @naub.layer.ctx.beginPath()
-    @naub.layer.ctx.rect(@pos.x-@width/2,@pos.y-@width/2,@width,@width)
-    @naub.layer.ctx.closePath()
-    @naub.layer.ctx.isPointInPath(x,y)
-
-
 Ball: class Ball extends Shape
   area: ->
     # TODO consolder the margin of each naub
@@ -107,13 +71,12 @@ Ball: class Ball extends Shape
   # !IMPORTANT: needs to recieve ctx, x and y directly because those could also point into a buffer
   render: (ctx, x = 42, y = x) ->
     ctx.save()
-    size= @naub.size
 
     offset = 0
     ctx.translate( x, y)
      
     ctx.beginPath()
-    ctx.arc(offset, offset, size, 0, Math.PI * 2, false)
+    ctx.arc(offset, offset, @naub.radius, 0, Math.PI * 2, false)
     ctx.closePath()
 
     ## border
@@ -122,7 +85,7 @@ Ball: class Ball extends Shape
 
     if @naub.focused
       # gradient
-      gradient = ctx.createRadialGradient(offset, offset, size/3, offset, offset, size)
+      gradient = ctx.createRadialGradient(offset, offset, @naub.radius/3, offset, offset, @naub.radius)
       gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
       gradient.addColorStop 1, @color_to_rgba(@style.fill, 50)
       ctx.fillStyle = gradient
@@ -136,12 +99,68 @@ Ball: class Ball extends Shape
 
     ctx.restore()
 
+  setup: (naub) ->
+    super(naub)
+    naub.radius = naub.size/2
+
+  setup_physics: ->
+    @naub.constraints = []
+    @naub.momentum = cp.momentForCircle( Naubino.settings.naub.mass, @naub.radius, @naub.radius, cp.v(0,0) )
+    @naub.physical_body = new cp.Body( Naubino.settings.naub.mass, @naub.momentum )
+    @naub.physical_body.setAngle( 0 ) # remember to set position
+    @naub.physical_shape = new cp.CircleShape( @naub.physical_body, @naub.radius , cp.v(0,0) )
+    @naub.physical_shape.setElasticity 0.05
+    @naub.physical_shape.setFriction 7
+
   isHit:(x,y) ->
     @naub.layer.ctx.beginPath()
     @naub.layer.ctx.arc(0, 0, @naub.size, 0, Math.PI * 2, false)
     @naub.layer.ctx.closePath()
     @naub.layer.ctx.isPointInPath(x,y)
 
+
+Square: class Square extends Shape
+  constructor: ->
+    super()
+    @rot = Math.random() * Math.PI
+
+  area: ->
+    @width/2 * @width/2
+
+  setup: (naub) ->
+    naub.width = naub.size
+    naub.height = naub.size
+    super(naub)
+
+
+  # actual painting routines
+  render: (ctx,x,y) ->
+    ctx.save()
+
+    #@rot = @rot + 0.1
+    ctx.translate( x, y)
+    #ctx.rotate @rot
+    ctx.rotate @naub.physical_body.a if @naub.physical_body?
+     
+    ctx.beginPath()
+    ctx.rect(-@naub.width/2,-@naub.height/2,@naub.width,@naub.height)
+
+    @draw_shadow(ctx)
+
+    ctx.fillStyle = @color_to_rgba(@style.fill)
+    ctx.fill()
+    ctx.closePath()
+
+    ctx.restore()
+
+  setup_physics: () ->
+    @naub.constraints = []
+    @naub.momentum = cp.momentForBox( Naubino.settings.naub.mass, @naub.width, @naub.height, cp.v(0,0) )
+    @naub.physical_body = new cp.Body( Naubino.settings.naub.mass, @naub.momentum )
+    @naub.physical_body.setAngle( 0 ) # remember to set position
+    @naub.physical_shape = new cp.BoxShape( @naub.physical_body, @naub.width, @naub.height, cp.v(0,0) )
+    @naub.physical_shape.setElasticity 0.05
+    @naub.physical_shape.setFriction 7
 
 Clock: class Clock extends Shape
   constructor: ->
@@ -286,7 +305,7 @@ StringShape: class StringShape extends Shape
     super(@naub)
 
   render: (ctx, x,y) ->
-    size = @naub.size * 1.3
+    size = @naub.size * .6
 
     ctx.save()
     ctx.translate x,y

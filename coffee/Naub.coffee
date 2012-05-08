@@ -26,22 +26,12 @@ define -> class Naub
     @drawing_join = {} # {id: true/false if this naub draws the join}
     @join_style = { fill: [0,0,0,1], width: 6 }
 
-    @update() #renders it for the first time
-    @setup_physics()
+    #@update() #renders it for the first time
 
-  setup_physics: -> @setup_physics_ball(@size)
-
-  setup_physics_box: (@radius)->
+  setup_physics: ->
+    # this is redundant - just in case the the shapes don't do this
     @constraints = []
-    @momentum = cp.momentForCircle( Naubino.settings.naub.mass, @radius, @radius, cp.v(0,0) )
-    @physical_body = new cp.Body( Naubino.settings.naub.mass, @momentum )
-    @physical_body.setAngle( 0 ) # remember to set position
-    @physical_shape = new cp.CircleShape( @physical_body, @radius , cp.v(0,0) )
-    @physical_shape.setElasticity 0.05
-    @physical_shape.setFriction 7
-
-  setup_physics_ball: (@radius)->
-    @constraints = []
+    @radius = @size/2
     @momentum = cp.momentForCircle( Naubino.settings.naub.mass, @radius, @radius, cp.v(0,0) )
     @physical_body = new cp.Body( Naubino.settings.naub.mass, @momentum )
     @physical_body.setAngle( 0 ) # remember to set position
