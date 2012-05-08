@@ -9,8 +9,7 @@ define -> Settings = {
 
   naub:
     size:          14
-    mass:          14
-    mass_menu:     40
+    mass:          1
     border:        off  # not yet implemented
     fondness:      12  # determines how hard it is to join two naubs
 

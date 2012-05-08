@@ -1,3 +1,8 @@
+
+#upper case function to avoid overwriting defaults
+cp.Vect::Copy   = -> new cp.Vect this.x, this.y
+cp.Vect::Length = -> Math.sqrt(this.x * this.x + this.y * this.y)
+
 window.Util =
   shuffle: (a) ->
     b = a.slice()

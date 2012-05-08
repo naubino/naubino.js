@@ -29,20 +29,25 @@ define -> class Naub
     @update() #renders it for the first time
     @setup_physics()
 
-  setup_physics: ->
+  setup_physics: -> @setup_physics_ball(@size)
 
+  setup_physics_box: (@radius)->
     @constraints = []
-    @radius = @size # for now
-    offset = cp.v(0,0)
-    mass = 1
-    momentum = cp.momentForCircle( mass, @radius, @radius, offset )
-    @physical_body = new cp.Body( mass, momentum )
+    @momentum = cp.momentForCircle( Naubino.settings.naub.mass, @radius, @radius, cp.v(0,0) )
+    @physical_body = new cp.Body( Naubino.settings.naub.mass, @momentum )
     @physical_body.setAngle( 0 ) # remember to set position
-
-    @physical_shape = new cp.CircleShape( @physical_body, @radius , offset )
+    @physical_shape = new cp.CircleShape( @physical_body, @radius , cp.v(0,0) )
     @physical_shape.setElasticity 0.05
     @physical_shape.setFriction 7
 
+  setup_physics_ball: (@radius)->
+    @constraints = []
+    @momentum = cp.momentForCircle( Naubino.settings.naub.mass, @radius, @radius, cp.v(0,0) )
+    @physical_body = new cp.Body( Naubino.settings.naub.mass, @momentum )
+    @physical_body.setAngle( 0 ) # remember to set position
+    @physical_shape = new cp.CircleShape( @physical_body, @radius , cp.v(0,0) )
+    @physical_shape.setElasticity 0.05
+    @physical_shape.setFriction 7
 
   set_number: (@number) ->
     @physical_shape.naub_number = @number
@@ -122,19 +127,16 @@ define -> class Naub
     pos = @physical_body.p
     pos2 = partner.physical_body.p
 
-    # TODO auskommentiert
-    # # joins getting thinner by stretching
-    # diff = pos2.Copy()
-    # diff.Subtract(pos)
-    # l = diff.Length()
-    # m = @physics.margin*25
-    # fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
-    # stretch = (m + fiber) / (l + fiber)
-    # stretch = Math.round((stretch)*10)/10 # rounding
-    # #@join_style.fill[3] = stretch
-    # stretched_width = @join_style.width * stretch
+    # joins getting thinner by stretching
+    diff = pos2.Copy()
+    diff.sub(pos)
+    l = diff.Length()
+    fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
+    stretch = (30 + fiber) / (l + fiber)
+    stretch = Math.round((stretch)*10)/10 # rounding
+    #@join_style.fill[3] = stretch
+    stretched_width = @join_style.width * stretch
 
-    stretched_width = 3
     ctx.save()
     ctx.strokeStyle = @color_to_rgba @join_style.fill
     try
@@ -199,14 +201,15 @@ define -> class Naub
   # do things a naub is supposed to do
   join_with: (other) ->
 
-    offset = cp.v(0,0)
 
     #restLength, stiffness, damping
-    #joint = new cp.DampedSpring( @physical_body, other.physical_body, offset, offset, @radius*2.5, 53, 1)
-    joint = new cp.SlideJoint( @physical_body, other.physical_body, offset, offset, @radius*2, @radius*3)
+    joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.v(0,0), cp.v(0,0), @radius*2, 5, 5)
+    joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.v(0,0), cp.v(0,0), @radius*2.5, @radius*4.5)
 
-    @layer.space.addConstraint( joint)
+    @layer.space.addConstraint( joint )
+    @layer.space.addConstraint( joint2 )
     @constraints.push joint
+    @constraints.push joint2
 
     join = @layer.graph.add_join this, other # returns the id of this join in the graph
     @joins[join] = other
@@ -271,11 +274,10 @@ define -> class Naub
   # @params other (naub) other naub
   distance_to: (other) ->
     unless other.number == @number
-      { pos, vel, force } = @physics
-      { pos: opos, vel: ovel, force: oforce } = other.physics
-      diff = new cp.v opos.x, opos.y
-      diff.Subtract(pos)
-      l = diff.Length()
+      p = @physical_body.p.Copy()
+      op = other.physical_body.p.Copy()
+      p.sub op
+      p.Length()
     else
       NaN
 
