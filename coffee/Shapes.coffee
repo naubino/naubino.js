@@ -290,6 +290,7 @@ StringShape: class StringShape extends Shape
 
     ctx.save()
     ctx.translate x,y
+    ctx.rotate @naub.physical_body.a
     ctx.fillStyle = @color
     ctx.textAlign = 'center'
     ctx.font= "#{size}px Helvetica"
