@@ -34,14 +34,14 @@ define -> class Naub
     @constraints = []
     @radius = @size # for now
     offset = cp.v(0,0)
-    mass = 5
-    momentum = cp.momentForCircle( mass, 0, @radius, offset )
+    mass = 1
+    momentum = cp.momentForCircle( mass, @radius, @radius, offset )
     @physical_body = new cp.Body( mass, momentum )
     @physical_body.setAngle( 0 ) # remember to set position
 
     @physical_shape = new cp.CircleShape( @physical_body, @radius , offset )
-    @physical_shape.setElasticity 0
-    @physical_shape.setFriction 0.7
+    @physical_shape.setElasticity 0.05
+    @physical_shape.setFriction 7
 
 
   set_number: (@number) ->
@@ -198,6 +198,16 @@ define -> class Naub
 
   # do things a naub is supposed to do
   join_with: (other) ->
+
+    offset = cp.v(0,0)
+
+    #restLength, stiffness, damping
+    #joint = new cp.DampedSpring( @physical_body, other.physical_body, offset, offset, @radius*2.5, 53, 1)
+    joint = new cp.SlideJoint( @physical_body, other.physical_body, offset, offset, @radius*2, @radius*3)
+
+    @layer.space.addConstraint( joint)
+    @constraints.push joint
+
     join = @layer.graph.add_join this, other # returns the id of this join in the graph
     @joins[join] = other
     @drawing_join[join] = true

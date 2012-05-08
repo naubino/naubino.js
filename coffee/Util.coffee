@@ -9,6 +9,7 @@ window.Util =
 
   extend: (obj, mixin) ->
     for name, method of mixin
+      console.log name
       obj[name] = method
 
   include: (klass, mixin) ->

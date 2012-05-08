@@ -62,7 +62,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     if @space?
       #restLength, stiffness, damping
       joint = new cp.DampedSpring(
-        obj.physical_body, @space.staticBody, cp.v(0,0), obj.center, 1, 3, 20 
+        obj.physical_body, @space.staticBody, cp.v(0,0), obj.center, 0, 1, 5
       )
       @space.addConstraint( joint)
       obj.constraints.push joint
@@ -210,7 +210,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
       @focused_naub = naub
 
       @mouseBody.p = @pointer
-      @mouseJoint = new cp.PivotJoint(@mouseBody, naub.physical_body, cp.v(0,0), naub.physical_body.world2Local(@pointer))
+      @mouseJoint = new cp.PivotJoint(@mouseBody, naub.physical_body, cp.v(0,0), cp.v(0,0))
       @mouseJoint.maxForce = 50000
       @mouseJoint.errorBias = Math.pow(1 - 0.15, 60)
       @space.addConstraint(@mouseJoint)

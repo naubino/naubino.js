@@ -53,6 +53,7 @@ define -> class Layer
     #chipmunk
     @remainder = 0
     @space = new cp.Space() # so far so good
+
     @mouseBody = new cp.Body(Infinity, Infinity)
     @mouseBody.p = new cp.v 0,0
     @space.addBody @mouseBody
