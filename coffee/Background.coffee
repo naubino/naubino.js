@@ -4,7 +4,6 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @name = "background"
     @animation.name = "background.animation"
 
-    @drawing = true
     @default_thickness = @basket_thickness = 4
     @ttl = 12
     @color = [0,0,0,0.5]

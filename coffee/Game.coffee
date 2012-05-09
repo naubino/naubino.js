@@ -1,6 +1,6 @@
 # controlls everything that has to do with logic and gameplay or menus
 # @extends Layer
-define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }) -> class Game extends Layer
+define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Box, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }) -> class Game extends Layer
 
   # get this started
   constructor: (canvas) ->
@@ -10,9 +10,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     @animation.name = "game.animation"
 
     # display stuff
-    @drawing = true # for debugging
     @focused_naub = null # points to the naub you click on
-    @gravity = Naubino.settings.physics.gravity.game
 
     #@points = -1
     @joining_allowed = yes
@@ -21,6 +19,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
     Naubino.mousedown.add @click
     Naubino.mouseup.add @unfocus
 
+    @centerjoins = []
     
     # gameplay
     @naub_replaced   = new Naubino.Signal()
@@ -57,13 +56,16 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   add_object:(obj) ->
     super obj
 
-   
     # attach it to its center
     if @space?
       #restLength, stiffness, damping
-      joint = new cp.DampedSpring(
-        obj.physical_body, @space.staticBody, cp.v(0,0), obj.center, 0, 1, 5
-      )
+      rstl = Naubino.settings.physics.center_join.restLength
+      stfs =  Naubino.settings.physics.center_join.stiffness
+      dmpg =  Naubino.settings.physics.center_join.damping
+
+      joint =
+        new cp.DampedSpring( obj.physical_body, @space.staticBody, cp.vzero, obj.center, rstl, stfs, dmpg)
+      @centerjoins.push joint
       @space.addConstraint( joint)
       obj.constraints.push joint
 
@@ -81,34 +83,34 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
       colors[5] = colors[0]
       i = 0
       while i < (colors.length )-1
-        {x,y} = @random_outside()
+        pos  = @random_outside()
         #Naubino.background.draw_marker(x,y)
-        [a,b] = @create_naub_pair(x,y,colors[i],colors[i+1], on)
+        [a,b] = @create_naub_pair(pos, colors[i],colors[i+1], on)
         #console.log "pairing " + [a,b]
         i++
 
     #create some extras
     if extras > 0
       for [1..extras]
-        {x,y} = @random_outside()
+        pos  = @random_outside()
         #Naubino.background.draw_marker(x,y)
-        @create_naub_pair(x,y)
+        @create_naub_pair(pos)
 
   # factory for a naub ball
   # 
   # @param pos [cp.v] position
   # @param color [int]  color_id
-  add_ball: (pos = cp.v(0,0), color = null) =>
+  add_ball: (pos = @random_outside(), color = null) =>
     naub = new Naub this, color
     ball = new Ball
 
     naub.add_shape ball
-    ball.setup_physics()
+    naub.setup_physics()
     naub.physical_body.setPos( pos.Copy() ) # remember to set position
     naub.kind = 'ball'
 
     @add_object naub
-    naub.add_shape new NumberShape
+    #naub.add_shape new NumberShape
     #naub.update() # again just to get the numbers
     naub
 
@@ -117,16 +119,20 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # 
   # @param pos [cp.v] position
   # @param color [int]  color_id
-  add_box: (pos = cp.v(0,0), color = null) =>
+  add_box: (pos = @random_outside(), color = null) =>
     naub = new Naub this, color
-    box = new Square
+    box = new Box
 
     naub.add_shape box
-    naub.setup_physics() # TODO have box do this
+    naub.setup_physics()
+    # turn a circle into a box
+    box.adjust_physics()
+
     naub.physical_body.setPos( pos.Copy() ) # remember to set position
     naub.kind = 'box'
-    @add_object naub
 
+    @add_object naub
+    #naub.add_shape new NumberShape
     #naub.update() # again just to get the numbers
     naub
 
@@ -147,11 +153,11 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # @param color [int] color id of naub 1
   # @param color [int] color id of naub 2
   # IMPLICIT if game has a @max_colors int random colors will only be picked out range [1..@max_colors]
-  create_naub_pair: (x=null, y=x, color_a = null, color_b = null, mixed = off) =>
-    {x,y} = @random_outside() unless x?
+  create_naub_pair: (pos = null, color_a = null, color_b = null, mixed = off) =>
+    pos = @random_outside() unless pos?
     dir = Math.random() * Math.PI
-    pos_a = new cp.v x, y
-    pos_b = new cp.v x, y
+    pos_a = pos.Copy()
+    pos_b = pos.Copy()
 
     #TODO auskommentiert
     #pos_a.AddPolar(dir,  15)
@@ -174,13 +180,12 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # works almost like create_naub_pair
   # @param x [int] x-ordinate
   # @param y [int] y-ordinate
-  create_naub_triple: (x=null, y=x, color_a = null, color_b = null, color_c = null) =>
-
-    {x,y} = @random_outside() unless x?
+  create_naub_triple: (pos = null, color_a = null, color_b = null, color_c = null) =>
+    pos = @random_outside() unless pos?
     dir = Math.random() * Math.PI
-    pos_a = new cp.v x, y
-    pos_b = new cp.v x, y
-    pos_c = new cp.v x, y
+    pos_a = pos.Copy()
+    pos_b = pos.Copy()
+    pos_c = pos.Copy()
 
     # TODO auskommentiert
     #pos_a.AddPolar(dir,  30)
@@ -234,7 +239,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
   # produces a random set of coordinates outside the field
   random_outside: ->
-    offset = 100
+    offset = Naubino.settings.game.creation_offset
     seed = Math.round (Math.random() * 3)+1
     switch seed
       when 1
@@ -249,7 +254,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
       when 4
         x = @width * Math.random()
         y = 0 - offset
-    {x,y}
+    new cp.v x,y
 
   # counts howmany naubs would be inside the circle
   # important for gameplay
@@ -267,7 +272,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
   # shows how much room is available in the basket
   capacity: ->
     r = @basket_size
-    size= Math.ceil r * r * Math.PI * 0.75 # don't ask me why
+    size= Math.ceil r * r * Math.PI * 0.68 # don't ask me why
     filling =0
     for naub in @count_basket()
       filling += naub.area()
@@ -326,7 +331,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Square
 
   # clears the graph as well, just in case
   clear_objects: ->
-    super()
+    @for_each (o)-> o.remove()
     @graph.clear()
 
   # run naub_forces, check for joinings and clean up

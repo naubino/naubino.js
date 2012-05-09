@@ -53,10 +53,10 @@ define -> class Layer
     #chipmunk
     @remainder = 0
     @space = new cp.Space() # so far so good
-    @space.damping = 0.4
+    @space.damping = Naubino.settings.physics.damping
 
     @mouseBody = new cp.Body(Infinity, Infinity)
-    @mouseBody.p = new cp.v 0,0
+    @mouseBody.p = cp.vzero
     @space.addBody @mouseBody
  
     # add center
@@ -116,7 +116,7 @@ define -> class Layer
     
   draw: ->
 
-  do_draw: => @draw() if @drawing
+  do_draw: => @draw()
 
 
   #visibility

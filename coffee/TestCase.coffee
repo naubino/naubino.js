@@ -3,8 +3,10 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
   #    super()
   oninit: ->
     super()
-    #@create_some_naubs 2
     @create_matching_naubs()
+    Naubino.settings.graphics.updating = on
+    Naubino.settings.game.creation_offset = -50
+
     @gravity = on
     @naub_replaced.add (number)=> @graph.cycle_test(number)
     @cycle_found.add (list) => @destroy_naubs(list)
@@ -19,4 +21,5 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
     #setTimeout(weightless, 4000)
 
   event:->
+  #check: =>
 
