@@ -113,7 +113,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "CollisionHandler"], (Layer, Naub, G
     naub.kind = 'ball'
 
     @add_object naub
-    naub.add_shape new NumberShape
+    #naub.add_shape new NumberShape
     #naub.update() # again just to get the numbers
     naub
 
@@ -135,7 +135,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "CollisionHandler"], (Layer, Naub, G
     naub.kind = 'box'
 
     @add_object naub
-    naub.add_shape new NumberShape
+    #naub.add_shape new NumberShape
     #naub.update() # again just to get the numbers
     naub
 

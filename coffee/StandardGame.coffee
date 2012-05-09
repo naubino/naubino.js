@@ -24,13 +24,13 @@ define ["Game"], (Game) -> class StandardGame extends Game
     @basket_size = @default_basket_size = 160
     @spammers = @default_spammers = {
       pair:
-        method: => @create_naub_pair(null, null, @max_color(), @max_color() )
+        method: => @create_naub_pair(null, @max_color(), @max_color() )
         probability: 5
       mixed_pair:
-        method: => @create_naub_pair(null, null, @max_color(), @max_color(), true )
+        method: => @create_naub_pair(null, @max_color(), @max_color(), true )
         probability: 0
       triple:
-        method: => @create_naub_triple(null, null, @max_color(), @max_color(), @max_color() )
+        method: => @create_naub_triple(null, @max_color(), @max_color(), @max_color() )
         probability: 0
     }
 

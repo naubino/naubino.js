@@ -9,24 +9,26 @@ define -> Settings = {
 
   game:
     creation_offset: 50
-    min_joining_force: 300
+    min_joining_force: 100
 
   naub:
     size:          28
-    mass:          1
+    mass:          5
     friction:      0.5
-    elasticity:    .8
+    elasticity:    1
+    min_join_len:  1.2 # times size
+    max_join_len:  2 # times size
 
   physics:
     center_join:
       restLength:   0
       stiffness:    2
-      damping:      12
+      damping:      5
     fps:            35 # bug:                                        slows down if high cpu usage
     calming_const:  0.5
     join_length:    3.0 # margin between joined naubs (n* avg size)
     spring_force:   0.6
-    damping:        0.4
+    damping:        0.3
 
   canvas:
     scale:         1 # not yet implemented
