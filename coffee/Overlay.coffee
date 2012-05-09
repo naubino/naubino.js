@@ -5,7 +5,6 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     @animation.name = "overlay.animation"
 
     @fps = 1000 / 15 # 5fps
-    @drawing = true
     @fade_speed = 40
 
 

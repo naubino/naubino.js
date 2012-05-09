@@ -3,31 +3,34 @@ define -> Settings = {
 
   graphics:
     fps:           35 # mind physics.fps
-    fps_menu:      20
-    draw_shadows:  off
     updating:      off
+    draw_shadows:  off
+    draw_borders:  off
+
+  game:
+    creation_offset: 50
 
   naub:
     size:          28
     mass:          1
-    border:        off  # not yet implemented
-    fondness:      12  # determines how hard it is to join two naubs
+    friction:      0.5
+    elasticity:    .8
 
   physics:
-    fps:           35 # bug: slows down if high cpu usage
-    calming_const: 0.5
-    gravity:
-      menu:        on
-      game:        on
-    margin:        1.2 # margin between naubs (n* avg size)
-    join_length:   3.0 # margin between joined naubs (n* avg size)
-    spring_force:  0.6
-    friction:      5.0
+    center_join:
+      restLength:   0
+      stiffness:    2
+      damping:      12
+    fps:            35 # bug:                                        slows down if high cpu usage
+    calming_const:  0.5
+    join_length:    3.0 # margin between joined naubs (n* avg size)
+    spring_force:   0.6
+    damping:        0.4
 
   canvas:
     scale:         1 # not yet implemented
-    width:         500#800
-    height:        300#480
+    width:         600#800
+    height:        400#480
 
   events: [
         { name: 'init',   from: 'none',     to: 'stopped'}

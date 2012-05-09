@@ -8,8 +8,6 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
 
     @objects = {}
     @hovering = off
-    @drawing = on
-    @gravity = Naubino.settings.physics.gravity.menu
 
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer

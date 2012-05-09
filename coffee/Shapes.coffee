@@ -17,6 +17,14 @@ Shape: class Shape
     a = color[3]
     "rgba(#{r},#{g},#{b},#{a})"
 
+  draw_border: (ctx) ->
+    ## border
+    if Naubino.settings.graphics.draw_borders
+      ctx.lineWidth = 4
+      ctx.strokeStyle = @color_to_rgba @naub.join_style.fill
+      ctx.stroke()
+
+
   draw_shadow: (ctx) ->
     if Naubino.settings.graphics.draw_shadows
       ctx.shadowColor = "#333"
@@ -79,10 +87,6 @@ Ball: class Ball extends Shape
     ctx.arc(offset, offset, @naub.radius, 0, Math.PI * 2, false)
     ctx.closePath()
 
-    ## border
-    #ctx.lineWidth = 2
-    #ctx.stroke()
-
     if @naub.focused
       # gradient
       gradient = ctx.createRadialGradient(offset, offset, @naub.radius/3, offset, offset, @naub.radius)
@@ -93,6 +97,7 @@ Ball: class Ball extends Shape
       ctx.fillStyle = @color_to_rgba(@style.fill)
 
     @draw_shadow(ctx)
+    @draw_border(ctx)
 
     ctx.fill()
     ctx.closePath()
@@ -103,33 +108,16 @@ Ball: class Ball extends Shape
     super(naub)
     naub.radius = naub.size/2
 
-  setup_physics: ->
-    @naub.constraints = []
-    @naub.momentum = cp.momentForCircle( Naubino.settings.naub.mass, @naub.radius, @naub.radius, cp.v(0,0) )
-    @naub.physical_body = new cp.Body( Naubino.settings.naub.mass, @naub.momentum )
-    @naub.physical_body.setAngle( 0 ) # remember to set position
-    @naub.physical_shape = new cp.CircleShape( @naub.physical_body, @naub.radius , cp.v(0,0) )
-    @naub.physical_shape.setElasticity 0.05
-    @naub.physical_shape.setFriction 7
-
-  isHit:(x,y) ->
-    @naub.layer.ctx.beginPath()
-    @naub.layer.ctx.arc(0, 0, @naub.size, 0, Math.PI * 2, false)
-    @naub.layer.ctx.closePath()
-    @naub.layer.ctx.isPointInPath(x,y)
-
-
-Square: class Square extends Shape
+Box: class Box extends Shape
   constructor: ->
     super()
     @rot = Math.random() * Math.PI
 
-  area: ->
-    @width/2 * @width/2
+  area: -> @width/2 * @width/2
 
   setup: (naub) ->
-    naub.width = naub.size
-    naub.height = naub.size
+    naub.width  = naub.size * 0.9
+    naub.height = naub.size * 0.9
     super(naub)
 
 
@@ -146,6 +134,7 @@ Square: class Square extends Shape
     ctx.rect(-@naub.width/2,-@naub.height/2,@naub.width,@naub.height)
 
     @draw_shadow(ctx)
+    @draw_border(ctx)
 
     ctx.fillStyle = @color_to_rgba(@style.fill)
     ctx.fill()
@@ -153,14 +142,13 @@ Square: class Square extends Shape
 
     ctx.restore()
 
-  setup_physics: () ->
-    @naub.constraints = []
-    @naub.momentum = cp.momentForBox( Naubino.settings.naub.mass, @naub.width, @naub.height, cp.v(0,0) )
+  adjust_physics: ->
+    @naub.momentum = cp.momentForBox( Naubino.settings.naub.mass, @naub.width, @naub.height )
     @naub.physical_body = new cp.Body( Naubino.settings.naub.mass, @naub.momentum )
     @naub.physical_body.setAngle( 0 ) # remember to set position
-    @naub.physical_shape = new cp.BoxShape( @naub.physical_body, @naub.width, @naub.height, cp.v(0,0) )
-    @naub.physical_shape.setElasticity 0.05
-    @naub.physical_shape.setFriction 7
+    @naub.physical_shape = new cp.BoxShape( @naub.physical_body, @naub.width, @naub.height )
+    @naub.physical_shape.setElasticity @naub.elasticity
+    @naub.physical_shape.setFriction @naub.friction
 
 Clock: class Clock extends Shape
   constructor: ->
@@ -271,7 +259,7 @@ PauseButton: class PauseButton extends Shape
     ctx.restore()
 
 
-MainButton: class MainButton extends Square
+MainButton: class MainButton extends Box
   render: (ctx, x, y) ->
     text = Naubino.game.points ? ""
     @width = @naub.size*3
@@ -305,14 +293,14 @@ StringShape: class StringShape extends Shape
     super(@naub)
 
   render: (ctx, x,y) ->
-    size = @naub.size * .6
+    size = @naub.size * .7
 
     ctx.save()
     ctx.translate x,y
     ctx.rotate @naub.physical_body.a
     ctx.fillStyle = @color
     ctx.textAlign = 'center'
-    ctx.font= "#{size}px Helvetica"
+    ctx.font= "#{size}px Courier"
     ctx.fillText(@string, 0, 6)
     ctx.restore()
 

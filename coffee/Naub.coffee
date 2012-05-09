@@ -8,8 +8,6 @@ define -> class Naub
   constructor: (@layer, @color_id = null, @size = Naubino.settings.naub.size) ->
     #@physics = new PhysicsModel this
    
-    # gravity center
-
     @ctx = @layer.ctx
     @frame = @size*1.5 # defines buffer canvas
 
@@ -32,12 +30,19 @@ define -> class Naub
     # this is redundant - just in case the the shapes don't do this
     @constraints = []
     @radius = @size/2
-    @momentum = cp.momentForCircle( Naubino.settings.naub.mass, @radius, @radius, cp.v(0,0) )
+    @width  = @size * 0.9
+    @height = @size * 0.9
+    @friction = Naubino.settings.naub.friction
+    @elasticity = Naubino.settings.naub.elasticity
+
+    #this part will be adjusted by shape
+    @momentum = cp.momentForCircle( Naubino.settings.naub.mass, @radius, @radius, cp.vzero)
     @physical_body = new cp.Body( Naubino.settings.naub.mass, @momentum )
     @physical_body.setAngle( 0 ) # remember to set position
-    @physical_shape = new cp.CircleShape( @physical_body, @radius , cp.v(0,0) )
-    @physical_shape.setElasticity 0.05
-    @physical_shape.setFriction 7
+    @physical_shape = new cp.CircleShape( @physical_body, @radius , cp.vzero )
+    @physical_shape.setElasticity @elasticity
+    @physical_shape.setFriction @friction
+
 
   set_number: (@number) ->
     @physical_shape.naub_number = @number
@@ -46,9 +51,8 @@ define -> class Naub
 
   # Returns the area value of the first shape that implements it,
   area: ->
-    r = @size
+    r = @size/2
     Math.floor r*r*Math.PI
-
 
   # Either renders shapes or draws buffer 
   #
@@ -77,13 +81,6 @@ define -> class Naub
     @buffer.width = @buffer.height = @frame *2
     b_ctx = @buffer.getContext('2d')
     @render b_ctx, @frame, @frame
-
-  # adjusts size and everything that is affected by it
-  resize: (size = null) ->
-    @size = size ? Naubino.settings.naub.size
-    @frame = @size*1.5 # defines buffer canvas
-    @update()
-
 
   # Executes the render method of all shapes
   render: (ctx,x,y) ->
@@ -155,12 +152,10 @@ define -> class Naub
     @update()
 
   # change fill to gray
-  grey_out: ->
-    @style.fill = [100,100,100,1]
+  grey_out: -> @style.fill = [100,100,100,1]
 
   # sets color from @color_id
-  recolor: ->
-    @style.fill = Naubino.colors[@color_id]
+  recolor: -> @style.fill = Naubino.colors[@color_id]
 
   # removes the reference to this naub from all its partners
   remove: =>
@@ -190,11 +185,9 @@ define -> class Naub
 
   # do things a naub is supposed to do
   join_with: (other) ->
-
-
     #restLength, stiffness, damping
-    joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.v(0,0), cp.v(0,0), @radius*2, 5, 5)
-    joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.v(0,0), cp.v(0,0), @radius*2.5, @radius*4.5)
+    joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, @radius*2, 5, 5)
+    joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.vzero, cp.vzero, @radius*2.5, @radius*4.5)
 
     @layer.space.addConstraint( joint )
     @layer.space.addConstraint( joint2 )
