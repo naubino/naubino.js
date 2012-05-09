@@ -186,8 +186,10 @@ define -> class Naub
   # do things a naub is supposed to do
   join_with: (other) ->
     #restLength, stiffness, damping
-    joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, @radius*2, 5, 5)
-    joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.vzero, cp.vzero, @radius*2.5, @radius*4.5)
+    minlen = Naubino.settings.naub.min_join_len * @size
+    maxlen = Naubino.settings.naub.max_join_len * @size
+    joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, 10, 4)
+    joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, maxlen)
 
     @layer.space.addConstraint( joint )
     @layer.space.addConstraint( joint2 )
