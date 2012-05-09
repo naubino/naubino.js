@@ -9,6 +9,7 @@ define -> Settings = {
 
   game:
     creation_offset: 50
+    min_joining_force: 300
 
   naub:
     size:          28

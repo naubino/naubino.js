@@ -80,16 +80,15 @@ Ball: class Ball extends Shape
   render: (ctx, x = 42, y = x) ->
     ctx.save()
 
-    offset = 0
     ctx.translate( x, y)
      
     ctx.beginPath()
-    ctx.arc(offset, offset, @naub.radius, 0, Math.PI * 2, false)
+    ctx.arc(0, 0, @naub.radius, 0, Math.PI * 2, false)
     ctx.closePath()
 
     if @naub.focused
       # gradient
-      gradient = ctx.createRadialGradient(offset, offset, @naub.radius/3, offset, offset, @naub.radius)
+      gradient = ctx.createRadialGradient(0, 0, @naub.radius/3, 0, 0, @naub.radius)
       gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
       gradient.addColorStop 1, @color_to_rgba(@style.fill, 50)
       ctx.fillStyle = gradient
@@ -136,7 +135,14 @@ Box: class Box extends Shape
     @draw_shadow(ctx)
     @draw_border(ctx)
 
-    ctx.fillStyle = @color_to_rgba(@style.fill)
+    if @naub.focused
+      # gradient
+      gradient = ctx.createRadialGradient(0, 0, @naub.radius/3, 0, 0, @naub.radius)
+      gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
+      gradient.addColorStop 1, @color_to_rgba(@style.fill, 50)
+      ctx.fillStyle = gradient
+    else
+      ctx.fillStyle = @color_to_rgba(@style.fill)
     ctx.fill()
     ctx.closePath()
 
@@ -166,11 +172,10 @@ Clock: class Clock extends Shape
 
     end = @naub.clock_progress * Math.PI/100
 
-    offset = 0
     ctx.translate( x, y)
      
     ctx.beginPath()
-    ctx.arc(offset, offset, size, @start, end, false)
+    ctx.arc(0, 0, size, @start, end, false)
     #ctx.closePath()
 
     ctx.fillStyle = @color_to_rgba ([255,255,255,0.5])

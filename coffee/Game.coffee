@@ -1,6 +1,6 @@
 # controlls everything that has to do with logic and gameplay or menus
 # @extends Layer
-define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Box, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }) -> class Game extends Layer
+define ["Layer", "Naub", "Graph", "Shapes", "CollisionHandler"], (Layer, Naub, Graph, { Ball, Box, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }, CollisionHandler) -> class Game extends Layer
 
   # get this started
   constructor: (canvas) ->
@@ -20,6 +20,8 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Box, F
     Naubino.mouseup.add @unfocus
 
     @centerjoins = []
+    @joining_naubs = []
+    @replacing_naubs = []
     
     # gameplay
     @naub_replaced   = new Naubino.Signal()
@@ -40,6 +42,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Box, F
   oninit: ->
     #chipmunk
     @setup_physics()
+    @space.defaultHandler = new CollisionHandler this
 
 
   #default state change actions
@@ -85,7 +88,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Box, F
       while i < (colors.length )-1
         pos  = @random_outside()
         #Naubino.background.draw_marker(x,y)
-        [a,b] = @create_naub_pair(pos, colors[i],colors[i+1], on)
+        [a,b] = @create_naub_pair(pos, colors[i],colors[i+1], off)
         #console.log "pairing " + [a,b]
         i++
 
@@ -110,7 +113,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Box, F
     naub.kind = 'ball'
 
     @add_object naub
-    #naub.add_shape new NumberShape
+    naub.add_shape new NumberShape
     #naub.update() # again just to get the numbers
     naub
 
@@ -132,7 +135,7 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Box, F
     naub.kind = 'box'
 
     @add_object naub
-    #naub.add_shape new NumberShape
+    naub.add_shape new NumberShape
     #naub.update() # again just to get the numbers
     naub
 
@@ -293,8 +296,14 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Box, F
 
 
   # is one naub allowed to join with another
-  check_joining: (naub, other) ->
+  check_joining: (naub, other, arbiter) ->
     return no if naub.number == other.number or not @joining_allowed
+    return no unless naub.focused or other.focused
+
+    force = arbiter.totalImpulse().Length()
+    return no if force < Naubino.settings.game.min_joining_force
+    console.log force
+
 
     close_related = naub.close_related other # prohibits folding of pairs
     joined = naub.is_joined_with other # can't join what's already joined
@@ -303,11 +312,13 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Box, F
 
     if !naub.disabled && not joined && agrees && not close_related && not naub.alone() && not other.alone()
       console.info 'replace'
-      other.replace_with naub
+      #other.replace_with naub # chipmunk does not like me deleting objects inside a step
+      @replacing_naubs.push [naub, other]
       return yes
     else if naub.alone() and not (other.disabled or naub.disabled)
       console.info 'join'
-      naub.join_with other
+      #naub.join_with other
+      @joining_naubs.push [naub, other]
       return yes
     no
 
@@ -340,14 +351,16 @@ define ["Layer", "Naub", "Graph", "Shapes"], (Layer, Naub, Graph, { Ball, Box, F
     
     #@naub_forces dt
 
-    # TODO auskommentiert
-    # # check for joinings
-    # if @mousedown && @focused_naub
-    #   @focused_naub.physics.follow @pointer.Copy()
-    #   for id, other of  @objects
-    #     if (@focused_naub.distance_to other) < (@focused_naub.size+Naubino.settings.naub.fondness)
-    #       @check_joining(@focused_naub,other)
-    #       break
+    for pair in @replacing_naubs
+      pair[0].replace_with pair[1]
+      console.log "replacing #{pair[0].number} with #{pair[1].number}"
+
+    for pair in @joining_naubs
+      pair[0].join_with pair[1]
+      console.log "joinging #{pair[0].number} with #{pair[1].number}"
+
+    @joining_naubs = []
+    @replacing_naubs = []
 
     # delete objects
     for id, obj of @objects
