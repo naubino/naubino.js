@@ -5,7 +5,7 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
     super()
     Naubino.settings.graphics.updating = on
     Naubino.settings.game.creation_offset = -50
-    @create_matching_naubs()
+    @factory.create_matching_naubs()
 
     @gravity = on
     @naub_replaced.add (number)=> @graph.cycle_test(number)
