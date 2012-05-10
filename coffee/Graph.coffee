@@ -84,6 +84,16 @@ define -> class Graph
     return
 
 
+
+  tree: (naub, visited = null) ->
+    visited = [] unless visited?
+    for p in @partners naub
+      unless p in visited
+        visited.push p
+        @tree(p, visited)
+
+    return visited
+
   # recursive part of cycle_test
   #
   # @param [id] naub naub in question

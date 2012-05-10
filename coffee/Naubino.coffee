@@ -56,8 +56,8 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @game_standard = new StandardGame(@game_canvas)
     @game_testcase = new TestCase(@game_canvas)
     @game_tutorial = new Tutorial(@game_canvas)
-    @game          = @game_standard
-    #@game          = @game_testcase
+    #@game          = @game_standard
+    @game          = @game_testcase
     #@game          = @game_tutorial
     #@menu          = new Menu(@menu_canvas)
     @overlay       = new Overlay(@overlay_canvas)

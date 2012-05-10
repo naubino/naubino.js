@@ -44,11 +44,6 @@ define -> class Naub
     @physical_shape.setFriction @friction
 
 
-  set_number: (@number) ->
-    @physical_shape.naub_number = @number
-    @physical_body.naub_number = @number
-
-
   # Returns the area value of the first shape that implements it,
   area: ->
     r = @size/2
@@ -188,7 +183,7 @@ define -> class Naub
     #restLength, stiffness, damping
     minlen = Naubino.settings.naub.min_join_len * @size
     maxlen = Naubino.settings.naub.max_join_len * @size
-    joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, 10, 4)
+    joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, 4, 30)
     joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, maxlen)
 
     @layer.space.addConstraint( joint )
