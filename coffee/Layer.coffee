@@ -49,6 +49,7 @@ define -> class Layer
 
   setup_physics: ->
     @GRABABLE_MASK_BIT = 1<<31
+    @NOT_GRABABLE_MASK = ~@GRABABLE_MASK_BIT
     console.info "setup physics", @name
     #chipmunk
     @remainder = 0
@@ -60,6 +61,21 @@ define -> class Layer
     @space.addBody @mouseBody
  
     # add center
+
+  add_walls: ->
+    walls=
+      ceil  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(@width, 0), 0)
+      floor : new cp.SegmentShape(@space.staticBody, cp.v(0,@height), cp.v(@width, @height), 0)
+      left  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(0,@height), 0)
+      right : new cp.SegmentShape(@space.staticBody, cp.v(@width, 0), cp.v(@width ,@height), 0)
+
+    for id, wall of walls
+      w = @space.addShape(wall)
+      w.setElasticity(1)
+      w.setFriction(1)
+      w.setLayers(@NOT_GRABABLE_MASK)
+
+
 
   step: (dt) ->
     @space.step(1/40)
