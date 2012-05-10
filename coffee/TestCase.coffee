@@ -3,9 +3,9 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
   #    super()
   oninit: ->
     super()
-    @create_matching_naubs()
     Naubino.settings.graphics.updating = on
     Naubino.settings.game.creation_offset = -50
+    @create_matching_naubs()
 
     @gravity = on
     @naub_replaced.add (number)=> @graph.cycle_test(number)
@@ -23,3 +23,16 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
   event:->
   #check: =>
 
+  add_ball: (pos = @random_outside(), color = null) =>
+    naub = new Naub this, color
+    ball = new Ball
+
+    naub.add_shape ball
+    naub.setup_physics()
+    naub.physical_body.setPos( pos.Copy() ) # remember to set position
+    naub.kind = 'ball'
+
+    @add_object naub
+    naub.add_shape new NumberShape
+    #naub.update() # again just to get the numbers
+    naub

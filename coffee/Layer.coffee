@@ -80,7 +80,8 @@ define -> class Layer
       @space.addBody obj.physical_body if obj.physical_body?
 
     obj.center = @center
-    obj.set_number ++@objects_count
+    ++@objects_count
+    obj.number = @objects_count
     @objects[@objects_count] = obj
     @objects_count
 

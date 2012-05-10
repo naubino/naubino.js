@@ -66,12 +66,13 @@ define ["Layer", "Naub", "Graph", "Shapes", "CollisionHandler"], (Layer, Naub, G
       stfs =  Naubino.settings.physics.center_join.stiffness
       dmpg =  Naubino.settings.physics.center_join.damping
 
-      joint =
-        new cp.DampedSpring( obj.physical_body, @space.staticBody, cp.vzero, obj.center, rstl, stfs, dmpg)
+      joint = new cp.DampedSpring( obj.physical_body, @space.staticBody, cp.vzero, obj.center, rstl, stfs, dmpg)
       @centerjoins.push joint
       @space.addConstraint( joint)
       obj.constraints.push joint
 
+    obj.physical_body.naub_number = @objects_count if obj.physical_body?
+    obj.physical_shape.naub_number = @objects_count if obj.physical_shape?
   
   # the game gives it the game takes it
   # FACTORIES
@@ -222,22 +223,37 @@ define ["Layer", "Naub", "Graph", "Shapes", "CollisionHandler"], (Layer, Naub, G
       @focused_naub = naub
 
       @mouseBody.p = @pointer
-      @mouseJoint = new cp.PivotJoint(@mouseBody, naub.physical_body, cp.v(0,0), cp.v(0,0))
-      @mouseJoint.maxForce = 50000
-      @mouseJoint.errorBias = Math.pow(1 - 0.15, 60)
+      @mouseJoint = new cp.PivotJoint(@mouseBody, naub.physical_body, cp.vzero, cp.vzero)
+      @mouseJoint.errorBias = Math.pow(1 - 0.5, 60)
       @space.addConstraint(@mouseJoint)
+      
+      # make naubs lighter
+      attached_naubs = @graph.tree(naub.number)
+      for n in attached_naubs
+        naub = @get_object n
+        naub.physical_body.setMass Naubino.settings.naub.light_mass
+        naub.physical_shape.setElasticity Naubino.settings.naub.soft
+
+
 
   # callback for mouseup signal
   unfocus: =>
     if @mousedown
       @mousedown = false
+
       if @focused_naub
+        # undo make naubs lighter
+        attached_naubs = @graph.tree(@focused_naub.number)
+        for n in attached_naubs
+          naub = @get_object n
+          naub.physical_body.setMass Naubino.settings.naub.mass
+          naub.physical_shape.setElasticity Naubino.settings.naub.hard
+
         @focused_naub.unfocus()
       @focused_naub = null
       if @space? && @mouseJoint?
         @space.removeConstraint @mouseJoint
         @mouseJoint = null
-
 
 
   # produces a random set of coordinates outside the field

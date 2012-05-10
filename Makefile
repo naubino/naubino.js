@@ -8,7 +8,7 @@ LIB_DIR = lib/
 TMP_DIR = js/
 
 SRC := $(shell find $(SRC_DIR) -type f -iname \*.coffee)
-TMP := $(SRC:$(SRC_DIR)%.coffee=js/%.js)
+TMP := $(SRC:$(SRC_DIR)%.coffee=$(TMP_DIR)%.js)
 
 
 all:       $(min_TARGET)
