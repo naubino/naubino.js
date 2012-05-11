@@ -42,6 +42,16 @@ define -> class Naub
     @physical_shape = new cp.CircleShape( @physical_body, @radius , cp.vzero )
     @physical_shape.setElasticity @elasticity
     @physical_shape.setFriction @friction
+    @physical_shape.setFriction @friction
+    @physical_shape.group = 1
+
+  watch_for_walls: ->
+    @check_group = setInterval (=>
+      if @layer.point_in_field @physical_body.p
+        clearInterval @check_group
+        setTimeout (=> @physical_shape.group = 0),1000
+
+    ), 10
 
 
   # Returns the area value of the first shape that implements it,
@@ -262,6 +272,11 @@ define -> class Naub
       NaN
 
 
+  enter_field: ->
+    check_in_field = ->
+
+
+    setInterval (check_in_field), 10
 
 
 

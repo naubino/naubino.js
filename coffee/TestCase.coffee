@@ -4,16 +4,19 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
   oninit: ->
     super()
     Naubino.settings.graphics.updating = on
-    Naubino.settings.game.creation_offset = -50
-    @factory.create_matching_naubs()
+    #Naubino.settings.game.creation_offset = -50
+    @factory.add_ball = @add_ball
 
-    @gravity = on
     @naub_replaced.add (number)=> @graph.cycle_test(number)
     @cycle_found.add (list) => @destroy_naubs(list)
     Naubino.play()
 
-  onplaying: ->
+    Naubino.game.add_walls()
+
+  onplaying: (e,f,t)->
     super()
+
+    @factory.create_matching_naubs() if f == "stopped"
     #Naubino.background.animation.play()
     #Naubino.background.start_stepper()
 
@@ -34,5 +37,6 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
 
     @add_object naub
     naub.add_shape new NumberShape
-    #naub.update() # again just to get the numbers
+    naub.update() # again just to get the numbers
+    naub.watch_for_walls()
     naub

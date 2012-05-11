@@ -298,7 +298,6 @@ StringShape: class StringShape extends Shape
     super(@naub)
 
   render: (ctx, x,y) ->
-    @string = @naub.physical_body.m
     size = @naub.size * .7
 
     ctx.save()

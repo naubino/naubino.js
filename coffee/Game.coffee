@@ -100,11 +100,10 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
       @space.addConstraint(@mouseJoint)
       
       # make naubs lighter
-      attached_naubs = @graph.tree(naub.number)
-      for n in attached_naubs
-        naub = @get_object n
-        naub.physical_body.setMass Naubino.settings.naub.light_mass
-        naub.physical_shape.setFriction Naubino.settings.naub.sticky
+      #attached_naubs = @graph.tree(naub.number)
+      #for n in attached_naubs
+      #  naub = @get_object n
+      #  #naub.physical_shape.setFriction Naubino.settings.naub.sticky
 
 
 
@@ -115,11 +114,10 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
 
       if @focused_naub
         # undo make naubs lighter
-        attached_naubs = @graph.tree(@focused_naub.number)
-        for n in attached_naubs
-          naub = @get_object n
-          naub.physical_body.setMass Naubino.settings.naub.mass
-          naub.physical_shape.setFriction Naubino.settings.naub.slick
+        #attached_naubs = @graph.tree(@focused_naub.number)
+        #for n in attached_naubs
+        #  naub = @get_object n
+        #  #naub.physical_shape.setFriction Naubino.settings.naub.slick
 
         @focused_naub.unfocus()
       @focused_naub = null
@@ -140,8 +138,10 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
           count.push naub
     count
 
+  point_in_field: (pos) ->
+    0 < pos.x < @width and 0 < pos.y < @height
 
-  # shows how much room is available in the basket
+  # shows how much room other.s available in the basket
   capacity: ->
     r = @basket_size
     size= Math.ceil r * r * Math.PI * 0.68 # don't ask me why
