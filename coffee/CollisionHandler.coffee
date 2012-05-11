@@ -24,6 +24,9 @@ define -> class CollisionHandler
       {a,b} = @naubs(arb)
       @game.check_joining a,b, arb
 
+  naub: (a)->
+    @game.get_object arb.a.naub_number
+
   naubs: (arb)->
     a = @game.get_object arb.a.naub_number
     b = @game.get_object arb.b.naub_number

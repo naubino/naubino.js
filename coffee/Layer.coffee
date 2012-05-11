@@ -50,31 +50,34 @@ define -> class Layer
   setup_physics: ->
     @GRABABLE_MASK_BIT = 1<<31
     @NOT_GRABABLE_MASK = ~@GRABABLE_MASK_BIT
-    console.info "setup physics", @name
-    #chipmunk
-    @remainder = 0
+
     @space = new cp.Space() # so far so good
     @space.damping = Naubino.settings.physics.damping
 
     @mouseBody = new cp.Body(Infinity, Infinity)
     @mouseBody.p = cp.vzero
+
     @space.addBody @mouseBody
+
+
  
     # add center
 
   add_walls: ->
-    ws = 5 #wall_strength
+    ws = 15 #wall_strength
+    @walls = {}
     walls=
       ceil  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(@width, 0), ws)
       floor : new cp.SegmentShape(@space.staticBody, cp.v(0,@height), cp.v(@width, @height), ws)
       left  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(0,@height), ws)
       right : new cp.SegmentShape(@space.staticBody, cp.v(@width, 0), cp.v(@width ,@height), ws)
 
-    for id, wall of walls
-      w = @space.addShape(wall)
-      w.setElasticity(.01)
-      w.setFriction(3)
-      w.setLayers(@NOT_GRABABLE_MASK)
+    for w, wall of walls
+      @walls[w] = @space.addShape(wall)
+      @walls[w].setElasticity(.01)
+      @walls[w].setFriction(3)
+      @walls[w].setLayers(@NOT_GRABABLE_MASK)
+      @walls[w].group = 1
 
 
 
