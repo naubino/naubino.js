@@ -43,9 +43,11 @@ define -> class Naub
     @physical_shape.setElasticity @elasticity
     @physical_shape.setFriction @friction
     @physical_shape.setFriction @friction
-    @physical_shape.group = 1
+
+    #@watch_for_walls()
 
   watch_for_walls: ->
+    @physical_shape.group = 1
     @check_group = setInterval (=>
       if @layer.point_in_field @physical_body.p
         clearInterval @check_group
