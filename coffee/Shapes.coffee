@@ -267,7 +267,7 @@ PauseButton: class PauseButton extends Shape
 MainButton: class MainButton extends Box
   render: (ctx, x, y) ->
     text = Naubino.game.points ? ""
-    @width = @naub.size*3
+    @width = @naub.size*1.5
     ctx.save()
     ctx.translate(x,y)
     ctx.rotate(Math.PI/6)

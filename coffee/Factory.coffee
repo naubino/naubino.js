@@ -2,8 +2,18 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
   constructor: (@layer) ->
 
   add_button: (callback, shapes) =>
-    pos = @random_outside()
+    pos = @layer.center
     naub = @add_ball pos, null
+
+    naub.kind = "button"
+    naub.add_shapes shapes
+    naub.focus = callback
+    naub.disabled = true
+    naub.isClickable = no
+    naub.update()
+
+    #@layer.graph.remove_join naub.join_with( @objects.main, name ) # add the object without managing the join
+    naub
 
   
   # factory for a naub ball

@@ -59,10 +59,9 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
 
   add_object:(obj) ->
     super obj
-
     obj.physical_body.naub_number = @objects_count if obj.physical_body?
     obj.physical_shape.naub_number = @objects_count if obj.physical_shape?
-    obj.attach_to @center
+    obj.attracted_to @center
   
 
 
