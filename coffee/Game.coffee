@@ -20,7 +20,6 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     Naubino.mousedown.add @click
     Naubino.mouseup.add @unfocus
 
-    @centerjoins = []
     @joining_naubs = []
     @replacing_naubs = []
     
@@ -61,24 +60,10 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
   add_object:(obj) ->
     super obj
 
-    # attach it to its center
-    if @space?
-      #restLength, stiffness, damping
-      rstl = Naubino.settings.physics.center_join.restLength
-      stfs =  Naubino.settings.physics.center_join.stiffness
-      dmpg =  Naubino.settings.physics.center_join.damping
-
-      joint = new cp.DampedSpring( obj.physical_body, @space.staticBody, cp.vzero, obj.center, rstl, stfs, dmpg)
-      @centerjoins.push joint
-      @space.addConstraint( joint)
-      obj.constraints.push joint
-
     obj.physical_body.naub_number = @objects_count if obj.physical_body?
     obj.physical_shape.naub_number = @objects_count if obj.physical_shape?
+    obj.attach_to @center
   
-  # the game gives it the game takes it
-  # FACTORIES
-
 
 
 

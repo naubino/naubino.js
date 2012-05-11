@@ -29,6 +29,7 @@ define -> class Naub
   setup_physics: ->
     # this is redundant - just in case the the shapes don't do this
     @constraints = []
+
     @radius = @size/2
     @width  = @size * 0.9
     @height = @size * 0.9
@@ -67,10 +68,6 @@ define -> class Naub
   # set @life_rendering to true if you want to have an animated naub
   # either renders live or draws pre_rendered image
   draw: (ctx) ->
-    #chipmunk test
-    cpos = @physical_body.p
-    
-
     pos = @physical_body.p
     unless Naubino.settings.graphics.updating or @life_rendering
       ctx.save()
@@ -82,6 +79,7 @@ define -> class Naub
     else # render life
       @render(@ctx, pos.x,pos.y)
 
+
   # Renders the shape into a buffer
   update: () ->
     @buffer = document.createElement('canvas')
@@ -89,10 +87,12 @@ define -> class Naub
     b_ctx = @buffer.getContext('2d')
     @render b_ctx, @frame, @frame
 
+
   # Executes the render method of all shapes
   render: (ctx,x,y) ->
     for shape in @shapes
       shape.render(ctx,x,y)
+
 
   # adds a shape and runs its setup
   add_shape: (shape)->
@@ -100,9 +100,11 @@ define -> class Naub
     @shapes.push shape
     @update()
 
+
   update_shapes: ->
     for shape in @shapes
       shape.setup this
+
 
   # runs draw_join on all partners, if this naub is the one drawing the join
   # Otherwise the partner will draw the join.
@@ -120,7 +122,6 @@ define -> class Naub
   draw_join: (ctx, partner) ->
     pos = @physical_body.p
     pos2 = partner.physical_body.p
-
     # joins getting thinner by stretching
     diff = pos2.Copy()
     diff.sub(pos)
@@ -130,7 +131,6 @@ define -> class Naub
     stretch = Math.round((stretch)*10)/10 # rounding
     #@join_style.fill[3] = stretch
     stretched_width = @join_style.width * stretch
-
     ctx.save()
     ctx.strokeStyle = @color_to_rgba @join_style.fill
     try
@@ -153,10 +153,12 @@ define -> class Naub
     @disabled = true
     @update()
 
+
   # makes a naub unclickable and joinable
   enable: ->
     @disabled = false
     @update()
+
 
   # change fill to gray
   grey_out: -> @style.fill = [100,100,100,1]
@@ -188,6 +190,14 @@ define -> class Naub
 
 
 
+  attach_to: ( center ) ->
+      #restLength, stiffness, damping
+      rstl = Naubino.settings.physics.center_join.restLength
+      stfs =  Naubino.settings.physics.center_join.stiffness
+      dmpg =  Naubino.settings.physics.center_join.damping
+      @centerjoin = new cp.DampedSpring( @physical_body, @layer.space.staticBody, cp.vzero, center, rstl, stfs, dmpg)
+      @layer.space.addConstraint( @centerjoin )
+      @constraints.push @centerjoin
 
 
   # do things a naub is supposed to do

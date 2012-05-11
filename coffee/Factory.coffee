@@ -1,30 +1,11 @@
 define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton })-> class Factory
   constructor: (@layer) ->
 
+  add_button: (callback, shapes) =>
+    pos = @random_outside()
+    naub = @add_ball pos, null
+
   
-  #create n sets of matching pairs and some leftovers
-  #
-  # @param n [int] number of matching pairs
-  # @param extras [int] number of leftovers
-  create_matching_naubs: (n=1,extras=0) ->
-    for [1..n]
-      colors = Util.shuffle [0..5]
-      colors[5] = colors[0]
-      i = 0
-      while i < (colors.length )-1
-        pos  = @random_outside()
-        #Naubino.background.draw_marker(x,y)
-        [a,b] = @create_naub_pair(pos, colors[i],colors[i+1], off)
-        #console.log "pairing " + [a,b]
-        i++
-
-    #create some extras
-    if extras > 0
-      for [1..extras]
-        pos  = @random_outside()
-        #Naubino.background.draw_marker(x,y)
-        @create_naub_pair(pos)
-
   # factory for a naub ball
   # 
   # @param pos [cp.v] position
@@ -64,15 +45,6 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
     #naub.add_shape new NumberShape
     #naub.update() # again just to get the numbers
     naub
-
-  #returns a random 
-  random_factory: ->
-    factories = [
-      @add_ball
-      @add_box
-    ]
-    console.log 'i', i = Math.floor(Math.random() * (factories.length))
-    factories[i]
 
   # create a pair of joined naubs
   #
@@ -127,6 +99,28 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
     naub_a.join_with naub_b
     naub_b.join_with naub_c
 
+  #create n sets of matching pairs and some leftovers
+  #
+  # @param n [int] number of matching pairs
+  # @param extras [int] number of leftovers
+  create_matching_naubs: (n=1,extras=0) ->
+    for [1..n]
+      colors = Util.shuffle [0..5]
+      colors[5] = colors[0]
+      i = 0
+      while i < (colors.length )-1
+        pos  = @random_outside()
+        #Naubino.background.draw_marker(x,y)
+        [a,b] = @create_naub_pair(pos, colors[i],colors[i+1], off)
+        #console.log "pairing " + [a,b]
+        i++
+    #create some extras
+    if extras > 0
+      for [1..extras]
+        pos  = @random_outside()
+        #Naubino.background.draw_marker(x,y)
+        @create_naub_pair(pos)
+
 
   # produces a random set of coordinates outside the field
   random_outside: ->
@@ -146,4 +140,13 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
         x = @layer.width * Math.random()
         y = 0 - offset
     new cp.v x,y
+
+  #returns a random 
+  random_factory: ->
+    factories = [
+      @add_ball
+      @add_box
+    ]
+    console.log 'i', i = Math.floor(Math.random() * (factories.length))
+    factories[i]
 
