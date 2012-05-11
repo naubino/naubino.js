@@ -63,16 +63,17 @@ define -> class Layer
     # add center
 
   add_walls: ->
+    ws = 5 #wall_strength
     walls=
-      ceil  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(@width, 0), 0)
-      floor : new cp.SegmentShape(@space.staticBody, cp.v(0,@height), cp.v(@width, @height), 0)
-      left  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(0,@height), 0)
-      right : new cp.SegmentShape(@space.staticBody, cp.v(@width, 0), cp.v(@width ,@height), 0)
+      ceil  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(@width, 0), ws)
+      floor : new cp.SegmentShape(@space.staticBody, cp.v(0,@height), cp.v(@width, @height), ws)
+      left  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(0,@height), ws)
+      right : new cp.SegmentShape(@space.staticBody, cp.v(@width, 0), cp.v(@width ,@height), ws)
 
     for id, wall of walls
       w = @space.addShape(wall)
-      w.setElasticity(1)
-      w.setFriction(1)
+      w.setElasticity(.01)
+      w.setFriction(3)
       w.setLayers(@NOT_GRABABLE_MASK)
 
 

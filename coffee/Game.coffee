@@ -104,7 +104,7 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
       for n in attached_naubs
         naub = @get_object n
         naub.physical_body.setMass Naubino.settings.naub.light_mass
-        naub.physical_shape.setElasticity Naubino.settings.naub.soft
+        naub.physical_shape.setFriction Naubino.settings.naub.sticky
 
 
 
@@ -119,7 +119,7 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
         for n in attached_naubs
           naub = @get_object n
           naub.physical_body.setMass Naubino.settings.naub.mass
-          naub.physical_shape.setElasticity Naubino.settings.naub.hard
+          naub.physical_shape.setFriction Naubino.settings.naub.slick
 
         @focused_naub.unfocus()
       @focused_naub = null

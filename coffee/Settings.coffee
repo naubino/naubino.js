@@ -15,10 +15,9 @@ define -> Settings = {
     size:          28
     mass:          15
     light_mass:    5
-    friction:      0.5
+    slick:         0.5
+    sticky:        1.2
     elasticity:    1
-    hard:          1
-    soft:          0.01
     min_join_len:  1.2 # times size
     max_join_len:  2 # times size
 

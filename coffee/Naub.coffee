@@ -32,7 +32,7 @@ define -> class Naub
     @radius = @size/2
     @width  = @size * 0.9
     @height = @size * 0.9
-    @friction = Naubino.settings.naub.friction
+    @friction = Naubino.settings.naub.slick
     @elasticity = Naubino.settings.naub.elasticity
 
     #this part will be adjusted by shape
