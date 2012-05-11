@@ -100,6 +100,10 @@ define -> class Naub
     @shapes.push shape
     @update()
 
+  # adds shapes and runs setups
+  add_shapes: (shapes)->
+    for shape in shapes
+      @add_shape shape
 
   update_shapes: ->
     for shape in @shapes
@@ -189,8 +193,14 @@ define -> class Naub
 
 
 
-
   attach_to: ( center ) ->
+    unless @centerjoin?
+      # TODO implement this
+    else
+      console.warn "object is already attached to a point"
+
+  attracted_to: ( center ) ->
+    unless @centerjoin?
       #restLength, stiffness, damping
       rstl = Naubino.settings.physics.center_join.restLength
       stfs =  Naubino.settings.physics.center_join.stiffness
@@ -198,6 +208,8 @@ define -> class Naub
       @centerjoin = new cp.DampedSpring( @physical_body, @layer.space.staticBody, cp.vzero, center, rstl, stfs, dmpg)
       @layer.space.addConstraint( @centerjoin )
       @constraints.push @centerjoin
+    else
+      console.warn "object is already attached to a point"
 
 
   # do things a naub is supposed to do

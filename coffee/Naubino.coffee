@@ -62,8 +62,8 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @menu          = new Menu(@menu_canvas)
     @overlay       = new Overlay(@overlay_canvas)
 
-    #@menu.init()
-    #@menu.animation.play()
+    @menu.init()
+    @menu.animation.play()
     @game.init()
 
 
