@@ -59,7 +59,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     #@game          = @game_standard
     @game          = @game_testcase
     #@game          = @game_tutorial
-    #@menu          = new Menu(@menu_canvas)
+    @menu          = new Menu(@menu_canvas)
     @overlay       = new Overlay(@overlay_canvas)
 
     #@menu.init()
