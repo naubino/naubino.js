@@ -1,50 +1,37 @@
 <!DOCTYPE HTML>
 <html>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
-    <link rel="stylesheet" href="css/naubino.css" type="text/css">
-    <link rel="stylesheet" href="css/github-badge.css" type="text/css">
-    <meta name="viewport" content="width=device-width, maximum-scale=1.2,user-scalable=no" />
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>naubino.js</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+        <link rel="stylesheet" href="css/naubino.css" type="text/css" />
+        <link rel="stylesheet" href="css/github-badge.css" type="text/css" />
 
-    <script type="text/javascript" src="lib/signals/dist/signals.min.js"></script>
-    <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
-    <script type="text/javascript" src="lib/requirejs/require.js" data-main="Naubino.min"></script>
-  </head>
-  <body>
-    <a id="github" href="https://github.com/hoodie/naubino.js">
-      <span>Watch me on Github!</span>
-      <span>Stay tuned!</span>
-    </a>
+        <script type="text/javascript" src="lib/signals/dist/signals.min.js"></script>
+        <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
+        <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
+        <script type="text/javascript" src="lib/zepto/dist/zepto.js"></script>
+        <script type="text/javascript" src="lib/chipmunk/cp.js"></script>
+        <script type="text/javascript" src="js/Util.js"></script>
+        <script type="text/javascript" src="lib/requirejs/require.js" data-main="js/Load"></script>
+    </head>
+    <body>
+        <div class="container">
+            <header> <a id="github" href="https://github.com/hoodie/naubino.js">
+                <span>Watch me on Github!</span>
+                <span>Stay tuned!</span>
+            </a> </header>
 
-    <header>
 
-    <div class="row-fluid">
-      <div class="span4"> </div>
-      <div class="span4">
-        <h1>naubino <sub>ålpha<sup>1</sup></sub></h1>
-    <hr/>
-      </div>
-      <div class="span4"> </div>
-    </div>
-    </header>
+            <div class="row span12" id="gamediv"> </div> 
 
-    <section class="row">
-      <div id="gamediv">
-        <canvas id="background_canvas" style="position: absolute; z-index:0;" width="20" height="15"></canvas>
-        <canvas id="game_canvas"       style="position: absolute; z-index:1;" width="20" height="15"></canvas>
-        <canvas id="menu_canvas"       style="position: absolute; z-index:2;" width="20" height="15"></canvas>
-        <canvas id="overlay_canvas"    style="position: absolute; z-index:2;" width="20" height="15"></canvas>
-      </div> 
-    </section>
-    <section class="row">
-    </section>
-
-    <script>
-      document.ontouchmove = function(event) {
-        event.preventDefault();
-      }
-    </script>
-  </body>
+        </div> 
+        <script>
+            document.ontouchmove = function(event) {
+                event.preventDefault();
+            }
+        </script>
+    </body>
 </html>
 

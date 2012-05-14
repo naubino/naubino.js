@@ -244,6 +244,9 @@ define -> class Naub
       delete naub.joins[id]
       @layer.graph.remove_join id
     @layer.unfocus()
+    p = other.physical_body.p
+    p2 = @physical_body.p
+    other.physical_body.p = cp.v.lerp(p, p2, 0.5)
     @remove()
     @layer.naub_replaced.dispatch(other.number)
     return 42
