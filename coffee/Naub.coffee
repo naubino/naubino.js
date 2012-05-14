@@ -67,10 +67,10 @@ define -> class Naub
   # @param ctx [canvas.context] context of the target layer
   # set @life_rendering to true if you want to have an animated naub
   # either renders live or draws pre_rendered image
-  draw: (ctx) ->
-    pos = @physical_body.p
+  draw: () ->
+    pos = if @physical_body then @physical_body.p else @pos
     unless Naubino.settings.graphics.updating or @life_rendering
-      ctx.save()
+      @ctx.save()
       x = pos.x-@frame
       y = pos.y-@frame
       #@draw_frame(ctx)

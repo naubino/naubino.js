@@ -1,9 +1,10 @@
 # TODO clean up menu code -- will do in naub_rethought
-define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, { Ball, StringShape, PlayButton, PauseButton, MainButton }) -> class Menu extends Layer
+define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { Ball, StringShape, PlayButton, PauseButton, MainButton }, Factory) -> class Menu extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "menu"
-    @graph = new Graph(this)
+    @graph = new Graph this
+    @factory = new Factory this
     @animation.name = "menu.animation"
 
     @objects = {}
@@ -14,8 +15,8 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
     Naubino.mousedown.add @click
     Naubino.menu_button.active = false
    
-    @physics_fps = 35
-    @position = new b2Vec2(20,25)
+    @physics_fps = 20
+    @center = new cp.v(20,25)
     @cube_size = 45
     
     StateMachine.create {
@@ -24,11 +25,6 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
       error: (e, from, to, args, code, msg) -> console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
     }
 
-    ### definition of each button
-    TODO: position should be dynamic
-    ###
-
-
   # changing the state a little
   oninit: ->
     @add_buttons()
@@ -36,36 +32,24 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
 
   buttons:
     main:
-      position:  new b2Vec2(20,25)
+      position:  new cp.v(20,25)
       shapes: [new MainButton]
+      #shapes: []
     play:
       function: -> Naubino.play()
-      position: new b2Vec2(65,35)
+      position: new cp.v(65,35)
       shapes: [new Ball, new PlayButton]
     help:
       function: -> Naubino.tutorial()
-      position: new b2Vec2(45,65)
+      position: new cp.v(45,65)
       shapes: [new Ball, new StringShape "?", "white"]
     exit:
       function: -> Naubino.stop()
-      position: new b2Vec2(14,80)
+      position: new cp.v(14,80)
       shapes: [new Ball, new StringShape "X", "white"]
 
   add_buttons: ->
-    for name, button of @buttons
-      @objects[name] = new Naub(this)
-      for shape in button.shapes
-        @objects[name].add_shape shape
-      @objects[name].update()
-      @objects[name].focus = button.function
-      @objects[name].disabled = button.disabled
-      @objects[name].isClickable = no
-      @objects[name].physics.pos.Set button.position.x, button.position.y
-      @objects[name].physics.mass = Naubino.settings.naub.mass_menu
-      @objects[name].physics.attracted_to.Set button.position.x, button.position.y
-      @graph.remove_join @objects[name].join_with( @objects.main, name ) # add the object without managing the join
-
-    @objects.main.life_rendering = on
+    @objects[name] = @factory.add_button(button.position, button.function, button.shapes) for name, button of @buttons
 
 
   onenterplaying: ->
@@ -74,32 +58,23 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
     @objects.play.add_shape new PauseButton
     @objects.play.update()
 
-
   onenterpaused: ->
     @objects.play.focus = -> Naubino.play()
     @objects.play.shapes.pop()
     @objects.play.add_shape new PlayButton
     @objects.play.update()
 
-  onenterstopped: (e,f,t) ->
-    unless e is 'init'
-      @onenterpaused()
+  onenterstopped: (e,f,t) -> @onenterpaused() unless e is 'init'
 
+  step: ->
 
-  step: (dt) ->
     for name, naub of @objects
-      naub.step (dt)
       if @hovering
-        naub.physics.gravitate(dt)
+        naub.pos = cp.v.lerp(naub.pos, naub.fixed_pos, 0.1) unless name == "main"
       else
-        naub.physics.gravitate(dt, @position)
-
-
-  #utility for Game
-  update:-> @objects.main.update()
+        naub.pos = cp.v.lerp(naub.pos, @center, 0.15) unless name == "main"
 
   ## can I touch this?
-
   move_pointer: (x,y) -> [@pointer.x, @pointer.y] = [x,y]
 
   draw: ->
@@ -110,11 +85,10 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
     for name, naub of @objects
-      naub.draw_joins(@ctx)if not naub.disabled
-      naub.draw(@ctx) if not naub.disabled
+      naub.draw_joins(@ctx)
+      naub.draw(@ctx)
     @objects.main.draw(@ctx)
     @objects.main.draw_joins()
-    @draw_listener_region()
     @ctx.restore()
 
   draw_listener_region: ->
@@ -132,7 +106,7 @@ define ["Menu", "Layer", "Naub", "Graph", "Shapes"], (Menu, Layer, Naub, Graph, 
       @for_each (b) -> b.isClickable = no
       @listener_size = @default_listener_size
       setTimeout (@stop_stepper ),1000
-    #@ctx.stroke() # like to see it
+    @ctx.stroke() # like to see it
     @ctx.closePath()
     @ctx.restore()
 
