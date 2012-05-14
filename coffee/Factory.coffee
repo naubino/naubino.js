@@ -70,9 +70,8 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
     pos_a = pos.Copy()
     pos_b = pos.Copy()
 
-    #TODO auskommentiert
-    #pos_a.AddPolar(dir,  15)
-    #pos_b.AddPolar(dir, -15)
+    pos_a.AddPolar(dir,  15)
+    pos_b.AddPolar(dir, -15)
 
     if mixed
       factory1 = @random_factory()
@@ -98,9 +97,8 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
     pos_b = pos.Copy()
     pos_c = pos.Copy()
 
-    # TODO auskommentiert
-    #pos_a.AddPolar(dir,  30)
-    #pos_c.AddPolar(dir, -30)
+    pos_a.AddPolar(dir,  30)
+    pos_c.AddPolar(dir, -30)
 
     naub_a = @add_ball pos_a, color_a
     naub_b = @add_ball pos_b, color_b

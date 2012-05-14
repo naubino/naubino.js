@@ -1,7 +1,10 @@
 
 #upper case function to avoid overwriting defaults
-cp.Vect::Copy   = -> new cp.Vect this.x, this.y
-cp.Vect::Length = -> Math.sqrt(this.x * this.x + this.y * this.y)
+cp.Vect::Copy   = -> new cp.Vect @.x, @.y
+cp.Vect::Length = -> Math.sqrt(@.x * @.x + @.y * @.y)
+cp.Vect::AddPolar = (dir, len) ->
+    @x += Math.cos(dir) * len
+    @y += Math.sin(dir) * len
 
 window.Util =
   shuffle: (a) ->

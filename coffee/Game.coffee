@@ -195,7 +195,8 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
 
   # clears the graph as well, just in case
   clear_objects: ->
-    @for_each (o)-> o.remove()
+    super()
+    @setup_physics()
     @graph.clear()
 
   # run naub_forces, check for joinings and clean up
