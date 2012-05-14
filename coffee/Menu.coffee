@@ -33,10 +33,14 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
   buttons:
     main:
       position:  new cp.v(20,25)
+      function: ->
+        console.info "menu"
       shapes: [new MainButton]
       #shapes: []
     play:
-      function: -> Naubino.play()
+      function: ->
+        console.info "play"
+        Naubino.play()
       position: new cp.v(65,35)
       shapes: [new Ball, new PlayButton]
     help:
@@ -76,6 +80,15 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
 
   ## can I touch this?
   move_pointer: (x,y) -> [@pointer.x, @pointer.y] = [x,y]
+
+  click: (x, y) =>
+    @mousedown = true
+
+    for name, naub of @objects
+      if naub.isHit @pointer
+        naub.focus()
+        @focused_naub = naub
+        break
 
   draw: ->
     @draw_menu()

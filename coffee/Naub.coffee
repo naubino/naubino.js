@@ -56,6 +56,9 @@ define -> class Naub
 
     ), 10
 
+  isHit: (pos) ->
+    s = @shapes[0]
+    s.isHit(@ctx, pos)
 
   # Returns the area value of the first shape that implements it,
   area: ->
