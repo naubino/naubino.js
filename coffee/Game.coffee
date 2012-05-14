@@ -187,8 +187,8 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     for id, obj of @objects
       obj.draw @ctx
 
-    @draw_point @pointer
-    @draw_point @mouseBody.p, "blue"
+    #@draw_point @pointer
+    #@draw_point @mouseBody.p, "blue"
     @ctx.restore()
 
 
