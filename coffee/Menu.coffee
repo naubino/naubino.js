@@ -38,9 +38,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
       shapes: [new MainButton]
       #shapes: []
     play:
-      function: ->
-        console.info "play"
-        Naubino.play()
+      function: -> Naubino.play()
       position: new cp.v(65,35)
       shapes: [new Ball, new PlayButton]
     help:
