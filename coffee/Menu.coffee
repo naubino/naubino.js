@@ -50,7 +50,9 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
       position: new cp.v(14,80)
       shapes: [new Ball, new StringShape "X", "white"]
 
-  add_buttons: -> @objects[name] = @factory.add_button(button.position, button.function, button.shapes) for name, button of @buttons
+  add_buttons: ->
+    @objects[name] = @factory.add_button(button.position, button.function, button.shapes) for name, button of @buttons
+    @objects.main.life_rendering = on
 
   onenterplaying: ->
     @objects.play.focus = -> Naubino.pause()

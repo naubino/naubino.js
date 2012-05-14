@@ -6,17 +6,25 @@
     <meta name="viewport" content="width=device-width" />
     <link rel="stylesheet" href="css/naubino.css" type="text/css">
     <link rel="stylesheet" href="css/github-badge.css" type="text/css">
+    <script type="text/javascript" src="lib/zepto/dist/zepto.js"></script>
   </head>
   <body>
-    <section>
-    <h1>naubino</h1>
-    <div id="gamediv" style="">
-      <img src="images/background.png" id="background_canvas" class="canvas" style="position: absolute; z-index:0;"  />
-      <img src="images/game.png"       id="game_canvas"       class="canvas" style="position: absolute; z-index:1;"  />
-      <img src="images/menu.png"       id="menu_canvas"       class="canvas" style="position: absolute; z-index:2;"  />
-      <img src="images/overlay.png"    id="overlay_canvas"    class="canvas" style="position: absolute; z-index:2;"  />
 
+    <script>
+      g = $('gamediv');
+      g.anim({ rotate: '720deg', opacity: .5 }, 2, 'ease-out')
+    </script>
+
+    <div class="container">
+      <section>
+      <div id="gamediv" style="">
+        <span >hallo world</span>
+        <img src="images/background.png" id="background_canvas" class="canvas" style="position: absolute; z-index:0;"  />
+        <img src="images/game.png"       id="game_canvas"       class="canvas" style="position: absolute; z-index:1;"  />
+        <img src="images/menu.png"       id="menu_canvas"       class="canvas" style="position: absolute; z-index:2;"  />
+        <img src="images/overlay.png"    id="overlay_canvas"    class="canvas" style="position: absolute; z-index:2;"  />
+      </div> 
+      </section>
     </div> 
-    </section>
   </body>
 </html>
