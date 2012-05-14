@@ -55,12 +55,6 @@ h1 {
     color: white;
     text-shadow: hsl(0,0%,022%) 2px 2px 4px;
 }
-#gamediv {
-    text-align:center;
-    display:block;
-    margin:auto;
-    max-width:800px;
-}
 #footerdiv {
     text-align:center;
     display:block;
@@ -69,6 +63,20 @@ h1 {
     padding:0 1em;
 }
 
-canvas {
+#gamediv {
+    display:block;
+}
+
+#gamediv > canvas, #gamediv .canvas{
     position: absolute;
+    z-index:0;
+    left:auto;
+}
+#gamediv > span{
+    position: absolute;
+    text-align:center;
+    width:600px;
+    height:400px;
+    padding-top:50px;
+    z-index:1;
 }
