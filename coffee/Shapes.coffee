@@ -86,8 +86,8 @@ Ball: class Ball extends Shape
     ctx.arc(0, 0, @naub.radius, 0, Math.PI * 2, false)
     ctx.closePath()
 
+    # gradient
     if @naub.focused
-      # gradient
       gradient = ctx.createRadialGradient(0, 0, @naub.radius/3, 0, 0, @naub.radius)
       gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
       gradient.addColorStop 1, @color_to_rgba(@style.fill, 50)
@@ -102,6 +102,11 @@ Ball: class Ball extends Shape
     ctx.closePath()
 
     ctx.restore()
+
+  isHit: (ctx, pos) ->
+    d = @pos.Copy()
+    d.sub pos
+    d.Length() <= @naub.size
 
   setup: (naub) ->
     super(naub)
@@ -155,6 +160,12 @@ Box: class Box extends Shape
     @naub.physical_shape = new cp.BoxShape( @naub.physical_body, @naub.width, @naub.height )
     @naub.physical_shape.setElasticity @naub.elasticity
     @naub.physical_shape.setFriction @naub.friction
+  isHit: (ctx, pos) ->
+    ctx.beginPath()
+    ctx.rect(-@naub.width/2,-@naub.height/2,@naub.width,@naub.height)
+    ctx.closePath()
+    ctx.isPointInPath(pos.x,pos.y)
+
 
 Clock: class Clock extends Shape
   constructor: ->

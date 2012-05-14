@@ -10,7 +10,7 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
     naub.add_shapes shapes
     naub.focus = callback
     naub.disabled = true
-    naub.isClickable = no
+    naub.isClickable = yes
     naub.update()
     #@layer.graph.remove_join naub.join_with( @objects.main, name ) # add the object without managing the join
     naub
