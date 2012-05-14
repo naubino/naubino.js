@@ -3,7 +3,7 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
   #    super()
   oninit: ->
     super()
-    Naubino.settings.graphics.updating = on
+    #Naubino.settings.graphics.updating = on
     Naubino.settings.game.creation_offset = -50
     @factory.add_ball = @add_ball
 
