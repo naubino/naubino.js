@@ -127,8 +127,8 @@ define -> class Naub
   # @param ctx [canvas.context] context of the target layer
   # @param partner [naub] target naub
   draw_join: (ctx, partner) ->
-    pos = @physical_body.p
-    pos2 = partner.physical_body.p
+    pos = if @physical_body then @physical_body.p else @pos
+    pos2 = if partner.physical_body then partner.physical_body.p else partner.pos
     # joins getting thinner by stretching
     diff = pos2.Copy()
     diff.sub(pos)

@@ -52,9 +52,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
       position: new cp.v(14,80)
       shapes: [new Ball, new StringShape "X", "white"]
 
-  add_buttons: ->
-    @objects[name] = @factory.add_button(button.position, button.function, button.shapes) for name, button of @buttons
-
+  add_buttons: -> @objects[name] = @factory.add_button(button.position, button.function, button.shapes) for name, button of @buttons
 
   onenterplaying: ->
     @objects.play.focus = -> Naubino.pause()
@@ -71,12 +69,13 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
   onenterstopped: (e,f,t) -> @onenterpaused() unless e is 'init'
 
   step: ->
-
     for name, naub of @objects
       if @hovering
         naub.pos = cp.v.lerp(naub.pos, naub.fixed_pos, 0.1) unless name == "main"
+        naub.isClickable = yes if naub.pos == naub.fixed_pos
       else
         naub.pos = cp.v.lerp(naub.pos, @center, 0.15) unless name == "main"
+        naub.isClickable = no
 
   ## can I touch this?
   move_pointer: (x,y) -> [@pointer.x, @pointer.y] = [x,y]
@@ -98,7 +97,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
     for name, naub of @objects
-      naub.draw_joins(@ctx)
+      naub.draw_join(@ctx,@objects.main)
       naub.draw(@ctx)
     @objects.main.draw(@ctx)
     @objects.main.draw_joins()
@@ -119,7 +118,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
       @for_each (b) -> b.isClickable = no
       @listener_size = @default_listener_size
       setTimeout (@stop_stepper ),1000
-    @ctx.stroke() # like to see it
+    #@ctx.stroke() # like to see it
     @ctx.closePath()
     @ctx.restore()
 
