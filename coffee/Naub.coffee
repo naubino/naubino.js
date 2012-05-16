@@ -8,21 +8,21 @@ define -> class Naub
   constructor: (@layer, @color_id = null, @size = Naubino.settings.naub.size) ->
     #@physics = new PhysicsModel this
    
-    @ctx = @layer.ctx
-    @frame = @size*1.5 # defines buffer canvas
+    @ctx            = @layer.ctx
+    @frame          = @size*1.5 # defines buffer canvas
 
-    @color_id = @random_palette_color() unless @color_id?  # unless a color_id has been give pick a randome color
+    @color_id       = @random_palette_color() unless @color_id?  # unless a color_id has been give pick a randome color
     @life_rendering = false # if true redraw on each frame
 
-    @removed = false # soon to be deleted by game, garbage collector
-    @focused = false # currently activated by pointer
-    @disabled = false # cannot join with another
-    @isClickable = yes # influences @layer.isHit()
+    @removed        = false # soon to be deleted by game, garbage collector
+    @focused        = false # currently activated by pointer
+    @disabled       = false # cannot join with another
+    @isClickable    = yes # influences @layer.isHit()
 
-    @shapes = [] # shapes this naub draws in order from bottom to top
-    @joins = {} # {id: opposing naub}
-    @drawing_join = {} # {id: true/false if this naub draws the join}
-    @join_style = { fill: [0,0,0,1], width: 6 }
+    @shapes         = [] # shapes this naub draws in order from bottom to top
+    @joins          = {} # {id: opposing naub}
+    @drawing_join   = {} # {id: true/false if this naub draws the join}
+    @join_style     = { fill: [0,0,0,1], width: 6 }
 
     #@update() #renders it for the first time
 
@@ -30,10 +30,10 @@ define -> class Naub
     # this is redundant - just in case the the shapes don't do this
     @constraints = []
 
-    @radius = @size/2
-    @width  = @size * 0.9
-    @height = @size * 0.9
-    @friction = Naubino.settings.naub.slick
+    @radius     = @size/2
+    @width      = @size * 0.9
+    @height     = @size * 0.9
+    @friction   = Naubino.settings.naub.slick
     @elasticity = Naubino.settings.naub.elasticity
 
     #this part will be adjusted by shape
@@ -140,18 +140,14 @@ define -> class Naub
     stretched_width = @join_style.width * stretch
     ctx.save()
     ctx.strokeStyle = @color_to_rgba @join_style.fill
-    try
-      ctx.beginPath()
-      ctx.moveTo pos.x, pos.y
-      ctx.lineTo pos2.x, pos2.y
-      ctx.lineWidth = stretched_width
-      ctx.lineCap = "round"
-      ctx.stroke()
-      ctx.closePath()
-      ctx.restore()
-    catch e
-      #console.log [pos.x, pos.y]
-      @layer.menu_pause.dispatch()
+    ctx.beginPath()
+    ctx.moveTo pos.x, pos.y
+    ctx.lineTo pos2.x, pos2.y
+    ctx.lineWidth = stretched_width
+    ctx.lineCap = "round"
+    ctx.stroke()
+    ctx.closePath()
+    ctx.restore()
 
 
 
@@ -191,8 +187,6 @@ define -> class Naub
     for shape in @shapes[1..]
       shape.destroy_animation() # these are just for fun
     @layer.naub_destroyed.dispatch(@number)
-
-
 
 
 

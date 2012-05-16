@@ -24,7 +24,7 @@ define -> Settings = {
       restLength:   40
       stiffness:    2.6
       damping:      4
-    fps:            35 # bug:                                        slows down if high cpu usage
+    fps:            35
     calming_const:  0.5
     join_length:    3.0 # margin between joined naubs (n* avg size)
     spring_force:   0.6

@@ -14,7 +14,7 @@
 
 define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", "TestCase", "Settings", "Tutorial"], (Background, Game, KeyBindings, Menu, Overlay, StandardGame, TestCase, Settings, Tutorial) -> class Naubino
   constructor: () ->
-    @name = "Naubino (chipmunk branch)"
+    @name = "Naubino (unstable master)"
     @settings = Settings
     @colors = @settings.colors.output
     @create_fsm()

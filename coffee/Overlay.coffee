@@ -3,24 +3,41 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     super(canvas)
     @name = "overlay"
     @animation.name = "overlay.animation"
-
-    @fps = 1000 / 15 # 5fps
+    @fps = 15 # 5fps
     @fade_speed = 40
 
+  fade_object: (buffer,id) ->
+    if buffer.alpha_delta? and 0 <= buffer.alpha <= 1
+      buffer.alpha += buffer.alpha_delta
 
-  draw:  ->
+      if buffer.alpha > 1
+        buffer.alpha = 1
+        buffer.callback.call() if buffer.callback?
+        delete buffer.callback
+        delete buffer.alpha_delta
+
+      if buffer.alpha <= 0
+        buffer.alpha = 0
+        buffer.callback.call() if buffer.callback?
+        delete buffer.callback
+        delete @objects[id]
+
+
+  draw: ->
+
+    if Object.keys(@objects).length == 0
+      @animation.pause()
+
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
-
     # objects are all full size buffers
     for id, buffer of @objects
+      @fade_object buffer, id
       @ctx.globalAlpha = buffer.alpha if buffer.alpha?
       @ctx.drawImage(buffer, 0, 0)
       @ctx.globalAlpha = 1
-
     @ctx.restore()
   
-
   warning:(text, font_size = 25,x = @center.x, y = @center.y) ->
     color = @color_to_rgba(Naubino.colors[0])
     @message text, font_size , color,  x, y
@@ -33,44 +50,22 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
   fade_in_message: (text, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
     mes_id = @message text, font_size , color,  x, y, ctx
     mes = @get_object mes_id
-
     mes.alpha = 0.01
-    fade = =>
-      if (mes.alpha *= 1.2) >= 1
-        clearInterval mes.fadeloop
-        mes.alpha = 1
-        if callback?
-          callback.call()
-        console.log 'fade in:', text
-    clearInterval mes.fadeloop
-    mes.fadeloop = setInterval( fade, @fade_speed )
+    mes.alpha_delta = 1 / @fps
+    mes.callback = callback
     mes_id
 
   
   ### fading out a specific message by id ###
   fade_out_message: (mes_id, callback = null)->
-    #console.log "fade out"
-    mes = @get_object mes_id
-    fade = =>
-      if (mes.alpha *= 0.8) <= 0.05
-        #console.log mes.alpha
-        clearInterval mes.fadeloop
-        if callback?
-          callback.call()
-        @remove_obj mes_id
-
-    clearInterval mes.fadeloop
-    #console.log mes
-    if mes?
-      mes.fadeloop = setInterval( fade, @fade_speed)
+    mes = @get_object(mes_id)
+    mes.alpha_delta = -1 / @fps if mes?
 
 
   ### fading out all messages ###
   fade_out_messages: (callback = null) ->
-    for id, message of @objects
-      @fade_out_message id
-    if callback?
-      callback()
+    @fade_out_message id for id, message of @objects
+    callback() if callback?
 
 
   fade_in_and_out_message: (text, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
@@ -100,13 +95,14 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
 
 
   message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
+    if @animation.can 'play'
+      @animation.play()
     buffer = document.createElement('canvas')
     buffer.width = Naubino.settings.canvas.width
     buffer.height = Naubino.settings.canvas.height
     buffer.alpha = 1
-
+    buffer.text = text
     ctx = buffer.getContext('2d')
-
     lines = text.split("\n")
     y -= font_size * lines.length /2
     for line in lines
