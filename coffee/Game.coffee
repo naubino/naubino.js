@@ -84,10 +84,11 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
       @space.addConstraint(@mouseJoint)
       
       # make naubs lighter
-      #attached_naubs = @graph.tree(naub.number)
-      #for n in attached_naubs
-      #  naub = @get_object n
-      #  #naub.physical_shape.setFriction Naubino.settings.naub.sticky
+      attached_naubs = @graph.tree(naub.number)
+      for n in attached_naubs
+        naub = @get_object n
+        naub.physical_body.setMass Naubino.settings.naub.mass / 10
+        naub.physical_shape.setFriction Naubino.settings.naub.sticky
 
 
 
@@ -98,10 +99,11 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
 
       if @focused_naub
         # undo make naubs lighter
-        #attached_naubs = @graph.tree(@focused_naub.number)
-        #for n in attached_naubs
-        #  naub = @get_object n
-        #  #naub.physical_shape.setFriction Naubino.settings.naub.slick
+        attached_naubs = @graph.tree(@focused_naub.number)
+        for n in attached_naubs
+          naub = @get_object n
+          naub.physical_body.setMass Naubino.settings.naub.mass
+          naub.physical_shape.setFriction Naubino.settings.naub.slick
 
         @focused_naub.unfocus()
       @focused_naub = null
@@ -155,7 +157,6 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
 
     force = arbiter.totalImpulse().Length()
     return no if force < Naubino.settings.game.min_joining_force
-    console.log force
 
 
     close_related = naub.close_related other # prohibits folding of pairs
