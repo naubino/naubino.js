@@ -1,37 +1,41 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>naubino.js</title>
-        <link rel="stylesheet" href="css/bootstrap.min.css">
-        <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
-        <link rel="stylesheet" href="css/naubino.css" type="text/css" />
-        <link rel="stylesheet" href="css/github-badge.css" type="text/css" />
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>naubino.js</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/naubino.css" type="text/css" />
+    <link rel="stylesheet" href="css/github-badge.css" type="text/css" />
 
-        <script type="text/javascript" src="lib/signals/dist/signals.min.js"></script>
-        <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
-        <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
-        <script type="text/javascript" src="lib/zepto/dist/zepto.js"></script>
-        <script type="text/javascript" src="lib/chipmunk/cp.js"></script>
-        <script type="text/javascript" src="js/Util.js"></script>
-        <script type="text/javascript" src="lib/requirejs/require.js" data-main="js/Load"></script>
-    </head>
-    <body>
-        <div class="container">
-            <header> <a id="github" href="https://github.com/hoodie/naubino.js">
-                <span>Watch me on Github!</span>
-                <span>Stay tuned!</span>
-            </a> </header>
+    <script type="text/javascript" src="lib/signals/dist/signals.min.js"></script>
+    <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
+    <script type="text/javascript" src="lib/state-machine/state-machine.js"></script>
+    <script type="text/javascript" src="lib/zepto/dist/zepto.js"></script>
+    <script type="text/javascript" src="lib/chipmunk/cp.js"></script>
+    <script type="text/javascript" src="js/Util.js"></script>
+    <script type="text/javascript" src="lib/requirejs/require.js" data-main="Naubino.min"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header> <a id="github" href="https://github.com/hoodie/naubino.js">
+        <span>Watch me on Github!</span>
+        <span>Stay tuned!</span>
+      </a> </header>
 
 
-            <div class="row span12" id="gamediv"> </div> 
+      <div class="fluid-row">
+        <div class="span12">
+          <div id="gamediv"> </div> 
+        </div>
+      </div>
 
-        </div> 
-        <script>
-            document.ontouchmove = function(event) {
-                event.preventDefault();
-            }
-        </script>
-    </body>
+
+    </div> 
+    <script>
+      document.ontouchmove = function(event) {
+        event.preventDefault();
+      }
+    </script>
+  </body>
 </html>
 

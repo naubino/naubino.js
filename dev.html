@@ -4,7 +4,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>naubino.js</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
     <link rel="stylesheet" href="css/naubino.css" type="text/css" />
     <link rel="stylesheet" href="css/github-badge.css" type="text/css" />
 
@@ -20,29 +19,35 @@
 
 
     <div class="container">
-    <header>
+      <header>
 
-      <div class="row span12">
-        <input type="button" onclick="window.Naubino.play();Naubino.list_states()" value="play"/>
-        <input type="button" onclick="window.Naubino.pause();Naubino.list_states()" value="pause"/>
-        <input type="button" onclick="window.Naubino.stop(true);Naubino.list_states()" value="stop"/>
-        <!-- <input type="button" onclick="window.Naubino.game.gravity = !window.Naubino.game.gravity " value="gravity on/off"/> -->
-        <input type="button" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
-        <!--  <input type="button" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
-        <input type="button" onclick="window.Naubino.settings.graphics.updating = !window.Naubino.settings.graphics.updating" value="prerendering on/off"/>
-        <a href="https://github.com/hoodie/naubino.js/issues/new">write and issue</a>
-        <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
+      <div class="fluid-row" id="buttons">
+        <div class="span12">
+          <input type="button" onclick="window.Naubino.play();Naubino.list_states()" value="play"/>
+          <input type="button" onclick="window.Naubino.pause();Naubino.list_states()" value="pause"/>
+          <input type="button" onclick="window.Naubino.stop(true);Naubino.list_states()" value="stop"/>
+          <!-- <input type="button" onclick="window.Naubino.game.gravity = !window.Naubino.game.gravity " value="gravity on/off"/> -->
+          <input type="button" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
+          <!--  <input type="button" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
+          <input type="button" onclick="window.Naubino.settings.graphics.updating = !window.Naubino.settings.graphics.updating" value="prerendering on/off"/>
+          <a href="https://github.com/hoodie/naubino.js/issues/new">write and issue</a>
+          <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
+        </div>
       </div>
-    </header>
+      </header>
 
-      <div class="row span12" id="gamediv"> </div> 
+      <div class="fluid-row">
+        <div class="span12">
+          <div id="gamediv"> </div> 
+        </div>
+      </div>
 
-      </div> 
-      <script>
-        document.ontouchmove = function(event) {
-          event.preventDefault();
-        }
-      </script>
-    </body>
-  </html>
+    </div> 
+    <script>
+      document.ontouchmove = function(event) {
+        event.preventDefault();
+      }
+    </script>
+  </body>
+</html>
 
