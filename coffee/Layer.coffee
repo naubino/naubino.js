@@ -17,8 +17,13 @@ define -> class Layer
 
     @animation = {
       parent: this
-      start_timer: => @draw_loop = setInterval(@do_draw, 1000 / @fps )
-      stop_timer: => clearInterval @draw_loop
+      start_timer: =>
+        console.info @name, "start animation timer"
+        @draw_loop = setInterval(@do_draw, 1000 / @fps ) unless @draw_loop?
+      stop_timer: =>
+        console.info @name, "stop animation timer"
+        clearInterval @draw_loop
+        @draw_loop = null
     }
 
     StateMachine.create {
