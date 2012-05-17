@@ -24,7 +24,7 @@ define -> class Graph
     @update_naub_list()
     @join_id_sequence
 
-  # one of those functions where documentation yould require more time than reading the actuall code
+  # one of those functions where documentation could require more time than reading the actuall code
   #
   # @param [id] naub naub to be removed
   #
@@ -32,7 +32,7 @@ define -> class Graph
     delete @joins[id]
     @update_naub_list()
 
-  # another one of those functions where documentation yould require more time than reading the actuall code
+  # another one of those functions where documentation could require more time than reading the actuall code
   clear: ->
     @join_id_sequence = 0
     @naubs = []

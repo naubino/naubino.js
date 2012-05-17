@@ -175,7 +175,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
 
   create_naubs: ->
     @gravity = on
-    @create_matching_naubs(1,1)
+    @factory.create_matching_naubs(1,1)
     @start_stepper()
     weightless = -> @gravity = off
     setTimeout weightless, 55*@multiplicator

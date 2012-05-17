@@ -25,7 +25,8 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
 
   draw: ->
 
-    if Object.keys(@objects).length == 0
+    if Object.keys(@objects).length == 0 and @animation.can "pause"
+
       @animation.pause()
 
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
@@ -106,7 +107,7 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     lines = text.split("\n")
     y -= font_size * lines.length /2
     for line in lines
-      #console.log line
+      console.log "OVERLAY:", line
       @render_text(line, font_size, color, x, y, ctx)
       y += font_size
     @add_object buffer
