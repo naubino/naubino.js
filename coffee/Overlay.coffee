@@ -3,32 +3,40 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     super(canvas)
     @name = "overlay"
     @animation.name = "overlay.animation"
-    @fps = 15 # 5fps
-    @fade_speed = 40
+    @fps = 20 # 5fps
+
+    @fade_duration = 1 # in seconds
+    @default_duration = 1 # in seconds 
+    @default_font = "Helvetica"
+    @default_color= "black"
+    @default_fontsize = 15
+
 
   fade_object: (buffer,id) ->
-    if buffer.alpha_delta? and 0 <= buffer.alpha <= 1
+    if buffer.alpha_delta? and 0 < buffer.alpha <= 1
       buffer.alpha += buffer.alpha_delta
-
-      if buffer.alpha > 1
-        buffer.alpha = 1
-        buffer.callback.call() if buffer.callback?
-        delete buffer.callback
-        delete buffer.alpha_delta
-
-      if buffer.alpha <= 0
-        buffer.alpha = 0
-        buffer.callback.call() if buffer.callback?
-        delete buffer.callback
-        delete @objects[id]
-
+      buffer.alpha = Math.min buffer.alpha, 1
+      buffer.alpha = Math.max buffer.alpha, 0
+      delete buffer.alpha_delta if 1 <= buffer.alpha or buffer.alpha <= 0
+    else
+      if buffer.duration?
+        buffer.age = if buffer.age? then buffer.age+1 else 0
+        console.time("fade #{id}") if buffer.age == 0
+        if buffer.age >= buffer.duration*@fps
+          delete buffer.duration
+          console.timeEnd("fade #{id}")
+      else if buffer.callback?
+        cb = buffer.callback
+        delete @objects[id]    if buffer.alpha <= 0
+        if buffer.alpha >=1
+          delete buffer.callback
+          delete buffer.age
+        cb.call()
+      else
+        delete @objects[id]    if buffer.alpha <= 0
 
   draw: ->
-
-    if Object.keys(@objects).length == 0 and @animation.can "pause"
-
-      @animation.pause()
-
+    @animation.pause() if Object.keys(@objects).length == 0 and @animation.can "pause"
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
     # objects are all full size buffers
@@ -38,87 +46,78 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
       @ctx.drawImage(buffer, 0, 0)
       @ctx.globalAlpha = 1
     @ctx.restore()
+
   
-  warning:(text, font_size = 25,x = @center.x, y = @center.y) ->
-    color = @color_to_rgba(Naubino.colors[0])
-    @message text, font_size , color,  x, y
-
-  fade_in_warning:(text, callback = null, font_size = 25,x = @center.x, y = @center.y) ->
-    color = @color_to_rgba(Naubino.colors[0])
-    @fade_in_message text, callback, font_size , color,  x, y
-
-
-  fade_in_message: (text, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
-    mes_id = @message text, font_size , color,  x, y, ctx
+  fade_in_message: (text, callback) ->
+    mes_id = @message text
     mes = @get_object mes_id
     mes.alpha = 0.01
-    mes.alpha_delta = 1 / @fps
+    mes.alpha_delta = @fade_duration / @fps
     mes.callback = callback
     mes_id
 
   
   ### fading out a specific message by id ###
-  fade_out_message: (mes_id, callback = null)->
+  fade_out_message: (mes_id, callback) ->
     mes = @get_object(mes_id)
-    mes.alpha_delta = -1 / @fps if mes?
+    mes.callback = callback
+    mes.alpha_delta = -@fade_duration / @fps if mes?
 
 
   ### fading out all messages ###
-  fade_out_messages: (callback = null) ->
+  fade_out_messages: (callback) ->
     @fade_out_message id for id, message of @objects
-    callback() if callback?
+    k = Object.keys(@objects)
+    @objects[k[k.length-1]].callback = callback
 
 
-  fade_in_and_out_message: (text, callback = null, font_size = 15, color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
-    if Array.isArray(text)
-      # don't worry - both lines are supposed to do the same...
-      font_size = text[2] ? font_size
-      time      = text[1] ? 1000
-      text      = text[0] ? ""
-      
-    else
-      time = 2000
 
-    fade_out = => setTimeout =>
-      @fade_out_message mes_id, callback
-    ,time
-
-    mes_id = @fade_in_message text, fade_out, font_size , color,  x, y, ctx
+  fade_in_and_out_message: (text, callback = null) ->
+    mes_id = @fade_in_message text
     mes = @get_object mes_id
+    mes.callback = (=> @fade_out_message mes_id, callback)
+    mes.duration = text.duration ? @default_duration
 
 
-  queue_messages: (messages = ["hello", "world"], callback = null, font_size = 15) =>
+  queue_messages: (messages = ["hello..", "...world"], qcallback) =>
     if m = messages.shift()
       messages = messages[0..]
-      @fade_in_and_out_message m, (=> @queue_messages messages, callback, font_size), font_size
+      @fade_in_and_out_message( m, (=> @queue_messages messages, qcallback))
     else
-      callback() if callback?
+      qcallback() if qcallback?
 
 
-  message: (text,font_size = 15,color = 'black',  x = @center.x, y = @center.y, ctx = @ctx) ->
-    if @animation.can 'play'
-      @animation.play()
+  message: (text, ctx = @ctx) ->
+    @animation.play() if @animation.can 'play'
+
+    {color, fontsize, font, text,pos} = text unless typeof text == "string"
+    pos       ?= @center.Copy()
+    color     ?= @default_color
+    fontsize ?= @default_fontsize
+    fontsize  = @default_fontsize unless typeof fontsize == "number"
+    font      ?= @default_font
+
     buffer = document.createElement('canvas')
     buffer.width = Naubino.settings.canvas.width
     buffer.height = Naubino.settings.canvas.height
     buffer.alpha = 1
+
     buffer.text = text
     ctx = buffer.getContext('2d')
     lines = text.split("\n")
-    y -= font_size * lines.length /2
+    pos.y -= fontsize * lines.length /2
     for line in lines
       console.log "OVERLAY:", line
-      @render_text(line, font_size, color, x, y, ctx)
-      y += font_size
+
+      ctx.fillStyle = color
+      ctx.shadowColor = '#fff'
+      ctx.shadowBlur = 3
+      ctx.strokeStyle = color
+      ctx.textAlign = 'center'
+      ctx.font= "#{fontsize}px #{font}"
+      ctx.fillText(line, pos.x,pos.y)
+
+      pos.y += fontsize
     @add_object buffer
 
-
-  render_text: (text, font_size = 15, color = 'black', x = @center.x, y = @center.y, ctx = @ctx) ->
-    ctx.fillStyle = color
-    ctx.shadowColor = '#fff'
-    ctx.shadowBlur = 3
-    ctx.strokeStyle = color
-    ctx.textAlign = 'center'
-    ctx.font= "#{font_size}px Helvetica"
-    ctx.fillText(text, x,y)
 

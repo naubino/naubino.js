@@ -18,7 +18,7 @@ define -> class Layer
     @animation = {
       parent: this
       start_timer: =>
-        console.info @name, "start animation timer"
+        console.info @name, "start animation timer", @fps, "fps"
         @draw_loop = setInterval(@do_draw, 1000 / @fps ) unless @draw_loop?
       stop_timer: =>
         console.info @name, "stop animation timer"
