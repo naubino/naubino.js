@@ -60,6 +60,7 @@ define -> class Layer
     @space.damping = Naubino.settings.physics.damping
 
     @mouseBody = new cp.Body(Infinity, Infinity)
+    @mouseBody.name = "mouseBody"
     @mouseBody.p = cp.vzero
 
     @space.addBody @mouseBody
@@ -116,6 +117,7 @@ define -> class Layer
       @space.removeShape obj.physical_shape if obj.physical_shape?
       @space.removeBody obj.physical_body if obj.physical_body?
       for constraint in obj.constraints
+        console.log constraint
         @space.removeConstraint constraint
     delete @objects[id]
 

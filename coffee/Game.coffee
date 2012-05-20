@@ -74,7 +74,7 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
 
     shape = @space.pointQueryFirst(@pointer, @GRABABLE_MASK_BIT, cp.NO_GROUP) if @space?
     naub = @get_object shape.naub_number if shape?
-    if naub
+    if naub and naub.isClickable
       naub.focus()
       @focused_naub = naub
 
@@ -82,13 +82,7 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
       @mouseJoint = new cp.PivotJoint(@mouseBody, naub.physical_body, cp.vzero, cp.vzero)
       @mouseJoint.errorBias = Math.pow(1 - 0.5, 60)
       @space.addConstraint(@mouseJoint)
-      
-      # make naubs lighter
-      attached_naubs = @graph.tree(naub.number)
-      for n in attached_naubs
-        naub = @get_object n
-        naub.physical_body.setMass Naubino.settings.naub.mass / 10
-        naub.physical_shape.setFriction Naubino.settings.naub.sticky
+
 
 
 
@@ -98,14 +92,8 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
       @mousedown = false
 
       if @focused_naub
-        # undo make naubs lighter
-        attached_naubs = @graph.tree(@focused_naub.number)
-        for n in attached_naubs
-          naub = @get_object n
-          naub.physical_body.setMass Naubino.settings.naub.mass
-          naub.physical_shape.setFriction Naubino.settings.naub.slick
-
         @focused_naub.unfocus()
+
       @focused_naub = null
       if @space? && @mouseJoint?
         @space.removeConstraint @mouseJoint
@@ -157,6 +145,7 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
 
     force = arbiter.totalImpulse().Length()
     return no if force < Naubino.settings.game.min_joining_force
+    #console.log force
 
 
     close_related = naub.close_related other # prohibits folding of pairs
@@ -185,12 +174,39 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     for id, obj of @objects
       obj.draw_joins @ctx
 
+    @draw_constraints()
+
     for id, obj of @objects
       obj.draw @ctx
 
     #@draw_point @pointer
     #@draw_point @mouseBody.p, "blue"
     @ctx.restore()
+
+
+
+  draw_constraints: ->
+    for con in @space.constraints
+      p1 = con.a.p
+      p1 = con.anchr1 if p1.IsZero()
+      p2 = con.b.p
+      p2 = con.anchr2 if p2.IsZero()
+
+      con_color = (con) ->
+        switch con.name
+          when "DampedSpring" then "red"
+          when "SlideJoint"   then "blue"
+          else "grey"
+
+      if p1? and p2?
+        @ctx.save()
+        @ctx.strokeStyle = con_color con
+        @ctx.moveTo p1.x, p1.y
+        @ctx.lineTo p2.x, p2.y
+        @ctx.stroke()
+        @ctx.restore()
+        
+
 
 
 
@@ -204,8 +220,6 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
   step: (dt) ->
     super()
     
-    #@naub_forces dt
-
     for pair in @replacing_naubs
       pair[0].replace_with pair[1]
       console.log "replacing #{pair[0].number} with #{pair[1].number}"
@@ -220,9 +234,9 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     # delete objects
     for id, obj of @objects
       if obj.removed
+        if obj.constraints?
+          for join, con of obj.constraints
+            console.log con.a.isRogue(), con.b.isRogue()
+        console.log "removed", id
         @remove_obj id
-        return 42 # TODO found out if there is a way to have a void function?
-
-
-
 

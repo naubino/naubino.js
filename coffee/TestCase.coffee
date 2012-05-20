@@ -1,22 +1,24 @@
-define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, FrameCircle}, StandardGame) -> class TestCase extends StandardGame
+define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberShape, Ball, FrameCircle}, StandardGame) -> class TestCase extends StandardGame
   #  constructor: ->
   #    super()
   oninit: ->
     super()
-    #Naubino.settings.graphics.updating = on
-    Naubino.settings.game.creation_offset = -50
+    Naubino.settings.graphics.updating = off
+    Naubino.settings.game.creation_offset = -150
     @factory.add_ball = @add_ball
 
     @naub_replaced.add (number)=> @graph.cycle_test(number)
     @cycle_found.add (list) => @destroy_naubs(list)
-    #Naubino.play()
+    Naubino.play()
 
-    #Naubino.game.add_walls()
+    Naubino.game.add_walls()
 
   onplaying: (e,f,t)->
     super()
 
     @factory.create_matching_naubs() if f == "stopped"
+    @factory.create_naub_pair(null,1,2)
+    @factory.create_naub_pair(null,1,2)
     #Naubino.background.animation.play()
     #Naubino.background.start_stepper()
 
@@ -36,6 +38,7 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{NumberShape, Ball, F
     naub.kind = 'ball'
 
     @add_object naub
-    naub.add_shape new NumberShape
+    #naub.add_shape new StringShape (-> naub.physical_body.m), 'white'
+    naub.add_shape new StringShape naub.number, 'white'
     naub.update() # again just to get the numbers
     naub

@@ -4,8 +4,12 @@ Shape: class Shape
     @style = { fill: [0,0,0,1] }
 
   setup: (@naub) ->
-    @pos = @naub.pos
-    @ctx = @naub.ctx
+    @pos    = @naub.pos
+    @ctx    = @naub.ctx
+    @radius = @naub.radius - Naubino.settings.naub.margin/2
+    @width  = @naub.width - Naubino.settings.naub.margin
+    @height = @naub.height - Naubino.settings.naub.margin
+
     @set_color_from_id @naub.color_id
 
 
@@ -17,20 +21,34 @@ Shape: class Shape
     a = color[3]
     "rgba(#{r},#{g},#{b},#{a})"
 
-  draw_border: (ctx) ->
-    ## border
-    if Naubino.settings.graphics.draw_borders
-      ctx.lineWidth = 4
-      ctx.strokeStyle = @color_to_rgba @naub.join_style.fill
-      ctx.stroke()
+  apply_filters: (filters, ctx )->
+    for filter in filters
+      @apply_filter(filter, ctx)
 
+  apply_filter: (filter, ctx )->
+    @[filter](ctx) if filter in [ "alpha", "draw_border", "draw_shadow", "draw_gradient" ]
+  
+  alpha: (ctx) ->
+    ctx.globalAlpha = 0.4
+
+  draw_border: (ctx) ->
+    ctx.lineWidth = 2
+    ctx.strokeStyle = @color_to_rgba @naub.join_style.fill
+    ctx.stroke()
+
+  draw_gradient: (ctx) ->
+    gradient = ctx.createRadialGradient(0, 0, @radius/3, 0, 0, @radius)
+    gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
+    gradient.addColorStop 1, @color_to_rgba(@style.fill, 50)
+    ctx.fillStyle = gradient
+    ctx.fill()
 
   draw_shadow: (ctx) ->
-    if Naubino.settings.graphics.draw_shadows
-      ctx.shadowColor = "#333"
-      ctx.shadowBlur = 3
-      ctx.shadowOffsetX = 1
-      ctx.shadowOffsetY = 1
+    ctx.shadowColor = "#333"
+    ctx.shadowBlur = 3
+    ctx.shadowOffsetX = 1
+    ctx.shadowOffsetY = 1
+    ctx.fill()
 
   # sets opacity
   # @param alpha (int) value between 0 and 1
@@ -79,38 +97,27 @@ Ball: class Ball extends Shape
   # !IMPORTANT: needs to recieve ctx, x and y directly because those could also point into a buffer
   render: (ctx, x = 42, y = x) ->
     ctx.save()
-
-    ctx.translate( x, y)
+    ctx.translate x, y
      
     ctx.beginPath()
-    ctx.arc(0, 0, @naub.radius, 0, Math.PI * 2, false)
-    ctx.closePath()
-
-    # gradient
-    if @naub.focused
-      gradient = ctx.createRadialGradient(0, 0, @naub.radius/3, 0, 0, @naub.radius)
-      gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
-      gradient.addColorStop 1, @color_to_rgba(@style.fill, 50)
-      ctx.fillStyle = gradient
-    else
-      ctx.fillStyle = @color_to_rgba(@style.fill)
-
-    @draw_shadow(ctx)
-    @draw_border(ctx)
-
+    ctx.arc(0, 0, @radius, 0, Math.PI * 2, false)
+    ctx.fillStyle = @color_to_rgba(@style.fill)
     ctx.fill()
-    ctx.closePath()
 
+    if @naub.filters?
+      @apply_filters @naub.filters, ctx
+
+
+    ctx.closePath()
     ctx.restore()
 
   isHit: (ctx, pos) ->
-    d = @pos.Copy()
+    d = @naub.pos.Copy()
     d.sub pos
     d.Length() <= @naub.size
 
   setup: (naub) ->
     super(naub)
-    naub.radius = naub.size/2
 
 Box: class Box extends Shape
   constructor: ->
@@ -128,29 +135,18 @@ Box: class Box extends Shape
   # actual painting routines
   render: (ctx,x,y) ->
     ctx.save()
-
-    #@rot = @rot + 0.1
     ctx.translate( x, y)
-    #ctx.rotate @rot
     ctx.rotate @naub.physical_body.a if @naub.physical_body?
      
     ctx.beginPath()
     ctx.rect(-@naub.width/2,-@naub.height/2,@naub.width,@naub.height)
-
-    @draw_shadow(ctx)
-    @draw_border(ctx)
-
-    if @naub.focused
-      # gradient
-      gradient = ctx.createRadialGradient(0, 0, @naub.radius/3, 0, 0, @naub.radius)
-      gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
-      gradient.addColorStop 1, @color_to_rgba(@style.fill, 50)
-      ctx.fillStyle = gradient
-    else
-      ctx.fillStyle = @color_to_rgba(@style.fill)
+    ctx.fillStyle = @color_to_rgba(@style.fill)
     ctx.fill()
-    ctx.closePath()
 
+    if @naub.filters?
+      @apply_filters @naub.filters, ctx
+
+    ctx.closePath()
     ctx.restore()
 
   adjust_physics: ->
@@ -285,7 +281,9 @@ MainButton: class MainButton extends Box
     ctx.beginPath()
     ctx.rect(-@width/2,-@width/2,@width,@width)
 
-    @draw_shadow(ctx)
+    if @naub.filters?
+      @apply_filters @naub.filters, ctx
+
 
     ctx.fillStyle = @color_to_rgba @style.fill
     ctx.fill()
@@ -309,24 +307,19 @@ StringShape: class StringShape extends Shape
     super(@naub)
 
   render: (ctx, x,y) ->
-    size = @naub.size * .7
+    size = @naub.size * .6
+    if typeof @string == "function"
+      string = @string()
+    else
+      string = @string
 
     ctx.save()
     ctx.translate x,y
     ctx.rotate @naub.physical_body.a if @naub.physical_body?
     ctx.fillStyle = @color
     ctx.textAlign = 'center'
-    ctx.font= "#{size}px Courier"
-    ctx.fillText(@string, 0, 6)
+    ctx.font= "#{size}px Helvetica"
+    ctx.fillText(string, 0, 6)
     ctx.restore()
-
-
-NumberShape: class NumberShape extends StringShape
-  constructor: ()->
-    super("", "white")
-
-  setup: (@naub)->
-    super(@naub)
-    @string = @naub.number
 
 }
