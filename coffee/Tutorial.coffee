@@ -37,7 +37,7 @@ define ["Game"], (Game) -> class Tutorial extends Game
       ]
       callbacks:{
         onchangestate:(e,f,t) ->
-          #console.info "Tutorial:", @current
+          console.info "Tutorial:", @current
           console.info "#{f} --(#{e})--> #{t}"
 
         onwelcome: (e, f, t) =>
@@ -45,24 +45,22 @@ define ["Game"], (Game) -> class Tutorial extends Game
           Naubino.mousedown.add => @lessons.click()
 
          # give instructions
-          Naubino.overlay.fade_in_message("Tutorial", null, @font_size)
+          Naubino.overlay.fade_in_message({text:"Tutorial", fontsize:24})
           setTimeout ->
-            Naubino.overlay.fade_in_message("\n\nclick to continue", null ,12)
+            Naubino.overlay.fade_in_message({text:"\n\nclick to continue", fontsize:12})
             Naubino.mousedown.active = true
           ,10*@multiplicator
-          setTimeout ->
+          setTimeout =>
+            pos = @center.Copy()
+            pos.add cp.v(0, @height/2-10)
             Naubino.overlay.fade_in_and_out_message(
-              ["use the menu to restart this tutorial at any time",50*@multiplicator],
-              null,
-              12,
-              'black',
-              Naubino.settings.canvas.width/2,
-              Naubino.settings.canvas.height-10)
+              {text:"use the menu to restart this tutorial at any time",duration:5, fontsize:12, pos:pos}
+            )
           ,30*@multiplicator
 
         # fade out and then change state
-        onleavewelcome: ->
-          Naubino.overlay.fade_out_messages => @transition()
+        onleavewelcome: =>
+          Naubino.overlay.fade_out_messages => @lessons.transition()
           false
 
         onclick: =>
@@ -75,15 +73,16 @@ define ["Game"], (Game) -> class Tutorial extends Game
           , 43*@multiplicator
 
           strings = [
-            ["Lesson 1",13*@multiplicator,@font_size*2]
-            ["Naubino is all about Naubs",10*@multiplicator]
-            ["These are Naubs",10*@multiplicator]
-            ["They always come in pairs",10*@multiplicator]
-            ["Try to move them around!",10*@multiplicator]
+            {text:"Lesson 1"                   , duration:1.3, fontsize: @font_size*2}
+            {text:"Naubino is all about Naubs" , duration:1.0}
+            {text:"These are Naubs"            , duration:1.0}
+            {text:"They always come in pairs"  , duration:1.0}
+            {text:"Try to move them around!"   , duration:1.0}
           ]
 
-          messages = => Naubino.overlay.queue_messages(strings, (=> @lessons.shown()), @font_size)
-          setTimeout messages, 20*@multiplicator
+          messages = => Naubino.overlay.queue_messages(strings, (=> @lessons.shown()))
+          messages()
+          #setTimeout messages, 20*@multiplicator
 
 
         onlesson_move: =>

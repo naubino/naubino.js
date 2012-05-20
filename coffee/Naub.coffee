@@ -11,6 +11,10 @@ define -> class Naub
     @ctx            = @layer.ctx
     @frame          = @size*1.5 # defines buffer canvas
 
+    @radius     = @size/2
+    @width      = @size * 0.9
+    @height     = @size * 0.9
+
     @color_id       = @random_palette_color() unless @color_id?  # unless a color_id has been give pick a randome color
     @life_rendering = false # if true redraw on each frame
 
@@ -28,17 +32,15 @@ define -> class Naub
 
   setup_physics: ->
     # this is redundant - just in case the the shapes don't do this
-    @constraints = []
+    @constraints = {}
 
-    @radius     = @size/2
-    @width      = @size * 0.9
-    @height     = @size * 0.9
-    @friction   = Naubino.settings.naub.slick
+    @friction   = Naubino.settings.naub.friction
     @elasticity = Naubino.settings.naub.elasticity
 
     #this part will be adjusted by shape
     @momentum = cp.momentForCircle( Naubino.settings.naub.mass, @radius, @radius, cp.vzero)
     @physical_body = new cp.Body( Naubino.settings.naub.mass, @momentum )
+    @physical_body.name = "naub"
     @physical_body.setAngle( 0 ) # remember to set position
     @physical_shape = new cp.CircleShape( @physical_body, @radius , cp.vzero )
     @physical_shape.setElasticity @elasticity
@@ -112,6 +114,20 @@ define -> class Naub
     for shape in @shapes
       shape.setup this
 
+  add_filter: (string) ->
+    @filters = [] unless @filters?
+
+    if string not in @filters
+      @filters.push string
+
+  remove_filter: (string) ->
+    if @filters?
+      i = @filters.indexOf string
+      @filters.splice(i,1) if i  >= 0
+      return
+
+
+
 
   # runs draw_join on all partners, if this naub is the one drawing the join
   # Otherwise the partner will draw the join.
@@ -119,14 +135,14 @@ define -> class Naub
     # drawing joins
     for id, partner of @joins
       if @drawing_join[id]
-        @draw_join context, partner
+        @draw_join context, partner, id
     return
 
 
   # Renders join between this naub and the partner
   # @param ctx [canvas.context] context of the target layer
   # @param partner [naub] target naub
-  draw_join: (ctx, partner) ->
+  draw_join: (ctx, partner,id) ->
     pos = if @physical_body then @physical_body.p else @pos
     pos2 = if partner.physical_body then partner.physical_body.p else partner.pos
     # joins getting thinner by stretching
@@ -148,6 +164,19 @@ define -> class Naub
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
+
+    if id?
+      join_string = id.toString()
+      ctx.save()
+      mid = cp.v.lerp(pos, pos2, 0.5)
+      ctx.translate mid.x,mid.y
+      ctx.rotate diff.Angle()
+      ctx.translate 0,-10
+      ctx.fillStyle = 'black'
+      ctx.textAlign = 'center'
+      ctx.font= "10px Courier"
+      ctx.fillText(join_string, 0, 6)
+      ctx.restore()
 
 
 
@@ -197,6 +226,7 @@ define -> class Naub
       console.warn "object is already attached to a point"
 
   attracted_to: ( center ) ->
+  xattracted_to: ( center ) ->
     unless @centerjoin?
       #restLength, stiffness, damping
       rstl = Naubino.settings.physics.center_join.restLength
@@ -204,43 +234,62 @@ define -> class Naub
       dmpg =  Naubino.settings.physics.center_join.damping
       @centerjoin = new cp.DampedSpring( @physical_body, @layer.space.staticBody, cp.vzero, center, rstl, stfs, dmpg)
       @layer.space.addConstraint( @centerjoin )
-      @constraints.push @centerjoin
+      @constraints['center'] = @centerjoin
     else
       console.warn "object is already attached to a point"
 
 
   # do things a naub is supposed to do
   join_with: (other) ->
+
+    join = @layer.graph.add_join this, other # returns the id of this join in the graph
+
     #restLength, stiffness, damping
     minlen = Naubino.settings.naub.min_join_len * @size
     maxlen = Naubino.settings.naub.max_join_len * @size
-    joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, 4, 30)
+
+    #joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, 4, 30)
+    #joint.name = "DampedSpring"
+    #@layer.space.addConstraint( joint )
+
     joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, maxlen)
-
-    @layer.space.addConstraint( joint )
+    joint2.name = "SlideJoint"
     @layer.space.addConstraint( joint2 )
-    @constraints.push joint
-    @constraints.push joint2
 
-    join = @layer.graph.add_join this, other # returns the id of this join in the graph
-    @joins[join] = other
-    @drawing_join[join] = true
+    @constraints[join] = []
+    #@constraints[join].push joint
+    @constraints[join].push joint2
+
+
+
+    @joins[join]      = other
     other.joins[join] = this
+
+    @drawing_join[join]      = true
     other.drawing_join[join] = false
+
     @layer.naub_joined.dispatch() if @layer.naub_joined?
     join
 
 
   # the 'other' naub takes my place 
   replace_with: (other) ->
-    remove_joins = for id, naub of @joins
+    for id, naub of @joins
+      if naub.constraints[id]?
+        for c in naub.constraints[id]
+          @layer.space.removeConstraint c
+
       other.join_with(naub)
       delete naub.joins[id]
       @layer.graph.remove_join id
+
+
     @layer.unfocus()
+
     p = other.physical_body.p
     p2 = @physical_body.p
     other.physical_body.p = cp.v.lerp(p, p2, 0.5)
+
     @remove()
     @layer.naub_replaced.dispatch(other.number)
     return 42
@@ -277,10 +326,6 @@ define -> class Naub
       list.push naub.number
     @joins
 
-  # @return [array] list of all neighboring naubs
-  partners: -> x for x in @joins
-
-
 
 
 
@@ -298,13 +343,7 @@ define -> class Naub
 
   enter_field: ->
     check_in_field = ->
-
-
     setInterval (check_in_field), 10
-
-
-
-
 
 
   # user interaction
@@ -313,13 +352,23 @@ define -> class Naub
 
   focus: ->
     @focused = true
-    @update()
+
+    for n in @layer.graph.tree(@number)
+      naub = @layer.get_object n
+      naub.add_filter "draw_border"
+      naub.update()
+
     @onfocus()
     @layer.naub_focused.dispatch(@)
 
   unfocus: ->
     @focused = false
-    @update()
+
+    for n in @layer.graph.tree(@number)
+      naub = @layer.get_object n
+      naub.remove_filter "draw_border"
+      naub.update()
+
     @onclick()
     @layer.naub_unfocused.dispatch(@)
 

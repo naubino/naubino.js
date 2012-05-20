@@ -102,6 +102,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
       #console.time('state_paused')
       @game.pause()
       @menu.pause()
+      @overlay.animation.pause() if @overlay.animation.can "pause"
 
   onenterpaused: ->
     #console.timeEnd('state_paused')

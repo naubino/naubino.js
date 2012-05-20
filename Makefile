@@ -1,7 +1,11 @@
-ful_TARGET = Naubino.full.js
-min_TARGET = Naubino.min.js
-all_TARGETS = $(ful_TARGET) $(min_TARGET)
+JOINED_TARGET = Naubino.joined.js
+FULL_TARGET = Naubino.full.js
+MIN_TARGET = Naubino.min.js
+all_TARGETS = $(FULL_TARGET) $(MIN_TARGET) $(JOINED_TARGET)
 
+COFFEE	= /usr/bin/coffee
+#COFFEE	= /usr/local/bin/coffee
+RJS			= r.js
 SRC_DIR = coffee/
 DOC_DIR = docs/
 LIB_DIR = lib/
@@ -11,24 +15,31 @@ SRC = $(shell find $(SRC_DIR) -type f -iname \*.coffee)
 TMP = $(SRC:$(SRC_DIR)%.coffee=$(TMP_DIR)%.js)
 
 
-all:       $(min_TARGET)
+all:       $(MIN_TARGET)
 js:        $(TMP)
 libs:      $(LIB_DIR)
 doc:       $(DOC_DIR)
-readable:  $(ful_TARGET)
+readable:  $(FULL_TARGET)
+joined	:  $(JOINED_TARGET)
 
 
-$(min_TARGET): $(TMP)
-	r.js -o name=Load out=./$@ baseUrl=js
+$(MIN_TARGET): $(TMP)
+	$(RJS) -o name=Load out=./$@ baseUrl=js
 
-$(ful_TARGET) : $(TMP)
-	r.js -o name=Load out=./$@ baseUrl=js optimize=none
-	cp $@ $(min_TARGET)
+$(FULL_TARGET) : $(TMP)
+	$(RJS) -o name=Load out=./$@ baseUrl=js optimize=none
+	cp $@ $(MIN_TARGET)
+
+$(JOINED_TARGET): $(SRC_DIR)
+	$(COFFEE) -j $(JOINED_TARGET) -c $(SRC_DIR)
+	cp $@ $(MIN_TARGET)
+
+
 
 $(SRC): $(TMP_DIR)
 
 $(TMP_DIR)%.js: $(SRC_DIR)%.coffee
-	coffee -p -c $< > $@
+	$(COFFEE) -p -c $< > $@
 
 $(DOC_DIR): $(SRC_DIR)
 	codo -o $@ $<
@@ -37,7 +48,7 @@ $(TMP_DIR):
 	mkdir $(TMP_DIR)
 
 watch: $(TMP_DIR)
-	coffee -o $(TMP_DIR) -cw $(SRC_DIR)
+	$(COFFEE) -o $(TMP_DIR) -cw $(SRC_DIR)
 
 $(LIB_DIR):
 	git submodule update --init

@@ -15,14 +15,14 @@ define -> class CollisionHandler
 
   # Collision post-solve event function callback type.
   postSolve: (arb, space) ->
+    if arb.a.naub_number? and arb.b.naub_number?
+      {a,b} = @naubs(arb)
+      @game.check_joining a,b, arb
 
 
 
   # Collision separate event function callback type.
   separate: (arb, space) ->
-    if arb.a.naub_number? and arb.b.naub_number?
-      {a,b} = @naubs(arb)
-      @game.check_joining a,b, arb
 
   naub: (a)->
     @game.get_object arb.a.naub_number
