@@ -17,11 +17,16 @@ define -> class Layer
 
     @animation = {
       parent: this
+      refresh_timer: (fps) =>
+        @fps = fps
+        @animation.stop_timer()
+        @animation.start_timer()
+
       start_timer: =>
-        console.info @name, "start animation timer", @fps, "fps"
+        #console.info @name, "start animation timer", @fps, "fps"
         @draw_loop = setInterval(@do_draw, 1000 / @fps ) unless @draw_loop?
       stop_timer: =>
-        console.info @name, "stop animation timer"
+        #console.info @name, "stop animation timer"
         clearInterval @draw_loop
         @draw_loop = null
     }
@@ -88,6 +93,7 @@ define -> class Layer
 
 
   step: (dt) ->
+  step_space: (dt) ->
     @space.step(1/40)
 
     # Move mouse body toward the mouse

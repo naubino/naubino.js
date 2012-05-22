@@ -237,7 +237,7 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
 
   # run naub_forces, check for joinings and clean up
   step: (dt) ->
-    super()
+    @step_space()
 
     @step_num = @step_num+1
     
