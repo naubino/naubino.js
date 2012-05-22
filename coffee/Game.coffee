@@ -31,6 +31,8 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     @naub_focused    = new Naubino.Signal()
     @naub_unfocused  = new Naubino.Signal()
 
+    @step_num = 0
+
     #state machine
     StateMachine.create {
       target: this
@@ -174,19 +176,19 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     for id, obj of @objects
       obj.draw_joins @ctx
 
-    @draw_constraints()
+    #@draw_constraints()
+    #@draw_point @pointer
+    #@draw_point @mouseBody.p, "blue"
 
     for id, obj of @objects
       obj.draw @ctx
 
-    #@draw_point @pointer
-    #@draw_point @mouseBody.p, "blue"
     @ctx.restore()
 
 
 
   draw_constraints: ->
-    for con in @space.constraints
+    for con, id in @space.constraints
       p1 = con.a.p
       p1 = con.anchr1 if p1.IsZero()
       p2 = con.b.p
@@ -205,6 +207,23 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
         @ctx.lineTo p2.x, p2.y
         @ctx.stroke()
         @ctx.restore()
+      if id?
+        diff = p2.Copy()
+        diff.sub(p1)
+        join_string = id.toString()
+        mid = cp.v.lerp(p1, p2, 0.5)
+        @ctx.save()
+        @ctx.translate mid.x,mid.y
+        @ctx.rotate diff.Angle()
+        @ctx.translate 0,-10
+        @ctx.rotate 2*Math.PI - diff.Angle()
+        @ctx.fillStyle = 'black'
+        if con.a.isRogue() or con.b.isRogue()
+          @ctx.fillStyle = 'red'
+        @ctx.textAlign = 'center'
+        @ctx.font= "10px Courier"
+        @ctx.fillText(join_string, 0, 6)
+        @ctx.restore()
         
 
 
@@ -219,6 +238,8 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
   # run naub_forces, check for joinings and clean up
   step: (dt) ->
     super()
+
+    @step_num = @step_num+1
     
     for pair in @replacing_naubs
       pair[0].replace_with pair[1]
@@ -231,12 +252,17 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     @joining_naubs = []
     @replacing_naubs = []
 
+    @clean_up()
+
+  clean_up: ->
     # delete objects
     for id, obj of @objects
       if obj.removed
-        if obj.constraints?
-          for join, con of obj.constraints
-            console.log con.a.isRogue(), con.b.isRogue()
-        console.log "removed", id
         @remove_obj id
+
+    if @step_num % 20 == 0
+      #console.log "clean up run"
+      for con, id in @space.constraints
+        if con? and con.IsRogue()
+          @space.removeConstraint con
 

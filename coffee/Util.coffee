@@ -8,6 +8,10 @@ cp.Vect::AddPolar = (dir, len) ->
     @x += Math.cos(dir) * len
     @y += Math.sin(dir) * len
 
+cp.Constraint::IsRogue= ->
+  (@a.isRogue() and not @a.isStatic()) or
+  (@b.isRogue() and not @b.isStatic())
+
 window.Util =
   shuffle: (a) ->
     b = a.slice()

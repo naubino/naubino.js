@@ -165,18 +165,19 @@ define -> class Naub
     ctx.closePath()
     ctx.restore()
 
-    if id?
-      join_string = id.toString()
-      ctx.save()
-      mid = cp.v.lerp(pos, pos2, 0.5)
-      ctx.translate mid.x,mid.y
-      ctx.rotate diff.Angle()
-      ctx.translate 0,-10
-      ctx.fillStyle = 'black'
-      ctx.textAlign = 'center'
-      ctx.font= "10px Courier"
-      ctx.fillText(join_string, 0, 6)
-      ctx.restore()
+    #if id?
+    #  join_string = id.toString()
+    #  ctx.save()
+    #  mid = cp.v.lerp(pos, pos2, 0.5)
+    #  ctx.translate mid.x,mid.y
+    #  ctx.rotate diff.Angle()
+    #  ctx.translate 0,-10
+    #  @ctx.rotate 2*Math.PI - diff.Angle()
+    #  ctx.fillStyle = 'black'
+    #  ctx.textAlign = 'center'
+    #  ctx.font= "10px Courier"
+    #  ctx.fillText(join_string, 0, 6)
+    #  ctx.restore()
 
 
 
@@ -200,11 +201,19 @@ define -> class Naub
 
   # removes the reference to this naub from all its partners
   remove: =>
-    @removed = true
     for id, naub of @joins
-      delete naub.joins[id]
-      @layer.graph.remove_join id
+      @split_join id
+    setTimeout (=> @removed = true), 50
 
+  split_join: (id) ->
+    if id of @joins
+      partner = @joins[id]
+      @layer.graph.remove_join id
+      delete partner.joins[id]
+      delete @joins[id]
+      if @constraints[id]?
+        for con in @constraints[id]
+          @layer.space.removeConstraint con
 
   # animated remove with disabling  
   destroy: ->
@@ -226,13 +235,13 @@ define -> class Naub
       console.warn "object is already attached to a point"
 
   attracted_to: ( center ) ->
-  xattracted_to: ( center ) ->
     unless @centerjoin?
       #restLength, stiffness, damping
       rstl = Naubino.settings.physics.center_join.restLength
       stfs =  Naubino.settings.physics.center_join.stiffness
       dmpg =  Naubino.settings.physics.center_join.damping
       @centerjoin = new cp.DampedSpring( @physical_body, @layer.space.staticBody, cp.vzero, center, rstl, stfs, dmpg)
+      @centerjoin.centerjoin = true
       @layer.space.addConstraint( @centerjoin )
       @constraints['center'] = @centerjoin
     else
@@ -241,35 +250,38 @@ define -> class Naub
 
   # do things a naub is supposed to do
   join_with: (other) ->
+    if typeof other == 'number'
+      other = @layer.get_object other
 
-    join = @layer.graph.add_join this, other # returns the id of this join in the graph
+    if other? and not @is_joined_with other
+      join = @layer.graph.add_join this, other # returns the id of this join in the graph
 
-    #restLength, stiffness, damping
-    minlen = Naubino.settings.naub.min_join_len * @size
-    maxlen = Naubino.settings.naub.max_join_len * @size
+      #restLength, stiffness, damping
+      minlen = Naubino.settings.naub.min_join_len * @size
+      maxlen = Naubino.settings.naub.max_join_len * @size
 
-    #joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, 4, 30)
-    #joint.name = "DampedSpring"
-    #@layer.space.addConstraint( joint )
+      #joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, 4, 30)
+      #joint.name = "DampedSpring"
+      #@layer.space.addConstraint( joint )
 
-    joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, maxlen)
-    joint2.name = "SlideJoint"
-    @layer.space.addConstraint( joint2 )
+      joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, maxlen)
+      joint2.name = "SlideJoint"
+      @layer.space.addConstraint( joint2 )
 
-    @constraints[join] = []
-    #@constraints[join].push joint
-    @constraints[join].push joint2
+      @constraints[join] = []
+      #@constraints[join].push joint
+      @constraints[join].push joint2
 
+      @joins[join]      = other
+      other.joins[join] = this
 
+      @drawing_join[join]      = true
+      other.drawing_join[join] = false
 
-    @joins[join]      = other
-    other.joins[join] = this
-
-    @drawing_join[join]      = true
-    other.drawing_join[join] = false
-
-    @layer.naub_joined.dispatch() if @layer.naub_joined?
-    join
+      @layer.naub_joined.dispatch() if @layer.naub_joined?
+      join
+    else
+      -1
 
 
   # the 'other' naub takes my place 
