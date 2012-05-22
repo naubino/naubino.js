@@ -184,7 +184,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
       Naubino.background.stop_pulse()
       Naubino.background.ttl = critical_capacity
 
-    @lost() if @capacity() < 0
+    @lost() if @capacity() < 10
     @levels.levelUp() if @points > @level_up_limit
 
   lost: ->

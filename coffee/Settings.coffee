@@ -12,8 +12,8 @@ define -> Settings = {
     min_joining_force: 800
 
   naub:
-    size:          30
-    margin:        1
+    size:          36
+    margin:        3
     mass:          5
     friction:         0.8
     elasticity:    0.3

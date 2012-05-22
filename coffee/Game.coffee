@@ -31,8 +31,6 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     @naub_focused    = new Naubino.Signal()
     @naub_unfocused  = new Naubino.Signal()
 
-    @step_num = 0
-
     #state machine
     StateMachine.create {
       target: this
@@ -239,8 +237,6 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
   step: (dt) ->
     @step_space()
 
-    @step_num = @step_num+1
-    
     for pair in @replacing_naubs
       pair[0].replace_with pair[1]
       console.log "replacing #{pair[0].number} with #{pair[1].number}"
@@ -252,17 +248,15 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     @joining_naubs = []
     @replacing_naubs = []
 
-    @clean_up()
-
-  clean_up: ->
     # delete objects
     for id, obj of @objects
       if obj.removed
         @remove_obj id
+        @clean_up()
 
-    if @step_num % 20 == 0
-      #console.log "clean up run"
-      for con, id in @space.constraints
-        if con? and con.IsRogue()
-          @space.removeConstraint con
+  clean_up: ->
+    #console.log "clean up run"
+    for con, id in @space.constraints
+      if con? and con.IsRogue()
+        @space.removeConstraint con
 
