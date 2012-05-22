@@ -9,6 +9,7 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @color = [0,0,0,0.5]
     @pulsating = off
     @seed = 0
+    @fps = 5
 
 
   draw: () ->

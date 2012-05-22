@@ -15,9 +15,9 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     Naubino.mousedown.add @click
     Naubino.menu_button.active = false
    
-    @physics_fps = 20
     @center = new cp.v(20,25)
     @cube_size = 45
+    @default_fps = @fps = 35
     
     StateMachine.create {
       target:this
@@ -103,21 +103,40 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     @objects.main.draw_joins()
     @ctx.restore()
 
+  activate_menu: ->
+    Naubino.menu_focus.dispatch()
+    @animation.refresh_timer @default_fps
+
+    @for_each (b) -> b.isClickable = yes
+    @listener_size = 90
+    @start_stepper()
+
+  deactivate_menu: ->
+    Naubino.menu_blur.dispatch()
+
+    @for_each (b) -> b.isClickable = no
+    @listener_size = @default_listener_size
+    setTimeout (
+      =>
+        console.log @fps
+        @stop_stepper()
+        @animation.refresh_timer 3
+        console.log "refreshed menu timer"
+        console.log @fps
+    ),1000
+
+
+
   draw_listener_region: ->
     @ctx.save()
     @ctx.beginPath()
     @ctx.arc 0, 15, @listener_size, 0, Math.PI*2, true
+
     if @ctx.isPointInPath(@pointer.x,@pointer.y)
-      unless @hovering
-        Naubino.menu_focus.dispatch()
-        @for_each (b) -> b.isClickable = yes
-        @listener_size = 90
-        @start_stepper()
-    else if @hovering
-      Naubino.menu_blur.dispatch()
-      @for_each (b) -> b.isClickable = no
-      @listener_size = @default_listener_size
-      setTimeout (@stop_stepper ),1000
+      @activate_menu() unless @hovering
+    else
+      @deactivate_menu() if @hovering
+
     #@ctx.stroke() # like to see it
     @ctx.closePath()
     @ctx.restore()
