@@ -92,9 +92,9 @@ define -> class Layer
 
 
 
-  step: (dt) ->
-  step_space: (dt) ->
-    @space.step(1/40)
+  step: ->
+  step_space: ->
+    @space.step(1/@physics_fps)
 
     # Move mouse body toward the mouse
     newPoint = cp.v.lerp(@mouseBody.p, @pointer, 0.25)

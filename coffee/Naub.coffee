@@ -260,9 +260,9 @@ define -> class Naub
       minlen = Naubino.settings.naub.min_join_len * @size
       maxlen = Naubino.settings.naub.max_join_len * @size
 
-      #joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, 4, 30)
-      #joint.name = "DampedSpring"
-      #@layer.space.addConstraint( joint )
+      joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, 10, 30)
+      joint.name = "DampedSpring"
+      @layer.space.addConstraint( joint )
 
       joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, maxlen)
       joint2.name = "SlideJoint"
@@ -367,7 +367,7 @@ define -> class Naub
 
     for n in @layer.graph.tree(@number)
       naub = @layer.get_object n
-      naub.add_filter "draw_border"
+      naub.add_filter "draw_gradient"
       naub.update()
 
     @onfocus()
@@ -378,7 +378,7 @@ define -> class Naub
 
     for n in @layer.graph.tree(@number)
       naub = @layer.get_object n
-      naub.remove_filter "draw_border"
+      naub.remove_filter "draw_gradient"
       naub.update()
 
     @onclick()
