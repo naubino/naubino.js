@@ -6,7 +6,7 @@ naubino.js is a little game build for the browser. It is intended to be played o
 
   * `git clone https://github.com/hoodie/naubino.js` ( "thanks for pointing out the obvious!!" - your welcome)
   * `git submodule update --init`
-  * `make libs` some libs need some preparation
+  * `make lib` some libs need some preparation
   * use dev.html during development
 
 # Make

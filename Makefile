@@ -47,7 +47,7 @@ $(JOINED_TARGET): $(SRC_DIR)
 	$(COFFEE) -j $(JOINED_TARGET) -c $(SRC_DIR)
 	cp $@ $(MIN_TARGET)
 
-$(TMP): $(TMP_DIR)
+$(TMP): $(TMP_DIR) $(LIB)
 
 $(TMP_DIR)%.js: $(SRC_DIR)%.coffee
 	$(COFFEE) -p -c $< > $@
