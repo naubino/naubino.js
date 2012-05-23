@@ -150,7 +150,7 @@ define -> class Naub
     diff.sub(pos)
     l = diff.Length()
     fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
-    stretch = (30 + fiber) / (l + fiber)
+    stretch = (65 + fiber) / (l + fiber)
     stretch = Math.round((stretch)*10)/10 # rounding
     #@join_style.fill[3] = stretch
     stretched_width = @join_style.width * stretch
@@ -376,8 +376,9 @@ define -> class Naub
   unfocus: ->
     @focused = false
 
-    for n in @layer.graph.tree(@number)
-      naub = @layer.get_object n
+    #for n in @layer.graph.tree(@number)
+    #  naub = @layer.get_object n
+    @layer.for_each (naub) ->
       naub.remove_filter "draw_gradient"
       naub.update()
 
