@@ -58,7 +58,7 @@ $(DOC_DIR): $(SRC_DIR)
 $(TMP_DIR):
 	mkdir $(TMP_DIR)
 
-$(LIB_PACK): $(LIB_PACK_DIR) $(LIB)
+$(LIB_PACK): $(LIB) $(LIB_PACK_DIR)
 	cp $(LIB) $(DIST_DIR)$(LIB_DIR)
 
 $(LIB_PACK_DIR): $(DIST_DIR)
