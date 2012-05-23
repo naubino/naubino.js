@@ -6,19 +6,32 @@ all_TARGETS = $(FULL_TARGET) $(MIN_TARGET) $(JOINED_TARGET)
 COFFEE	= /usr/bin/coffee
 #COFFEE	= /usr/local/bin/coffee
 RJS			= r.js
+INDEX	  = index.html
 SRC_DIR = coffee/
+DIST_DIR = dist/
 DOC_DIR = docs/
 LIB_DIR = lib/
 TMP_DIR = js/
+CSS_DIR = css/
 
 SRC = $(shell find $(SRC_DIR) -type f -iname \*.coffee)
 TMP = $(SRC:$(SRC_DIR)%.coffee=$(TMP_DIR)%.js)
+LIB_PACK = $(DIST_DIR)$(LIB_DIR)/*.js
+LIB_PACK_DIR = $(DIST_DIR)$(LIB_DIR)
+
+
+LIB = \
+lib/signals/dist/signals.min.js\
+lib/state-machine/state-machine.min.js\
+lib/zepto/dist/zepto.min.js\
+lib/chipmunk/cp.min.js\
+lib/requirejs/require.js
 
 
 all:       $(MIN_TARGET)
 js:        $(TMP)
-libs:      $(LIB_DIR)
 doc:       $(DOC_DIR)
+dist:      $(DIST)
 readable:  $(FULL_TARGET)
 joined	:  $(JOINED_TARGET)
 
@@ -34,9 +47,7 @@ $(JOINED_TARGET): $(SRC_DIR)
 	$(COFFEE) -j $(JOINED_TARGET) -c $(SRC_DIR)
 	cp $@ $(MIN_TARGET)
 
-
-
-$(SRC): $(TMP_DIR)
+$(TMP): $(TMP_DIR)
 
 $(TMP_DIR)%.js: $(SRC_DIR)%.coffee
 	$(COFFEE) -p -c $< > $@
@@ -47,14 +58,25 @@ $(DOC_DIR): $(SRC_DIR)
 $(TMP_DIR):
 	mkdir $(TMP_DIR)
 
+$(LIB_PACK): $(LIB_PACK_DIR) $(LIB)
+	cp $(LIB) $(DIST_DIR)$(LIB_DIR)
+
+$(LIB_PACK_DIR): $(DIST_DIR)
+	mkdir	$(LIB_PACK_DIR)
+
+dist: $(LIB_PACK) $(MIN_TARGET) $(INDEX) $(CSS_DIR)
+	cp $(MIN_TARGET) $(DIST_DIR)
+	cp -r $(CSS_DIR) $(DIST_DIR)
+	cp $(INDEX) $(DIST_DIR)
+
+$(DIST_DIR):
+	mkdir $(DIST_DIR)
+
 watch: $(TMP_DIR)
 	$(COFFEE) -o $(TMP_DIR) -cw $(SRC_DIR)
 
-$(LIB_DIR):
+$(LIB):
 	git submodule update --init
-
-
-libs: $(LIB_DIR)
 	cd lib/zepto; rake
 
 .PHONY:
@@ -66,6 +88,7 @@ clean:
 	rm -f  $(all_TARGETS)
 	rm -rf $(TMP_DIR)
 	rm -rf $(DOC_DIR)
+	rm -rf $(DIST_DIR)
 
 .PHONY: loc
 loc:
