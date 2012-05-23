@@ -248,10 +248,10 @@ PlayButton: class PlayButton extends Shape
     ctx.save()
     ctx.beginPath()
     ctx.fillStyle = "#ffffff"
-    ctx.moveTo(x-5,y-5)
-    ctx.lineTo(x-5,y+5)
-    ctx.lineTo(x+7,y+0)
-    ctx.lineTo(x-5,y-5)
+    ctx.moveTo(x-7,y-7)
+    ctx.lineTo(x-7,y+7)
+    ctx.lineTo(x+9,y+0)
+    ctx.lineTo(x-7,y-7)
     ctx.closePath()
     ctx.fill()
     ctx.restore()
@@ -263,8 +263,8 @@ PauseButton: class PauseButton extends Shape
     ctx.fillStyle = "#ffffff"
     ctx.beginPath()
 
-    ctx.rect(x-5, y-6, 4, 12)
-    ctx.rect(x+1, y-6, 4,12)
+    ctx.rect(x-7, y-7, 5,13)
+    ctx.rect(x+1, y-7, 5,13)
 
     ctx.closePath()
     ctx.fill()
@@ -274,7 +274,7 @@ PauseButton: class PauseButton extends Shape
 MainButton: class MainButton extends Box
   render: (ctx, x, y) ->
     text = Naubino.game.points ? ""
-    @width = @naub.size*1.5
+    @width = @naub.size*1.4
     ctx.save()
     ctx.translate(x,y)
     ctx.rotate(Math.PI/6)
@@ -294,8 +294,8 @@ MainButton: class MainButton extends Box
     ctx.translate(x,y)
     ctx.fillStyle = 'white'
     ctx.textAlign = 'center'
-    ctx.font= 'bold 33px Helvetica'
-    ctx.fillText(text, 0,10, @width*1.1)
+    ctx.font= 'bold 38px Helvetica'
+    ctx.fillText(text, 2,12, @width*1.1)
     ctx.restore()
 
 
@@ -319,7 +319,7 @@ StringShape: class StringShape extends Shape
     ctx.fillStyle = @color
     ctx.textAlign = 'center'
     ctx.font= "#{size}px Helvetica"
-    ctx.fillText(string, 0, 6)
+    ctx.fillText(string, 0, 7)
     ctx.restore()
 
 }

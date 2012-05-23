@@ -39,15 +39,15 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
       #shapes: []
     play:
       function: -> Naubino.play()
-      position: new cp.v(65,35)
+      position: new cp.v(70,32)
       shapes: [new Ball, new PlayButton]
     help:
       function: -> Naubino.tutorial()
-      position: new cp.v(45,65)
+      position: new cp.v(55,65)
       shapes: [new Ball, new StringShape "?", "white"]
     exit:
       function: -> Naubino.stop()
-      position: new cp.v(14,80)
+      position: new cp.v(20,80)
       shapes: [new Ball, new StringShape "X", "white"]
 
   add_buttons: ->
