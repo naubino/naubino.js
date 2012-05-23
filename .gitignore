@@ -6,3 +6,5 @@ Session.vim
 docs
 stats/
 node_modules/
+lib/*
+dist/*
