@@ -88,7 +88,7 @@ clean:
 	rm -f  $(all_TARGETS)
 	rm -rf $(TMP_DIR)
 	rm -rf $(DOC_DIR)
-	rm -rf $(DIST_DIR)
+	rm -rf $(DIST_DIR)*
 
 .PHONY: loc
 loc:

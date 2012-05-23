@@ -13,3 +13,6 @@
 [submodule "lib/chipmunk"]
 	path = lib/chipmunk
 	url = https://github.com/josephg/Chipmunk-js/
+[submodule "dist"]
+	path = dist
+	url = git@github.com:naubino/naubino.github.com
