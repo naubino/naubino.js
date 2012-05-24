@@ -38,8 +38,8 @@ Shape: class Shape
 
   draw_gradient: (ctx) ->
     gradient = ctx.createRadialGradient(0, 0, @radius/3, 0, 0, @radius)
-    gradient.addColorStop 0, @color_to_rgba(@style.fill, 80)
-    gradient.addColorStop 1, @color_to_rgba(@style.fill, 50)
+    gradient.addColorStop 0, @color_to_rgba(@style.fill, 60)
+    gradient.addColorStop 1, @color_to_rgba(@style.fill, 30)
     ctx.fillStyle = gradient
     ctx.fill()
 
