@@ -16,7 +16,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
   constructor: () ->
     @name = "Naubino (unstable master)"
     @settings = Settings
-    @colors = @settings.colors.output
+    @colors = @settings.colors.cuddle_bunny
     @create_fsm()
     @Signal = window.signals.Signal
     @add_signals()
