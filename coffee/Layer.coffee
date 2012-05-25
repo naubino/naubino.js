@@ -24,11 +24,12 @@ define -> class Layer
 
       start_timer: =>
         #console.info @name, "start animation timer", @fps, "fps"
-        @draw_loop = setInterval(@do_draw, 1000 / @fps ) unless @draw_loop?
+        @draw_loop ?= Naubino.animation.graphics.on('tick', @do_draw)
       stop_timer: =>
         #console.info @name, "stop animation timer"
-        clearInterval @draw_loop
-        @draw_loop = null
+        if @draw_loop
+            Naubino.animation.graphics.removeListener('tick', @do_draw)
+            @draw_loop = null
     }
 
     StateMachine.create {
@@ -102,8 +103,17 @@ define -> class Layer
     @mouseBody.p = newPoint
 
 
-  start_stepper: => @loop = setInterval((=> @step(@dt)),  1000 / @physics_fps )
-  stop_stepper: => clearInterval @loop
+  start_stepper: =>
+    unless @loop?
+        @loop = (dt) =>
+#             c = dt / Naubino.animation.physics.frametime # tick correction
+            @dt = dt * Naubino.settings.physics.calming_const
+            @step(@dt)
+        Naubino.animation.physics.on('tick', @loop)
+  stop_stepper: =>
+    if @loop?
+        Naubino.animation.physics.removeListener('tick', @loop)
+        @loop = null
 
   add_object: (obj)->
     #chipmunk
