@@ -12,7 +12,6 @@ Shape: class Shape
 
     @set_color_from_id @naub.color_id
 
-
   # turns the internal color init a string that applies to canvas
   color_to_rgba: (color = @style.fill, shift = 0) =>
     r = Math.round((color[0] + shift))
@@ -58,10 +57,13 @@ Shape: class Shape
 
   # change color
   set_color_from_id:(id)->
-    palette = Naubino.colors
+    palette = Naubino.colors()
     pick = palette[id]
-    @style.fill = [pick[0],pick[1],pick[2], 1]
-    # TODO automatically assume 1 if alpha is unset (pick[3])
+    if pick?
+      @style.fill = [pick[0],pick[1],pick[2], pick[3]]
+    else
+      @style.fill = [255,0,0, 0.5]
+      console.warn id, "not found"
     id
 
   # colors the shape randomly and returns color id for comparison
@@ -104,8 +106,8 @@ Ball: class Ball extends Shape
     ctx.fillStyle = @color_to_rgba(@style.fill)
     ctx.fill()
 
-    if @naub.filters?
-      @apply_filters @naub.filters, ctx
+    @apply_filters @naub.filters, ctx if @naub.filters?
+    @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
 
 
     ctx.closePath()
@@ -143,8 +145,8 @@ Box: class Box extends Shape
     ctx.fillStyle = @color_to_rgba(@style.fill)
     ctx.fill()
 
-    if @naub.filters?
-      @apply_filters @naub.filters, ctx
+    @apply_filters @naub.filters, ctx if @naub.filters?
+    @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
 
     ctx.closePath()
     ctx.restore()
@@ -281,8 +283,8 @@ MainButton: class MainButton extends Box
     ctx.beginPath()
     ctx.rect(-@width/2,-@width/2,@width,@width)
 
-    if @naub.filters?
-      @apply_filters @naub.filters, ctx
+    @apply_filters @naub.filters, ctx if @naub.filters?
+    @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
 
 
     ctx.fillStyle = @color_to_rgba @style.fill

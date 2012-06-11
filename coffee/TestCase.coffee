@@ -4,7 +4,7 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberS
   oninit: ->
     super()
     Naubino.settings.graphics.updating = off
-    Naubino.settings.game.creation_offset = -150
+    Naubino.settings.game.creation_offset = -200
     @factory.add_ball = @add_ball
 
     @naub_replaced.add (number)=> @graph.cycle_test(number)
@@ -17,8 +17,6 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberS
     super()
 
     @factory.create_matching_naubs() if f == "stopped"
-    @factory.create_naub_pair(null,1,2)
-    @factory.create_naub_pair(null,1,2)
     #Naubino.background.animation.play()
     #Naubino.background.start_stepper()
 

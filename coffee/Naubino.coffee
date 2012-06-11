@@ -16,7 +16,6 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
   constructor: () ->
     @name = "Naubino (unstable master)"
     @settings = Settings
-    @colors = @settings.colors.cuddle_bunny
     @create_fsm()
     @Signal = window.signals.Signal
     @add_signals()
@@ -30,6 +29,10 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @setup_cursorbindings()
     console.timeEnd("loading")
 
+
+  colors: -> @settings.colors[@settings.color]
+  recolor: ->
+    @game.for_each (naub) -> naub.recolor()
 
   print: -> @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
 
@@ -55,8 +58,8 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @game_standard = new StandardGame(@game_canvas)
     @game_testcase = new TestCase(@game_canvas)
     @game_tutorial = new Tutorial(@game_canvas)
-    @game          = @game_standard
-    #@game          = @game_testcase
+    #@game          = @game_standard
+    @game          = @game_testcase
     #@game          = @game_tutorial
     @menu          = new Menu(@menu_canvas)
     @overlay       = new Overlay(@overlay_canvas)
