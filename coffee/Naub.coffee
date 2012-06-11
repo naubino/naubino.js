@@ -127,6 +127,17 @@ define -> class Naub
       return
 
 
+  # change fill to gray
+  grey_out: ->
+    for shape in @shapes
+      shape.style.fill = [100,100,100,1]
+    @update()
+
+  # sets color from @color_id
+  recolor: ->
+    @update_shapes()
+    @update()
+
 
 
   # runs draw_join on all partners, if this naub is the one drawing the join
@@ -192,12 +203,6 @@ define -> class Naub
     @disabled = false
     @update()
 
-
-  # change fill to gray
-  grey_out: -> @style.fill = [100,100,100,1]
-
-  # sets color from @color_id
-  recolor: -> @style.fill = Naubino.colors[@color_id]
 
   # removes the reference to this naub from all its partners
   remove: =>
@@ -397,5 +402,5 @@ define -> class Naub
 
   # colors the shape randomly and returns color id for comparison
   random_palette_color: ->
-    palette = Naubino.colors
+    palette = Naubino.colors()
     id = Math.round(Math.random() * (palette.length-1))

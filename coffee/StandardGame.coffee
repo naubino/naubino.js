@@ -75,7 +75,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
           @game.level_up_limit = 65
 
         onlevel4:->
-          @game.number_of_colors = 6
+          @game.number_of_colors = Naubino.colors().length # dont' know whether there are more than 6
           @game.spammer_interval = 25
           @game.level_up_limit = 90
 
@@ -84,7 +84,6 @@ define ["Game"], (Game) -> class StandardGame extends Game
           @game.level_up_limit = 120
 
         onlevel6:->
-          @game.number_of_colors = Naubino.colors.length
           @game.level_up_limit = 140
 
         onlevel7:->

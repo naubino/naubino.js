@@ -53,6 +53,7 @@ define -> Settings = {
         { name: 'stop',   from: 'paused',   to: 'stopped'}
       ]
 
+  color: "lip"
   colors:
     #please sort colors by
     # red
@@ -60,9 +61,9 @@ define -> Settings = {
     # blue
     # yellow
     # misc...
-    # a palett must have at least 6 colors
+    # a palett must have at least 5 colors
     output: [
-    # [RRR, GGG, BBB, , name,    is_background,    is_joincolor ]
+    # [RRR, GGG, BBB, alpha, name,    is_background,    is_joincolor ]
       [229,  53,  23, 1, "red"      ]
       [151, 190,  13, 1, "green"    ]
       [  0, 139, 208, 1, "blue"     ]
@@ -85,6 +86,7 @@ define -> Settings = {
       [  0, 153, 204, 1, "Office Blue" ]
       [  0, 204,   0, 1, "Astroturf"   ]
       [255, 255,   0, 1, "Yellow"      ]
+      [  0,   0,   0, 1, "black" ]
     ]
     cuddle_bunny: [ # http://www.colourlovers.com/palette/124912/Cuddle_Bunny
       [174,  49,  45, 1, "cuddling red"    ]
@@ -92,6 +94,7 @@ define -> Settings = {
       [ 73,  37,  13, 1, "midnight fudge"  ]
       [173, 165,  64, 1, "cuddling yellow" ]
       [202, 202, 182, 1, "ill beige"       ]
+      [  0,   0,   0, 0.5, "black" ]
     ]
     '70': [ # http://www.colourlovers.com/palette/1712615/70
       [191,  73,  73, 1]
@@ -99,6 +102,7 @@ define -> Settings = {
       [ 38, 110, 128, 1]
       [255, 232, 222, 1]
       [ 41,  14,   3, 1, "tell me"]
+      [  0,   0,   0, 1, "black" ]
     ]
     lip: [
       [125,  97,  83, 1]
@@ -106,8 +110,10 @@ define -> Settings = {
       [ 82, 195, 193, 1]
       [246, 153, 167, 1]
       [198, 190,  99, 1]
+      [240, 240, 240, 1, "black" ]
     ]
     # http://www.colourlovers.com/palette/1763674/The_Hearth#
+    # http://www.colourlovers.com/palette/1740916/lip
     # http://www.colourlovers.com/palette/1763676/DeepSeaNEONS
     # http://www.colourlovers.com/palette/1763669/neon_spring
     # http://www.colourlovers.com/palette/373610/mellon_ball_surprise

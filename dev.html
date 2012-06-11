@@ -21,15 +21,19 @@
 
       <div class="fluid-row" id="buttons">
         <div class="span12">
-          <input type="button" onclick="window.Naubino.play();Naubino.list_states()" value="play"/>
-          <input type="button" onclick="window.Naubino.pause();Naubino.list_states()" value="pause"/>
-          <input type="button" onclick="window.Naubino.stop(true);Naubino.list_states()" value="stop"/>
-          <!-- <input type="button" onclick="window.Naubino.game.gravity = !window.Naubino.game.gravity " value="gravity on/off"/> -->
-          <input type="button" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
-          <!--  <input type="button" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
-          <input type="button" onclick="window.Naubino.settings.graphics.updating = !window.Naubino.settings.graphics.updating" value="prerendering on/off"/>
-          <a href="https://github.com/hoodie/naubino.js/issues/new">write and issue</a>
-          <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
+          <form class="form-inline">
+            <input type="button" onclick="window.Naubino.play();Naubino.list_states()" value="play"/>
+            <input type="button" onclick="window.Naubino.pause();Naubino.list_states()" value="pause"/>
+            <input type="button" onclick="window.Naubino.stop(true);Naubino.list_states()" value="stop"/>
+            <!-- <input type="button" onclick="window.Naubino.game.gravity = !window.Naubino.game.gravity " value="gravity on/off"/> -->
+            <input type="button" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
+            <!--  <input type="button" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
+            <input type="button" onclick="window.Naubino.settings.graphics.updating = !window.Naubino.settings.graphics.updating" value="prerendering on/off"/>
+            <select id="colors" >
+            </select>
+            <a href="https://github.com/hoodie/naubino.js/issues/new">write and issue</a>
+            <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
+          </form>
         </div>
       </div>
       </header>
