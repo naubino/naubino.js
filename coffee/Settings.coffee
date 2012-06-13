@@ -53,7 +53,7 @@ define -> Settings = {
         { name: 'stop',   from: 'paused',   to: 'stopped'}
       ]
 
-  color: "lip"
+  color: "output"
   colors:
     #please sort colors by
     # red
@@ -79,6 +79,13 @@ define -> Settings = {
       [255, 255,   0, 1, "hcyellow" ]
       [  0,   0,   0, 1, "hcblack"  ]
       [128,   0, 128, 1, "hcpurple" ]
+    ]
+    pop_is_everything: [
+      [ 255,   0, 170, 1, "Hue 320 Degrees"]
+      [ 170, 255,   0, 1, "Hue 80 Degrees"]
+      [   0, 170, 255, 1, "Hue 200 Degrees"]
+      [ 255, 170,   0, 1, "Norad Orange"]
+      [ 170,   0, 255, 1, "Hue 280 Degrees"]
     ]
     normal_colors: [
       [255,   0,   0, 1, "red"         ]
@@ -119,6 +126,8 @@ define -> Settings = {
     # http://www.colourlovers.com/palette/373610/mellon_ball_surprise
     # http://www.colourlovers.com/palette/1473/Ocean_Five
     # http://www.colourlovers.com/palette/705921/Spring_Birds
+    # http://www.colourlovers.com/palette/2223536/Luxury
+    # http://www.colourlovers.com/palette/845564/its_raining_love
 
 
 
