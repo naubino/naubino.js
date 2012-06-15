@@ -1,10 +1,10 @@
 console.time("loading")
 
-requirejs.config {
-  baseUrl: 'js/'
-  paths:
-      lib: '../../lib'
-}
+#requirejs.config {
+#  baseUrl: 'js/'
+#  paths:
+#      lib: '../../lib'
+#}
 
 define ["Naubino"], (Naubino) ->
   window.onload = ->
