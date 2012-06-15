@@ -56,13 +56,13 @@ $(DOC_DIR): $(SRC_DIR)
 	codo -o $@ $<
 
 $(TMP_DIR):
-	mkdir $(TMP_DIR)
+	mkdir $(TMP_DIR) -p
 
 $(LIB_PACK): $(LIB) $(LIB_PACK_DIR)
 	cp $(LIB) $(DIST_DIR)$(LIB_DIR)
 
 $(LIB_PACK_DIR): $(DIST_DIR)
-	mkdir	$(LIB_PACK_DIR)
+	mkdir	$(LIB_PACK_DIR) -p
 
 dist: $(LIB_PACK) $(MIN_TARGET) $(INDEX) $(CSS_DIR)
 	cp $(MIN_TARGET) $(DIST_DIR)
@@ -70,7 +70,7 @@ dist: $(LIB_PACK) $(MIN_TARGET) $(INDEX) $(CSS_DIR)
 	cp $(INDEX) $(DIST_DIR)
 
 $(DIST_DIR):
-	mkdir $(DIST_DIR)
+	mkdir $(DIST_DIR) -p
 
 watch: $(TMP_DIR)
 	$(COFFEE) -o $(TMP_DIR) -cw $(SRC_DIR)
