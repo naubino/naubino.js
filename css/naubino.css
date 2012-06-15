@@ -84,3 +84,15 @@ h1 {
     position:absolute;
     top: 550px;
 }
+@media screen and (view-mode: minimized) { 
+    body
+    {
+        background: #ffffff;
+        background-image:  url('../images/game.png');
+        background-size: 120% auto;
+    }
+    body > *
+    {
+        display: none;
+    }
+}
