@@ -139,14 +139,17 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
 
 
   # is one naub allowed to join with another
-  check_joining: (naub, other, arbiter) ->
-    return no if naub.number == other.number or not @joining_allowed
-    return no unless naub.focused or other.focused
+  check_joining: (a, b, arbiter) ->
+    return no if a.number == b.number or not @joining_allowed
+    return no unless a.focused or b.focused
+
+    naub = if a.focused then a else b
+    other= unless a.focused then a else b
+
 
     force = arbiter.totalImpulse().Length()
     return no if force < Naubino.settings.game.min_joining_force
     #console.log force
-
 
     close_related = naub.close_related other # prohibits folding of pairs
     joined = naub.is_joined_with other # can't join what's already joined
