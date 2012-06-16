@@ -52,6 +52,10 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
       @canvases.push c
 
   init_layers: ->
+    @animation =
+        graphics: new Animation(frame:1000 / @settings.graphics.fps)
+        physics:  new Animation(frame:1000 / @settings.physics.fps)
+
     @gamediv.max-width     = @settings.canvas.width
 
     @background    = new Background(@background_canvas)
@@ -67,6 +71,8 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @menu.init()
     @menu.animation.play()
     @game.init()
+    @animation.graphics.start()
+    @animation.physics.start()
 
 
 
