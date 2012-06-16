@@ -192,7 +192,7 @@ define -> class Naub
   remove: =>
     for id, naub of @joins
       @split_join id
-    setTimeout (=> @removed = true), 50
+    @removed = true
 
   split_join: (id) ->
     if id of @joins
