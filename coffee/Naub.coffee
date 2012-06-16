@@ -161,8 +161,8 @@ define -> class Naub
     diff.sub(pos)
     l = diff.Length()
     fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
-    stretch = (65 + fiber) / (l + fiber)
-    stretch = Math.round((stretch)*10)/10 # rounding
+    stretch = (75 ) / (l + 10)
+    #stretch = Math.round((stretch)*10)/10 # rounding
     #@join_style.fill[3] = stretch
     stretched_width = @join_style.width * stretch
     ctx.save()
@@ -175,22 +175,6 @@ define -> class Naub
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
-
-    #if id?
-    #  join_string = id.toString()
-    #  ctx.save()
-    #  mid = cp.v.lerp(pos, pos2, 0.5)
-    #  ctx.translate mid.x,mid.y
-    #  ctx.rotate diff.Angle()
-    #  ctx.translate 0,-10
-    #  @ctx.rotate 2*Math.PI - diff.Angle()
-    #  ctx.fillStyle = 'black'
-    #  ctx.textAlign = 'center'
-    #  ctx.font= "10px Courier"
-    #  ctx.fillText(join_string, 0, 6)
-    #  ctx.restore()
-
-
 
   # makes a naub clickable and joinable again
   disable: ->
