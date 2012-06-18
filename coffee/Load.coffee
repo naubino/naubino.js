@@ -31,4 +31,44 @@ define ["Naubino"], (Naubino) ->
 
       naubino.menu.for_each (naub) -> naub.recolor()
       naubino.game.for_each (naub) -> naub.recolor()
-    
+
+
+
+
+
+    @requestFullscreen = ->
+      docElm = document.documentElement
+
+      if (docElm.requestFullscreen?)
+        docElm.requestFullscreen()
+      else if (docElm.mozRequestFullScreen?)
+        docElm.mozRequestFullScreen()
+      else if (docElm.oRequestFullScreen?)
+        docElm.oRequestFullScreen()
+      else if (docElm.webkitRequestFullScreen?)
+        docElm.webkitRequestFullScreen()
+
+    @exitFullscreen = ->
+      if (document.exitFullscreen)
+        document.exitFullscreen()
+
+      else if (document.mozCancelFullScreen)
+        document.mozCancelFullScreen()
+
+      else if (document.webkitCancelFullScreen)
+        document.webkitCancelFullScreen()
+
+
+    @changeFullscreen = (fullScreen) ->
+      if fullScreen
+        window.Naubino.maximise()
+      else
+        window.Naubino.demaximise()
+
+
+    document.addEventListener("fullscreenchange",       ( => @changeFullscreen (document.fullscreen)         ), false)
+    document.addEventListener("mozfullscreenchange",    ( => @changeFullscreen (document.mozFullScreen)      ), false)
+    document.addEventListener("webkitfullscreenchange", ( => @changeFullscreen (document.webkitIsFullScreen) ), false)
+
+
+

@@ -16,12 +16,9 @@
   <body>
 
 
-    <div class="container">
       <header>
 
-      <div class="fluid-row" id="buttons">
-        <div class="span12">
-          <form class="form-inline">
+          <form>
             <input type="button" onclick="window.Naubino.play();Naubino.list_states()" value="play"/>
             <input type="button" onclick="window.Naubino.pause();Naubino.list_states()" value="pause"/>
             <input type="button" onclick="window.Naubino.stop(true);Naubino.list_states()" value="stop"/>
@@ -29,23 +26,18 @@
             <input type="button" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
             <!--  <input type="button" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
             <input type="button" onclick="window.Naubino.settings.graphics.updating = !window.Naubino.settings.graphics.updating" value="prerendering on/off"/>
+            <input type="button" onclick="requestFullscreen()" value="fullscreen" />
+            <input type="button" onclick="exitFullscreen()" value="no fullscreen" />
             <select id="colors" >
             </select>
             <a href="https://github.com/hoodie/naubino.js/issues/new">write and issue</a>
             <a href="https://github.com/hoodie/naubino.js/wiki">use the wiki</a>
             <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
           </form>
-        </div>
-      </div>
       </header>
 
-      <div class="fluid-row">
-        <div class="span12">
           <div id="gamediv"> </div> 
-        </div>
-      </div>
 
-    </div> 
     <script>
       document.ontouchmove = function(event) {
         event.preventDefault();

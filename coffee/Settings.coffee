@@ -128,6 +128,8 @@ define -> Settings = {
     # http://www.colourlovers.com/palette/705921/Spring_Birds
     # http://www.colourlovers.com/palette/2223536/Luxury
     # http://www.colourlovers.com/palette/845564/its_raining_love
+    # http://www.colourlovers.com/palette/694737/Thought_Provoking
+    # http://www.colourlovers.com/palette/1930/cheer_up_emo_kid
 
 
 

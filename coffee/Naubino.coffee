@@ -13,6 +13,7 @@
 
 
 define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", "TestCase", "Settings", "Tutorial", "Util"], (Background, Game, KeyBindings, Menu, Overlay, StandardGame, TestCase, Settings, Tutorial) -> class Naubino
+
   constructor: () ->
     @name = "Naubino (unstable master)"
     @settings = Settings
@@ -20,6 +21,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @Signal = window.signals.Signal
     @add_signals()
     @add_listeners()
+    @scale = 1 # will be changed by fullscreen
 
   setup: ->
     @init_dom()
@@ -31,8 +33,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
 
 
   colors: -> @settings.colors[@settings.color]
-  recolor: ->
-    @game.for_each (naub) -> naub.recolor()
+  recolor: -> @game.for_each (naub) -> naub.recolor()
 
   print: -> @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
 
@@ -68,6 +69,37 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @menu.animation.play()
     @game.init()
 
+  # this is for fullscreen
+  demaximise: -> @maximise ""
+
+
+  maximise: (width = "100%")->
+    for name in 'background game menu overlay'.split ' '
+      document.querySelector("canvas##{name}_canvas").style.width = width
+    console.log @scale = $("canvas#game_canvas").width()/@settings.canvas.width
+
+  tutorial: ->
+    @game_tutorial = new Tutorial(@game_canvas)
+    @soft_switch @game_tutorial
+
+  leave_tutorial: ->
+    @soft_switch @oldgame
+    @overlay       = new Overlay(@overlay_canvas)
+    delete @game_tutorial
+    delete @oldgame
+
+  soft_switch: (new_game) ->
+    @pause() if @current == "playing"
+    @oldgame = @game
+
+    @game.fade_out =>
+      @game.clear()
+      @game = new_game
+      @game.draw()
+      @game.init() if @game.current == "none"
+      @game.fade_in => @play()
+
+
 
 
   ###
@@ -94,6 +126,7 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
   onbeforeplay: (event, from, to) -> @game.play()
   onenterplaying: -> @menu.play()
 
+  # switching between pause and play
   toggle: ->
     switch @current
       when 'playing' then @pause()
@@ -119,39 +152,6 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
       @menu.stop()
     else
       false
-
-  tutorial: ->
-    @game_tutorial = new Tutorial(@game_canvas)
-    @soft_switch @game_tutorial
-
-  leave_tutorial: ->
-    @soft_switch @oldgame
-    @overlay       = new Overlay(@overlay_canvas)
-    delete @game_tutorial
-    delete @oldgame
-
-  soft_switch: (new_game) ->
-    @pause() if @current == "playing"
-    @oldgame = @game
-
-    @game.fade_out =>
-      @game.clear()
-      @game = new_game
-      @game.draw()
-      @game.init() if @game.current == "none"
-      @game.fade_in => @play()
-
-
-  scale: (nscale) ->
-    console.log oscale = 1
-    @settings.canvas.scale = nscale
-    console.log ratio = nscale/oscale
-    for canvas in  @canvases
-      # doesnt work
-      #canvas.width = @settings.canvas.width * ratio
-      #canvas.height = @settings.canvas.height * ratio
-      canvas.getContext('2d').scale ratio, ratio
-
 
 
   ###
@@ -190,18 +190,18 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
   setup_cursorbindings: () ->
     # TODO mouse events should be handled though Signals
     onmousemove = (e) =>
-      x = (e.pageX - @overlay_canvas.offsetLeft) / @settings.canvas.scale
-      y = (e.pageY - @overlay_canvas.offsetTop) / @settings.canvas.scale
+      x = (e.pageX - @overlay_canvas.offsetLeft) / @scale
+      y = (e.pageY - @overlay_canvas.offsetTop) /  @scale
       @mousemove.dispatch x,y
 
     onmouseup = (e) =>
-      x = (e.pageX - @overlay_canvas.offsetLeft) / @settings.canvas.scale
-      y = (e.pageY - @overlay_canvas.offsetTop) / @settings.canvas.scale
+      x = (e.pageX - @overlay_canvas.offsetLeft) / @scale
+      y = (e.pageY - @overlay_canvas.offsetTop) /  @scale
       @mouseup.dispatch x,y
 
     onmousedown = (e) =>
-      x = (e.pageX - @overlay_canvas.offsetLeft) / @settings.canvas.scale
-      y = (e.pageY - @overlay_canvas.offsetTop) / @settings.canvas.scale
+      x = (e.pageX - @overlay_canvas.offsetLeft) / @scale
+      y = (e.pageY - @overlay_canvas.offsetTop) /  @scale
       @mousedown.dispatch x,y
 
     @overlay_canvas.addEventListener("mousedown"  , onmousedown , false)
