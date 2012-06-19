@@ -134,7 +134,7 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
       if i < list.length
         @get_object(list[i]).destroy()
         i++
-      setTimeout one_after_another, 40
+      setTimeout one_after_another, 120
     one_after_another()
 
 

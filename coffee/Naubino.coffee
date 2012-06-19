@@ -12,7 +12,7 @@
 #   Naubino.constructor()
 
 
-define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", "TestCase", "Settings", "Tutorial", "Util"], (Background, Game, KeyBindings, Menu, Overlay, StandardGame, TestCase, Settings, Tutorial) -> class Naubino
+define ["Audio","Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", "TestCase", "Settings", "Tutorial", "Util"], (Audio, Background, Game, KeyBindings, Menu, Overlay, StandardGame, TestCase, Settings, Tutorial) -> class Naubino
 
   constructor: () ->
     @name = "Naubino (unstable master)"
@@ -22,6 +22,8 @@ define ["Background", "Game", "Keybindings", "Menu", "Overlay", "StandardGame", 
     @add_signals()
     @add_listeners()
     @scale = 1 # will be changed by fullscreen
+
+    @audio = new Audio
 
   setup: ->
     @init_dom()
