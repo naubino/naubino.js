@@ -36,6 +36,7 @@ define ["Naubino"], (Naubino) ->
 
 
 
+    # https://developer.mozilla.org/en/DOM/Using_full-screen_mode
     @requestFullscreen = ->
       docElm = document.documentElement
 

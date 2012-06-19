@@ -19,6 +19,8 @@ define ["Game"], (Game) -> class StandardGame extends Game
     @naub_destroyed.add => @points++
     @cycle_found.add (list) => @destroy_naubs(list)
 
+    Naubino.audio.connect_to_game this
+
 
     @basket_size = @default_basket_size = 160
     @spammers = @default_spammers = {
