@@ -24,13 +24,12 @@ define ["Layer"], (Layer) -> class Background extends Layer
 
 
   draw_basket: () ->
-    width = @canvas.width
-    height = @canvas.height
-    centerX = width/2
-    centerY = height/2
+
+    centerX = 10 # = @canvas.width/2
+    centerY = @canvas.height/2
     @basket_size = Naubino.game.basket_size or 10
 
-    @ctx.clearRect(0, 0, width, height)
+    @ctx.clearRect(0, 0, @canvas.width, @canvas.height)
 
     @ctx.save()
     @ctx.beginPath()
@@ -89,6 +88,7 @@ define ["Layer"], (Layer) -> class Background extends Layer
       @ctx.restore()
     @ctx.restore()
     
+
   draw_line: (x0, y0, x1 = @center.x, y1 = @center.y, color = 'black') ->
     @ctx.beginPath()
     @ctx.moveTo(x0, y0)

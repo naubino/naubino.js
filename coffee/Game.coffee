@@ -171,7 +171,7 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
   # draws everything that happens inside the field
   draw:  ->
     # clears the canvas before drawing
-    @ctx.clearRect(0, 0, Naubino.settings.canvas.width, Naubino.settings.canvas.height)
+    @clear()
     # draws joins and naubs seperately
     @ctx.save()
     for id, obj of @objects

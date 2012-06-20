@@ -185,7 +185,18 @@ define -> class Layer
   show: -> @canvas.style.opacity = 1
   hide: -> @canvas.style.opacity = 0
 
-  clear: -> @canvas.width = @canvas.width
+  clear: ->
+    @ctx.clearRect(0, 0, @canvas.width, @canvas.height)
+
+    #@ctx.beginPath()
+    #@ctx.rect(0, 0, @canvas.width, @canvas.height)
+    #@ctx.fillStyle = "rgba(255,255,255,)"
+    #@ctx.fill()
+    #@ctx.lineWidth = 5
+    #@ctx.strokeStyle = 'black'
+    #@ctx.stroke()
+
+    #@canvas.width = @canvas.width
   cache: -> @backup_ctx = @ctx
   restore: -> @ctx = @backup_ctx
 

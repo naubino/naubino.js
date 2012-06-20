@@ -71,6 +71,7 @@ h1 {
     position: absolute;
     z-index:0;
     left:auto;
+    top: 30px;
 }
 #gamediv > span{
     position: absolute;

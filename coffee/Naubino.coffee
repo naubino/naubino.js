@@ -23,7 +23,7 @@ define ["Audio","Background", "Game", "Keybindings", "Menu", "Overlay", "Standar
     @add_listeners()
     @scale = 1 # will be changed by fullscreen
 
-    @audio = new Audio
+    #@audio = new Audio
 
   setup: ->
     @init_dom()
@@ -74,11 +74,30 @@ define ["Audio","Background", "Game", "Keybindings", "Menu", "Overlay", "Standar
   # this is for fullscreen
   demaximise: -> @maximise ""
 
-
   maximise: (width = "100%")->
     for name in 'background game menu overlay'.split ' '
       document.querySelector("canvas##{name}_canvas").style.width = width
     console.log @scale = $("canvas#game_canvas").width()/@settings.canvas.width
+
+  smaximise: ->
+    win_width = document.documentElement.clientWidth
+    win_height= document.documentElement.clientHeight
+    game_width = $("canvas#game_canvas").width()
+    oscale = 1
+
+    @scale = @settings.canvas.scale = win_width / game_width
+    document.querySelector("#gamediv").style.width = ""
+    console.log ratio = @settings.canvas.scale/oscale
+    for canvas in  @canvases
+      # doesnt work
+      #canvas.width = @settings.canvas.width * ratio
+      #canvas.height = @settings.canvas.height * ratio
+      canvas.width *= ratio
+      canvas.height*= ratio
+      canvas.getContext('2d').scale ratio, ratio
+
+
+
 
   tutorial: ->
     @game_tutorial = new Tutorial(@game_canvas)

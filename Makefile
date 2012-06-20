@@ -8,6 +8,7 @@ COFFEE	= /usr/bin/coffee
 RJS			= r.js
 INDEX	  = index.html
 SRC_DIR = coffee/
+AUDIO_DIR = audio/
 IMG_DIR = images/
 DIST_DIR = dist/
 DOC_DIR = docs/
@@ -69,6 +70,7 @@ dist: $(LIB_PACK) $(MIN_TARGET) $(INDEX) $(CSS_DIR)
 	cp $(MIN_TARGET) $(DIST_DIR)
 	cp -r $(CSS_DIR) $(DIST_DIR)
 	cp -r $(IMG_DIR) $(DIST_DIR)
+	cp -r $(AUDIO_DIR) $(DIST_DIR)
 	cp $(INDEX) $(DIST_DIR)
 
 $(DIST_DIR):

@@ -11,6 +11,11 @@ define ["Naubino"], (Naubino) ->
     naubino = window.Naubino = new Naubino()
     naubino.setup()
 
+    window.onresize = =>
+      naubino.win_width = document.documentElement.clientWidth
+      naubino.win_height= document.documentElement.clientHeight
+
+
     #populate color selector
     for name, colors of naubino.settings.colors
       $('select#colors').append("<option value=\"#{name}\">#{name}</option>")
