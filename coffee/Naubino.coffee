@@ -23,7 +23,7 @@ define ["Audio","Background", "Game", "Keybindings", "Menu", "Overlay", "Standar
     @add_listeners()
     @scale = 1 # will be changed by fullscreen
 
-    #@audio = new Audio
+    @audio = new Audio
 
   setup: ->
     @init_dom()

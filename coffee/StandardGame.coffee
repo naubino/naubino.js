@@ -11,19 +11,18 @@ define ["Game"], (Game) -> class StandardGame extends Game
   ### state machine ###
   oninit: ->
     super()
-    @inner_clock = 0 # to avoid resetting timer after pause
-    @points = 0
+    console.log "INITTING GAME"
 
     Naubino.background.basket_size = @basket_size
-    @naub_replaced.add (number) => @graph.cycle_test(number)
-    @naub_destroyed.add => @points++
-    @cycle_found.add (list) => @destroy_naubs(list)
+    @naub_replaced.add (number)    => @graph.cycle_test(number)
+    @naub_destroyed.add            => @points++
+    @cycle_found.add (list)        => @destroy_naubs(list)
 
     #Naubino.audio.connect_to_game this
+    @number_of_colors = @default_number_of_colors = 3
+    @basket_size      = @default_basket_size      = 160
 
-
-    @basket_size = @default_basket_size = 160
-    @spammers = @default_spammers = {
+    console.log @spammers = {
       pair:
         method: => @factory.create_naub_pair(null, @max_color(), @max_color() )
         probability: 5
@@ -35,73 +34,41 @@ define ["Game"], (Game) -> class StandardGame extends Game
         probability: 0
     }
 
-    @levels = {game:this}
-    StateMachine.create {
-      target: @levels
-      initial: 'level1'
-      error:(e,f,t,a,ec,em) -> console.warn e,f,t,a,ec,em unless e is 'click'
-      events: [
-        { name: 'reset',  from: '*', to: 'level1'  }
-        { name: 'levelUp',  from: 'level1', to: 'level2'  }
-        { name: 'levelUp',  from: 'level2', to: 'level3'  }
-        { name: 'levelUp',  from: 'level3', to: 'level4'  }
-        { name: 'levelUp',  from: 'level4', to: 'level5'  }
-        { name: 'levelUp',  from: 'level5', to: 'level6'  }
-        { name: 'levelUp',  from: 'level6', to: 'level7'  }
-        { name: 'levelUp',  from: 'level7', to: 'level8'  }
-        { name: 'levelUp',  from: 'level8', to: 'level9'  }
-      ]
-      callbacks:
-        onchangestate:->
-          console.log @current
-          unless @current == "level1"
-            Naubino.overlay.animation.play()
-            Naubino.overlay.fade_in_and_out_message @current,( -> Naubino.overlay.animation.stop()), 35
+    @inner_clock = 0 # to avoid resetting timer after pause
+    @points = 0
+    @naubs_count = 0
+    @load_level 0
 
-        onlevel1: ->
-          @game.spammers = @game.default_spammers
-          @game.basket_size = @game.default_basket_size
+  level_details: [
+    { limit:-1,  number_of_colors: 3, interval: 40, basket_size: @default_basket_size, probabilities:{ pair:1, mixed_pair:0, triple: 0 } }
+    { limit:45,  number_of_colors: 3, interval: 40, basket_size: @default_basket_size, probabilities:{ pair:1, mixed_pair:0, triple: 0 } }
+    { limit:65,  number_of_colors: 4, interval: 35 }
+    { limit:90,  number_of_colors: 5, interval: 30 }
+    { limit:120, interval: 30 }
+  ]
 
-          @game.number_of_colors = 3
-          @game.spammer_interval = 40 # 4 seconds
-          @game.level_up_limit = 20
+  load_level: (level) ->
+    if @level_details.length >= level
+      @load_level 0 if 0 < level < @level
 
-        onlevel2:->
-          @game.number_of_colors = 4
-          @game.spammer_interval = 35
-          @game.level_up_limit = 45
+      @level = level
+      name = "Level #{@level}"
+      Naubino.overlay.fade_in_and_out_message name unless level == 0
+      set = @level_details[@level]
 
-        onlevel3:->
-          @game.number_of_colors = 5
-          @game.spammer_interval = 30
-          @game.level_up_limit = 65
+      @basket_size      = set['basket_size']      ? @basket_size
+      @number_of_colors = set['number_of_colors'] ? @number_of_colors
+      @spammer_interval = set['interval']         ? @spammer_interval
 
-        onlevel4:->
-          @game.number_of_colors = Naubino.colors().length # dont' know whether there are more than 6
-          @game.spammer_interval = 25
-          @game.level_up_limit = 90
+      console.log "limit"            , set['limit']
+      console.log "basket size"      , @basket_size
+      console.log "number of colors" , @number_of_colors
+      console.log "spammerinterval"  , @spammer_interval
 
-        onlevel5:->
-          @game.spammers.triple.probability = 1
-          @game.level_up_limit = 120
+      for name, probability of set['probabilities']
+        console.log name
+        @spammers[name].probability = probability
 
-        onlevel6:->
-          @game.level_up_limit = 140
-
-        onlevel7:->
-          @game.spammer_interval = 20
-          @game.level_up_limit = 165
-
-        onlevel8:->
-          @game.spammers.triple.probability = 2
-          @game.basket_size = 140
-          @game.level_up_limit = 200
-
-        onlevel9:->
-          Naubino.overlay.animation.play()
-          Naubino.overlay.fade_in_and_out_message "you got further than we implemented", Naubino.stop(yes)
-          @game.level_up_limit = 250
-    }
 
 
   max_color: -> Math.floor(Math.random() * (@number_of_colors))
@@ -114,9 +81,9 @@ define ["Game"], (Game) -> class StandardGame extends Game
       
 
   spam: ->
-    probabilites = for name, spam of @spammers
+    probabilities = for name, spam of @spammers
       spam.probability
-    max = probabilites.reduce (f,s) -> f+s
+    max = probabilities.reduce (f,s) -> f+s
     min = 0
     dart = Math.floor(Math.random() * (max - min )) + min
     for spammer in @map_spammers()
@@ -126,14 +93,14 @@ define ["Game"], (Game) -> class StandardGame extends Game
         return
 
 
-
-
-
   onchangestate: (e,f,t)-> #console.info "ruleset recived #{e}: #{f} -> #{t}"
 
-  onbeforeplay: ->
+  onbeforeplay: (e,f,t) ->
+    console.time('st-game')
+
 
   onplaying: ->
+    console.timeEnd('st-game')
     super() #takes care of starting animation and physics
     Naubino.background.animation.play()
     Naubino.background.start_stepper()
@@ -163,7 +130,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
       Naubino.background.animation.stop()
       Naubino.background.stop_stepper()
       @animation.stop()
-      @levels.reset()
+      @level  = 0
       @stop_stepper()
       @clear()
       @clear_objects()
@@ -173,6 +140,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
     return true
 
   check: =>
+    console
     capacity = @capacity()
     critical_capacity = 35
 
@@ -186,17 +154,19 @@ define ["Game"], (Game) -> class StandardGame extends Game
       Naubino.background.ttl = critical_capacity
 
     @lost() if @capacity() < 10
-    @levels.levelUp() if @points > @level_up_limit
+
+    @load_level(@level+1) if @level_details[@level].limit < @points
 
   lost: ->
     Naubino.pause()
-    Naubino.overlay.animation.play()
     Naubino.overlay.warning "Naub Overflow", @basket_size/4
-    console.error "you lost", @levels.current
+    console.error "you lost", @level_details.current
 
 
   event: =>
     @spam() if @inner_clock == 0
     @inner_clock = (@inner_clock + 1) % @spammer_interval
+    @spammer_interval
+
 
 
