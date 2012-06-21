@@ -24,16 +24,14 @@ define ["Layer"], (Layer) -> class Background extends Layer
 
 
   draw_basket: () ->
-
-    centerX = 10 # = @canvas.width/2
-    centerY = @canvas.height/2
+    center = @center()
     @basket_size = Naubino.game.basket_size or 10
 
     @ctx.clearRect(0, 0, @canvas.width, @canvas.height)
 
     @ctx.save()
     @ctx.beginPath()
-    @ctx.arc centerX, centerY, @basket_size+@basket_thickness/2, 0, Math.PI*2, false
+    @ctx.arc center.x, center.y, @basket_size+@basket_thickness/2, 0, Math.PI*2, false
 
     @ctx.lineWidth = @basket_thickness
     @ctx.strokeStyle = @color_to_rgba(@color)
@@ -73,7 +71,8 @@ define ["Layer"], (Layer) -> class Background extends Layer
   drawTextAlongArc: (str, rot = 0) ->
     angle = str.length * 0.1
     @ctx.save()
-    @ctx.translate(@center.x, @center.y)
+    c= @center()
+    @ctx.translate(c.x, c.y)
     @ctx.rotate(-1 * angle / 2)
     @ctx.rotate(-1 * (angle / str.length) / 2 + rot)
     for char in str
@@ -89,7 +88,7 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @ctx.restore()
     
 
-  draw_line: (x0, y0, x1 = @center.x, y1 = @center.y, color = 'black') ->
+  draw_line: (x0, y0, x1 = @center().x, y1 = @center().y, color = 'black') ->
     @ctx.beginPath()
     @ctx.moveTo(x0, y0)
     @ctx.lineTo(x1, y1)

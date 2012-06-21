@@ -4,7 +4,6 @@ define -> class Layer
     @width = @canvas.width
     @height = @canvas.height
     @ctx = @canvas.getContext('2d')
-    @center = new cp.v @width/2, @height/2
     @pointer = new cp.v @width/2, @height/2
     @objects = {}
     @objects_count = 0
@@ -72,8 +71,6 @@ define -> class Layer
 
 
  
-    # add center
-
   add_walls: ->
     ws = 15 #wall_strength
     @walls = {}
@@ -111,7 +108,7 @@ define -> class Layer
       @space.addShape obj.physical_shape if obj.physical_shape?
       @space.addBody obj.physical_body if obj.physical_body?
 
-    obj.center = @center
+    obj.center = @center()
     ++@objects_count
     obj.number = @objects_count
     @objects[@objects_count] = obj
@@ -154,6 +151,22 @@ define -> class Layer
 
 
   #visibility
+  
+  center: ->
+    new cp.v @width/2, @height/2
+
+  resize_by: (ratio) ->
+    @canvas.width *= ratio
+    @canvas.height*= ratio
+    @ctx.scale ratio, ratio
+    @draw()
+
+  reset_resize: ->
+    @ctx.setTransform 1,0,0,1,0,0
+    @canvas.width  = Naubino.settings.canvas.width
+    @canvas.height = Naubino.settings.canvas.height
+    @draw()
+
 
   fade_in: (callback = null) ->
     console.log "fade in", @fadeloop

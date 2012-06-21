@@ -91,7 +91,7 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     @animation.play() if @animation.can 'play'
 
     {color, fontsize, font, text,pos} = text unless typeof text == "string"
-    pos       ?= @center.Copy()
+    pos       ?= @center()
     color     ?= @default_color
     fontsize ?= @default_fontsize
     fontsize  = @default_fontsize unless typeof fontsize == "number"

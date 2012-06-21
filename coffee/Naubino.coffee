@@ -67,34 +67,35 @@ define ["Audio","Background", "Game", "Keybindings", "Menu", "Overlay", "Standar
     @menu          = new Menu(@menu_canvas)
     @overlay       = new Overlay(@overlay_canvas)
 
+    @layers = [ @background, @game, @menu, @overlay ]
+    
     @menu.init()
     @menu.animation.play()
     @game.init()
 
   # this is for fullscreen
-  demaximise: -> @maximise ""
+  demaximise: ->
+    for layer in  @layers
+      layer.reset_resize()
+    @scale = 1
 
-  maximise: (width = "100%")->
-    for name in 'background game menu overlay'.split ' '
-      document.querySelector("canvas##{name}_canvas").style.width = width
-    console.log @scale = $("canvas#game_canvas").width()/@settings.canvas.width
-
-  smaximise: ->
-    win_width = document.documentElement.clientWidth
-    win_height= document.documentElement.clientHeight
+  maximise: ->
+    win_width = screen.width
+    win_height= screen.height
     game_width = $("canvas#game_canvas").width()
     oscale = 1
 
     @scale = @settings.canvas.scale = win_width / game_width
     document.querySelector("#gamediv").style.width = ""
     console.log ratio = @settings.canvas.scale/oscale
-    for canvas in  @canvases
-      # doesnt work
-      #canvas.width = @settings.canvas.width * ratio
-      #canvas.height = @settings.canvas.height * ratio
-      canvas.width *= ratio
-      canvas.height*= ratio
-      canvas.getContext('2d').scale ratio, ratio
+    for layer in  @layers
+      layer.resize_by ratio
+      
+  stretch: (width = "100%")->
+    for name in 'background game menu overlay'.split ' '
+      document.querySelector("canvas##{name}_canvas").style.width = width
+    console.log @scale = $("canvas#game_canvas").width()/@settings.canvas.width
+
 
 
 

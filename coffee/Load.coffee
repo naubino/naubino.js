@@ -36,6 +36,7 @@ define ["Naubino"], (Naubino) ->
 
       naubino.menu.for_each (naub) -> naub.recolor()
       naubino.game.for_each (naub) -> naub.recolor()
+      naubino.game.draw()
 
 
 
@@ -66,7 +67,7 @@ define ["Naubino"], (Naubino) ->
 
 
     @changeFullscreen = (fullScreen) ->
-      if fullScreen
+      if fullScreen or (document.fullscreen) or (document.mozFullScreen) or (document.webkitIsFullScreen)
         window.Naubino.maximise()
       else
         window.Naubino.demaximise()

@@ -61,7 +61,7 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     super obj
     obj.physical_body.naub_number = @objects_count if obj.physical_body?
     obj.physical_shape.naub_number = @objects_count if obj.physical_shape?
-    obj.attracted_to @center
+    obj.attracted_to @center()
   
 
 
@@ -106,7 +106,7 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     count = []
     if @basket_size?
       for id, naub of @objects
-        diff = new cp.v @center.x, @center.y
+        diff = @center()
         diff.sub naub.physical_body.p
         if cp.v.len(diff) < @basket_size - naub.size/2
           count.push naub

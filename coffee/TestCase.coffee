@@ -11,7 +11,7 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberS
     @cycle_found.add (list) => @destroy_naubs(list)
     Naubino.play()
 
-    Naubino.game.add_walls()
+    #Naubino.game.add_walls()
 
   onplaying: (e,f,t)->
     super()
