@@ -205,10 +205,13 @@ define -> class Naub
           @layer.space.removeConstraint con
 
   # animated remove with disabling  
-  destroy: ->
-    for id, partner of @joins
-      @drawing_join[id] = true
-      partner.drawing_join[id] = false
+  destroy: (is_last = false) ->
+
+    unless is_last
+      for id, partner of @joins
+        @drawing_join[id] = true
+        partner.drawing_join[id] = false
+
     @destroying = true
     @shapes[0].destroy_animation(@remove) # when this one is done the naub is removed
     for shape in @shapes[1..]
