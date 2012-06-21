@@ -21,7 +21,7 @@ define -> Settings = {
     max_join_len:  2 # times size
 
   physics:
-    fps:            40
+    fps:            50
     center_join:
       restLength:   40
       stiffness:    2.6
