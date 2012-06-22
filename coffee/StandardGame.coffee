@@ -8,6 +8,19 @@ define ["Game"], (Game) -> class StandardGame extends Game
   constructor: (canvas) ->
     super(canvas)
 
+  calculate_points: (list) ->
+    @ex_naubs += list.length
+    max_grow = 3 # may be moved to settings some day
+    factor = (max_grow-1) / @max_naubs
+    p = list.length + Math.floor(factor * list.length * list.length)
+    msg = "Chain: "+list.length+" Points: "+p
+    @points += p
+    if (@cur_capacity() == 0)
+      msg += "\nBonus!"
+      @points += 10
+
+    Naubino.overlay.fade_in_and_out_message (msg)
+
   ### state machine ###
   oninit: ->
     super()
@@ -15,12 +28,13 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
     Naubino.background.basket_size = @basket_size
     @naub_replaced.add (number)    => @graph.cycle_test(number)
-    @naub_destroyed.add            => @points++
+    #@naub_destroyed.add            => @points++
     @cycle_found.add (list)        => @destroy_naubs(list)
-
+    @cycle_found.add (list)        => @calculate_points(list)
+    
     #Naubino.audio.connect_to_game this
     @number_of_colors = @default_number_of_colors = 3
-    @basket_size      = @default_basket_size      = 160
+    #@basket_size      = @default_basket_size      = 160
 
     console.log @spammers = {
       pair:
@@ -36,15 +50,17 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
     @inner_clock = 0 # to avoid resetting timer after pause
     @points = 0
+    @ex_naubs = 0
     @naubs_count = 0
     @load_level 0
 
   level_details: [
-    { limit:-1,  number_of_colors: 3, interval: 40, basket_size: @default_basket_size, probabilities:{ pair:1, mixed_pair:0, triple: 0 } }
-    { limit:45,  number_of_colors: 3, interval: 40, basket_size: @default_basket_size, probabilities:{ pair:1, mixed_pair:0, triple: 0 } }
-    { limit:65,  number_of_colors: 4, interval: 35 }
-    { limit:90,  number_of_colors: 5, interval: 30 }
-    { limit:120, interval: 30 }
+    { limit:-1,  number_of_colors: 3, interval: 40, max_naubs: 20, probabilities:{ pair:1, mixed_pair:0, triple: 0 } }
+    { limit:30,  number_of_colors: 3, interval: 37, max_naubs: 20 }
+    { limit:60,  number_of_colors: 4, interval: 33, max_naubs: 40 }
+    { limit:90,  number_of_colors: 4, interval: 30, max_naubs: 30 }
+    { limit:120, number_of_colors: 5, interval: 27, max_naubs: 35 }
+    { limit:150, number_of_colors: 5, interval: 23, max_naubs: 40 }
   ]
 
   load_level: (level) ->
@@ -56,20 +72,19 @@ define ["Game"], (Game) -> class StandardGame extends Game
       Naubino.overlay.fade_in_and_out_message name unless level == 0
       set = @level_details[@level]
 
-      @basket_size      = set['basket_size']      ? @basket_size
+      #@basket_size      = set['basket_size']      ? @basket_size
+      @max_naubs      = set['max_naubs']      ? @max_naubs
       @number_of_colors = set['number_of_colors'] ? @number_of_colors
       @spammer_interval = set['interval']         ? @spammer_interval
 
       console.log "limit"            , set['limit']
-      console.log "basket size"      , @basket_size
+      #console.log "basket size"      , @basket_size
       console.log "number of colors" , @number_of_colors
       console.log "spammerinterval"  , @spammer_interval
 
       for name, probability of set['probabilities']
         console.log name
         @spammers[name].probability = probability
-
-
 
   max_color: -> Math.floor(Math.random() * (@number_of_colors))
 
@@ -135,6 +150,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
       @clear()
       @clear_objects()
       @points = 0
+      @ex_naubs = 0
     else
       console.info "game initialized"
     return true
@@ -155,11 +171,11 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
     @lost() if @capacity() < 10
 
-    @load_level(@level+1) if @level_details[@level].limit < @points
+    @load_level(@level+1) if @level_details[@level].limit < @ex_naubs
 
   lost: ->
     Naubino.pause()
-    Naubino.overlay.warning "Naub Overflow", @basket_size/4
+    #Naubino.overlay.warning "Naub Overflow", @basket_size/4
     console.error "you lost", @level_details.current
 
 

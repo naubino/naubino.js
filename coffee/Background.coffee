@@ -25,7 +25,7 @@ define ["Layer"], (Layer) -> class Background extends Layer
 
   draw_basket: () ->
     center = @center()
-    @basket_size = Naubino.game.basket_size or 10
+    @basket_size = Naubino.game.basket_size() # or 10
 
     @ctx.clearRect(0, 0, @canvas.width, @canvas.height)
 
