@@ -16,6 +16,3 @@
 [submodule "lib/audio-fx"]
 	path = lib/audio-fx
 	url = https://github.com/jakesgordon/javascript-audio-fx
-[submodule "dist"]
-	path = dist
-	url = git@github.com:naubino/naubino.github.com
