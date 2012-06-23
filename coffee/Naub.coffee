@@ -6,29 +6,65 @@
 # @param size [int] size, what else
 define -> class Naub
   constructor: (@layer, @color_id = null, @size = Naubino.settings.naub.size) ->
-    #@physics = new PhysicsModel this
+    @shapes       = [] # shapes this naub draws in order from bottom to top
+    @joins        = {} # {id: opposing naub}
+    @drawing_join = {} # {id: true/false if this naub draws the join}
    
-    @ctx            = @layer.ctx
-    @frame          = @size*1.5 # defines buffer canvas
+    @ctx         = @layer.ctx
+    @frame       = @size*1.5 # defines buffer canvas
 
-    @radius     = @size/2
-    @width      = @size * 0.9
-    @height     = @size * 0.9
+    @radius      = @size/2
+    @width       = @size * 0.9
+    @height      = @size * 0.9
 
-    @color_id       = @random_palette_color() unless @color_id?  # unless a color_id has been give pick a randome color
+    @removed     = false # soon to be deleted by game, garbage collector
+    @focused     = false # currently activated by pointer
+    @disabled    = false # cannot join with another
+    @isClickable = yes # influences @layer.isHit()
+
     @life_rendering = false # if true redraw on each frame
+    @color_id       = @random_palette_color() unless @color_id?  # unless a color_id has been give pick a randome color
+    @setup_style()
 
-    @removed        = false # soon to be deleted by game, garbage collector
-    @focused        = false # currently activated by pointer
-    @disabled       = false # cannot join with another
-    @isClickable    = yes # influences @layer.isHit()
 
-    @shapes         = [] # shapes this naub draws in order from bottom to top
-    @joins          = {} # {id: opposing naub}
-    @drawing_join   = {} # {id: true/false if this naub draws the join}
-    @join_style     = { fill: [0,0,0,1], width: 6 }
 
-    #@update() #renders it for the first time
+  # sets opacity
+  # @param alpha (int) value between 0 and 1
+  set_opacity: (value) -> @style.fill[3] = value
+
+  # sets up the style - used by all shapes
+  setup_style: ->
+    @style = {
+      fill: [0,0,0,1]
+      scale: 1
+      border_width: 0
+      text_color: "white"
+    }
+    @join_style = {
+      fill: [0,0,0,1]
+      width: 6
+    }
+
+    palette = Naubino.colors()
+    pick = palette[@color_id]
+    if pick?
+      @style.fill = [ pick[0], pick[1], pick[2], pick[3] ]
+    else
+      @style.fill = [0,0,0, 0.5]
+      console.warn @color_id, "not found"
+
+  # colors the shape randomly and returns color id for comparison
+  random_color: ->
+    r = Math.random()
+    g = Math.random()
+    b = Math.random()
+    @style.fill = [r,g,b,1]
+    return -1
+
+  # colors the shape randomly and returns color id for comparison
+  random_palette_color: ->
+    palette = Naubino.colors()
+    id = Math.round(Math.random() * (palette.length-1))
 
   setup_physics: ->
     # this is redundant - just in case the the shapes don't do this
@@ -47,16 +83,6 @@ define -> class Naub
     @physical_shape.setFriction @friction
     @physical_shape.setFriction @friction
 
-    #@watch_for_walls()
-
-  watch_for_walls: ->
-    @physical_shape.group = 1
-    @check_group = setInterval (=>
-      if @layer.point_in_field @physical_body.p
-        clearInterval @check_group
-        setTimeout (=> @physical_shape.group = 0),1000
-
-    ), 10
 
   isHit: (pos) ->
     s = @shapes[0]
@@ -96,7 +122,7 @@ define -> class Naub
   # Executes the render method of all shapes
   render: (ctx,x,y) ->
     for shape in @shapes
-      shape.render(ctx,x,y)
+      shape.draw(ctx,x,y)
 
 
   # adds a shape and runs its setup
@@ -110,32 +136,27 @@ define -> class Naub
     for shape in shapes
       @add_shape shape
 
-  update_shapes: ->
-    for shape in @shapes
-      shape.setup this
-
   add_filter: (string) ->
-    @filters = [] unless @filters?
+    @style.filters = [] unless @style.filters?
 
-    if string not in @filters
-      @filters.push string
+    if string not in @style.filters
+      @style.filters.push string
 
   remove_filter: (string) ->
-    if @filters?
-      i = @filters.indexOf string
-      @filters.splice(i,1) if i  >= 0
+    if @style.filters?
+      i = @style.filters.indexOf string
+      @style.filters.splice(i,1) if i  >= 0
       return
 
 
   # change fill to gray
   grey_out: ->
-    for shape in @shapes
-      shape.style.fill = [100,100,100,1]
+    @style.fill = [100,100,100,1]
     @update()
 
   # sets color from @color_id
   recolor: ->
-    @update_shapes()
+    @setup_style()
     @update()
 
 
@@ -166,7 +187,8 @@ define -> class Naub
     #@join_style.fill[3] = stretch
     stretched_width = @join_style.width * stretch
     ctx.save()
-    ctx.strokeStyle = @color_to_rgba @join_style.fill
+    ctx.globalCompositeOperation = "destination-over"
+    ctx.strokeStyle = Util.color_to_rgba @join_style.fill
     ctx.beginPath()
     ctx.moveTo pos.x, pos.y
     ctx.lineTo pos2.x, pos2.y
@@ -177,16 +199,11 @@ define -> class Naub
     ctx.restore()
 
   # makes a naub clickable and joinable again
-  disable: ->
-    @disabled = true
-    @update()
+  disable: -> @disabled = true
 
 
   # makes a naub unclickable and joinable
-  enable: ->
-    @disabled = false
-    @update()
-
+  enable: -> @disabled = false
 
   # removes the reference to this naub from all its partners
   remove: =>
@@ -206,17 +223,52 @@ define -> class Naub
 
   # animated remove with disabling  
   destroy: (is_last = false) ->
-
+    duration = 270
     unless is_last
       for id, partner of @joins
         @drawing_join[id] = true
         partner.drawing_join[id] = false
 
-    @destroying = true
-    @shapes[0].destroy_animation(@remove) # when this one is done the naub is removed
+    @disable()
+
+    #@shapes[0].destroy_animation(duration) # when this one is done the naub is removed
+    setTimeout (=> @remove()), duration
+
+    @animation(@shrink,duration)
+
     for shape in @shapes[1..]
       shape.destroy_animation() # these are just for fun
+
     @layer.naub_destroyed.dispatch(@number)
+
+
+
+  animation_pulse: ->
+    @life_rendering = on
+    @animation @pulse
+
+  pulse: (dt) =>
+    @style.scale = 1 +  Math.sin(3* Math.PI * dt)*0.2
+
+  shrink: (dt) =>
+    @style.scale = 1.1-dt
+    @style.fill[3]= 1.1-dt
+    @join_style.width *= 0.3
+    @join_style.fill[3]= 1.1-dt
+
+  animation: (animation, duration = 1000) ->
+    interval = 50
+    duration = duration/interval
+    if typeof animation == 'function'
+      animation_dt = 0
+      i = setInterval (
+        =>
+          if animation_dt < duration
+            animation(++animation_dt/duration)
+          else
+            clearInterval i
+
+      ), interval
 
 
 
@@ -377,17 +429,3 @@ define -> class Naub
     @onclick()
     @layer.naub_unfocused.dispatch(@)
 
-
-
-  # utils
-  color_to_rgba: (color, shift = 0) =>
-    r = Math.round((color[0] + shift))
-    g = Math.round((color[1] + shift))
-    b = Math.round((color[2] + shift))
-    a = color[3]
-    "rgba(#{r},#{g},#{b},#{a})"
-
-  # colors the shape randomly and returns color id for comparison
-  random_palette_color: ->
-    palette = Naubino.colors()
-    id = Math.round(Math.random() * (palette.length-1))

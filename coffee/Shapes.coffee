@@ -1,24 +1,13 @@
 define -> Shapes = {
 Shape: class Shape
   constructor: ->
-    @style = { fill: [0,0,0,1] }
 
   setup: (@naub) ->
-    @pos    = @naub.pos
-    @ctx    = @naub.ctx
-    @radius = @naub.radius - Naubino.settings.naub.margin/2
-    @width  = @naub.width - Naubino.settings.naub.margin
-    @height = @naub.height - Naubino.settings.naub.margin
-
-    @set_color_from_id @naub.color_id
-
-  # turns the internal color init a string that applies to canvas
-  color_to_rgba: (color = @style.fill, shift = 0) =>
-    r = Math.round((color[0] + shift))
-    g = Math.round((color[1] + shift))
-    b = Math.round((color[2] + shift))
-    a = color[3]
-    "rgba(#{r},#{g},#{b},#{a})"
+    @pos      = @naub.pos
+    @ctx      = @naub.ctx
+    @radius   = @naub.radius - Naubino.settings.naub.margin/2
+    @width    = @naub.width - Naubino.settings.naub.margin
+    @height   = @naub.height - Naubino.settings.naub.margin
 
   apply_filters: (filters, ctx )->
     for filter in filters
@@ -30,15 +19,27 @@ Shape: class Shape
   alpha: (ctx) ->
     ctx.globalAlpha = 0.4
 
+  # !IMPORTANT: needs to recieve ctx, x and y directly because those could also point into a buffer
+  draw: (ctx, x = 42, y = x) ->
+    ctx.save()
+    ctx.translate x, y
+    ctx.scale @naub.style.scale, @naub.style.scale if @naub.style.scale?
+    @render ctx, x, y
+
+    @apply_filters @naub.style.filters, ctx if @naub.style.filters?
+    @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
+
+    ctx.restore()
+     
   draw_border: (ctx) ->
     ctx.lineWidth = 2
-    ctx.strokeStyle = @color_to_rgba @naub.join_style.fill
+    ctx.strokeStyle = Util.color_to_rgba @naub.join_style.fill
     ctx.stroke()
 
   draw_gradient: (ctx) ->
     gradient = ctx.createRadialGradient(0, 0, @radius/3, 0, 0, @radius)
-    gradient.addColorStop 0, @color_to_rgba(@style.fill, 60)
-    gradient.addColorStop 1, @color_to_rgba(@style.fill, 30)
+    gradient.addColorStop 0, Util.color_to_rgba(@naub.style.fill, 60)
+    gradient.addColorStop 1, Util.color_to_rgba(@naub.style.fill, 30)
     ctx.fillStyle = gradient
     ctx.fill()
 
@@ -49,45 +50,10 @@ Shape: class Shape
     ctx.shadowOffsetY = 1
     ctx.fill()
 
-  # sets opacity
-  # @param alpha (int) value between 0 and 1
-  set_opacity: (value) ->
-    @style.fill[3] = value
-
-
-  # change color
-  set_color_from_id:(id)->
-    palette = Naubino.colors()
-    pick = palette[id]
-    if pick?
-      @style.fill = [pick[0],pick[1],pick[2], pick[3]]
-    else
-      @style.fill = [255,0,0, 0.5]
-      console.warn id, "not found"
-    id
-
-  # colors the shape randomly and returns color id for comparison
-  random_color: ->
-    r = Math.random()
-    g = Math.random()
-    b = Math.random()
-    @style.fill = [r,g,b,1]
-    return -1
-
   # animates the destruction of a naub
   # @params callback [function] function that will be called after the animation has ended
-  destroy_animation: (callback = null) ->
+  destroy_animation: (duration) ->
     @naub.life_rendering = on
-    shrink = =>
-      @naub.size *= 0.8
-      @naub.join_style.width *= 0.6
-      @naub.join_style.fill[3] *= 0.6
-      @style.fill[3] *= 0.6
-      if callback? and @naub.size <= 0.1
-        clearInterval @loop
-        callback.call()
-
-    @loop = setInterval shrink, 50
 
 
 Ball: class Ball extends Shape
@@ -96,22 +62,13 @@ Ball: class Ball extends Shape
     Math.PI * (@naub.size/2)*(@naub.size/2)
 
   # actual painting routines
-  # !IMPORTANT: needs to recieve ctx, x and y directly because those could also point into a buffer
   render: (ctx, x = 42, y = x) ->
-    ctx.save()
-    ctx.translate x, y
-     
     ctx.beginPath()
     ctx.arc(0, 0, @radius, 0, Math.PI * 2, false)
-    ctx.fillStyle = @color_to_rgba(@style.fill)
+    ctx.fillStyle = Util.color_to_rgba(@naub.style.fill)
     ctx.fill()
 
-    @apply_filters @naub.filters, ctx if @naub.filters?
-    @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
-
-
     ctx.closePath()
-    ctx.restore()
 
   isHit: (ctx, pos) ->
     d = @naub.pos.Copy()
@@ -136,20 +93,13 @@ Box: class Box extends Shape
 
   # actual painting routines
   render: (ctx,x,y) ->
-    ctx.save()
-    ctx.translate( x, y)
     ctx.rotate @naub.physical_body.a if @naub.physical_body?
      
     ctx.beginPath()
     ctx.rect(-@naub.width/2,-@naub.height/2,@naub.width,@naub.height)
-    ctx.fillStyle = @color_to_rgba(@style.fill)
+    ctx.fillStyle = Util.color_to_rgba(@naub.style.fill)
     ctx.fill()
-
-    @apply_filters @naub.filters, ctx if @naub.filters?
-    @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
-
     ctx.closePath()
-    ctx.restore()
 
   adjust_physics: ->
     @naub.momentum = cp.momentForBox( Naubino.settings.naub.mass, @naub.width, @naub.height )
@@ -176,7 +126,6 @@ Clock: class Clock extends Shape
   # actual painting routines
   # !IMPORTANT: needs to recieve ctx, x and y directly because those could also point into a buffer
   render: (ctx, x = 42, y = x) ->
-    ctx.save()
     size= @naub.size - 5
 
     end = @naub.clock_progress * Math.PI/100
@@ -187,7 +136,7 @@ Clock: class Clock extends Shape
     ctx.arc(0, 0, size, @start, end, false)
     #ctx.closePath()
 
-    ctx.fillStyle = @color_to_rgba ([255,255,255,0.5])
+    ctx.fillStyle = Util.color_to_rgba ([255,255,255,0.5])
     #ctx.fill()
 
     ctx.strokeStyle = ctx.fillStyle
@@ -196,7 +145,6 @@ Clock: class Clock extends Shape
 
     ctx.closePath()
 
-    ctx.restore()
 
 
 Frame: class Frame extends Shape
@@ -216,7 +164,6 @@ Frame: class Frame extends Shape
     x = x-@frame/2
     y = y-@frame/2
 
-    ctx.save()
     ctx.beginPath()
     ctx.moveTo x, y
     ctx.lineTo x, @frame+y
@@ -225,28 +172,25 @@ Frame: class Frame extends Shape
     ctx.lineTo x, y
     ctx.stroke()
     ctx.closePath()
-    ctx.restore()
 
 
 FrameCircle: class FrameCircle extends Frame
   render: (ctx, x = 42, y = x) ->
-    ctx.save()
     ctx.beginPath()
     r = @naub.physics.margin * @naub.size
     ctx.arc(x, y, r, 0, Math.PI * 2, false)
     ctx.closePath()
     ctx.strokeStyle  = "black"
-    fill = @style.fill
+    fill = @naub.style.fill
     fill[3] = 0.3
-    ctx.fillStyle  = @color_to_rgba(fill)
+    ctx.fillStyle  = Util.color_to_rgba(fill)
     ctx.stroke()
     ctx.fill()
     ctx.closePath()
-    ctx.restore()
 
 
 PlayButton: class PlayButton extends Shape
-  render: (ctx, x,y) ->
+  draw: (ctx, x,y) ->
     ctx.save()
     ctx.beginPath()
     ctx.fillStyle = "#ffffff"
@@ -260,7 +204,7 @@ PlayButton: class PlayButton extends Shape
 
 
 PauseButton: class PauseButton extends Shape
-  render: (ctx, x,y) ->
+  draw: (ctx, x,y) ->
     ctx.save()
     ctx.fillStyle = "#ffffff"
     ctx.beginPath()
@@ -274,7 +218,7 @@ PauseButton: class PauseButton extends Shape
 
 
 MainButton: class MainButton extends Box
-  render: (ctx, x, y) ->
+  draw: (ctx, x, y) ->
     text = Naubino.game.points ? ""
     @width = @naub.size*1.4
     ctx.save()
@@ -286,8 +230,7 @@ MainButton: class MainButton extends Box
     @apply_filters @naub.filters, ctx if @naub.filters?
     @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
 
-
-    ctx.fillStyle = @color_to_rgba @style.fill
+    ctx.fillStyle = Util.color_to_rgba @naub.style.fill
     ctx.fill()
     ctx.closePath()
     ctx.restore()
@@ -308,7 +251,7 @@ StringShape: class StringShape extends Shape
   setup: (@naub) ->
     super(@naub)
 
-  render: (ctx, x,y) ->
+  draw: (ctx, x,y) ->
     size = @naub.size * .6
     if typeof @string == "function"
       string = @string()
@@ -317,6 +260,7 @@ StringShape: class StringShape extends Shape
 
     ctx.save()
     ctx.translate x,y
+    ctx.scale @naub.style.scale, @naub.style.scale if @naub.style.scale?
     ctx.rotate @naub.physical_body.a if @naub.physical_body?
     ctx.fillStyle = @color
     ctx.textAlign = 'center'

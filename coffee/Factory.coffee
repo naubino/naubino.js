@@ -50,6 +50,7 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
 
     naub.physical_body.setPos( pos.Copy() ) # remember to set position
     naub.kind = 'box'
+    naub.life_rendering = on
 
     @layer.add_object naub
     #naub.add_shape new NumberShape

@@ -34,7 +34,7 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @ctx.arc center.x, center.y, @basket_size+@basket_thickness/2, 0, Math.PI*2, false
 
     @ctx.lineWidth = @basket_thickness
-    @ctx.strokeStyle = @color_to_rgba(@color)
+    @ctx.strokeStyle = Util.color_to_rgba(@color)
     @ctx.stroke()
     @ctx.closePath()
     @ctx.restore()
@@ -80,7 +80,7 @@ define ["Layer"], (Layer) -> class Background extends Layer
       #@ctx.rotate(str.length * 0.01)
       @ctx.save()
       @ctx.translate(0, (-1 *@basket_size + 15) )
-      @ctx.fillStyle = @color_to_rgba(@color)
+      @ctx.fillStyle = Util.color_to_rgba(@color)
       @ctx.textAlign = 'center'
       @ctx.font= "#{20}px Helvetica"
       @ctx.fillText(char, 0, 0)

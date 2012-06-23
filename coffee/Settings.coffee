@@ -2,7 +2,7 @@
 define -> Settings = {
 
   graphics:
-    fps:           40 # mind physics.fps
+    fps:           35 # mind physics.fps
     updating:      off
     draw_shadows:  off
     draw_borders:  off
@@ -21,7 +21,7 @@ define -> Settings = {
     max_join_len:  2 # times size
 
   physics:
-    fps:            50
+    fps:            40
     center_join:
       restLength:   20
       stiffness:    10

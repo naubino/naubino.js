@@ -11,7 +11,6 @@ define ["Game"], (Game) -> class StandardGame extends Game
   ### state machine ###
   oninit: ->
     super()
-    console.log "INITTING GAME"
 
     Naubino.background.basket_size = @basket_size
     @naub_replaced.add (number)    => @graph.cycle_test(number)
@@ -22,7 +21,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
     @number_of_colors = @default_number_of_colors = 3
     @basket_size      = @default_basket_size      = 160
 
-    console.log @spammers = {
+    @spammers = {
       pair:
         method: => @factory.create_naub_pair(null, @max_color(), @max_color() )
         probability: 5
@@ -60,10 +59,10 @@ define ["Game"], (Game) -> class StandardGame extends Game
       @number_of_colors = set['number_of_colors'] ? @number_of_colors
       @spammer_interval = set['interval']         ? @spammer_interval
 
-      console.log "limit"            , set['limit']
-      console.log "basket size"      , @basket_size
-      console.log "number of colors" , @number_of_colors
-      console.log "spammerinterval"  , @spammer_interval
+      set['limit']
+      @basket_size
+      @number_of_colors
+      @spammer_interval
 
       for name, probability of set['probabilities']
         console.log name
