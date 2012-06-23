@@ -115,6 +115,22 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
   point_in_field: (pos) ->
     0 < pos.x < @width and 0 < pos.y < @height
 
+  #calculates the size of the basket
+  basket_size: ->
+    if @max_naubs?
+      n_r = Naubino.settings.naub.size / 2
+      special_factor = .62 # discovered with scientific methods, don't ask
+      b_r = Math.sqrt(@max_naubs * n_r * n_r / special_factor)
+
+  # number of naubs currently in the basket
+  cur_naubs: ->
+    @count_basket().length
+
+  # current space in basket in %
+  # mainly here for compatibility reasons
+  capacity: ->
+    100 - @cur_naubs() * 100 / @max_naubs
+
 #   #shows how much room other.s available in the basket
 #   capacity: ->
 #     r = @basket_size
@@ -124,24 +140,6 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
 #       filling += naub.area()
 #     100-Math.ceil(filling*100 / size)
 
-  #calculates the size of the basket according to this strange formula:
-#                 b_r * b_r * Math.PI
-#  max_naubs =   ---------------------- * 0.68
-#                 n_r * n_r * Math.PI
-  basket_size: ->
-    if @max_naubs?
-      n_r = Naubino.settings.naub.size / 2
-      b_r = Math.sqrt(@max_naubs * n_r * n_r / 0.68)
-  
-  # number of naubs currently in the basket
-  cur_capacity: ->
-    @count_basket().length
-
-  # current space in basket in %
-  # mainly here for compatibility reasons
-  capacity: ->
-    100 - @cur_capacity * 100 / @max_capacity
-    
   # destroys every naub in a list of IDs by calling its own destroy function
   destroy_naubs: (list)->
     for naub in list

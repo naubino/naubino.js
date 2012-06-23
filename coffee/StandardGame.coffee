@@ -12,14 +12,10 @@ define ["Game"], (Game) -> class StandardGame extends Game
     @ex_naubs += list.length
     max_grow = 3 # may be moved to settings some day
     factor = (max_grow-1) / @max_naubs
-    p = list.length + Math.floor(factor * list.length * list.length)
-    msg = "Chain: "+list.length+" Points: "+p
+    p = Math.floor(factor * list.length * list.length)
     @points += p
-    if (@cur_capacity() == 0)
-      msg += "\nBonus!"
-      @points += 10
-
-    Naubino.overlay.fade_in_and_out_message (msg)
+    if p > 0
+      Naubino.overlay.fade_in_and_out_message ("\n\nChain Bonus "+p)
 
   ### state machine ###
   oninit: ->
@@ -28,7 +24,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
     Naubino.background.basket_size = @basket_size
     @naub_replaced.add (number)    => @graph.cycle_test(number)
-    #@naub_destroyed.add            => @points++
+    @naub_destroyed.add (id)       => @points += @get_object(id).points_on_destroy()
     @cycle_found.add (list)        => @destroy_naubs(list)
     @cycle_found.add (list)        => @calculate_points(list)
     
@@ -56,11 +52,16 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
   level_details: [
     { limit:-1,  number_of_colors: 3, interval: 40, max_naubs: 20, probabilities:{ pair:1, mixed_pair:0, triple: 0 } }
-    { limit:30,  number_of_colors: 3, interval: 37, max_naubs: 20 }
-    { limit:60,  number_of_colors: 4, interval: 33, max_naubs: 40 }
-    { limit:90,  number_of_colors: 4, interval: 30, max_naubs: 30 }
-    { limit:120, number_of_colors: 5, interval: 27, max_naubs: 35 }
-    { limit:150, number_of_colors: 5, interval: 23, max_naubs: 40 }
+    { limit:30,  number_of_colors: 3, interval: 40, max_naubs: 20 } #1
+    { limit:60,  number_of_colors: 3, interval: 37, max_naubs: 25, probabilities:{ pair:.9, mixed_pair: 0, triple: .1 } } #2
+    { limit:90,  number_of_colors: 4, interval: 33, max_naubs: 30 } #3
+    { limit:120, number_of_colors: 4, interval: 30, max_naubs: 35, probabilities:{ pair:.8, mixed_pair: 0, triple: .2 } } #4
+    { limit:150, number_of_colors: 5, interval: 27, max_naubs: 40 } #5
+    { limit:180, number_of_colors: 5, interval: 23, max_naubs: 43, probabilities:{ pair:.6, mixed_pair: 0, triple: .4 } } #6
+    { limit:210, number_of_colors: 5, interval: 20, max_naubs: 45 } #7
+    { limit:240, number_of_colors: 5, interval: 18, max_naubs: 47, probabilities:{ pair:.4, mixed_pair: 0, triple: .6 } } #8
+    { limit:270, number_of_colors: 5, interval: 16, max_naubs: 49 } #9
+    { limit:30000, number_of_colors: 5, interval: 15, max_naubs: 50, probabilities:{ pair:.2, mixed_pair: 0, triple: .8 } } #10
   ]
 
   load_level: (level) ->

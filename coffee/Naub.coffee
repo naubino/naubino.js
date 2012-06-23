@@ -29,7 +29,7 @@ define -> class Naub
     @join_style     = { fill: [0,0,0,1], width: 6 }
 
     #@update() #renders it for the first time
-
+  
   setup_physics: ->
     # this is redundant - just in case the the shapes don't do this
     @constraints = {}
@@ -204,6 +204,12 @@ define -> class Naub
         for con in @constraints[id]
           @layer.space.removeConstraint con
 
+
+  # the amount of points the user is awarded if this naub is included in a cycle
+  # 1 for "normal" naub
+  # >1 for "bonus" naubs
+  points_on_destroy: -> 1
+    
   # animated remove with disabling  
   destroy: (is_last = false) ->
 
