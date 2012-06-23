@@ -2,7 +2,7 @@
 define -> Settings = {
 
   graphics:
-    fps:           30 # mind physics.fps
+    fps:           40 # mind physics.fps
     updating:      off
     draw_shadows:  off
     draw_borders:  off
@@ -23,9 +23,9 @@ define -> Settings = {
   physics:
     fps:            50
     center_join:
-      restLength:   40
-      stiffness:    2.6
-      damping:      4
+      restLength:   20
+      stiffness:    10
+      damping:      0.1
     calming_const:  0.5
     join_length:    3.0 # margin between joined naubs (n* avg size)
     spring_force:   0.6
