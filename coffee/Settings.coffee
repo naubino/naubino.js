@@ -23,9 +23,9 @@ define -> Settings = {
   physics:
     fps:            40
     center_join:
-      restLength:   20
-      stiffness:    10
-      damping:      0.1
+      restLength:   30
+      stiffness:    7
+      damping:      7
     calming_const:  0.5
     join_length:    3.0 # margin between joined naubs (n* avg size)
     spring_force:   0.6
