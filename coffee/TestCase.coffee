@@ -1,4 +1,4 @@
-define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberShape, Ball, FrameCircle}, StandardGame) -> class TestCase extends StandardGame
+define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberShape, Ball, FrameCircle}, StandardGame) -> class TestCase extends Game 
   #  constructor: ->
   #    super()
   oninit: ->

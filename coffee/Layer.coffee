@@ -248,12 +248,3 @@ define -> class Layer
       for id, obj of @objects
         if obj.isHit(pos.x, pos.y) and obj.isClickable
           return obj
-
-
-  ### utils ###
-  color_to_rgba: (color, shift = 0) =>
-    r = Math.round((color[0] + shift))
-    g = Math.round((color[1] + shift))
-    b = Math.round((color[2] + shift))
-    a = color[3]
-    "rgba(#{r},#{g},#{b},#{a})"

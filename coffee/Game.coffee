@@ -190,14 +190,13 @@ define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, G
     @clear()
     # draws joins and naubs seperately
     @ctx.save()
-    for id, obj of @objects
-      obj.draw_joins @ctx
 
     #@draw_constraints()
     #@draw_point @pointer
     #@draw_point @mouseBody.p, "blue"
 
     for id, obj of @objects
+      obj.draw_joins @ctx
       obj.draw @ctx
 
     @ctx.restore()
