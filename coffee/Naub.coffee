@@ -240,6 +240,7 @@ define -> class Naub
         partner.drawing_join[id] = false
 
     @disable()
+    @life_rendering = on
 
     #@shapes[0].destroy_animation(duration) # when this one is done the naub is removed
     setTimeout (=> @remove()), duration
