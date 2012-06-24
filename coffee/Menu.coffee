@@ -33,8 +33,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
   buttons:
     main:
       position:  new cp.v(20,25)
-      function: ->
-        console.info "menu"
+      function: -> console.info "menu"
       shapes: [new MainButton]
       #shapes: []
     play:
@@ -104,26 +103,30 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     @ctx.restore()
 
   activate_menu: ->
-    Naubino.menu_focus.dispatch()
-    @animation.refresh_framerate @default_fps
+    @hovering = on
 
-    @for_each (b) -> b.isClickable = yes
+    if @deactivation_timeout?
+      clearTimeout @deactivation_timeout
+      @deactivation_timeout = null
+    else
+      @animation.refresh_framerate @default_fps
+
     @listener_size = 90
     @start_stepper()
 
   deactivate_menu: ->
-    Naubino.menu_blur.dispatch()
+    @hovering = off
 
     @for_each (b) -> b.isClickable = no
     @listener_size = @default_listener_size
-    setTimeout (
-      =>
-        console.log @fps
-        @stop_stepper()
-        @animation.refresh_framerate 3
-        console.log "refreshed menu timer"
-        console.log @fps
-    ),1000
+
+    unless @deactivation_timeout?
+      @deactivation_timeout = setTimeout (
+        =>
+          @stop_stepper()
+          @animation.refresh_framerate 3
+          @deactivation_timeout = null
+      ),1000
 
 
 
@@ -137,7 +140,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     else
       @deactivate_menu() if @hovering
 
-    #@ctx.stroke() # like to see it
+    @ctx.stroke() # like to see it
     @ctx.closePath()
     @ctx.restore()
 
