@@ -25,7 +25,7 @@ define ["Layer"], (Layer) -> class Background extends Layer
 
   draw_basket: () ->
     center = @center()
-    @basket_size = Naubino.game.basket_size() # or 10
+    @basket_size = Naubino.game.basket_size() ? 150
 
     @ctx.clearRect(0, 0, @canvas.width, @canvas.height)
 
@@ -43,8 +43,7 @@ define ["Layer"], (Layer) -> class Background extends Layer
 
 
   start_pulse: ->
-    if @animation.current != "playing"
-      @animation.play()
+    @animation.play() if @animation.current != "playing"
     @pulsating = on
 
   stop_pulse: ->

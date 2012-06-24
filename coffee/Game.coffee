@@ -1,6 +1,6 @@
 # controlls everything that has to do with logic and gameplay or menus
 # @extends Layer
-define ["Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Layer, Naub, Graph, CollisionHandler, Factory) -> class Game extends Layer
+define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physical_Layer, Naub, Graph, CollisionHandler, Factory) -> class Game extends Physical_Layer
 
   # get this started
   constructor: (canvas) ->

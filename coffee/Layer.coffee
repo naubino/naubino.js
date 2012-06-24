@@ -9,10 +9,10 @@ define -> class Layer
     @objects_count = 0
 
 
-    @fps         = Naubino.settings.graphics.fps
-    @physics_fps = Naubino.settings.physics.fps
-    @dt          = Naubino.settings.physics.fps/1000 * Naubino.settings.physics.calming_const
-    @time        = Date.now()
+    @fps          = Naubino.settings.graphics.fps
+    @stepper_rate = Naubino.settings.stepper_rate
+    @dt           = Naubino.settings.stepper_rate/1000 * Naubino.settings.physics.calming_const
+    @time         = Date.now()
 
     @animation = {
       parent: this
@@ -56,58 +56,12 @@ define -> class Layer
     # TODO perhaps have zepto do it
     @show()
 
-  setup_physics: ->
-    @GRABABLE_MASK_BIT = 1<<31
-    @NOT_GRABABLE_MASK = ~@GRABABLE_MASK_BIT
-
-    @space = new cp.Space() # so far so good
-    @space.damping = Naubino.settings.physics.damping
-
-    @mouseBody = new cp.Body(Infinity, Infinity)
-    @mouseBody.name = "mouseBody"
-    @mouseBody.p = cp.vzero
-
-    @space.addBody @mouseBody
-
-
- 
-  add_walls: ->
-    ws = 15 #wall_strength
-    @walls = {}
-    walls=
-      ceil  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(@width, 0), ws)
-      floor : new cp.SegmentShape(@space.staticBody, cp.v(0,@height), cp.v(@width, @height), ws)
-      left  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(0,@height), ws)
-      right : new cp.SegmentShape(@space.staticBody, cp.v(@width, 0), cp.v(@width ,@height), ws)
-
-    for w, wall of walls
-      @walls[w] = @space.addShape(wall)
-      @walls[w].setElasticity(.01)
-      @walls[w].setFriction(3)
-      @walls[w].setLayers(@NOT_GRABABLE_MASK)
-      @walls[w].group = 1
-
-
-
   step: ->
-  step_space: ->
-    @space.step(1/@physics_fps)
 
-    # Move mouse body toward the mouse
-    newPoint = cp.v.lerp(@mouseBody.p, @pointer, 0.25)
-    @mouseBody.v = cp.v.mult(cp.v.sub(newPoint, @mouseBody.p), 60)
-    @mouseBody.p = newPoint
-
-
-  start_stepper: => @loop = setInterval((=> @step(@dt)),  1000 / @physics_fps )
+  start_stepper: => @loop = setInterval((=> @step(@dt)),  1000 / @stepper_rate)
   stop_stepper: => clearInterval @loop
 
   add_object: (obj)->
-    #chipmunk
-    if @space?
-      @space.addShape obj.physical_shape if obj.physical_shape?
-      @space.addBody obj.physical_body if obj.physical_body?
-
     obj.center = @center()
     ++@objects_count
     obj.number = @objects_count
@@ -116,12 +70,6 @@ define -> class Layer
 
   remove_obj: (id) ->
     obj = @get_object id
-    if @space?
-      @space.removeShape obj.physical_shape if obj.physical_shape?
-      @space.removeBody obj.physical_body if obj.physical_body?
-      for constraint in obj.constraints
-        console.log constraint
-        @space.removeConstraint constraint
     delete @objects[id]
 
 
@@ -129,10 +77,8 @@ define -> class Layer
   clear_objects: -> @objects = {}
 
   for_each: (callback) ->
-    for k, v of @objects
-      callback(v)
-
-
+    callback(v) for k, v of @objects
+    return
 
   ### overwrite these ###
   draw_point: (pos, color = "black") ->
@@ -152,8 +98,7 @@ define -> class Layer
 
   #visibility
   
-  center: ->
-    new cp.v @width/2, @height/2
+  center: -> new cp.v @width/2, @height/2
 
   resize_by: (ratio) ->
     @canvas.width *= ratio
@@ -219,14 +164,10 @@ define -> class Layer
   click: (x, y) =>
     @mousedown = true
     [@pointer.x, @pointer.y] = [x,y]
-
-    shape = @space.pointQueryFirst(@pointer, @GRABABLE_MASK_BIT, cp.NO_GROUP) if @space?
-    naub = @get_object shape.naub_number if shape?
+    naub = @get_obj_in_pos @pointer
     if naub
       naub.focus()
       @focused_naub = naub
-
-
 
   # callback for mouseup signal
   unfocus: =>
@@ -237,14 +178,10 @@ define -> class Layer
 
   # callback for mousemove signal
   move_pointer: (x,y) =>
-    if @mousedown
-      [@pointer.x, @pointer.y] = [x,y]
+    [@pointer.x, @pointer.y] = [x,y] if @mousedown
 
   # asks all objects whether they have been hit by pointer
   get_obj_in_pos: (pos) ->
-    if @space?
-      shape = @space.pointQueryFirst(pos, @GRABABLE_MASK_BIT, cp.NO_GROUP)
-      console.log shape
-      for id, obj of @objects
-        if obj.isHit(pos.x, pos.y) and obj.isClickable
-          return obj
+    for id, obj of @objects
+      if obj.isHit(pos.x, pos.y) and obj.isClickable
+        return obj

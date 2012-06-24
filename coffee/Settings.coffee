@@ -2,7 +2,7 @@
 define -> Settings = {
 
   graphics:
-    fps:           35 # mind physics.fps
+    fps:           35 # mind stepper_rate
     updating:      off
     draw_shadows:  off
     draw_borders:  off
@@ -20,13 +20,13 @@ define -> Settings = {
     min_join_len:  1.2 # times size
     max_join_len:  2 # times size
 
+
+  stepper_rate:            40
   physics:
-    fps:            40
     center_join:
       restLength:   30
       stiffness:    7
       damping:      7
-    calming_const:  0.5
     join_length:    3.0 # margin between joined naubs (n* avg size)
     spring_force:   0.6
     damping:        0.1
