@@ -28,6 +28,7 @@ Shape: class Shape
 
     @apply_filters @naub.style.filters, ctx if @naub.style.filters?
     @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
+    @apply_filter "draw_gradient", ctx if @naub.is_active() 
 
     ctx.restore()
      
@@ -57,9 +58,6 @@ Shape: class Shape
 
 
 Ball: class Ball extends Shape
-  area: ->
-    # TODO consolder the margin of each naub
-    Math.PI * (@naub.size/2)*(@naub.size/2)
 
   # actual painting routines
   render: (ctx, x = 42, y = x) ->
@@ -220,7 +218,7 @@ PauseButton: class PauseButton extends Shape
 MainButton: class MainButton extends Box
   draw: (ctx, x, y) ->
     text = Naubino.game.points ? ""
-    @width = @naub.size*1.4
+    @width = @naub.size*1.2
     ctx.save()
     ctx.translate(x,y)
     ctx.rotate(Math.PI/6)
@@ -252,7 +250,7 @@ StringShape: class StringShape extends Shape
     super(@naub)
 
   draw: (ctx, x,y) ->
-    size = @naub.size * .6
+    size = @naub.size * .5
     if typeof @string == "function"
       string = @string()
     else

@@ -39,6 +39,7 @@ define -> class Naub
       scale: 1
       border_width: 0
       text_color: "white"
+      glowing: false
     }
     @join_style = {
       fill: [0,0,0,1]
@@ -98,7 +99,8 @@ define -> class Naub
   # either renders live or draws pre_rendered image
   draw: () ->
     pos = if @physical_body then @physical_body.p else @pos
-    unless Naubino.settings.graphics.updating or @life_rendering
+
+    unless Naubino.settings.graphics.updating or @life_rendering or @is_active()
       @ctx.save()
       x = pos.x-@frame
       y = pos.y-@frame
@@ -418,6 +420,7 @@ define -> class Naub
     check_in_field = ->
     setInterval (check_in_field), 10
 
+  is_active: -> @focused or (@layer.active_tree? and @number in @layer.active_tree)
 
   # user interaction
   onclick: ->
@@ -426,10 +429,7 @@ define -> class Naub
   focus: ->
     @focused = true
 
-    for n in @layer.graph.tree(@number)
-      naub = @layer.get_object n
-      naub.add_filter "draw_gradient"
-      naub.update()
+    console.log @layer.active_tree =  @layer.graph.tree(@number)
 
     @onfocus()
     @layer.naub_focused.dispatch(@)
@@ -439,9 +439,6 @@ define -> class Naub
 
     #for n in @layer.graph.tree(@number)
     #  naub = @layer.get_object n
-    @layer.for_each (naub) ->
-      naub.remove_filter "draw_gradient"
-      naub.update()
 
     @onclick()
     @layer.naub_unfocused.dispatch(@)
