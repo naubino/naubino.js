@@ -5,11 +5,6 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     @animation.name = "overlay.animation"
     @fps = 20 # 5fps
 
-    @fade_duration = 1 # in seconds
-    @default_duration = 1 # in seconds 
-    @default_font = "Helvetica"
-    @default_color= "black"
-    @default_fontsize = 15
 
 
   draw: ->
@@ -31,20 +26,22 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     mes_id = @message text
     mes = @get_object mes_id
     mes.alpha = 0.01
-    mes.alpha_delta = @fade_duration / @fps
+    mes.alpha_delta = Naubino.settings.overlay.fade_duration / @fps
     mes.callback = callback
     mes_id
 
   
   ### fading out a specific message by id ###
   fade_out_message: (mes_id, callback) ->
+    @animation.play() if @animation.can "play"
     mes = @get_object(mes_id)
     mes.callback = callback
-    mes.alpha_delta = -@fade_duration / @fps if mes?
+    mes.alpha_delta = -Naubino.settings.overlay.fade_duration / @fps if mes?
 
 
   ### fading out all messages ###
   fade_out_messages: (callback) ->
+    @animation.play() if @animation.can "play"
     @fade_out_message id for id, message of @objects
     k = Object.keys(@objects)
     @objects[k[k.length-1]].callback = callback
@@ -55,7 +52,7 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     mes_id = @fade_in_message text
     mes = @get_object mes_id
     mes.callback = (=> @fade_out_message mes_id, callback)
-    mes.duration = text.duration ? @default_duration
+    mes.duration = text.duration ? Naubino.settings.overlay.duration
 
 
   queue_messages: (messages = ["hello..", "...world"], qcallback) =>
@@ -65,17 +62,19 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     else
       qcallback() if qcallback?
 
+  warning: (text) -> @fade_in_message {text: text, fontsize: 45, color: Util.color_to_rgba(Naubino.colors()[0])}
+
 
   message: (text, ctx = @ctx) ->
     @animation.play() if @animation.can 'play'
 
     {color, fontsize, font, text,pos} = text unless typeof text == "string"
     pos       ?= @center()
-    color     ?= @default_color
-    fontsize  ?= @default_fontsize
-    fontsize   = @default_fontsize unless typeof fontsize == "number"
-    font      ?= @default_font
-
+    color     ?= Naubino.settings.overlay.color
+    fontsize  ?= Naubino.settings.overlay.fontsize
+    fontsize   = Naubino.settings.overlay.fontsize unless typeof fontsize == "number"
+    font      ?= Naubino.settings.overlay.font
+ 
     buffer        = document.createElement('canvas')
     buffer.width  = Naubino.settings.canvas.width
     buffer.height = Naubino.settings.canvas.height

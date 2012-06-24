@@ -140,7 +140,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     else
       @deactivate_menu() if @hovering
 
-    @ctx.stroke() # like to see it
+    #@ctx.stroke() # like to see it
     @ctx.closePath()
     @ctx.restore()
 
