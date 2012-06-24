@@ -2,6 +2,7 @@ js/*
 *.swp
 *.swo
 *.js
+*~
 Session.vim
 docs
 stats/
