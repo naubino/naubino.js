@@ -4,6 +4,9 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @name = "background"
     @animation.name = "background.animation"
 
+    @set_defaults()
+
+  set_defaults: ->
     @default_thickness = @basket_thickness = 4
     @ttl = 12
     @color = [0,0,0,0.5]
@@ -11,15 +14,14 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @seed = 0
     @fps = 5
 
+    @pulsating = off
+    @pulse_ends = false
 
-  draw: () ->
-    @draw_basket()
+
+  draw: () -> @draw_basket()
 
   # TODO ISSUE #38 Make every animation framerate aware
-  step: (dt) ->
-    if @pulsating
-      @pulse()
-
+  step: (dt) -> @pulse() if @pulsating
 
 
 
@@ -43,27 +45,25 @@ define ["Layer"], (Layer) -> class Background extends Layer
 
 
   start_pulse: ->
+    @start_stepper()
     @animation.play() if @animation.current != "playing"
     @pulsating = on
 
-  stop_pulse: ->
-    @pulse_ends = true
+  stop_pulse: -> @pulse_ends = true
 
   pulse: () ->
-    if @pulse_ends and Math.abs(@default_thickness - @basket_thickness) < 1
-      @pulsating = off
-      @pulse_ends = false
-      @basket_thickness = @default_thickness
-      @color[0] = 0
-      @color[3] = 0.5
-      @animation.pause()
-
     @basket_thickness = Math.abs(Math.sin(@seed/@ttl))  * 2 *   @default_thickness + @default_thickness
     rot = Math.sin(@seed/@ttl)
     @color[0] = Math.abs(rot) * 200
     @color[3] = Math.abs(rot) * 0.5 + 0.5
     #@drawTextAlongArc("naub warning", -@seed/30)
     @seed++
+
+    if @pulse_ends and Math.abs(@default_thickness - @basket_thickness) < 1
+      @set_defaults()
+      @animation.pause()
+      @draw()
+      console.log "pulsing stopped"
 
 
 

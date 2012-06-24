@@ -59,8 +59,10 @@ define -> class Layer
 
   step: ->
 
-  start_stepper: => @stepper_loop = setInterval((=> @step()),  1000 / @stepper_rate)
-  stop_stepper: => clearInterval @stepper_loop
+  start_stepper: => @stepper_loop = setInterval((=> @step()),  1000 / @stepper_rate) unless @stepper_loop?
+  stop_stepper: =>
+    clearInterval @stepper_loop
+    @stepper_loop = null
 
   draw: ->
 
