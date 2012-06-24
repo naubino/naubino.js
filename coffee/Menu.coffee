@@ -105,7 +105,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
 
   activate_menu: ->
     Naubino.menu_focus.dispatch()
-    @animation.refresh_timer @default_fps
+    @animation.refresh_framerate @default_fps
 
     @for_each (b) -> b.isClickable = yes
     @listener_size = 90
@@ -120,7 +120,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
       =>
         console.log @fps
         @stop_stepper()
-        @animation.refresh_timer 3
+        @animation.refresh_framerate 3
         console.log "refreshed menu timer"
         console.log @fps
     ),1000

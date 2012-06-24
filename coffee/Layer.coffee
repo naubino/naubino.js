@@ -1,29 +1,30 @@
 define -> class Layer
 
   constructor: (@canvas) ->
-    @width = @canvas.width
-    @height = @canvas.height
-    @ctx = @canvas.getContext('2d')
+    @width   = @canvas.width
+    @height  = @canvas.height
+    @center  = -> new cp.v @width/2, @height/2
+    @ctx     = @canvas.getContext('2d')
     @pointer = new cp.v @width/2, @height/2
+
     @objects = {}
     @objects_count = 0
 
-
     @fps          = Naubino.settings.graphics.fps
     @stepper_rate = Naubino.settings.stepper_rate
-    @dt           = Naubino.settings.stepper_rate/1000 * Naubino.settings.physics.calming_const
-    @time         = Date.now()
 
-    @animation = {
+    @animation= {
       parent: this
-      refresh_timer: (fps) =>
+
+      refresh_framerate: (fps) =>
         @fps = fps
         @animation.stop_timer()
         @animation.start_timer()
 
       start_timer: =>
         #console.info @name, "start animation timer", @fps, "fps"
-        @draw_loop = setInterval(@do_draw, 1000 / @fps ) unless @draw_loop?
+        @draw_loop = setInterval (=> @draw()), 1000 / @fps  unless @draw_loop?
+
       stop_timer: =>
         #console.info @name, "stop animation timer"
         clearInterval @draw_loop
@@ -58,27 +59,10 @@ define -> class Layer
 
   step: ->
 
-  start_stepper: => @loop = setInterval((=> @step(@dt)),  1000 / @stepper_rate)
-  stop_stepper: => clearInterval @loop
+  start_stepper: => @stepper_loop = setInterval((=> @step()),  1000 / @stepper_rate)
+  stop_stepper: => clearInterval @stepper_loop
 
-  add_object: (obj)->
-    obj.center = @center()
-    ++@objects_count
-    obj.number = @objects_count
-    @objects[@objects_count] = obj
-    @objects_count
-
-  remove_obj: (id) ->
-    obj = @get_object id
-    delete @objects[id]
-
-
-  get_object: (id)-> @objects[id]
-  clear_objects: -> @objects = {}
-
-  for_each: (callback) ->
-    callback(v) for k, v of @objects
-    return
+  draw: ->
 
   ### overwrite these ###
   draw_point: (pos, color = "black") ->
@@ -90,15 +74,6 @@ define -> class Layer
     @ctx.stroke()
     @ctx.closePath()
 
-    
-  draw: ->
-
-  do_draw: => @draw()
-
-
-  #visibility
-  
-  center: -> new cp.v @width/2, @height/2
 
   resize_by: (ratio) ->
     @canvas.width *= ratio
@@ -111,7 +86,6 @@ define -> class Layer
     @canvas.width  = Naubino.settings.canvas.width
     @canvas.height = Naubino.settings.canvas.height
     @draw()
-
 
   fade_in: (callback = null) ->
     console.log "fade in", @fadeloop
@@ -140,24 +114,16 @@ define -> class Layer
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
 
+
   show: -> @canvas.style.opacity = 1
+
   hide: -> @canvas.style.opacity = 0
 
-  clear: ->
-    @ctx.clearRect(0, 0, @canvas.width, @canvas.height)
-
-    #@ctx.beginPath()
-    #@ctx.rect(0, 0, @canvas.width, @canvas.height)
-    #@ctx.fillStyle = "rgba(255,255,255,)"
-    #@ctx.fill()
-    #@ctx.lineWidth = 5
-    #@ctx.strokeStyle = 'black'
-    #@ctx.stroke()
-
-    #@canvas.width = @canvas.width
+  clear: -> @ctx.clearRect(0, 0, @canvas.width, @canvas.height)
+  
   cache: -> @backup_ctx = @ctx
-  restore: -> @ctx = @backup_ctx
 
+  restore: -> @ctx = @backup_ctx
 
 
   # callback for mousedown signal
@@ -179,6 +145,26 @@ define -> class Layer
   # callback for mousemove signal
   move_pointer: (x,y) =>
     [@pointer.x, @pointer.y] = [x,y] if @mousedown
+
+  ### housekeeping ###
+  add_object: (obj)->
+    obj.center = @center()
+    ++@objects_count
+    obj.number = @objects_count
+    @objects[@objects_count] = obj
+    @objects_count
+
+  remove_obj: (id) ->
+    obj = @get_object id
+    delete @objects[id]
+
+
+  get_object: (id)-> @objects[id]
+  clear_objects: -> @objects = {}
+
+  for_each: (callback) ->
+    callback(v) for k, v of @objects
+    return
 
   # asks all objects whether they have been hit by pointer
   get_obj_in_pos: (pos) ->

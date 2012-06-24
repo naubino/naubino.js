@@ -12,31 +12,10 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     @default_fontsize = 15
 
 
-  fade_object: (buffer,id) ->
-    if buffer.alpha_delta? and 0 < buffer.alpha <= 1
-      buffer.alpha += buffer.alpha_delta
-      buffer.alpha = Math.min buffer.alpha, 1
-      buffer.alpha = Math.max buffer.alpha, 0
-      delete buffer.alpha_delta if 1 <= buffer.alpha or buffer.alpha <= 0
-    else
-      if buffer.duration?
-        buffer.age = if buffer.age? then buffer.age+1 else 0
-        console.time("fade #{id}") if buffer.age == 0
-        if buffer.age >= buffer.duration*@fps
-          delete buffer.duration
-          console.timeEnd("fade #{id}")
-      else if buffer.callback?
-        cb = buffer.callback
-        delete @objects[id]    if buffer.alpha <= 0
-        if buffer.alpha >=1
-          delete buffer.callback
-          delete buffer.age
-        cb.call()
-      else
-        delete @objects[id]    if buffer.alpha <= 0
-
   draw: ->
-    @animation.pause() if Object.keys(@objects).length == 0 and @animation.can "pause"
+    if Object.keys(@objects).length == 0 and @animation.can "pause"
+      @animation.pause()
+
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
     # objects are all full size buffers
@@ -93,14 +72,14 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     {color, fontsize, font, text,pos} = text unless typeof text == "string"
     pos       ?= @center()
     color     ?= @default_color
-    fontsize ?= @default_fontsize
-    fontsize  = @default_fontsize unless typeof fontsize == "number"
+    fontsize  ?= @default_fontsize
+    fontsize   = @default_fontsize unless typeof fontsize == "number"
     font      ?= @default_font
 
-    buffer = document.createElement('canvas')
-    buffer.width = Naubino.settings.canvas.width
+    buffer        = document.createElement('canvas')
+    buffer.width  = Naubino.settings.canvas.width
     buffer.height = Naubino.settings.canvas.height
-    buffer.alpha = 1
+    buffer.alpha  = 1
 
     buffer.text = text
     ctx = buffer.getContext('2d')
@@ -120,4 +99,27 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
       pos.y += fontsize
     @add_object buffer
 
+
+  fade_object: (buffer,id) ->
+    if buffer.alpha_delta? and 0 < buffer.alpha <= 1
+      buffer.alpha += buffer.alpha_delta
+      buffer.alpha = Math.min buffer.alpha, 1
+      buffer.alpha = Math.max buffer.alpha, 0
+      delete buffer.alpha_delta if 1 <= buffer.alpha or buffer.alpha <= 0
+    else
+      if buffer.duration?
+        buffer.age = if buffer.age? then buffer.age+1 else 0
+        console.time("fade #{id}") if buffer.age == 0
+        if buffer.age >= buffer.duration*@fps
+          delete buffer.duration
+          console.timeEnd("fade #{id}")
+      else if buffer.callback?
+        cb = buffer.callback
+        delete @objects[id]    if buffer.alpha <= 0
+        if buffer.alpha >=1
+          delete buffer.callback
+          delete buffer.age
+        cb.call()
+      else
+        delete @objects[id]    if buffer.alpha <= 0
 

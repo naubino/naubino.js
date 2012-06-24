@@ -20,7 +20,6 @@ define -> Settings = {
     min_join_len:  1.2 # times size
     max_join_len:  2 # times size
 
-
   stepper_rate:            40
   physics:
     center_join:
