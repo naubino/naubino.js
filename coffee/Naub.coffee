@@ -46,12 +46,10 @@ define -> class Naub
     }
 
     palette = Naubino.colors()
-    pick = palette[@color_id]
+    color_id = @color_id % palette.length
+    pick = palette[color_id]
     if pick?
       @style.fill = [ pick[0], pick[1], pick[2], pick[3] ]
-    else
-      @style.fill = [0,0,0, 0.5]
-      console.warn @color_id, "not found"
 
   # colors the shape randomly and returns color id for comparison
   random_color: ->
@@ -185,19 +183,27 @@ define -> class Naub
     diff = pos2.Copy()
     diff.sub(pos)
     l = diff.Length()
-    fiber = 10 # strength of join material ( the higher the less a join will be affected by stretching )
-    stretch = (75 ) / (l + 10)
-    #stretch = Math.round((stretch)*10)/10 # rounding
+    # = (constant for width) / (l + elasticity)
+    stretch = (75) / (l + 10)
+    #stretch = Math.round((stretch)*10)/10 # rounding removed for opera
     #@join_style.fill[3] = stretch
     stretched_width = @join_style.width * stretch
+
     ctx.save()
     ctx.globalCompositeOperation = "destination-over"
     ctx.strokeStyle = Util.color_to_rgba @join_style.fill
     ctx.beginPath()
-    ctx.moveTo pos.x, pos.y
-    ctx.lineTo pos2.x, pos2.y
-    ctx.lineWidth = stretched_width
-    ctx.lineCap = "round"
+
+    #ctx.moveTo pos.x, pos.y
+    #ctx.lineTo pos2.x, pos2.y
+    ctx.lineWidth = 1
+    ctx.fillStyle = '#000000'
+    ctx.strokeStyle = '#ffffff'
+    ctx.translate pos.x, pos.y
+    ctx.rotate diff.Angle()
+    ctx.rect 0, -stretched_width/2, l, stretched_width
+    ctx.fill()
+
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
