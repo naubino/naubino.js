@@ -14,8 +14,8 @@ define ["Game"], (Game) -> class StandardGame extends Game
     factor = (max_grow-1) / @max_naubs
     p = Math.floor(factor * list.length * list.length)
     @points += p
-    #if p > 0
-      #Naubino.overlay.fade_in_and_out_message ("\n\nChain Bonus "+p)
+    if p > 0
+      Naubino.overlay.fade_in_and_out_message ("\n\nChain Bonus "+p)
 
   level_details: [
     { limit:-1,  number_of_colors: 3, interval: 40, max_naubs: 20, probabilities:{ pair:1, mixed_pair:0, triple: 0 } }
@@ -37,7 +37,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
       @level = level
       name = "Level #{@level}"
-      #Naubino.overlay.fade_in_and_out_message name unless level == 0
+      Naubino.overlay.fade_in_and_out_message name unless level == 0
       set = @level_details[@level]
 
       #@basket_size      = set['basket_size']      ? @basket_size
@@ -46,7 +46,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
       @spammer_interval = set['interval']         ? @spammer_interval
 
       console.log "limit"            , set['limit']
-      #console.log "basket size"      , @basket_size
+      console.log "basket size"      , @basket_size
       console.log "number of colors" , @number_of_colors
       console.log "spammerinterval"  , @spammer_interval
 
