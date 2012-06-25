@@ -71,7 +71,7 @@ h1 {
     position: absolute;
     z-index:0;
     left:auto;
-    top: 30px;
+    top: 20px;
 }
 #gamediv > span{
     position: absolute;
@@ -84,6 +84,10 @@ h1 {
 .flattr{
     position:absolute;
     top: 550px;
+}
+select.btn{
+    text-align: left;
+    height: 1.6em;
 }
 @media screen and (view-mode: minimized) { 
     body

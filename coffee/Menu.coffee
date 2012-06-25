@@ -5,7 +5,6 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     @name = "menu"
     @graph = new Graph this
     @factory = new Factory this
-    @animation.name = "menu.animation"
 
     @objects = {}
     @hovering = off
@@ -19,16 +18,13 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     @cube_size = 45
     @default_fps = @fps = 35
     
-    StateMachine.create {
-      target:this
-      events: Naubino.settings.events
-      error: (e, from, to, args, code, msg) -> console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
-    }
+    @setup_fsm()
 
   # changing the state a little
   oninit: ->
     @add_buttons()
-    @start_stepper()
+    @start_stepping()
+    @start_drawing()
 
   buttons:
     main:
@@ -53,19 +49,19 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     @objects[name] = @factory.add_button(button.position, button.function, button.shapes) for name, button of @buttons
     @objects.main.life_rendering = on
 
-  onenterplaying: ->
-    @objects.play.focus = -> Naubino.pause()
-    @objects.play.shapes.pop()
-    @objects.play.add_shape new PauseButton
-    @objects.play.update()
-
-  onenterpaused: ->
-    @objects.play.focus = -> Naubino.play()
-    @objects.play.shapes.pop()
-    @objects.play.add_shape new PlayButton
-    @objects.play.update()
-
-  onenterstopped: (e,f,t) -> @onenterpaused() unless e is 'init'
+  check_game_state: (game = Naubino.game) ->
+    console.log "checking game state"
+    if @objects.play?
+      if game.current == "playing"
+        @objects.play.focus = -> Naubino.pause()
+        @objects.play.shapes.pop()
+        @objects.play.add_shape new PauseButton
+        @objects.play.update()
+      else
+        @objects.play.focus = -> Naubino.play()
+        @objects.play.shapes.pop()
+        @objects.play.add_shape new PlayButton
+        @objects.play.update()
 
   step: ->
     for name, naub of @objects
@@ -109,10 +105,9 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
       clearTimeout @deactivation_timeout
       @deactivation_timeout = null
     else
-      @animation.refresh_framerate @default_fps
+      @refresh_draw_rate @default_fps
 
     @listener_size = 90
-    @start_stepper()
 
   deactivate_menu: ->
     @hovering = off
@@ -123,8 +118,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     unless @deactivation_timeout?
       @deactivation_timeout = setTimeout (
         =>
-          @stop_stepper()
-          @animation.refresh_framerate 3
+          @refresh_draw_rate 3
           @deactivation_timeout = null
       ),1000
 

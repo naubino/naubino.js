@@ -3,24 +3,25 @@ define -> Settings = {
 
   graphics:
     fps:           35 # mind stepper_rate
-    updating:      off
-    draw_shadows:  off
-    draw_borders:  off
+    updating:      yes
+    draw_shadows:  on
+    draw_borders:  no
 
   game:
     creation_offset: 50
     min_joining_force: 800
 
   naub:
-    size:          36
-    margin:        3
+    size:          42
+    margin:        8
     mass:          5
     friction:         0.8
     elasticity:    0.3
     min_join_len:  1.2 # times size
     max_join_len:  2 # times size
 
-  stepper_rate:            40
+  step_rate:            40
+
   physics:
     center_join:
       restLength:   30
@@ -35,22 +36,39 @@ define -> Settings = {
     width:         800
     height:        480
 
-  events: [
-        { name: 'init',   from: 'none',     to: 'stopped'}
-        # { name: 'unset',  from: 'stopped',  to: 'none'   } # TODO REMOVE THIS 
-        { name: 'play',   from: 'stopped',  to: 'playing'}
-        { name: 'play',   from: 'paused',   to: 'playing'}
-        { name: 'pause',  from: 'playing',  to: 'paused' }
-        { name: 'stop',   from: 'playing',  to: 'stopped'}
-        { name: 'stop',   from: 'paused',   to: 'stopped'}
+  events:
+
+    # every state machine has these
+    default:
+      [
+        { name: 'init',   from: ['none',  'stopped'], to: 'stopped'}
+        { name: 'play',   from: ['paused','stopped'], to: 'playing'}
+        { name: 'pause',  from: ['paused','playing'], to: 'paused' }
+        { name: 'stop',   from: '*',                  to: 'stopped'}
       ]
 
-  layer_events: [
-        { name: 'play',   from: ['paused','stopped'],  to: 'playing'}
-        { name: 'pause',  from: 'playing',  to: 'paused' }
-        { name: 'stop',   from: 'playing',  to: 'stopped'}
-        { name: 'stop',   from: 'paused',   to: 'stopped'}
+    # game also has these:
+    game:
+      [
+        { name: 'loose', from: 'playing', to: 'lost'    }
+        { name: 'stop',  from: 'lost',    to: 'stopped' }
       ]
+
+    # Backgraound also has these:
+    background:
+      [
+        { name: 'pulse',       from: 'playing',       to: 'pulsing'      }
+        { name: 'stop_pulse',  from: 'pulsing',       to: 'playing'      }
+        { name: 'pause',       from: 'pulsing',       to: 'paused_pulse' }
+        { name: 'play',        from: 'paused_pulse',  to: 'pulsing'      }
+      ]
+      
+  overlay:
+    font: "Helvetica"
+    color: "Black"
+    fontsize:  25 # in px
+    duration: 1 # in seconds
+    fade_duration: 1 # in seconds
 
   color: "output"
   colors:

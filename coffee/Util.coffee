@@ -36,5 +36,17 @@ window.Util =
     g = Math.round((color[1] + shift))
     b = Math.round((color[2] + shift))
     a = color[3]
-    "rgba(#{r},#{g},#{b},#{a})"
+    if a?
+      "rgba(#{r},#{g},#{b},#{a})"
+    else
+      "rgba(#{r},#{g},#{b},1)"
 
+  interpolate_color: (a,b,s=0.5)->
+    max = Math.min a.length, b.length
+    for i in [0...max]
+      @interpolate a[i],b[i],s
+
+
+  interpolate: (a,b,s=0.5)->
+    d = b-a
+    v = a + d*s

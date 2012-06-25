@@ -428,18 +428,11 @@ define -> class Naub
 
   focus: ->
     @focused = true
-
-    console.log @layer.active_tree =  @layer.graph.tree(@number)
-
     @onfocus()
     @layer.naub_focused.dispatch(@)
 
   unfocus: ->
     @focused = false
-
-    #for n in @layer.graph.tree(@number)
-    #  naub = @layer.get_object n
-
     @onclick()
     @layer.naub_unfocused.dispatch(@)
 

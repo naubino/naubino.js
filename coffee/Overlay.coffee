@@ -2,14 +2,14 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "overlay"
-    @animation.name = "overlay.animation"
     @fps = 20 # 5fps
 
+    @setup_fsm()
 
 
   draw: ->
-    if Object.keys(@objects).length == 0 and @animation.can "pause"
-      @animation.pause()
+    if Object.keys(@objects).length == 0 and @can "pause"
+      @pause()
 
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
@@ -33,7 +33,7 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
   
   ### fading out a specific message by id ###
   fade_out_message: (mes_id, callback) ->
-    @animation.play() if @animation.can "play"
+    @play() if @can "play"
     mes = @get_object(mes_id)
     mes.callback = callback
     mes.alpha_delta = -Naubino.settings.overlay.fade_duration / @fps if mes?
@@ -41,7 +41,7 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
 
   ### fading out all messages ###
   fade_out_messages: (callback) ->
-    @animation.play() if @animation.can "play"
+    @play() if @can "play"
     @fade_out_message id for id, message of @objects
     k = Object.keys(@objects)
     @objects[k[k.length-1]].callback = callback
@@ -66,7 +66,7 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
 
 
   message: (text, ctx = @ctx) ->
-    @animation.play() if @animation.can 'play'
+    @play() if @can 'play'
 
     {color, fontsize, font, text,pos} = text unless typeof text == "string"
     pos       ?= @center()

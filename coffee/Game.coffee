@@ -7,7 +7,6 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
     super(canvas)
     @name = "game"
     @graph = new Graph(this)
-    @animation.name = "game.animation"
     @factory = new Factory this
 
     # display stuff
@@ -22,7 +21,16 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
 
     @joining_naubs = []
     @replacing_naubs = []
+    @active_tree = []
     
+    #chipmunk
+    @setup_physics()
+    @space.defaultHandler = new CollisionHandler this
+
+    @setup_fsm Naubino.settings.events.game
+    
+
+  oninit: (e,f,t) ->
     # gameplay
     @naub_replaced   = new Naubino.Signal()
     @naub_joined     = new Naubino.Signal()
@@ -30,40 +38,20 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
     @cycle_found     = new Naubino.Signal()
     @naub_focused    = new Naubino.Signal()
     @naub_unfocused  = new Naubino.Signal()
+    @game_lost       = new Naubino.Signal()
 
-    #state machine
-    StateMachine.create {
-      target: this
-      #error:(event,from,to,args,ec,em) -> console.warn "#{event}(#{args}): #{from}->#{to} - #{ec}:\"#{em}\"" unless event is 'click'
-      events: Naubino.settings.events
-    }
+    @game_lost.add (msg)-> Naubino.loose(msg)
 
-
-  oninit: ->
-    #chipmunk
-    @setup_physics()
-    @space.defaultHandler = new CollisionHandler this
-
-
-
-  #default state change actions
-  onplaying: ->
-    @animation.play()
-    @start_stepper()
-
-  onleaveplaying: (e,f,t) -> @stop_stepper()
-  onpaused: (e,f,t) -> @animation.pause()
   onstopped: (e,f,t) ->
+    @clear_objects() unless e is 'init'
 
-
-
-  add_object:(obj) ->
-    super obj
-    obj.physical_body.naub_number = @objects_count if obj.physical_body?
-    obj.physical_shape.naub_number = @objects_count if obj.physical_shape?
-    obj.attracted_to @center()
-  
-
+  onlost: ->
+    @game_lost.dispatch("Naub Overflow")
+    @stop_stepping()
+    @for_each (naub) -> naub.grey_out()
+    #Naubino.overlay.warning "Naub Overflow"
+    setTimeout (=>@stop(yes)), 4000 # TODO make the a keyboard event
+    # after this point you must be able to press play an start again
 
 
 
@@ -98,6 +86,8 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
       if @space? && @mouseJoint?
         @space.removeConstraint @mouseJoint
         @mouseJoint = null
+
+      @active_tree = []
 
 
   # counts how many naubs would be inside the circle
@@ -161,7 +151,6 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
 
     naub = if a.focused then a else b
     other= unless a.focused then a else b
-
 
     force = arbiter.totalImpulse().Length()
     return no if force < Naubino.settings.game.min_joining_force
@@ -243,6 +232,12 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
         
 
 
+
+  add_object:(obj) ->
+    super obj
+    obj.physical_body.naub_number = @objects_count if obj.physical_body?
+    obj.physical_shape.naub_number = @objects_count if obj.physical_shape?
+    obj.attracted_to @center()
 
 
   # clears the graph as well, just in case

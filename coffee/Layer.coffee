@@ -1,80 +1,84 @@
 define -> class Layer
 
   constructor: (@canvas) ->
+    @name = "unnamed layer"
+
     @width   = @canvas.width
     @height  = @canvas.height
-    @center  = -> new cp.v @width/2, @height/2
     @ctx     = @canvas.getContext('2d')
-    @pointer = new cp.v @width/2, @height/2
+    @center  = -> new cp.v @width/2, @height/2
+    @pointer = @center()
 
-    @objects = {}
+    @objects       = {}
     @objects_count = 0
 
-    @fps          = Naubino.settings.graphics.fps
-    @stepper_rate = Naubino.settings.stepper_rate
+    @fps       = Naubino.settings.graphics.fps
+    @step_rate = Naubino.settings.step_rate
 
-    @animation= {
-      parent: this
-
-      refresh_framerate: (fps) =>
-        @fps = fps
-        @animation.stop_timer()
-        @animation.start_timer()
-
-      start_timer: =>
-        #console.info @name, "start animation timer", @fps, "fps"
-        @draw_loop = setInterval (=> @draw()), 1000 / @fps  unless @draw_loop?
-
-      stop_timer: =>
-        #console.info @name, "stop animation timer"
-        clearInterval @draw_loop
-        @draw_loop = null
-    }
-
-    StateMachine.create {
-      target: @animation
-      initial: 'stopped'
-      events: Naubino.settings.layer_events
-      callbacks:{
-        # states (overwrite these)
-        # place only onenterevent here
-        # place onenterstate into the concrete implementation
-
-        error: (e, from, to, args, code, msg) -> console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
-        onbeforeplay:(e, f, t) -> @start_timer()
-        onbeforepause: (e,f,t) -> @stop_timer()
-        onbeforestop: (e,f,t) ->
-          @stop_timer()
-          @parent.clear()
-
-        onchangestate: (e,f,t)->
-          #console.info "#{@name} changed state #{e}: #{f} -> #{t}"
-          #return true
-      }
-    }
-
-    # set opacity
-    # TODO perhaps have zepto do it
     @show()
 
-  step: ->
 
-  start_stepper: => @stepper_loop = setInterval((=> @step()),  1000 / @stepper_rate) unless @stepper_loop?
-  stop_stepper: =>
-    clearInterval @stepper_loop
-    @stepper_loop = null
+  default_state_machine:
+    initial: 'none'
+    # not ready until runtime #events: Naubino.settings.events.default
+    callbacks:
+      error: (e, from, to, args, code, msg) -> console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
 
-  draw: ->
+
+  setup_fsm: (special_events = []) ->
+    @default_state_machine.target = this
+    events = Naubino.settings.events.default.concat special_events
+    @default_state_machine.events = events
+    StateMachine.create @default_state_machine
+
+
+  # describe all events here (except oninit)
+  # describe all states elsewhere
+  onplay: (e,f,t) ->
+    @start_drawing()
+    @start_stepping()
+
+  onpause: (e,f,t) ->
+    @stop_stepping()
+    @stop_drawing()
+
+  onstop: (e,f,t) ->
+    @stop_stepping()
+    @stop_drawing()
+    @clear()
+    @clear_objects()
+
+  onchangestate: (e,f,t)->
+    console.info "#{@name} changed state #{e}: #{f} -> #{t}"
+    #return true
+
+  ### manage timers for drawing and stepping ###
+  start_stepping: -> @step_loop = setInterval((=> @step()),  1000 / @step_rate) unless @step_loop?
+  stop_stepping: ->
+    clearInterval @step_loop
+    @step_loop = null
+
+  start_drawing: -> @draw_loop = setInterval (=> @draw()), 1000 / @fps  unless @draw_loop?
+  stop_drawing: ->
+    clearInterval @draw_loop
+    @draw_loop = null
+
+  refresh_draw_rate: (fps) ->
+    @fps = fps
+    @stop_drawing()
+    @start_drawing()
+
+  refresh_step_rate: (fps) ->
+    @step_rate= fps
+    @stop_drawing()
+    @start_drawing()
+
 
   ### overwrite these ###
-  draw_point: (pos, color = "black") ->
-    @ctx.beginPath()
-    @ctx.arc(pos.x, pos.y, 4, 0, 2 * Math.PI, false)
-    @ctx.arc(pos.x, pos.y, 1, 0, 2 * Math.PI, false)
-    @ctx.lineWidth = 1
-    @ctx.strokeStyle = color
-    @ctx.stroke()
-    @ctx.closePath()
+  step: ->
+  draw: ->
+
+
 
 
   resize_by: (ratio) ->
@@ -98,7 +102,7 @@ define -> class Layer
         clearInterval @fadeloop
         console.log "done"
         @show()
-        if callback?
+        if callback? and typeof callback == 'function'
           callback.call()
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
@@ -111,7 +115,7 @@ define -> class Layer
         clearInterval @fadeloop
         @hide()
         #@canvas.style.opacity = 1
-        if callback?
+        if callback? and typeof callback == 'function'
           callback.call()
     clearInterval @fadeloop
     console.log @fadeloop = setInterval( fade, 40 )
@@ -132,6 +136,7 @@ define -> class Layer
   click: (x, y) =>
     @mousedown = true
     [@pointer.x, @pointer.y] = [x,y]
+
     naub = @get_obj_in_pos @pointer
     if naub
       naub.focus()
@@ -162,14 +167,27 @@ define -> class Layer
 
 
   get_object: (id)-> @objects[id]
-  clear_objects: -> @objects = {}
-
-  for_each: (callback) ->
-    callback(v) for k, v of @objects
-    return
 
   # asks all objects whether they have been hit by pointer
   get_obj_in_pos: (pos) ->
     for id, obj of @objects
       if obj.isHit(pos.x, pos.y) and obj.isClickable
         return obj
+
+  clear_objects: -> @objects = {}
+
+  for_each: (callback) ->
+    callback(v) for k, v of @objects
+    return
+  
+  ### visible utilites ###
+  draw_point: (pos, color = "black") ->
+    @ctx.beginPath()
+    @ctx.arc(pos.x, pos.y, 4, 0, 2 * Math.PI, false)
+    @ctx.arc(pos.x, pos.y, 1, 0, 2 * Math.PI, false)
+    @ctx.lineWidth = 1
+    @ctx.strokeStyle = color
+    @ctx.stroke()
+    @ctx.closePath()
+
+
