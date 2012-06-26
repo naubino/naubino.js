@@ -81,6 +81,10 @@ h1 {
     padding-top:50px;
     z-index:1;
 }
+form label
+{
+    font-size:11px;
+}
 .flattr{
     position:absolute;
     top: 550px;

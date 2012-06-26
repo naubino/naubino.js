@@ -65,6 +65,19 @@ define ["Naubino"], (Naubino) ->
       else if (document.webkitCancelFullScreen)
         document.webkitCancelFullScreen()
 
+    @togglePrerendering = ->
+      naubino.settings.graphics.updating = 
+        if $('#prerenderingCheck').attr('checked')
+          off
+        else
+          on
+
+
+    @toggleFullscreen = ->
+      if $('#fullScreenCheck').attr('checked')
+        @requestFullscreen()
+      else
+        @exitFullscreen()
 
     @changeFullscreen = (fullScreen) ->
       if fullScreen or (document.fullscreen) or (document.mozFullScreen) or (document.webkitIsFullScreen)

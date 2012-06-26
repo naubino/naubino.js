@@ -18,7 +18,7 @@
 
 
 
-          <form>
+          <form class="form-inline">
             <input type="button" class="btn btn-mini" onclick="window.Naubino.play();Naubino.list_states()" value="play"/>
             <input type="button" class="btn btn-mini" onclick="window.Naubino.pause();Naubino.list_states()" value="pause"/>
             <input type="button" class="btn btn-mini" onclick="window.Naubino.stop(true);Naubino.list_states()" value="stop"/>
@@ -26,13 +26,18 @@
             <input type="button" class="btn btn-mini" onclick="window.Naubino.game.gravity = !window.Naubino.game.gravity " value="gravity on/off"/>
             <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
             <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
-            <input type="button" class="btn btn-mini" onclick="window.Naubino.settings.graphics.updating = !window.Naubino.settings.graphics.updating" value="prerendering on/off"/>
-            <input type="button" class="btn btn-mini" onclick="requestFullscreen()" value="fullscreen" />
-            <input type="button" class="btn btn-mini" onclick="exitFullscreen()" value="no fullscreen" />
+
+
+            <label for="prerenderingCheck">prerendering</label>
+            <input type="checkbox" id="prerenderingCheck" class="btn btn-mini" onchange="togglePrerendering()" value="fullscreen" />
+
+            <label for="fullScreenCheck">fullscreen</label>
+            <input type="checkbox" id="fullScreenCheck" class="btn btn-mini" onchange="toggleFullscreen()" value="fullscreen" />
+
             <select id="colors"  class="btn btn-mini" > </select>
-            <a href="https://github.com/hoodie/naubino.js/issues/new">write and issue</a>
-            <a href="https://github.com/hoodie/naubino.js/wiki">use the wiki</a>
             <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
+            <a href="http://flattr.com/thing/685359/naubino" target="_blank">
+                <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
           </form>
 
           <div id="gamediv"> </div> 
