@@ -17,6 +17,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     @center = new cp.v(20,25)
     @cube_size = 45
     @default_fps = @fps = 35
+    @min_fps = 3
     
     @setup_fsm()
 
@@ -28,7 +29,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
 
   buttons:
     main:
-      position:  new cp.v(20,25)
+      position:  new cp.v(23,26)
       function: -> console.info "menu"
       shapes: [new MainButton]
       #shapes: []
@@ -118,7 +119,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     unless @deactivation_timeout?
       @deactivation_timeout = setTimeout (
         =>
-          @refresh_draw_rate 3
+          @refresh_draw_rate @min_fps
           @deactivation_timeout = null
       ),1000
 

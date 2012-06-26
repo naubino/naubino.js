@@ -10,6 +10,7 @@ define -> Settings = {
   game:
     creation_offset: 50
     min_joining_force: 800
+    font: "Helvetica"
 
   naub:
     size:          42
@@ -63,6 +64,10 @@ define -> Settings = {
         { name: 'play',        from: 'paused_pulse',  to: 'pulsing'      }
       ]
       
+  menu:
+    font: "Helvetica"
+    color: "white"
+
   overlay:
     font: "Helvetica"
     color: "Black"

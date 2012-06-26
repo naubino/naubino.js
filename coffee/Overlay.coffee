@@ -68,12 +68,13 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
   message: (text, ctx = @ctx) ->
     @play() if @can 'play'
 
-    {color, fontsize, font, text,pos} = text unless typeof text == "string"
+    {color, fontsize, font, text, pos, weight} = text unless typeof text == "string"
     pos       ?= @center()
     color     ?= Naubino.settings.overlay.color
     fontsize  ?= Naubino.settings.overlay.fontsize
     fontsize   = Naubino.settings.overlay.fontsize unless typeof fontsize == "number"
     font      ?= Naubino.settings.overlay.font
+    weight    ?= ""
  
     buffer        = document.createElement('canvas')
     buffer.width  = Naubino.settings.canvas.width
@@ -92,7 +93,7 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
       ctx.shadowBlur = 3
       ctx.strokeStyle = color
       ctx.textAlign = 'center'
-      ctx.font= "#{fontsize}px #{font}"
+      ctx.font= "#{weight} #{fontsize}px #{font}"
       ctx.fillText(line, pos.x,pos.y)
 
       pos.y += fontsize

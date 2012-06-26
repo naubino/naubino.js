@@ -218,6 +218,7 @@ PauseButton: class PauseButton extends Shape
 MainButton: class MainButton extends Box
   draw: (ctx, x, y) ->
     text = Naubino.game.points ? ""
+    size=38
     @width = @naub.size*1.2
     ctx.save()
     ctx.translate(x,y)
@@ -233,12 +234,20 @@ MainButton: class MainButton extends Box
     ctx.closePath()
     ctx.restore()
 
+    l = text.toString().length
+    switch l
+      when 1,2 then ratio = 1
+      when 3 then ratio = 0.7
+      when 4 then ratio = 0.5
+      else ratio = 0.4
+
     ctx.save()
     ctx.translate(x,y)
+    ctx.scale ratio, ratio
     ctx.fillStyle = 'white'
     ctx.textAlign = 'center'
-    ctx.font= 'bold 38px Helvetica'
-    ctx.fillText(text, 2,12, @width*1.1)
+    ctx.font= "bold #{size}px #{Naubino.settings.menu.font}"
+    ctx.fillText(text, 2,12)
     ctx.restore()
 
 
@@ -262,7 +271,7 @@ StringShape: class StringShape extends Shape
     ctx.rotate @naub.physical_body.a if @naub.physical_body?
     ctx.fillStyle = @color
     ctx.textAlign = 'center'
-    ctx.font= "#{size}px Helvetica"
+    ctx.font= "#{size}px #{Naubino.settings.game.font}"
     ctx.fillText(string, 0, 7)
     ctx.restore()
 
