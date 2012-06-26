@@ -18,23 +18,35 @@
         <span>Watch me on Github!</span>
         <span>Stay tuned!</span>
       </a>
-    <div class="container">
-      <header>
-      <h1>naubino alpha<sub>4</sub></h1>
-      <p>we got an opera preview</p>
-      </header>
+
+      <form class="form-inline">
+        <input type="button" class="btn btn-mini" onclick="window.Naubino.play();Naubino.list_states()" value="play"/>
+        <input type="button" class="btn btn-mini" onclick="window.Naubino.pause();Naubino.list_states()" value="pause"/>
+        <input type="button" class="btn btn-mini" onclick="window.Naubino.stop(true);Naubino.list_states()" value="stop"/>
+        <!--
+        <input type="button" class="btn btn-mini" onclick="window.Naubino.game.gravity = !window.Naubino.game.gravity " value="gravity on/off"/>
+        <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
+        <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
 
 
-      <div class="fluid-row">
-        <div class="span12">
+        <label for="prerenderingCheck">prerendering</label>
+        <input type="checkbox" id="prerenderingCheck" class="btn btn-mini" onchange="togglePrerendering()" value="fullscreen" />
+
+        <label for="fullScreenCheck">fullscreen</label>
+        <input type="checkbox" id="fullScreenCheck" class="btn btn-mini" onchange="toggleFullscreen()" value="fullscreen" />
+
+        <select id="colors"  class="btn btn-mini" > </select>
+        <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
+        <a href="http://flattr.com/thing/685359/naubino" target="_blank">
+          <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
+      </form>
+
+<!--      <div class="fluid-row">
+  <div class="span12">-->
           <div id="gamediv"> </div> 
-        </div>
-      </div>
+ <!--       </div>
+      </div>-->
 
-      <a href="http://flattr.com/thing/685359/naubino" target="_blank" class="flattr">
-        <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
-
-    </div> 
     <script>
       document.ontouchmove = function(event) {
         event.preventDefault();
