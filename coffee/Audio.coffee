@@ -1,6 +1,6 @@
 define -> class Audio
 
-  path: "sounds/"
+  path: "sound/"
   blubs:[]
   pool: 10
   i: 0
