@@ -45,13 +45,13 @@ define ["Game"], (Game) -> class StandardGame extends Game
       @number_of_colors = set['number_of_colors'] ? @number_of_colors
       @spammer_interval = set['interval']         ? @spammer_interval
 
-      console.log "limit"            , set['limit']
-      console.log "basket size"      , @basket_size
-      console.log "number of colors" , @number_of_colors
-      console.log "spammerinterval"  , @spammer_interval
+      #console.log "limit"            , set['limit']
+      #console.log "basket size"      , @basket_size
+      #console.log "number of colors" , @number_of_colors
+      #console.log "spammerinterval"  , @spammer_interval
 
       for name, probability of set['probabilities']
-        console.log name
+        #console.log name
         @spammers[name].probability = probability
 
   max_color: -> Math.floor(Math.random() * (@number_of_colors))
@@ -87,10 +87,6 @@ define ["Game"], (Game) -> class StandardGame extends Game
     @naubs_count = 0
     @load_level 0
 
-  onchangestate: (e,f,t)-> #console.info "ruleset recived #{e}: #{f} -> #{t}"
-
-  onbeforeplay: (e,f,t) ->
-
   onplaying: ->
     @spamming = setInterval @event, 100
     @checking = setInterval @check, 300
@@ -102,7 +98,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
   onbeforestop: (e,f,t, override) ->
     if Naubino.override or override
-      console.log "killed"
+      #console.log "killed"
       delete Naubino.override
       return true
     else
@@ -130,13 +126,12 @@ define ["Game"], (Game) -> class StandardGame extends Game
     dart = Math.floor(Math.random() * (max - min )) + min
     for spammer in @map_spammers()
       if dart < spammer.range
-        console.log spammer.name
+        #console.log spammer.name
         spammer.method()
         return
 
   # recurring check (@checking)
   check: =>
-    console
     capacity = @capacity()
     critical_capacity = 35
 

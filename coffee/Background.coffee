@@ -37,15 +37,14 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @pulsating = off
     @refresh_draw_rate @default_fps
 
-  draw: -> @draw_basket()
+  draw: ->
+    @clear()
+    @draw_basket()
 
   draw_basket: () ->
     center = @center()
     @basket_size = Naubino.game.basket_size() ? 150
 
-    @ctx.rect(0, 0, @canvas.width, @canvas.height)
-    @ctx.fillStyle = "rgba(255,255,255,0.4)"
-    @ctx.fill()
 
     @ctx.save()
     @ctx.beginPath()

@@ -61,7 +61,7 @@ define ["Layer"], (Layer) -> class Physical_Layer extends Layer
       @space.removeShape obj.physical_shape if obj.physical_shape?
       @space.removeBody obj.physical_body if obj.physical_body?
       for constraint in obj.constraints
-        console.log constraint
+        #console.log constraint
         @space.removeConstraint constraint
     delete @objects[id]
 

@@ -14,7 +14,7 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
 
     #@points = -1
     @joining_allowed = yes
-    console.log "mousemove"
+    #console.log "mousemove"
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
     Naubino.mouseup.add @unfocus
@@ -162,12 +162,12 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
     agrees = naub.agrees_with(other) and other.agrees_with(naub)
 
     if !naub.disabled && not joined && agrees && not close_related && not naub.alone() && not other.alone()
-      console.info 'replace'
+      #console.info 'replace'
       #other.replace_with naub # chipmunk does not like me deleting objects inside a step
       @replacing_naubs.push [naub, other]
       return yes
     else if naub.alone() and not (other.disabled or naub.disabled)
-      console.info 'join'
+      #console.info 'join'
       #naub.join_with other
       @joining_naubs.push [naub, other]
       return yes
@@ -252,11 +252,11 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
 
     for pair in @replacing_naubs
       pair[0].replace_with pair[1]
-      console.log "replacing #{pair[0].number} with #{pair[1].number}"
+      #console.log "replacing #{pair[0].number} with #{pair[1].number}"
 
     for pair in @joining_naubs
       pair[0].join_with pair[1]
-      console.log "joinging #{pair[0].number} with #{pair[1].number}"
+      #console.log "joinging #{pair[0].number} with #{pair[1].number}"
 
     @joining_naubs = []
     @replacing_naubs = []

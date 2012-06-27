@@ -30,7 +30,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
   buttons:
     main:
       position:  new cp.v(23,26)
-      function: -> console.info "menu"
+      function: -> #console.info "menu"
       shapes: [new MainButton]
       #shapes: []
     play:
@@ -51,7 +51,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     @objects.main.life_rendering = on
 
   check_game_state: (game = Naubino.game) ->
-    console.log "checking game state"
+    #console.log "checking game state"
     if @objects.play?
       if game.current == "playing"
         @objects.play.focus = -> Naubino.pause()

@@ -156,6 +156,6 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
       @add_ball
       @add_box
     ]
-    console.log 'i', i = Math.floor(Math.random() * (factories.length))
+    #console.log 'i', i = Math.floor(Math.random() * (factories.length))
     factories[i]
 

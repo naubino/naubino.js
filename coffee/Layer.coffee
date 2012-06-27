@@ -48,8 +48,7 @@ define -> class Layer
     @clear()
     @clear_objects()
 
-  onchangestate: (e,f,t)->
-    console.info "#{@name} changed state #{e}: #{f} -> #{t}"
+  onchangestate: (e,f,t)-> #console.info "#{@name} changed state #{e}: #{f} -> #{t}"
     #return true
 
   ### manage timers for drawing and stepping ###
@@ -85,30 +84,30 @@ define -> class Layer
     @canvas.width *= ratio
     @canvas.height*= ratio
     @ctx.scale ratio, ratio
-    @draw()
+    @clear()
 
   reset_resize: ->
     @ctx.setTransform 1,0,0,1,0,0
     @canvas.width  = Naubino.settings.canvas.width
     @canvas.height = Naubino.settings.canvas.height
-    @draw()
+    @clear()
 
   fade_in: (callback = null) ->
-    console.log "fade in", @fadeloop
+    #console.log "fade in", @fadeloop
     @canvas.style.opacity = 0.01
     @restore() if @backup_ctx?
     fade = =>
       if (@canvas.style.opacity *= 1.2) >= 1
         clearInterval @fadeloop
-        console.log "done"
+        #console.log "done"
         @show()
         if callback? and typeof callback == 'function'
           callback.call()
     clearInterval @fadeloop
-    console.log @fadeloop = setInterval( fade, 40 )
+    @fadeloop = setInterval( fade, 40 )
 
   fade_out: (callback = null)->
-    console.log "fade out", @fadeloop
+    #console.log "fade out", @fadeloop
     @cache()
     fade = =>
       if (@canvas.style.opacity *= 0.8) <= 0.05
@@ -118,7 +117,7 @@ define -> class Layer
         if callback? and typeof callback == 'function'
           callback.call()
     clearInterval @fadeloop
-    console.log @fadeloop = setInterval( fade, 40 )
+    @fadeloop = setInterval( fade, 40 )
 
 
   show: -> @canvas.style.opacity = 1

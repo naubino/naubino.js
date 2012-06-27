@@ -109,10 +109,10 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
     else
       if buffer.duration?
         buffer.age = if buffer.age? then buffer.age+1 else 0
-        console.time("fade #{id}") if buffer.age == 0
+        #console.time("fade #{id}") if buffer.age == 0
         if buffer.age >= buffer.duration*@fps
           delete buffer.duration
-          console.timeEnd("fade #{id}")
+          #console.timeEnd("fade #{id}")
       else if buffer.callback?
         cb = buffer.callback
         delete @objects[id]    if buffer.alpha <= 0

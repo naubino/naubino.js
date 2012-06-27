@@ -46,14 +46,14 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
 
       @scale = Naubino.settings.canvas.scale = win_width / game_width
       document.querySelector("#gamediv").style.width = ""
-      console.log ratio = Naubino.settings.canvas.scale/oscale
+      ratio = Naubino.settings.canvas.scale/oscale
       for layer in  @layers
         layer.resize_by ratio
       
   stretch: (width = "100%")->
     for name in 'background game menu overlay'.split ' '
       document.querySelector("canvas##{name}_canvas").style.width = width
-    console.log @scale = $("canvas#game_canvas").width()/Naubino.settings.canvas.width
+    #console.log @scale = $("canvas#game_canvas").width()/Naubino.settings.canvas.width
 
 
   list_states: ->
@@ -73,8 +73,7 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
       when 'paused'  then @play()
       when 'stopped' then @play()
 
-  onchangestate: (e,f,t) ->
-    console.info "Naubino changed states #{e}: #{f} -> #{t}"
+  onchangestate: (e,f,t) -> console.info "Naubino changed states #{e}: #{f} -> #{t}"
 
   onleavestopped: -> @menu.play() if @menu.can 'play'
 
