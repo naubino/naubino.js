@@ -65,8 +65,16 @@ define ["Naubino"], (Naubino) ->
       else if (document.webkitCancelFullScreen)
         document.webkitCancelFullScreen()
 
+
+    @toggleMaximized= ->
+      if $('#maximizeCheck').attr('checked')
+        naubino.maximize()
+      else
+        naubino.demaximize()
+
+
     @togglePrerendering = ->
-      naubino.settings.graphics.updating = 
+      naubino.settings.graphics.updating =
         if $('#prerenderingCheck').attr('checked')
           off
         else
@@ -81,9 +89,9 @@ define ["Naubino"], (Naubino) ->
 
     @changeFullscreen = (fullScreen) ->
       if fullScreen or (document.fullscreen) or (document.mozFullScreen) or (document.webkitIsFullScreen)
-        window.Naubino.maximise()
+        window.Naubino.maximize()
       else
-        window.Naubino.demaximise()
+        window.Naubino.demaximize()
 
 
     document.addEventListener("fullscreenchange",       ( => @changeFullscreen (document.fullscreen)         ), false)

@@ -32,22 +32,23 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     @overlay.init()
 
 
-  demaximise: ->
+  demaximize: ->
     for layer in  @layers
       layer.reset_resize()
     @scale = 1
 
-  maximise: ->
-    win_width = screen.width
-    win_height= screen.height
-    game_width = $("canvas#game_canvas").width()
-    oscale = 1
+  maximize: ->
+    if @scale is 1
+      win_width = screen.width
+      win_height= screen.height
+      game_width = $("canvas#game_canvas").width()
+      oscale = 1
 
-    @scale = Naubino.settings.canvas.scale = win_width / game_width
-    document.querySelector("#gamediv").style.width = ""
-    console.log ratio = Naubino.settings.canvas.scale/oscale
-    for layer in  @layers
-      layer.resize_by ratio
+      @scale = Naubino.settings.canvas.scale = win_width / game_width
+      document.querySelector("#gamediv").style.width = ""
+      console.log ratio = Naubino.settings.canvas.scale/oscale
+      for layer in  @layers
+        layer.resize_by ratio
       
   stretch: (width = "100%")->
     for name in 'background game menu overlay'.split ' '
