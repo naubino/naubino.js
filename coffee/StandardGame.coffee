@@ -105,11 +105,6 @@ define ["Game"], (Game) -> class StandardGame extends Game
       confirm "do you realy want to stop the game?"
 
 
-  lost: ->
-    Naubino.loose()
-    console.error "you lost", @level_details.current
-
-
   #maps spammers to their probabilities
   map_spammers: ->
     sum = 0
@@ -133,18 +128,22 @@ define ["Game"], (Game) -> class StandardGame extends Game
   # recurring check (@checking)
   check: =>
     capacity = @capacity()
-    critical_capacity = 35
+    critical_capacity = 45
 
     # start warning 
-    if @capacity() < critical_capacity
+    if capacity < critical_capacity
       if Naubino.background.pulsating == off
         Naubino.background.pulse()
       Naubino.background.ttl = Math.floor capacity/2
+
+      Naubino.background.pulse_speed = Util.interpolate(3,25,(critical_capacity-capacity)/critical_capacity)
+
+
     else if Naubino.background.pulsating == on
       Naubino.background.stop_pulse()
       Naubino.background.ttl = critical_capacity
 
-    @lost() if @capacity() < 10
+    @loose() if @capacity() < 5
 
     @load_level(@level+1) if @level_details[@level].limit < @ex_naubs
 

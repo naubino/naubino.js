@@ -38,21 +38,16 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
     @cycle_found     = new Naubino.Signal()
     @naub_focused    = new Naubino.Signal()
     @naub_unfocused  = new Naubino.Signal()
-    @game_lost       = new Naubino.Signal()
-
-    @game_lost.add (msg)-> Naubino.loose(msg)
 
   onstopped: (e,f,t) ->
     @clear_objects() unless e is 'init'
 
-  onlost: ->
-    @game_lost.dispatch("Naub Overflow")
+  onloose: ->
+    Naubino.loose('Naub Overflow') if Naubino.can 'loose'
+    Naubino.background.pause()
     @stop_stepping()
-    @for_each (naub) -> naub.grey_out()
-    #Naubino.overlay.warning "Naub Overflow"
-    setTimeout (=>@stop(yes)), 4000 # TODO make the a keyboard event
-    # after this point you must be able to press play an start again
 
+    # after this point you must be able to press play an start again
 
 
   # callback for mousedown signal
@@ -92,13 +87,13 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
 
   # counts how many naubs would be inside the circle
   # important for gameplay
-  count_basket: ->
+  count_basket: (margin) ->
     count = []
     b_s = @basket_size()
     for id, naub of @objects
       diff = @center()
       diff.sub naub.physical_body.p
-      if cp.v.len(diff) < b_s - naub.size/2
+      if cp.v.len(diff) < b_s*(1+margin) - naub.size/2
         count.push naub
     count
 
@@ -113,13 +108,11 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
       b_r = Math.sqrt(@max_naubs * n_r * n_r / special_factor)
 
   # number of naubs currently in the basket
-  cur_naubs: ->
-    @count_basket().length
+  cur_naubs: -> @count_basket(0.08).length
 
   # current space in basket in %
   # mainly here for compatibility reasons
-  capacity: ->
-    100 - @cur_naubs() * 100 / @max_naubs
+  capacity: -> 100 - @cur_naubs() * 100 / @max_naubs
 
 #   #shows how much room other.s available in the basket
 #   capacity: ->

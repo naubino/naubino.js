@@ -35,6 +35,7 @@ define -> class Layer
   # describe all events here (except oninit)
   # describe all states elsewhere
   onplay: (e,f,t) ->
+    @show()
     @start_drawing()
     @start_stepping()
 
@@ -48,7 +49,7 @@ define -> class Layer
     @clear()
     @clear_objects()
 
-  onchangestate: (e,f,t)-> #console.info "#{@name} changed state #{e}: #{f} -> #{t}"
+  #onchangestate: (e,f,t)-> console.info "#{@name} changed state #{e}: #{f} -> #{t}"
     #return true
 
   ### manage timers for drawing and stepping ###
@@ -94,6 +95,7 @@ define -> class Layer
 
   fade_in: (callback = null) ->
     #console.log "fade in", @fadeloop
+    @start_drawing()
     @canvas.style.opacity = 0.01
     @restore() if @backup_ctx?
     fade = =>
@@ -108,6 +110,7 @@ define -> class Layer
 
   fade_out: (callback = null)->
     #console.log "fade out", @fadeloop
+    @start_drawing()
     @cache()
     fade = =>
       if (@canvas.style.opacity *= 0.8) <= 0.05
@@ -116,8 +119,9 @@ define -> class Layer
         #@canvas.style.opacity = 1
         if callback? and typeof callback == 'function'
           callback.call()
+          @stop_drawing()
     clearInterval @fadeloop
-    @fadeloop = setInterval( fade, 40 )
+    @fadeloop = setInterval( fade, 70 )
 
 
   show: -> @canvas.style.opacity = 1
@@ -178,6 +182,14 @@ define -> class Layer
   for_each: (callback) ->
     callback(v) for k, v of @objects
     return
+
+  one_after_another: (callback, callback2, list = Object.keys(@objects)) =>
+    i = list.shift()
+    if i?
+      setTimeout (=> @one_after_another(callback,callback2,list)), 150
+      callback(@get_object(i))
+    else
+      callback2()
   
   ### visible utilites ###
   draw_point: (pos, color = "black") ->

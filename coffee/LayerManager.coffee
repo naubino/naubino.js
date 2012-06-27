@@ -23,15 +23,6 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     #@game = new Game @game_canvas
     @layers = [ @background, @game, @menu, @overlay ]
 
-  oninit: -> @init_layers()
-
-  init_layers:->
-    @menu.init()
-    @background.init()
-    @game.init()
-    @overlay.init()
-
-
   demaximize: ->
     for layer in  @layers
       layer.reset_resize()
@@ -73,33 +64,25 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
       when 'paused'  then @play()
       when 'stopped' then @play()
 
+  oninit: ->
+    for layer in @layers
+      layer.init()
+
   onchangestate: (e,f,t) -> console.info "Naubino changed states #{e}: #{f} -> #{t}"
 
   onleavestopped: -> @menu.play() if @menu.can 'play'
 
   onplay: (event, from, to) ->
-    @game.play()
-    @overlay.play()
-    @background.play()
+    for layer in [ @game, @overlay, @background ]
+      layer.play()
     @menu.check_game_state @game
 
   onbeforepause: -> @game.can("pause") and @background.can("pause")
 
   onpause: (event, from, to) ->
-    @game.pause()
-    @background.pause()
-    @overlay.pause() if @overlay.can 'pause'
+    for layer in [ @game, @overlay, @background ]
+      layer.pause() if @overlay.can 'pause'
     @menu.check_game_state @game
-
-  onstopped: (e,f,t) ->
-    @menu.stop()
-    @init_layers()
-
-  onleavelost: ->
-    @game.fade_out()
-    @overlay.fade_out()
-    @background.fade_out @transition
-    StateMachine.ASYNC
 
   onbeforestop: (event, from, to, @override = off) ->
     @game.stop()
@@ -109,13 +92,26 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     else
       return false
 
-  onloose:(e,f,t,msg="GameOver") ->
-    @game.for_each (n) -> n.grey_out()
-    setTimeout (=> @game.pause()), 500
+  onstopped: (e,f,t) ->
+    console.warn 'stopped'
+    for layer in [ @game, @overlay, @background ]
+      layer.init()
+    @menu.check_game_state @game
+
+
+  onloose:(e,f,t,msg="Game Over") ->
+    @game.loose() if @game.can 'loose'
     @overlay.warning (msg)
-    setTimeout (=> @stop(true)), 4000
+
+    leavelost= =>
+      console.warn 'leaving lost'
+      @overlay.stop()
+      @background.stop()
+      @game.fade_out(=> (setTimeout (=> @stop(yes)), 2000))
+
+    @game.one_after_another ((n) -> n.grey_out()), leavelost
 
   onleavelost: ->
-    @game.fade_out( )
-
-
+    name = prompt("Enter your name for the highscore")
+    alert("Thank you #{name}, unfortunately a highscore has not been implemented yet")
+    #Naubino 
