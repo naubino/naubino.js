@@ -6,18 +6,25 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
 
     @setup_fsm()
 
+  active_objects: ->
+    active_objects = 0
+    for id, object of @objects
+      if object.life isnt true
+        active_objects++
+    active_objects
+
 
   draw: ->
-    if Object.keys(@objects).length == 0 and @can "pause"
-      @pause()
+    @pause() if @active_objects() == 0 and @can 'pause'
 
     @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
     @ctx.save()
     # objects are all full size buffers
     for id, buffer of @objects
+      buffer.render() if buffer.life?
       @fade_object buffer, id
       @ctx.globalAlpha = buffer.alpha if buffer.alpha?
-      @ctx.drawImage(buffer, 0, 0)
+      @ctx.drawImage(buffer.buffer, 0, 0)
       @ctx.globalAlpha = 1
     @ctx.restore()
 
@@ -35,6 +42,7 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
   fade_out_message: (mes_id, callback) ->
     @play() if @can "play"
     mes = @get_object(mes_id)
+    console.log 'fade out message', mes.text
     mes.callback = callback
     mes.alpha_delta = -Naubino.settings.overlay.fade_duration / @fps if mes?
 
@@ -42,9 +50,9 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
   ### fading out all messages ###
   fade_out_messages: (callback) ->
     @play() if @can "play"
-    @fade_out_message id for id, message of @objects
+    @fade_out_message id for id, message of @objects when message.life isnt on
     k = Object.keys(@objects)
-    @objects[k[k.length-1]].callback = callback
+    @objects[k[k.length-1]].callback = callback if callback?
 
 
 
@@ -64,41 +72,22 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
 
   warning: (text) -> @fade_in_message {text: text, fontsize: 45, color: Util.color_to_rgba(Naubino.colors()[0])}
 
+  reset_osd: (text) ->
+    @objects['OSD'] = new TextBuffer text, this
+    @objects['OSD'].life = on
+    @draw()
 
-  message: (text, ctx = @ctx) ->
-    @play() if @can 'play'
+  set_osd: (text) ->
+    unless @objects['OSD']
+      @reset_osd text
+    else
+      @set_text 'OSD', text
+      @objects['OSD'].life = on
+      @draw()
 
-    {color, fontsize, font, text, pos, weight} = text unless typeof text == "string"
-    pos       ?= @center()
-    color     ?= Naubino.settings.overlay.color
-    fontsize  ?= Naubino.settings.overlay.fontsize
-    fontsize   = Naubino.settings.overlay.fontsize unless typeof fontsize == "number"
-    font      ?= Naubino.settings.overlay.font
-    weight    ?= ""
- 
-    buffer        = document.createElement('canvas')
-    buffer.width  = Naubino.settings.canvas.width
-    buffer.height = Naubino.settings.canvas.height
-    buffer.alpha  = 1
-
-    buffer.text = text
-    ctx = buffer.getContext('2d')
-    lines = text.split("\n")
-    pos.y -= fontsize * lines.length /2
-    for line in lines
-      console.log "OVERLAY:", line
-
-      ctx.fillStyle = color
-      ctx.shadowColor = '#fff'
-      ctx.shadowBlur = 3
-      ctx.strokeStyle = color
-      ctx.textAlign = 'center'
-      ctx.font= "#{weight} #{fontsize}px #{font}"
-      ctx.fillText(line, pos.x,pos.y)
-
-      pos.y += fontsize
-    @add_object buffer
-
+  set_text: (id, text)->
+    @objects[id].parse_text text
+    @draw()
 
   fade_object: (buffer,id) ->
     if buffer.alpha_delta? and 0 < buffer.alpha <= 1
@@ -123,3 +112,47 @@ define ["Layer"], (Layer) -> class Overlay extends Layer
       else
         delete @objects[id]    if buffer.alpha <= 0
 
+
+  message: (text, ctx = @ctx) ->
+    @play() if @can 'play'
+    buffer = new TextBuffer text, this
+    @add_object buffer
+
+class TextBuffer
+  constructor: (text,@layer) ->
+    @buffer        = document.createElement('canvas')
+    @buffer.width  = Naubino.settings.canvas.width
+    @buffer.height = Naubino.settings.canvas.height
+    @alpha  = 1
+    @ctx = @buffer.getContext('2d')
+
+    @parse_text text
+    @render()
+
+  parse_text: (text) ->
+    {@life, @color, @fontsize, @font, text, @pos, @weight, @align, x, y} = text unless typeof text == "string"
+    @pos = new cp.v(x,y) if x? and y?
+    @pos       ?= @layer.center()
+    @color     ?= Naubino.settings.overlay.color
+    @fontsize  ?= Naubino.settings.overlay.fontsize
+    @fontsize   = Naubino.settings.overlay.fontsize unless typeof @fontsize == "number"
+    @font      ?= Naubino.settings.overlay.font
+    @align     ?= 'center'
+    @weight    ?= ""
+    @text = text
+
+  render: ->
+    @ctx.clearRect(0, 0, @buffer.width, @buffer.height)
+    lines = @text.split("\n")
+    pos = {x:@pos.x, y:@pos.y}
+    pos.y -= @fontsize * lines.length /2
+    for line in lines
+      console.log "OVERLAY:", line unless @life
+      @ctx.fillStyle = @color
+      @ctx.shadowColor = '#fff'
+      @ctx.shadowBlur = 3
+      @ctx.strokeStyle = @color
+      @ctx.textAlign = @align
+      @ctx.font= "#{@weight} #{@fontsize}px #{@font}"
+      @ctx.fillText(line, pos.x,pos.y)
+      pos.y += @fontsize
