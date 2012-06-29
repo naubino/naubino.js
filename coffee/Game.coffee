@@ -28,19 +28,22 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
     @space.defaultHandler = new CollisionHandler this
 
     @setup_fsm Naubino.settings.events.game
+
     
 
   oninit: (e,f,t) ->
     # gameplay
+    @game_draw       = new Naubino.Signal()
     @naub_replaced   = new Naubino.Signal()
     @naub_joined     = new Naubino.Signal()
     @naub_destroyed  = new Naubino.Signal()
     @cycle_found     = new Naubino.Signal()
     @naub_focused    = new Naubino.Signal()
     @naub_unfocused  = new Naubino.Signal()
+    
 
-  onstopped: (e,f,t) ->
-    @clear_objects() unless e is 'init'
+
+  onstopped: (e,f,t) -> @clear_objects() unless e is 'init'
 
   onloose: ->
     Naubino.loose('Naub Overflow') if Naubino.can 'loose'
@@ -182,6 +185,7 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
       obj.draw @ctx
 
     @ctx.restore()
+    @game_draw.dispatch()
 
 
 
