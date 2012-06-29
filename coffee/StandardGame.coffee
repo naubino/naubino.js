@@ -5,8 +5,7 @@
 #
 # @extends Game
 define ["Game"], (Game) -> class StandardGame extends Game
-  constructor: (canvas) ->
-    super(canvas)
+  constructor: (canvas) -> super(canvas)
 
   calculate_points: (list) ->
     @ex_naubs += list.length
@@ -14,21 +13,21 @@ define ["Game"], (Game) -> class StandardGame extends Game
     factor = (max_grow-1) / @max_naubs
     p = Math.floor(factor * list.length * list.length)
     @points += p
-    if p > 0
-      Naubino.overlay.fade_in_and_out_message ("\n\nChain Bonus "+p)
+    Naubino.overlay.fade_in_and_out_message ("Chain Bonus "+p) if p > 0
+
 
   level_details: [
     { limit:-1,  number_of_colors: 3, interval: 40, max_naubs: 20, probabilities:{ pair:1, mixed_pair:0, triple: 0 } }
-    { limit:30,  number_of_colors: 3, interval: 40, max_naubs: 20 } #1
-    { limit:60,  number_of_colors: 3, interval: 37, max_naubs: 25, probabilities:{ pair:.9, mixed_pair: 0, triple: .1 } } #2
-    { limit:90,  number_of_colors: 4, interval: 33, max_naubs: 30 } #3
-    { limit:120, number_of_colors: 4, interval: 30, max_naubs: 35, probabilities:{ pair:.8, mixed_pair: 0, triple: .2 } } #4
+    { limit:20,  number_of_colors: 3, interval: 40, max_naubs: 20 } #1
+    { limit:50,  number_of_colors: 3, interval: 37, max_naubs: 25, probabilities:{ pair:9, mixed_pair: 0, triple: 1 } } #2
+    { limit:80,  number_of_colors: 4, interval: 33, max_naubs: 30 } #3
+    { limit:120, number_of_colors: 4, interval: 30, max_naubs: 35, probabilities:{ pair:8, mixed_pair: 0, triple: 2 } } #4
     { limit:150, number_of_colors: 5, interval: 27, max_naubs: 40 } #5
-    { limit:180, number_of_colors: 5, interval: 23, max_naubs: 43, probabilities:{ pair:.6, mixed_pair: 0, triple: .4 } } #6
+    { limit:180, number_of_colors: 5, interval: 23, max_naubs: 43, probabilities:{ pair:7, mixed_pair: 1, triple: 2 } } #6
     { limit:210, number_of_colors: 5, interval: 20, max_naubs: 45 } #7
-    { limit:240, number_of_colors: 5, interval: 18, max_naubs: 47, probabilities:{ pair:.4, mixed_pair: 0, triple: .6 } } #8
-    { limit:270, number_of_colors: 5, interval: 16, max_naubs: 49 } #9
-    { limit:30000, number_of_colors: 5, interval: 15, max_naubs: 50, probabilities:{ pair:.2, mixed_pair: 0, triple: .8 } } #10
+    { limit:240, number_of_colors: 5, interval: 27, max_naubs: 47, probabilities:{ pair:3, mixed_pair: 7, triple: 0 } } #8
+    { limit:270, number_of_colors: 5, interval: 35, max_naubs: 49 } #9
+    { limit:30000, number_of_colors: 5, max_naubs: 50, probabilities:{ pair:.2, mixed_pair: 0, triple: .8 } } #10
   ]
 
   load_level: (level) ->
@@ -59,11 +58,11 @@ define ["Game"], (Game) -> class StandardGame extends Game
   ### state machine ###
   oninit: ->
     super()
-
-    @naub_replaced.add (number)    => @graph.cycle_test(number)
-    @naub_destroyed.add (id)       => @points += @get_object(id).points_on_destroy()
-    @cycle_found.add (list)        => @destroy_naubs(list)
-    @cycle_found.add (list)        => @calculate_points(list)
+    @naub_replaced.add   (number) => @graph.cycle_test(number)
+    @naub_destroyed.add  (id)     => @points += @get_object(id).points_on_destroy()
+    @cycle_found.add     (list)   => @destroy_naubs(list)
+    @cycle_found.add     (list)   => @calculate_points(list)
+    @naub_focused.add    (n)      => @active_tree = @graph.tree n.number
     
     #Naubino.audio.connect_to_game this
     @number_of_colors = @default_number_of_colors = 3
@@ -90,6 +89,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
   onplaying: ->
     @spamming = setInterval @event, 100
     @checking = setInterval @check, 300
+    Naubino.overlay.set_osd { text:'level0', pos:{x:10,y:@height}, fontsize:8, align:'', life:true, color:'gray' } unless @OSD?
 
   onleaveplaying: ->
     clearInterval @spamming
@@ -146,6 +146,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
     @loose() if @capacity() < 5
 
     @load_level(@level+1) if @level_details[@level].limit < @ex_naubs
+    Naubino.overlay.set_osd "| level: #{@level} | points: #{@points} | destroyed naubs: #{@ex_naubs} | capacity:#{@capacity()}% |"
 
   # recurring event (@spamming)
   event: =>
