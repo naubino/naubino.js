@@ -167,6 +167,16 @@ define -> class Naub
 
   # runs draw_join on all partners, if this naub is the one drawing the join
   # Otherwise the partner will draw the join.
+  draw_outlines: (context) =>
+    # drawing joins
+    for id, partner of @joins
+      if @drawing_join[id]
+        @draw_outline context, partner, id
+    return
+
+
+  # runs draw_join on all partners, if this naub is the one drawing the join
+  # Otherwise the partner will draw the join.
   draw_joins: (context) =>
     # drawing joins
     for id, partner of @joins
@@ -209,6 +219,37 @@ define -> class Naub
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
+ 
+  # Renders join between this naub and the partner
+  # @param ctx [canvas.context] context of the target layer
+  # @param partner [naub] target naub
+  draw_outline: (ctx, partner,id) ->
+    pos = if @physical_body then @physical_body.p else @pos
+    pos2 = if partner.physical_body then partner.physical_body.p else partner.pos
+    # joins getting thinner by stretching
+    diff = pos2.Copy()
+    diff.sub(pos)
+    l = diff.Length()
+
+    ctx.save()
+    ctx.globalCompositeOperation = "destination-over"
+    ctx.strokeStyle = Util.color_to_rgba @join_style.fill
+    ctx.beginPath()
+
+    #ctx.moveTo pos.x, pos.y
+    #ctx.lineTo pos2.x, pos2.y
+    ctx.lineWidth = 1
+    ctx.fillStyle = '#000000'
+    ctx.strokeStyle = '#ffffff'
+    ctx.rotate diff.Angle()
+    ctx.translate pos.x, pos.y
+    ctx.rect 0, @size/2, l, @size
+    ctx.fill()
+
+    ctx.stroke()
+    ctx.closePath()
+    ctx.restore()
+ 
 
   # makes a naub clickable and joinable again
   disable: -> @disabled = true

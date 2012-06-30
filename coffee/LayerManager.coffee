@@ -70,7 +70,9 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
 
   onchangestate: (e,f,t) -> console.info "Naubino changed states #{e}: #{f} -> #{t}"
 
-  onleavestopped: -> @menu.play() if @menu.can 'play'
+  onleavestopped: ->
+    @menu.play() if @menu.can 'play'
+    @overlay.fade_out_messages()
 
   onplay: (event, from, to) ->
     for layer in [ @game, @overlay, @background ]
@@ -96,6 +98,7 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     console.warn 'stopped'
     for layer in [ @game, @overlay, @background ]
       layer.init()
+    setTimeout (=> @overlay.fade_in_message({text:'naubino', fontsize:75})), 100
     @menu.check_game_state @game
 
 

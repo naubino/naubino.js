@@ -9,7 +9,7 @@ define -> Settings = {
 
   game:
     creation_offset: 50
-    min_joining_force: 800
+    min_joining_force: 1000
     font: "Helvetica"
 
   naub:
@@ -100,47 +100,48 @@ define -> Settings = {
       [  0, 128, 224, 1, "hcblue"   ]
       [255, 255,   0, 1, "hcyellow" ]
       [  0,   0,   0, 1, "hcblack"  ]
+      [255, 255, 255, 1, "hcwhite" ]
       [128,   0, 128, 1, "hcpurple" ]
     ]
-    pop_is_everything: [
-      [ 255,   0, 170, 1, "Hue 320 Degrees"]
-      [ 170, 255,   0, 1, "Hue 80 Degrees"]
-      [   0, 170, 255, 1, "Hue 200 Degrees"]
-      [ 255, 170,   0, 1, "Norad Orange"]
-      [ 170,   0, 255, 1, "Hue 280 Degrees"]
-    ]
-    normal_colors: [
-      [255,   0,   0, 1, "red"         ]
-      [255, 153,   0, 1, "Vitamin C"   ]
-      [  0, 153, 204, 1, "Office Blue" ]
-      [  0, 204,   0, 1, "Astroturf"   ]
-      [255, 255,   0, 1, "Yellow"      ]
-      [  0,   0,   0, 1, "black" ]
-    ]
-    cuddle_bunny: [ # http://www.colourlovers.com/palette/124912/Cuddle_Bunny
-      [174,  49,  45, 1, "cuddling red"    ]
-      [ 75, 136,  95, 1, "cuddling green"  ]
-      [ 73,  37,  13, 1, "midnight fudge"  ]
-      [173, 165,  64, 1, "cuddling yellow" ]
-      [202, 202, 182, 1, "ill beige"       ]
-      [  0,   0,   0, 0.5, "black" ]
-    ]
-    '70': [ # http://www.colourlovers.com/palette/1712615/70
-      [191,  73,  73, 1]
-      [166,  30,  30, 1]
-      [ 38, 110, 128, 1]
-      [255, 232, 222, 1]
-      [ 41,  14,   3, 1, "tell me"]
-      [  0,   0,   0, 1, "black" ]
-    ]
-    lip: [
-      [125,  97,  83, 1]
-      [147, 208, 189, 1]
-      [ 82, 195, 193, 1]
-      [246, 153, 167, 1]
-      [198, 190,  99, 1]
-      [240, 240, 240, 1, "black" ]
-    ]
+    #pop_is_everything: [
+    #  [ 255,   0, 170, 1, "Hue 320 Degrees"]
+    #  [ 170, 255,   0, 1, "Hue 80 Degrees"]
+    #  [   0, 170, 255, 1, "Hue 200 Degrees"]
+    #  [ 255, 170,   0, 1, "Norad Orange"]
+    #  [ 170,   0, 255, 1, "Hue 280 Degrees"]
+    #]
+    #normal_colors: [
+    #  [255,   0,   0, 1, "red"         ]
+    #  [255, 153,   0, 1, "Vitamin C"   ]
+    #  [  0, 153, 204, 1, "Office Blue" ]
+    #  [  0, 204,   0, 1, "Astroturf"   ]
+    #  [255, 255,   0, 1, "Yellow"      ]
+    #  [  0,   0,   0, 1, "black" ]
+    #]
+    #cuddle_bunny: [ # http://www.colourlovers.com/palette/124912/Cuddle_Bunny
+    #  [174,  49,  45, 1, "cuddling red"    ]
+    #  [ 75, 136,  95, 1, "cuddling green"  ]
+    #  [ 73,  37,  13, 1, "midnight fudge"  ]
+    #  [173, 165,  64, 1, "cuddling yellow" ]
+    #  [202, 202, 182, 1, "ill beige"       ]
+    #  [  0,   0,   0, 0.5, "black" ]
+    #]
+    #'70': [ # http://www.colourlovers.com/palette/1712615/70
+    #  [191,  73,  73, 1]
+    #  [166,  30,  30, 1]
+    #  [ 38, 110, 128, 1]
+    #  [255, 232, 222, 1]
+    #  [ 41,  14,   3, 1, "tell me"]
+    #  [  0,   0,   0, 1, "black" ]
+    #]
+    #lip: [
+    #  [125,  97,  83, 1]
+    #  [147, 208, 189, 1]
+    #  [ 82, 195, 193, 1]
+    #  [246, 153, 167, 1]
+    #  [198, 190,  99, 1]
+    #  [240, 240, 240, 1, "black" ]
+    #]
     # http://www.colourlovers.com/palette/1763674/The_Hearth#
     # http://www.colourlovers.com/palette/1740916/lip
     # http://www.colourlovers.com/palette/1763676/DeepSeaNEONS

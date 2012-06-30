@@ -24,11 +24,14 @@ Shape: class Shape
     ctx.save()
     ctx.translate x, y
     ctx.scale @naub.style.scale, @naub.style.scale if @naub.style.scale?
+
+    ctx.scale 1.05, 1.05 if @naub.is_active()
+
     @render ctx, x, y
 
     @apply_filters @naub.style.filters, ctx if @naub.style.filters?
     @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
-    @apply_filter "draw_gradient", ctx if @naub.is_active() 
+    @apply_filter "draw_gradient", ctx if @naub.is_active()
 
     ctx.restore()
      
@@ -53,8 +56,7 @@ Shape: class Shape
 
   # animates the destruction of a naub
   # @params callback [function] function that will be called after the animation has ended
-  destroy_animation: (duration) ->
-    @naub.life_rendering = on
+  destroy_animation: (duration) -> @naub.life_rendering = on
 
 
 Ball: class Ball extends Shape

@@ -9,19 +9,18 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberS
 
     @naub_replaced.add (number)=> @graph.cycle_test(number)
     @cycle_found.add (list) => @destroy_naubs(list)
+    @naub_focused.add (n) => console.log @active_tree = @graph.tree n.number
     Naubino.play()
 
-    #Naubino.game.add_walls()
-
   onplaying: (e,f,t)->
-    super()
-
     @factory.create_matching_naubs() if f == "stopped"
     #Naubino.background.animation.play()
     #Naubino.background.start_stepper()
 
     weightless = => @gravity = off
     #setTimeout(weightless, 4000)
+
+
 
   event:->
   #check: =>
