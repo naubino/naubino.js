@@ -23,7 +23,7 @@ define -> class Naub
     @isClickable = yes # influences @layer.isHit()
 
     @life_rendering = false # if true redraw on each frame
-    @color_id       = @random_palette_color() unless @color_id?  # unless a color_id has been give pick a randome color
+    @set_random_palette_color() unless @color_id?  # unless a color_id has been give pick a randome color
     @setup_style()
 
 
@@ -61,9 +61,10 @@ define -> class Naub
     return -1
 
   # colors the shape randomly and returns color id for comparison
-  random_palette_color: ->
+  set_random_palette_color: ->
     palette = Naubino.colors()
-    id = Math.round(Math.random() * (palette.length-1))
+    @color_id = Math.floor(Math.random() * (palette.length))
+    @recolor()
 
   setup_physics: ->
     # this is redundant - just in case the the shapes don't do this

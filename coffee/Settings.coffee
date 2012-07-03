@@ -83,7 +83,7 @@ define -> Settings = {
     # blue
     # yellow
     # misc...
-    # a palett must have at least 5 colors
+    # a palett must have 7 colors
     output: [
     # [RRR, GGG, BBB, alpha, name,    is_background,    is_joincolor ]
       [229,  53,  23, 1, "red"      ]
@@ -100,7 +100,7 @@ define -> Settings = {
       [  0, 128, 224, 1, "hcblue"   ]
       [255, 255,   0, 1, "hcyellow" ]
       [  0,   0,   0, 1, "hcblack"  ]
-      [255, 255, 255, 1, "hcwhite" ]
+      [255, 255, 255, 1, "hcwhite"  ]
       [128,   0, 128, 1, "hcpurple" ]
     ]
     #pop_is_everything: [
@@ -126,14 +126,26 @@ define -> Settings = {
     #  [202, 202, 182, 1, "ill beige"       ]
     #  [  0,   0,   0, 0.5, "black" ]
     #]
-    #'70': [ # http://www.colourlovers.com/palette/1712615/70
-    #  [191,  73,  73, 1]
-    #  [166,  30,  30, 1]
-    #  [ 38, 110, 128, 1]
-    #  [255, 232, 222, 1]
-    #  [ 41,  14,   3, 1, "tell me"]
-    #  [  0,   0,   0, 1, "black" ]
-    #]
+    # http://www.colourlovers.com/palette/1712615/70 (modified & extended)
+    '70': [
+     [166,  30,  30, 1] # dr
+     [ 38, 110, 128, 1] # lb
+     [ 41,  14,   3, 1] # brown
+     [188, 105, 105, 1] # lr
+     [ 33,  66,  19, 1] # dg
+     [ 12,  47,  56, 1] # db
+     [110, 155,  88, 1] # lg
+    ]
+    # http://www.colourlovers.com/palette/433018 (EXTENDED)	
+    'Gasoline Rainbow': [
+     [189,  42,  51, 1] # RED
+     [147, 163,  28, 1] # GREEN
+     [ 48,  55,  79, 1] # BLUE
+     [214, 170,  38, 1] # YELLOW
+     [ 64, 129,  86, 1] # CYAN
+     [130,  65, 108, 1] # PURPLE
+     [188,  86,  43, 1] # ORANGE
+    ]
     #lip: [
     #  [125,  97,  83, 1]
     #  [147, 208, 189, 1]
@@ -143,10 +155,10 @@ define -> Settings = {
     #  [240, 240, 240, 1, "black" ]
     #]
     # http://www.colourlovers.com/palette/1763674/The_Hearth#
-    # http://www.colourlovers.com/palette/1740916/lip
     # http://www.colourlovers.com/palette/1763676/DeepSeaNEONS
     # http://www.colourlovers.com/palette/1763669/neon_spring
     # http://www.colourlovers.com/palette/373610/mellon_ball_surprise
+    # http://www.colourlovers.com/palette/1740916/lip
     # http://www.colourlovers.com/palette/1473/Ocean_Five
     # http://www.colourlovers.com/palette/705921/Spring_Birds
     # http://www.colourlovers.com/palette/2223536/Luxury

@@ -86,8 +86,8 @@ Box: class Box extends Shape
   area: -> @width/2 * @width/2
 
   setup: (naub) ->
-    naub.width  = naub.size * 0.9
-    naub.height = naub.size * 0.9
+    naub.width  = naub.size * 0.7
+    naub.height = naub.size * 0.7
     super(naub)
 
 
@@ -246,10 +246,19 @@ MainButton: class MainButton extends Box
     ctx.save()
     ctx.translate(x,y)
     ctx.scale ratio, ratio
-    ctx.fillStyle = 'white'
-    ctx.textAlign = 'center'
+    
     ctx.font= "bold #{size}px #{Naubino.settings.menu.font}"
+    ctx.textAlign = 'center'
+    if Naubino.settings.graphics.draw_borders
+      ctx.fillStyle = 'black'
+      ctx.fillText(text, 2,11)
+      ctx.fillText(text, 2,13)
+      ctx.fillText(text, 1,12)
+      ctx.fillText(text, 3,12)
+      ctx.fillText(text, 4,14)
+    ctx.fillStyle = 'white'
     ctx.fillText(text, 2,12)
+
     ctx.restore()
 
 

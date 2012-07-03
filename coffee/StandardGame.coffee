@@ -13,21 +13,22 @@ define ["Game"], (Game) -> class StandardGame extends Game
     factor = (max_grow-1) / @max_naubs
     p = Math.floor(factor * list.length * list.length)
     @points += p
-    Naubino.overlay.fade_in_and_out_message ("Chain Bonus "+p) if p > 0
+    Naubino.overlay.fade_in_and_out_message ("\n\nChain Bonus "+p) if p > 0
+    # Newlines prevent Level + Bonus messages overlapping
 
 
   level_details: [
-    { limit:-1,  number_of_colors: 3, interval: 40, max_naubs: 20, probabilities:{ pair:1, mixed_pair:0, triple: 0 } }
-    { limit:20,  number_of_colors: 3, interval: 40, max_naubs: 20 } #1
-    { limit:50,  number_of_colors: 3, interval: 37, max_naubs: 25, probabilities:{ pair:9, mixed_pair: 0, triple: 1 } } #2
-    { limit:80,  number_of_colors: 4, interval: 33, max_naubs: 30 } #3
-    { limit:120, number_of_colors: 4, interval: 30, max_naubs: 35, probabilities:{ pair:8, mixed_pair: 0, triple: 2 } } #4
-    { limit:150, number_of_colors: 5, interval: 27, max_naubs: 40 } #5
-    { limit:180, number_of_colors: 5, interval: 23, max_naubs: 43, probabilities:{ pair:7, mixed_pair: 1, triple: 2 } } #6
-    { limit:210, number_of_colors: 5, interval: 20, max_naubs: 45 } #7
-    { limit:240, number_of_colors: 5, interval: 27, max_naubs: 47, probabilities:{ pair:3, mixed_pair: 7, triple: 0 } } #8
-    { limit:270, number_of_colors: 5, interval: 35, max_naubs: 49 } #9
-    { limit:30000, number_of_colors: 5, max_naubs: 50, probabilities:{ pair:.2, mixed_pair: 0, triple: .8 } } #10
+    { limit:-1,    number_of_colors: 3, interval: 40, max_naubs: 20 } # initial state
+    { limit:20,    number_of_colors: 3, interval: 38, max_naubs: 20, probabilities:{ pair:1, mixed_1:0, mixed_2:0, triple: 0 }  } #1
+    { limit:50,    number_of_colors: 3, interval: 36, max_naubs: 25, probabilities:{ pair:9, mixed_1:0, mixed_2:0, triple: 1 }  } #2
+    { limit:80,    number_of_colors: 4, interval: 34, max_naubs: 30, probabilities:{ pair:9, mixed_1:0, mixed_2:0, triple: 1 }  } #3
+    { limit:120,   number_of_colors: 4, interval: 32, max_naubs: 35, probabilities:{ pair:8, mixed_1:1, mixed_2:0, triple: 1 }  } #4
+    { limit:150,   number_of_colors: 5, interval: 30, max_naubs: 40, probabilities:{ pair:7, mixed_1:2, mixed_2:0, triple: 1 }  } #5
+    { limit:180,   number_of_colors: 5, interval: 29, max_naubs: 43, probabilities:{ pair:6, mixed_1:3, mixed_2:0, triple: 1 }  } #6
+    { limit:210,   number_of_colors: 6, interval: 28, max_naubs: 45, probabilities:{ pair:5, mixed_1:3, mixed_2:1, triple: 1 }  } #7
+    { limit:240,   number_of_colors: 6, interval: 27, max_naubs: 47, probabilities:{ pair:4, mixed_1:4, mixed_2:1, triple: 1 }  } #8
+    { limit:270,   number_of_colors: 7, interval: 26, max_naubs: 49, probabilities:{ pair:3, mixed_1:4, mixed_2:2, triple: 1 }  } #9
+    { limit:30000, number_of_colors: 7, interval: 25, max_naubs: 50, probabilities:{ pair:3, mixed_1:3, mixed_2:3, triple: 1 } } #10
   ]
 
   load_level: (level) ->
@@ -36,7 +37,9 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
       @level = level
       name = "Level #{@level}"
-      Naubino.overlay.fade_in_and_out_message name unless level == 0
+      Naubino.overlay.fade_in_and_out_message name unless level < 1
+      Naubino.menu.for_each (naub)->naub.set_random_palette_color() unless level < 2
+
       set = @level_details[@level]
 
       #@basket_size      = set['basket_size']      ? @basket_size
@@ -72,8 +75,11 @@ define ["Game"], (Game) -> class StandardGame extends Game
       pair:
         method: => @factory.create_naub_pair(null, @max_color(), @max_color() )
         probability: 5
-      mixed_pair:
-        method: => @factory.create_naub_pair(null, @max_color(), @max_color(), true )
+      mixed_1:
+        method: => @factory.create_naub_pair(null, @max_color(), @max_color(), 1 )
+        probability: 0
+      mixed_2:
+        method: => @factory.create_naub_pair(null, @max_color(), @max_color(), 2 )
         probability: 0
       triple:
         method: => @factory.create_naub_triple(null, @max_color(), @max_color(), @max_color() )
@@ -87,13 +93,14 @@ define ["Game"], (Game) -> class StandardGame extends Game
     @load_level 0
 
   onplaying: ->
-    @spamming = setInterval @event, 100
-    @checking = setInterval @check, 300
+    @spamming = setInterval @event, 100 unless @spamming
+    @checking = setInterval @check, 300 unless @checking
     Naubino.overlay.set_osd { text:'level0', pos:{x:10,y:@height}, fontsize:8, align:'', life:true, color:'gray' } unless @OSD?
 
   onleaveplaying: ->
     clearInterval @spamming
     clearInterval @checking
+    @spamming = @checking = null
     #Naubino.background.stop_stepper()
 
   onbeforestop: (e,f,t, override) ->
@@ -102,7 +109,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
       delete Naubino.override
       return true
     else
-      confirm "do you realy want to stop the game?"
+      confirm "Do you realy want to stop the game?"
 
 
   #maps spammers to their probabilities
@@ -117,11 +124,10 @@ define ["Game"], (Game) -> class StandardGame extends Game
     probabilities = for name, spam of @spammers
       spam.probability
     max = probabilities.reduce (f,s) -> f+s
-    min = 0
-    dart = Math.floor(Math.random() * (max - min )) + min
+    dart = Math.floor(Math.random() * max)
     for spammer in @map_spammers()
       if dart < spammer.range
-        #console.log spammer.name
+        # console.log spammer.name
         spammer.method()
         return
 
@@ -146,7 +152,7 @@ define ["Game"], (Game) -> class StandardGame extends Game
     @loose() if @capacity() < 5
 
     @load_level(@level+1) if @level_details[@level].limit < @ex_naubs
-    Naubino.overlay.set_osd "| level: #{@level} | points: #{@points} | destroyed naubs: #{@ex_naubs} | capacity:#{@capacity()}% |"
+    Naubino.overlay.set_osd "| level: #{@level} | points: #{@points} | destroyed naubs: #{@ex_naubs} | capacity:#{Math.round(@capacity())}% |"
 
   # recurring event (@spamming)
   event: =>

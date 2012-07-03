@@ -65,7 +65,7 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
   # @param color [int] color id of naub 1
   # @param color [int] color id of naub 2
   # IMPLICIT if game has a @max_colors int random colors will only be picked out range [1..@max_colors]
-  create_naub_pair: (pos = null, color_a = null, color_b = null, mixed = off) =>
+  create_naub_pair: (pos = null, color_a = null, color_b = null, boxes = 0) =>
     pos = @random_outside() unless pos?
     dir = Math.random() * Math.PI
     pos_a = pos.Copy()
@@ -74,11 +74,16 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
     pos_a.AddPolar(dir,  15)
     pos_b.AddPolar(dir, -15)
 
-    if mixed
-      factory1 = @random_factory()
-      factory2 = @random_factory()
-    else
+    if boxes == 0
+      console.log('0 boxes')
       factory1 = factory2 = @add_ball
+    else if boxes == 1
+      console.log('1 boxe')
+      factory1 = @add_ball
+      factory2 = @add_box
+    else
+      console.log('2 boxes')
+      factory1 = factory2 = @add_box
 
     naub_a = factory1 pos_a, color_a
     naub_b = factory2 pos_b, color_b
@@ -120,7 +125,7 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
       while i < (colors.length )-1
         pos  = @random_outside()
         #Naubino.background.draw_marker(x,y)
-        [a,b] = @create_naub_pair(pos, colors[i],colors[i+1], off)
+        [a,b] = @create_naub_pair(pos, colors[i], colors[i+1])
         #console.log "pairing " + [a,b]
         i++
     #create some extras
@@ -156,6 +161,7 @@ define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberS
       @add_ball
       @add_box
     ]
-    #console.log 'i', i = Math.floor(Math.random() * (factories.length))
+    #console.log 'i',
+    i = Math.floor(Math.random() * (factories.length))
     factories[i]
 
