@@ -21,7 +21,32 @@ define ["Audio","Keybindings", "Settings", "LayerManager","Util"], (Audio, KeyBi
     @setup_signals()
     @add_listeners()
     @scale = 1 # will be changed by fullscreen
+    @load_highscores()
     #@audio = new Audio
+
+  load_highscores: ->
+    string = localStorage.getItem("naubino_hiscore")
+    @scores =
+      if string
+        JSON.parse string
+      else [ {name:"nobody", points: 0, time: 0, naubs: 0, level: 0 } ]
+
+  set_score: ->
+    @temp_score = {
+        name:"nobody"
+        points: @game.points
+        time: @game.duration
+        naubs: @game.ex_naubs
+        level: @game.level
+    }
+
+  store_score: (name = 'nobody')->
+    @temp_score.name = name
+    @scores.push @temp_score
+    string = JSON.stringify @scores
+    localStorage.setItem("naubino_hiscore",string)
+
+
 
   setup: ->
     @setup_dom()
@@ -35,7 +60,6 @@ define ["Audio","Keybindings", "Settings", "LayerManager","Util"], (Audio, KeyBi
   colors: -> @settings.colors[@settings.color]
   recolor: -> @game.for_each (naub) -> naub.recolor()
   print: -> @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
-
 
   setup_dom: () ->
     @gamediv = document.querySelector("#gamediv")

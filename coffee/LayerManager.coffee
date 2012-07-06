@@ -115,6 +115,6 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     @game.one_after_another ((n) -> n.grey_out()), leavelost
 
   onleavelost: ->
-    name = prompt("Enter your name for the highscore")
+    Naubino.store_score prompt("Enter your name for the highscore")
     alert("Thank you #{name}, unfortunately a highscore has not been implemented yet")
     #Naubino 

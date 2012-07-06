@@ -133,6 +133,10 @@ define ["Game"], (Game) -> class StandardGame extends Game
 
   # recurring check (@checking)
   check: =>
+
+    @duration = Date.now() - @start_timer
+    Naubino.set_score()
+
     capacity = @capacity()
     critical_capacity = 45
 
