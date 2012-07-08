@@ -10,6 +10,8 @@ define ["Naubino"], (Naubino) ->
   window.onload = ->
     naubino = window.Naubino = new Naubino()
     naubino.setup()
+    if $('#maximizeCheck').is(':checked')
+      naubino.remaximize()
 
 
 
@@ -63,7 +65,7 @@ define ["Naubino"], (Naubino) ->
         document.webkitCancelFullScreen()
 
     window.onresize = =>
-      if $('#maximizeCheck').attr('checked')
+      if $("#maximizeCheck").is(":checked")
         clearTimeout window.resizetimeout if window.resizetimeout?
         window.resizetimeout = setTimeout (
           ->
@@ -72,7 +74,7 @@ define ["Naubino"], (Naubino) ->
 
 
     @toggleMaximized= ->
-      if $('#maximizeCheck').attr('checked')
+      if $("#maximizeCheck").is(":checked")
         naubino.maximize()
       else
         naubino.demaximize()
@@ -80,14 +82,14 @@ define ["Naubino"], (Naubino) ->
 
     @togglePrerendering = ->
       naubino.settings.graphics.updating =
-        if $('#prerenderingCheck').attr('checked')
+        if $('#prerenderingCheck').is(":checked")
           off
         else
           on
 
 
     @toggleFullscreen = ->
-      if $('#fullScreenCheck').attr('checked')
+      if $('#fullScreenCheck').is(":checked")
         @requestFullscreen()
       else
         @exitFullscreen()
