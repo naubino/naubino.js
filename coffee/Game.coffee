@@ -23,15 +23,12 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
     @replacing_naubs = []
     @active_tree = []
     
-    #chipmunk
-    @setup_physics()
-    @space.defaultHandler = new CollisionHandler this
-
     @setup_fsm Naubino.settings.events.game
 
     
 
   oninit: (e,f,t) ->
+    console.log "game INIT"
     # gameplay
     @game_draw       = new Naubino.Signal()
     @naub_replaced   = new Naubino.Signal()
@@ -40,6 +37,11 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
     @cycle_found     = new Naubino.Signal()
     @naub_focused    = new Naubino.Signal()
     @naub_unfocused  = new Naubino.Signal()
+
+    #chipmunk
+    @setup_physics()
+    @space.defaultHandler = new CollisionHandler this
+
     
 
 
