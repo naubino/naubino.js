@@ -111,7 +111,7 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
       layer.init()
     #setTimeout (=> @overlay.fade_in_message({text:'naubino', fontsize:75})), 100
     @menu.check_game_state @game
-    unless f == 'none'
+    unless f == 'none' or @temp_score.points == 0
       name = prompt("Enter your name for the highscore")
       Naubino.store_score name if name?
 
