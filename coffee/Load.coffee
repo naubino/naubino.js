@@ -9,11 +9,8 @@ console.time("loading")
 define ["Naubino"], (Naubino) ->
   window.onload = ->
     naubino = window.Naubino = new Naubino()
+
     naubino.setup()
-    if $('#maximizeCheck').is(':checked')
-      naubino.remaximize()
-
-
 
     #populate color selector
     for name, colors of naubino.settings.colors
@@ -36,9 +33,6 @@ define ["Naubino"], (Naubino) ->
       naubino.menu.for_each (naub) -> naub.recolor()
       naubino.game.for_each (naub) -> naub.recolor()
       naubino.game.draw()
-
-
-
 
 
     # https://developer.mozilla.org/en/DOM/Using_full-screen_mode
@@ -64,30 +58,6 @@ define ["Naubino"], (Naubino) ->
       else if (document.webkitCancelFullScreen)
         document.webkitCancelFullScreen()
 
-    window.onresize = =>
-      if $("#maximizeCheck").is(":checked")
-        clearTimeout window.resizetimeout if window.resizetimeout?
-        window.resizetimeout = setTimeout (
-          ->
-            naubino.remaximize()
-        ) , 1000
-
-
-    @toggleMaximized= ->
-      if $("#maximizeCheck").is(":checked")
-        naubino.maximize()
-      else
-        naubino.demaximize()
-
-
-    @togglePrerendering = ->
-      naubino.settings.graphics.updating =
-        if $('#prerenderingCheck').is(":checked")
-          off
-        else
-          on
-
-
     @toggleFullscreen = ->
       if $('#fullScreenCheck').is(":checked")
         @requestFullscreen()
@@ -98,12 +68,42 @@ define ["Naubino"], (Naubino) ->
       if fullScreen or (document.fullscreen) or (document.mozFullScreen) or (document.webkitIsFullScreen)
         window.Naubino.maximize()
       else
-        window.Naubino.demaximize()
+        toggleMaximized()
+
+
+    window.onresize = =>
+      if $("#maximizeCheck").is(":checked")
+        clearTimeout window.resizetimeout if window.resizetimeout?
+        window.resizetimeout = setTimeout (
+          ->
+            naubino.remaximize()
+            naubino.center()
+        ) , 1000
+      else
+        naubino.center()
+
+    @toggleMaximized= ->
+      console.log 'toggleMaximized'
+      if $("#maximizeCheck").is(":checked")
+        naubino.maximize()
+      else
+        naubino.demaximize()
+      naubino.center()
+
+
+    @togglePrerendering = ->
+      naubino.settings.graphics.updating =
+        if $('#prerenderingCheck').is(":checked")
+          off
+        else
+          on
 
 
     document.addEventListener("fullscreenchange",       ( => @changeFullscreen (document.fullscreen)         ), false)
     document.addEventListener("mozfullscreenchange",    ( => @changeFullscreen (document.mozFullScreen)      ), false)
     document.addEventListener("webkitfullscreenchange", ( => @changeFullscreen (document.webkitIsFullScreen) ), false)
+
+    @toggleMaximized()
 
 
 

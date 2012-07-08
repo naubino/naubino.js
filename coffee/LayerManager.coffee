@@ -15,13 +15,21 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     @overlay       = new Overlay      @canvases.overlay_canvas
     @game_standard = new StandardGame @canvases.game_canvas
 
-    #@game_testcase = new TestCase(@game_canvas)
+    @game_testcase = new TestCase(@game_canvas)
     #@game_tutorial = new Tutorial(@game_canvas)
     @game          = @game_standard
     #@game          = @game_testcase
     #@game          = @game_tutorial
     #@game = new Game @game_canvas
     @layers = [ @background, @game, @menu, @overlay ]
+
+  center: () ->
+    win_width   = window.innerWidth #screen.width
+    game_width  = $("canvas#game_canvas").width()
+    left = win_width/2 - game_width/2
+    document.querySelector('form').style.left = "#{left}px"
+    for layer in @layers then layer.canvas.style.left = "#{left}px"
+
 
   demaximize: ->
     for layer in  @layers
@@ -34,13 +42,12 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
 
   maximize: ()->
     if @scale is 1
-      win_width = window.innerWidth #screen.width
-      win_height= window.innerHeight#screen.height
-      game_width = $("canvas#game_canvas").width()
+      win_width   = window.innerWidth #screen.width
+      win_height  = window.innerHeight#screen.height
+      game_width  = $("canvas#game_canvas").width()
       game_height = $("canvas#game_canvas").height()
-      game_height = $("canvas#game_canvas").height()
-      offset_top = $("canvas#game_canvas").offset().top
-      oscale = 1
+      offset_top  = $("canvas#game_canvas").offset().top
+      oscale      = 1
 
       @scale = Naubino.settings.canvas.scale = win_width / game_width
 
@@ -82,7 +89,7 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
   onchangestate: (e,f,t) -> console.info "Naubino changed states #{e}: #{f} -> #{t}"
 
   onleavestopped: ->
-    @menu.play() if @menu.can 'play'
+    @menu.play() #if @menu.can 'play'
     #@overlay.fade_out_messages()
 
   onplay: (event, from, to) ->

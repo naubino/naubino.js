@@ -74,13 +74,17 @@ h1 {
     left:auto;
     top: 20px;
 }
+form{
+    position: absolute;
+    text-align:center;
+}
 #gamediv > span{
     position: absolute;
     text-align:center;
     width:600px;
     height:400px;
     padding-top:50px;
-    z-index:1;
+    z-index:10;
 }
 form label
 {
