@@ -38,7 +38,7 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
       position: new cp.v(70,32)
       shapes: [new Ball, new PlayButton]
     help:
-      function: -> Naubino.tutorial()
+      function: -> alert("tutorial deactivated")#Naubino.tutorial()
       position: new cp.v(55,65)
       shapes: [new Ball, new StringShape "?", "white"]
     exit:
