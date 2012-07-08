@@ -9,8 +9,8 @@ console.time("loading")
 define ["Naubino"], (Naubino) ->
   window.onload = ->
     naubino = window.Naubino = new Naubino()
-
     naubino.setup()
+    $("#highscorelink").on "click", -> confirm "do you want to leave this page?"
 
     #populate color selector
     for name, colors of naubino.settings.colors

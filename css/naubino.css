@@ -1,61 +1,61 @@
-@font-face {
-    font-family: 'ComfortaaThin';
-    src: url('comfortaa/Comfortaa_Thin-webfont.eot');
-    src: url('comfortaa/Comfortaa_Thin-webfont.eot?#iefix') format('embedded-opentype'),
-         url('comfortaa/Comfortaa_Thin-webfont.woff') format('woff'),
-         url('comfortaa/Comfortaa_Thin-webfont.ttf') format('truetype'),
-         url('comfortaa/Comfortaa_Thin-webfont.svg#ComfortaaThin') format('svg');
-    font-weight: normal;
-    font-style: normal;
+@media screen and (view-mode: minimized) {
+    body 
+    {
+        background: #ffffff;
+        background-image:  url('../images/game.png');
+        background-size: 120% auto;
+    }
+    body > *
 
+    {
+        display: none;
+    }
 }
 
-@font-face {
-    font-family: 'Comfortaa';
-    src: url('comfortaa/Comfortaa_Regular-webfont.eot');
-    src: url('comfortaa/Comfortaa_Regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('comfortaa/Comfortaa_Regular-webfont.woff') format('woff'),
-         url('comfortaa/Comfortaa_Regular-webfont.ttf') format('truetype'),
-         url('comfortaa/Comfortaa_Regular-webfont.svg#ComfortaaRegular') format('svg');
-    font-weight: normal;
-    font-style: normal;
-
-}
-
-@font-face {
-    font-family: 'Comfortaa';
-    src: url('comfortaa/Comfortaa_Bold-webfont.eot');
-    src: url('comfortaa/Comfortaa_Bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('comfortaa/Comfortaa_Bold-webfont.woff') format('woff'),
-         url('comfortaa/Comfortaa_Bold-webfont.ttf') format('truetype'),
-         url('comfortaa/Comfortaa_Bold-webfont.svg#ComfortaaBold') format('svg');
-    font-weight: Bold;
-    font-style: normal;
-}
-
-body {
+body 
+{
     margin:0;
     background-color:rgb(88%,88%,88%);
 }
-canvas, .canvas {
+.container{
+    display:block;
+    border:1px solid gray;
+    background-color: #fff;
+}
+
+canvas, .canvas 
+{
     display:block;
     border:1px solid gray;
     background-color: rgba(255,255,255,0);
 }
-#background_canvas {
+
+#background_canvas 
+{
     background-color: #fff;
 }
-header{
+
+#highscore
+{
+    display:none;
+}
+
+header
+{
     margin:auto;
     align:center;
 }
-h1 {
+
+/*h1 
+{
     font-family: "Comfortaa";
     font-size:32pt;
     color: white;
     text-shadow: hsl(0,0%,022%) 2px 2px 4px;
-}
-#footerdiv {
+}*/
+
+#footerdiv 
+{
     text-align:center;
     display:block;
     margin:auto;
@@ -63,22 +63,30 @@ h1 {
     padding:0 1em;
 }
 
-#gamediv {
+
+#gamediv 
+{
     background-color: #fff;
     display:block;
 }
 
-#gamediv > canvas, #gamediv .canvas{
+
+#gamediv > canvas, #gamediv .canvas
+{
     position: absolute;
     z-index:0;
     left:auto;
     top: 20px;
 }
-form{
+
+form
+{
     position: absolute;
     text-align:center;
 }
-#gamediv > span{
+
+#gamediv > span
+{
     position: absolute;
     text-align:center;
     width:600px;
@@ -86,27 +94,22 @@ form{
     padding-top:50px;
     z-index:10;
 }
+
 form label
 {
     font-size:11px;
 }
-.flattr{
+
+.flattr
+{
     position:absolute;
     top: 550px;
 }
-select.btn{
+
+select.btn
+{
     text-align: left;
     height: 1.6em;
 }
-@media screen and (view-mode: minimized) { 
-    body
-    {
-        background: #ffffff;
-        background-image:  url('../images/game.png');
-        background-size: 120% auto;
-    }
-    body > *
-    {
-        display: none;
-    }
-}
+
+

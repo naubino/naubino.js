@@ -13,36 +13,42 @@
     <script type="text/javascript" src="lib/zepto/dist/zepto.js"></script>
     <script type="text/javascript" src="lib/chipmunk/cp.js"></script>
     <script type="text/javascript" src="lib/requirejs/require.js" data-main="js/Load"></script>
+
+    <script type="text/javascript" src="lib/underscore/underscore-min.js"></script>
+    <script type="text/javascript" src="js/highscore.js"></script>
   </head>
   <body>
 
 
 
-          <form class="form-inline">
-            <input type="button" class="btn btn-mini" onclick="window.Naubino.play();Naubino.list_states()" value="play"/>
-            <input type="button" class="btn btn-mini" onclick="window.Naubino.pause();Naubino.list_states()" value="pause"/>
-            <input type="button" class="btn btn-mini" onclick="window.Naubino.stop(true);Naubino.list_states()" value="stop"/>
-            <!--
-            <input type="button" class="btn btn-mini" onclick="window.Naubino.game.gravity = !window.Naubino.game.gravity " value="gravity on/off"/>
-            <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
-            <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
+    <form class="form-inline">
+      <input type="button" class="btn btn-mini" onclick="window.Naubino.play();Naubino.list_states()" value="play"/>
+      <input type="button" class="btn btn-mini" onclick="window.Naubino.pause();Naubino.list_states()" value="pause"/>
+      <input type="button" class="btn btn-mini" onclick="window.Naubino.stop(true);Naubino.list_states()" value="stop"/>
+      <!--
+      <input type="button" class="btn btn-mini" onclick="window.Naubino.game.gravity = !window.Naubino.game.gravity " value="gravity on/off"/>
+      <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.join_list()" value="joins"/>
+      <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
 
 
-            <input type="checkbox" id="prerenderingCheck" class="btn btn-mini" onchange="togglePrerendering()"/>
-            <label for="prerenderingCheck" class="checkbox">prerendering</label>
+      <input type="checkbox" id="prerenderingCheck" class="btn btn-mini" onchange="togglePrerendering()"/>
+      <label for="prerenderingCheck" class="checkbox">prerendering</label>
 
-            <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="toggleMaximized()"   />
-            <label for="maximizeCheck" class="checkbox">maximize</label>
+      <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="toggleMaximized()"   />
+      <label for="maximizeCheck" class="checkbox">maximize</label>
 
-            <input type="checkbox" id="fullScreenCheck" class="checkbox" onchange="toggleFullscreen()"/>
-            <label for="fullScreenCheck" class="checkbox">fullscreen</label>
+      <input type="checkbox" id="fullScreenCheck" class="checkbox" onchange="toggleFullscreen()"/>
+      <label for="fullScreenCheck" class="checkbox">fullscreen</label>
 
-            <select id="colors"  class="btn btn-mini" > </select>
-            <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
-          </form>
+      <select id="colors"  class="btn btn-mini" > </select>
+      <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
 
-          <div id="gamediv">
-          </div> 
+      <a class="btn btn-mini" id="highscorelink" href="highscore.html">HighScore</a>
+
+    </form>
+
+    <div id="gamediv">
+    </div> 
 
     <script>
       document.ontouchmove = function(event) {

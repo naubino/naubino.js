@@ -7,6 +7,7 @@ COFFEE	= /usr/bin/coffee
 #COFFEE	= /usr/local/bin/coffee
 RJS			= r.js
 INDEX	  = index.html
+SCORE 	= highscore.html
 SRC_DIR = coffee/
 AUDIO_DIR = sound/
 IMG_DIR = images/
@@ -66,12 +67,13 @@ $(LIB_PACK): $(LIB) $(LIB_PACK_DIR)
 $(LIB_PACK_DIR): $(DIST_DIR)
 	mkdir	$(LIB_PACK_DIR) -p
 
-dist: $(LIB_PACK) $(MIN_TARGET) $(INDEX) $(CSS_DIR)
+dist: $(LIB_PACK) $(MIN_TARGET) $(INDEX) $(SCORE) $(CSS_DIR)
 	cp $(MIN_TARGET) $(DIST_DIR)
 	cp -r $(CSS_DIR) $(DIST_DIR)
 	cp -r $(IMG_DIR) $(DIST_DIR)
 	cp -r $(AUDIO_DIR) $(DIST_DIR)
 	cp $(INDEX) $(DIST_DIR)
+	cp $(SCORE) $(DIST_DIR)
 
 $(DIST_DIR):
 	mkdir $(DIST_DIR) -p
