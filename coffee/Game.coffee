@@ -144,29 +144,32 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
 
   # is one naub allowed to join with another
   check_joining: (a, b, arbiter) ->
-    return no if a.number == b.number or not @joining_allowed
+    return no unless @joining_allowed
     return no unless a.focused or b.focused
+    return no if a.disabled or b.disabled
+    return no if a.number is b.number
+    return no if arbiter.totalImpulse().Length() < Naubino.settings.game.min_joining_force
 
-    naub = if a.focused then a else b
-    other= unless a.focused then a else b
+    # assigning better names the a and b
+    naub  = if a.focused then a else b
+    other = unless a.focused then a else b
 
-    force = arbiter.totalImpulse().Length()
-    return no if force < Naubino.settings.game.min_joining_force
-    #console.log force
 
-    close_related = naub.close_related other # prohibits folding of pairs
-    joined = naub.is_joined_with other # can't join what's already joined
+    to_close = naub.close_related other # prohibits folding of pairs
+    joined   = naub.is_joined_with other # can't join what's already joined
+    agree    = naub.agrees_with(other) and other.agrees_with(naub)
+    alone    = naub.is_alone() or other.is_alone()
 
-    agrees = naub.agrees_with(other) and other.agrees_with(naub)
-
-    if !naub.disabled && not joined && agrees && not close_related && not naub.alone() && not other.alone()
+    if not joined && agree && not to_close && not alone
       #console.info 'replace'
       #other.replace_with naub # chipmunk does not like me deleting objects inside a step
       @replacing_naubs.push [naub, other]
       return yes
-    else if naub.alone() and not (other.disabled or naub.disabled)
+
+    else if naub.is_alone() and naub.number isnt @just_joined
       #console.info 'join'
       #naub.join_with other
+      @just_joined = naub.number
       @joining_naubs.push [naub, other]
       return yes
     no
