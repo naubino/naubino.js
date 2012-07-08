@@ -35,7 +35,7 @@ define -> Settings = {
   canvas:
     scale:         1 # not yet implemented
     width:         800
-    height:        480
+    height:        500
 
   events:
 

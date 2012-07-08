@@ -11,9 +11,6 @@ define ["Naubino"], (Naubino) ->
     naubino = window.Naubino = new Naubino()
     naubino.setup()
 
-    window.onresize = =>
-      naubino.win_width = document.documentElement.clientWidth
-      naubino.win_height= document.documentElement.clientHeight
 
 
     #populate color selector
@@ -64,6 +61,14 @@ define ["Naubino"], (Naubino) ->
 
       else if (document.webkitCancelFullScreen)
         document.webkitCancelFullScreen()
+
+    window.onresize = =>
+      if $('#maximizeCheck').attr('checked')
+        clearTimeout window.resizetimeout if window.resizetimeout?
+        window.resizetimeout = setTimeout (
+          ->
+            naubino.remaximize()
+        ) , 1000
 
 
     @toggleMaximized= ->

@@ -28,14 +28,25 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
       layer.reset_resize()
     @scale = 1
 
-  maximize: ->
+  remaximize: ()->
+    @demaximize()
+    @maximize()
+
+  maximize: ()->
     if @scale is 1
-      win_width = screen.width
-      win_height= screen.height
+      win_width = window.innerWidth #screen.width
+      win_height= window.innerHeight#screen.height
       game_width = $("canvas#game_canvas").width()
+      game_height = $("canvas#game_canvas").height()
+      game_height = $("canvas#game_canvas").height()
+      offset_top = $("canvas#game_canvas").offset().top
       oscale = 1
 
       @scale = Naubino.settings.canvas.scale = win_width / game_width
+
+      if game_height * @scale > win_height
+        @scale = Naubino.settings.canvas.scale = (win_height-offset_top) / game_height
+
       document.querySelector("#gamediv").style.width = ""
       ratio = Naubino.settings.canvas.scale/oscale
       for layer in  @layers
@@ -100,6 +111,9 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
       layer.init()
     #setTimeout (=> @overlay.fade_in_message({text:'naubino', fontsize:75})), 100
     @menu.check_game_state @game
+    unless f == 'none'
+      name = prompt("Enter your name for the highscore")
+      Naubino.store_score name if name?
 
 
   onloose:(e,f,t,msg="Game Over") ->
@@ -115,6 +129,3 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     @game.one_after_another ((n) -> n.grey_out()), leavelost
 
   onleavelost: ->
-    Naubino.store_score prompt("Enter your name for the highscore")
-    alert("Thank you #{name}, unfortunately a highscore has not been implemented yet")
-    #Naubino 
