@@ -37,11 +37,13 @@ define ["Audio","Keybindings", "Settings", "LayerManager","Util"], (Audio, KeyBi
         points: @game.points
         time: @game.duration
         naubs: @game.ex_naubs
+        game_version: @game.version
         level: @game.level
     }
 
   store_score: (name = 'nobody')->
     @temp_score.name = name
+    @temp_score.date = Date.now()
     @scores.push @temp_score
     string = JSON.stringify @scores
     localStorage.setItem("naubino_hiscore",string)

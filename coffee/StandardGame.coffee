@@ -5,7 +5,9 @@
 #
 # @extends Game
 define ["Game"], (Game) -> class StandardGame extends Game
-  constructor: (canvas) -> super(canvas)
+  constructor: (canvas) ->
+    super(canvas)
+    @version = 1 # please raise when makeing changes to this file
 
   calculate_points: (list) ->
     @ex_naubs += list.length
