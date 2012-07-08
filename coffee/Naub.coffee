@@ -419,7 +419,7 @@ define -> class Naub
     close_related = naub_partners.some (x) -> x in other_partners # "some" is standard js and means "filter"
 
   # is this naub not joined with any other naub?
-  alone: -> Object.keys(@joins).length == 0
+  is_alone: -> Object.keys(@joins).length == 0
 
   # checks whether this naub wants to join with the other
   # OVERWRITE ME
