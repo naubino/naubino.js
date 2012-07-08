@@ -5,15 +5,17 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberS
     super()
     Naubino.settings.graphics.updating = off
     Naubino.settings.game.creation_offset = -200
-    @factory.add_ball = @add_ball
+    #@factory.add_ball = @add_ball
 
     @naub_replaced.add (number)=> @graph.cycle_test(number)
     @cycle_found.add (list) => @destroy_naubs(list)
-    @naub_focused.add (n) => console.log @active_tree = @graph.tree n.number
-    Naubino.play()
+    setTimeout (-> Naubino.play()), 300
 
   onplaying: (e,f,t)->
     @factory.create_matching_naubs() if f == "stopped"
+    
+    for [..5]
+      @add_ball()
     #Naubino.background.animation.play()
     #Naubino.background.start_stepper()
 
@@ -25,7 +27,7 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberS
   event:->
   #check: =>
 
-  add_ball: (pos = @random_outside(), color = null) =>
+  add_ball: (pos = @factory.random_outside(), color = null) =>
     naub = new Naub this, color
     ball = new Ball
 
