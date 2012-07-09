@@ -14,7 +14,7 @@ define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberS
   onplaying: (e,f,t)->
     @factory.create_matching_naubs() if f == "stopped"
     
-    for [..5]
+    for [0..5]
       @add_ball()
     #Naubino.background.animation.play()
     #Naubino.background.start_stepper()
