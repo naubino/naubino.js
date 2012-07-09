@@ -14,7 +14,7 @@ Shape: class Shape
       @apply_filter(filter, ctx)
 
   apply_filter: (filter, ctx )->
-    @[filter](ctx) if filter in [ "alpha", "draw_glow", "draw_border", "draw_shadow", "draw_gradient" ]
+    @[filter](ctx) if filter in [ "alpha", "draw_glow", "draw_border", "draw_shadow", "draw_gradient","draw_gradient_soft" ]
   
   alpha: (ctx) ->
     ctx.globalAlpha = 0.4
@@ -33,6 +33,8 @@ Shape: class Shape
     if @naub.is_active_end() or @naub.destroying
       @apply_filter "draw_glow", ctx
       @apply_filter "draw_gradient", ctx
+    else if @naub.is_active()
+      @apply_filter "draw_gradient_soft", ctx
 
     ctx.restore()
      
@@ -45,6 +47,13 @@ Shape: class Shape
     gradient = ctx.createRadialGradient(0, 0, @radius/3, 0, 0, @radius)
     gradient.addColorStop 0, Util.color_to_rgba(@naub.style.fill, 60)
     gradient.addColorStop 1, Util.color_to_rgba(@naub.style.fill, 30)
+    ctx.fillStyle = gradient
+    ctx.fill()
+
+  draw_gradient_soft: (ctx) ->
+    gradient = ctx.createRadialGradient(0, 0, @radius/3, 0, 0, @radius)
+    gradient.addColorStop 0, Util.color_to_rgba(@naub.style.fill, 45)
+    gradient.addColorStop 1, Util.color_to_rgba(@naub.style.fill, 20)
     ctx.fillStyle = gradient
     ctx.fill()
 
