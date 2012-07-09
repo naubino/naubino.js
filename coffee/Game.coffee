@@ -9,6 +9,7 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
     @name = "game"
     @graph = new Graph(this)
     @factory = new Factory this
+    @begin_time = Date.now()
 
     # display stuff
     @focused_naub = null # points to the naub you click on
