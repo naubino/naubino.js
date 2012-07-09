@@ -30,7 +30,7 @@ Shape: class Shape
     @apply_filters @naub.style.filters, ctx if @naub.style.filters?
     @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
     #@apply_filter "draw_gradient", ctx if @naub.is_active()
-    if @naub.is_active_end()
+    if @naub.is_active_end() or @naub.destroying
       @apply_filter "draw_glow", ctx
       @apply_filter "draw_gradient", ctx
 

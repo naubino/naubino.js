@@ -16,6 +16,7 @@ define -> class Naub
     @radius      = @size/2
     @width       = @size * 0.9
     @height      = @size * 0.9
+    @destroying  = false
 
     @removed     = false # soon to be deleted by game, garbage collector
     @focused     = false # currently activated by pointer
@@ -283,6 +284,7 @@ define -> class Naub
     
   # animated remove with disabling  
   destroy: (is_last = false) ->
+    @destroying = true
     duration = 270
     unless is_last
       for id, partner of @joins
