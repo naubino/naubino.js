@@ -16,7 +16,7 @@ define -> Settings = {
     size:          42
     margin:        8
     mass:          5
-    friction:         0.8
+    friction:         0.1
     elasticity:    0.3
     min_join_len:  1.2 # times size
     max_join_len:  2 # times size
