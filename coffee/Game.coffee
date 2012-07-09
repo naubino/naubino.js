@@ -4,6 +4,7 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
 
   # get this started
   constructor: (canvas) ->
+    @version = 0
     super(canvas)
     @name = "game"
     @graph = new Graph(this)
@@ -170,6 +171,7 @@ define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physi
       #console.info 'join'
       #naub.join_with other
       @just_joined = naub.number
+      setTimeout (=> @just_joined = -1), 300
       @joining_naubs.push [naub, other]
       return yes
     no
