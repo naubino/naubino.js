@@ -29,19 +29,19 @@
         <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
 
 
-        <label for="prerenderingCheck">prerendering</label>
         <input type="checkbox" id="prerenderingCheck" class="btn btn-mini" onchange="togglePrerendering()" value="fullscreen" />
+        <label for="prerenderingCheck">prerendering</label>
 
+        <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="toggleMaximized()"/>
         <label for="maximizeCheck">maximize</label>
-        <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="toggleMaximized()" />
 
-        <label for="fullScreenCheck">fullscreen</label>
         <input type="checkbox" id="fullScreenCheck" class="btn btn-mini" onchange="toggleFullscreen()" value="fullscreen" />
+        <label for="fullScreenCheck">fullscreen</label>
 
         <select id="colors"  class="btn btn-mini" > </select>
         <!-- <a href="http://www1.inf.tu-dresden.de/~s8880935/naubino/">there be a reference</a> -->
-        <a href="http://flattr.com/thing/685359/naubino" target="_blank">
-          <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
+
+        <a href="http://flattr.com/thing/685359/naubino" target="_blank"> <img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
         <a class="btn btn-mini" id="highscorelink" href="highscore.html">HighScore</a>
       </form>
 
