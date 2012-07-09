@@ -91,7 +91,6 @@ define -> class Graph
       unless p in visited
         visited.push p
         @tree(p, visited)
-
     return visited
 
   # recursive part of cycle_test

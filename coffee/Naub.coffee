@@ -463,6 +463,8 @@ define -> class Naub
     setInterval (check_in_field), 10
 
   is_active: -> @focused or (@layer.active_tree? and @number in @layer.active_tree)
+  is_active_end: ->
+    @focused or ( (@layer.active_tree? and @number in @layer.active_tree) and Object.keys(@joins).length == 1)
 
   # user interaction
   onclick: ->
