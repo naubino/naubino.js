@@ -26,6 +26,9 @@ define ["Naubino"], (Naubino) ->
 
     if navigator.platform.indexOf("iPad") != -1
       $("#maximizeCheck").prop "checked", true
+      $("#github").hide()
+      $("form label").hide()
+      $("form input[type=checkbox]").hide()
       
 
 
