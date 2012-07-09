@@ -14,7 +14,7 @@ Shape: class Shape
       @apply_filter(filter, ctx)
 
   apply_filter: (filter, ctx )->
-    @[filter](ctx) if filter in [ "alpha", "draw_border", "draw_shadow", "draw_gradient" ]
+    @[filter](ctx) if filter in [ "alpha", "draw_glow", "draw_border", "draw_shadow", "draw_gradient" ]
   
   alpha: (ctx) ->
     ctx.globalAlpha = 0.4
@@ -25,13 +25,14 @@ Shape: class Shape
     ctx.translate x, y
     ctx.scale @naub.style.scale, @naub.style.scale if @naub.style.scale?
 
-    ctx.scale 1.05, 1.05 if @naub.is_active()
-
     @render ctx, x, y
 
     @apply_filters @naub.style.filters, ctx if @naub.style.filters?
     @apply_filter "draw_border", ctx if Naubino.settings.graphics.draw_borders
-    @apply_filter "draw_gradient", ctx if @naub.is_active()
+    #@apply_filter "draw_gradient", ctx if @naub.is_active()
+    if @naub.is_active() && Object.keys(@naub.joins).length == 1
+      @apply_filter "draw_glow", ctx
+      @apply_filter "draw_gradient", ctx
 
     ctx.restore()
      
@@ -45,6 +46,13 @@ Shape: class Shape
     gradient.addColorStop 0, Util.color_to_rgba(@naub.style.fill, 60)
     gradient.addColorStop 1, Util.color_to_rgba(@naub.style.fill, 30)
     ctx.fillStyle = gradient
+    ctx.fill()
+
+  draw_glow: (ctx) ->
+    ctx.shadowColor = Util.color_to_rgba(@naub.style.fill)
+    ctx.shadowBlur = 10
+    ctx.shadowOffsetX = 0
+    ctx.shadowOffsetY = 0
     ctx.fill()
 
   draw_shadow: (ctx) ->
