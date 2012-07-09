@@ -14,8 +14,6 @@
     <script type="text/javascript" src="lib/chipmunk/cp.js"></script>
     <script type="text/javascript" src="lib/requirejs/require.js" data-main="js/Load"></script>
 
-    <script type="text/javascript" src="lib/underscore/underscore-min.js"></script>
-    <script type="text/javascript" src="js/highscore.js"></script>
   </head>
   <body>
 
@@ -31,13 +29,13 @@
       <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
 
 
-      <input type="checkbox" id="prerenderingCheck" class="btn btn-mini" onchange="togglePrerendering()"/>
+      <input type="checkbox" id="prerenderingCheck" class="btn btn-mini" onchange="Util.togglePrerendering()"/>
       <label for="prerenderingCheck" class="checkbox">prerendering</label>
 
-      <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="toggleMaximized()"   />
+      <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="Util.toggleMaximized()"   />
       <label for="maximizeCheck" class="checkbox">maximize</label>
 
-      <input type="checkbox" id="fullScreenCheck" class="checkbox" onchange="toggleFullscreen()"/>
+      <input type="checkbox" id="fullScreenCheck" class="checkbox" onchange="Util.toggleFullscreen()"/>
       <label for="fullScreenCheck" class="checkbox">fullscreen</label>
 
       <select id="colors"  class="btn btn-mini" > </select>

@@ -36,11 +36,9 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
       layer.reset_resize()
     @scale = 1
 
-  remaximize: ()->
-    @demaximize()
-    @maximize()
-
   maximize: ()->
+    @demaximize()
+
     if @scale is 1
       win_width   = window.innerWidth #screen.width
       win_height  = window.innerHeight#screen.height

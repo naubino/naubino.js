@@ -29,13 +29,13 @@
         <input type="button" class="btn btn-mini" onclick="window.Naubino.game.graph.dotty()" value="dotty"/> -->
 
 
-        <input type="checkbox" id="prerenderingCheck" class="btn btn-mini" onchange="togglePrerendering()" value="fullscreen" />
+        <input type="checkbox" id="prerenderingCheck" class="btn btn-mini" onchange="Util.togglePrerendering()"/>
         <label for="prerenderingCheck">prerendering</label>
 
-        <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="toggleMaximized()"/>
+        <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="Util.toggleMaximized()"   />
         <label for="maximizeCheck">maximize</label>
 
-        <input type="checkbox" id="fullScreenCheck" class="btn btn-mini" onchange="toggleFullscreen()" value="fullscreen" />
+        <input type="checkbox" id="fullScreenCheck" class="checkbox" onchange="Util.toggleFullscreen()"/>
         <label for="fullScreenCheck">fullscreen</label>
 
         <select id="colors"  class="btn btn-mini" > </select>

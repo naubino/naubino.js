@@ -47,6 +47,57 @@ window.Util =
       @interpolate a[i],b[i],s
 
 
-  interpolate: (a,b,s=0.5)->
+  interpolate: (a,b,s = 0.5)->
     d = b-a
     v = a + d*s
+
+  togglePrerendering: ->
+    Naubino.settings.graphics.updating =
+      if $('#prerenderingCheck').is(":checked")
+        off
+      else
+        on
+
+
+  toggleMaximized: (force = false) ->
+    if $("#maximizeCheck").is(":checked") or force
+      Naubino.maximize()
+    else
+      Naubino.demaximize()
+    window.Naubino.center()
+
+
+  # https://developer.mozilla.org/en/DOM/Using_full-screen_mode
+  requestFullscreen: ->
+    docElm = document.documentElement
+    if (docElm.requestFullscreen?)
+      docElm.requestFullscreen()
+    else if (docElm.mozRequestFullScreen?)
+      docElm.mozRequestFullScreen()
+    else if (docElm.oRequestFullScreen?)
+      docElm.oRequestFullScreen()
+    else if (docElm.webkitRequestFullScreen?)
+      docElm.webkitRequestFullScreen()
+
+  exitFullscreen: ->
+    if (document.exitFullscreen)
+      document.exitFullscreen()
+    else if (document.mozCancelFullScreen)
+      document.mozCancelFullScreen()
+    else if (document.webkitCancelFullScreen)
+      document.webkitCancelFullScreen()
+
+
+  toggleFullscreen: ->
+    if $('#fullScreenCheck').is(":checked")
+      @requestFullscreen()
+    else
+      @exitFullscreen()
+
+  changeFullscreen: (fullScreen) ->
+    if fullScreen or (document.fullscreen) or (document.mozFullScreen) or (document.webkitIsFullScreen)
+      @toggleMaximized(on)
+    else
+      @toggleMaximized()
+
+
