@@ -67,9 +67,9 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     @.name = "Naubino"
     for o in [ @, @menu, @game, @overlay, @background]
       switch o.current
-        when 'playing' then console.info o.name, o.current
-        when 'paused'  then console.warn o.name, o.current
-        when 'stopped' then console.warn o.name, o.current
+        when 'playing' then console.info o.name, o.current, o.fps, o.step_rate
+        when 'paused'  then console.warn o.name, o.current, o.fps, o.step_rate
+        when 'stopped' then console.warn o.name, o.current, o.fps, o.step_rate
         else console.error o.name, o.current
 
 

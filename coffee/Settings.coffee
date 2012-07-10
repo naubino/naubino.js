@@ -6,6 +6,7 @@ define -> Settings = {
     updating:      yes
     draw_shadows:  on
     draw_borders:  no
+    effects:       off
 
   game:
     creation_offset: 50

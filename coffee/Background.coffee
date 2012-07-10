@@ -4,6 +4,8 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @name = "background"
     @setup_fsm Naubino.settings.events.background
     @fps = @default_fps = 2
+    @min_fps = 15
+    @min_step_rate= 15
 
   set_defaults: ->
     @p_min= { color: [130,130,130], thick: 2 }
@@ -20,7 +22,10 @@ define ["Layer"], (Layer) -> class Background extends Layer
   onstopped: -> @set_defaults()
 
   onbeforepulse: ->
-    @refresh_draw_rate 25
+    if Naubino.settings.graphics.effects == on
+      @refresh_draw_rate 25
+    else
+      @refresh_draw_rate 10
 
   onenterpulsing: ->
     @pulsating = on
@@ -42,9 +47,9 @@ define ["Layer"], (Layer) -> class Background extends Layer
     @draw_basket()
 
   draw_basket: () ->
+
     center = @center()
     @basket_size = Naubino.game.basket_size() ? 150
-
 
     @ctx.save()
     @ctx.beginPath()

@@ -66,6 +66,31 @@ window.Util =
       Naubino.demaximize()
     window.Naubino.center()
 
+  toggleEffects: ->
+    if $('#effectsCheck').is(":checked")
+      Naubino.settings.graphics.effects = on
+      for layer in Naubino.layers
+        layer.refresh_draw_rate(layer.min_fps) if layer.min_fps?
+        layer.refresh_step_rate(layer.min_step_rate) if layer.min_step_rate?
+    else
+      Naubino.settings.graphics.effects = off
+      for layer in Naubino.layers
+        layer.refresh_draw_rate(layer.default_fps)
+        layer.refresh_step_rate(layer.default_step_rate)
+
+  toggleFullscreen: ->
+    if $('#fullScreenCheck').is(":checked")
+      @requestFullscreen()
+    else
+      @exitFullscreen()
+
+  toggleAll: ->
+    @toggleEffects()
+    @toggleFullscreen()
+    @toggleMaximized()
+    @togglePrerendering
+
+
 
   # https://developer.mozilla.org/en/DOM/Using_full-screen_mode
   requestFullscreen: ->
@@ -87,12 +112,6 @@ window.Util =
     else if (document.webkitCancelFullScreen)
       document.webkitCancelFullScreen()
 
-
-  toggleFullscreen: ->
-    if $('#fullScreenCheck').is(":checked")
-      @requestFullscreen()
-    else
-      @exitFullscreen()
 
   changeFullscreen: (fullScreen) ->
     if fullScreen or (document.fullscreen) or (document.mozFullScreen) or (document.webkitIsFullScreen)

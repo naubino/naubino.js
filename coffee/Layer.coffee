@@ -12,8 +12,8 @@ define -> class Layer
     @objects       = {}
     @objects_count = 0
 
-    @fps       = Naubino.settings.graphics.fps
-    @step_rate = Naubino.settings.step_rate
+    @fps       =   @default_fps       = Naubino.settings.graphics.fps
+    @step_rate =   @default_step_rate = Naubino.settings.step_rate
 
     @show()
 
@@ -63,13 +63,13 @@ define -> class Layer
     clearInterval @draw_loop
     @draw_loop = null
 
-  refresh_draw_rate: (fps) ->
-    @fps = fps
+  refresh_draw_rate: (fps = false) ->
+    @fps = fps if fps
     @stop_drawing()
     @start_drawing()
 
-  refresh_step_rate: (fps) ->
-    @step_rate= fps
+  refresh_step_rate: (fps = false) ->
+    @step_rate = fps if fps
     @stop_drawing()
     @start_drawing()
 

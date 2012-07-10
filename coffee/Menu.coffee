@@ -17,6 +17,10 @@ define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { B
     @center = new cp.v(20,25)
     @cube_size = 45
     @default_fps = @fps = 35
+    @min_fps = 15
+    @min_step_rate= 15
+
+
     @min_fps = 3
     
     @setup_fsm()
