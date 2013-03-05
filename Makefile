@@ -3,10 +3,10 @@ FULL_TARGET = Naubino.full.js
 MIN_TARGET = Naubino.min.js
 all_TARGETS = $(FULL_TARGET) $(MIN_TARGET) $(JOINED_TARGET)
 
-COFFEE	= /usr/bin/coffee
-#COFFEE	= /usr/local/bin/coffee
+#COFFEE	= /usr/bin/coffee
+COFFEE	= ~/code/hub/coffee-script/bin/coffee
 RJS			= r.js
-INDEX	  = index.html
+INDEX	  = dist.html
 SCORE 	= highscore.html
 SRC_DIR = coffee/
 AUDIO_DIR = sound/
@@ -37,6 +37,9 @@ doc:       $(DOC_DIR)
 dist:      $(DIST)
 readable:  $(FULL_TARGET)
 joined	:  $(JOINED_TARGET)
+
+version :
+	$(COFFEE) -v
 
 
 $(MIN_TARGET): $(TMP)
@@ -72,8 +75,9 @@ dist: $(LIB_PACK) $(MIN_TARGET) $(INDEX) $(SCORE) $(CSS_DIR)
 	cp -r $(CSS_DIR) $(DIST_DIR)
 	cp -r $(IMG_DIR) $(DIST_DIR)
 	cp -r $(AUDIO_DIR) $(DIST_DIR)
-	cp $(INDEX) $(DIST_DIR)
+	cp $(INDEX) $(DIST_DIR)index.html
 	cp $(SCORE) $(DIST_DIR)
+	sed -i "s/##version##/$$($(COFFEE) -v)/g" dist/index.html
 
 $(DIST_DIR):
 	mkdir $(DIST_DIR) -p
