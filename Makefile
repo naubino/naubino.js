@@ -56,7 +56,7 @@ $(JOINED_TARGET): $(SRC_DIR)
 $(TMP): $(TMP_DIR) $(LIB)
 
 $(TMP_DIR)%.js: $(SRC_DIR)%.coffee
-	$(COFFEE) -p -c $< > $@
+	$(COFFEE) -o $(TMP_DIR) -m -c $<
 
 $(DOC_DIR): $(SRC_DIR)
 	codo -o $@ $<
