@@ -3,8 +3,9 @@ FULL_TARGET = Naubino.full.js
 MIN_TARGET = Naubino.min.js
 all_TARGETS = $(FULL_TARGET) $(MIN_TARGET) $(JOINED_TARGET)
 
-#COFFEE	= /usr/bin/coffee
-COFFEE	= ~/code/hub/coffee-script/bin/coffee
+COFFEE	= /usr/bin/coffee
+#COFFEE	= ~/code/hub/coffee-script/bin/coffee
+#COFFEE	= ~/code/hub/CoffeeScriptRedux/bin/coffee
 RJS			= r.js
 INDEX	  = dist.html
 SCORE 	= highscore.html
@@ -55,6 +56,8 @@ $(JOINED_TARGET): $(SRC_DIR)
 
 $(TMP): $(TMP_DIR) $(LIB)
 
+# this line builds js from coffee
+#$(COFFEE) -j -i $< > $@ # line for CoffeeScriptRedux
 $(TMP_DIR)%.js: $(SRC_DIR)%.coffee
 	$(COFFEE) -o $(TMP_DIR) -m -c $<
 
