@@ -15,6 +15,9 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     @overlay       = new Overlay      @canvases.overlay_canvas
     @game_standard = new StandardGame @canvases.game_canvas
 
+    Naubino.settings.canvas.width  = window.screen.width  * .7
+    Naubino.settings.canvas.height = window.screen.height * .7 - 15
+
     @game_testcase = new TestCase(@game_canvas)
     #@game_tutorial = new Tutorial(@game_canvas)
     @game          = @game_standard
@@ -40,8 +43,11 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     @demaximize()
 
     if @scale is 1
-      win_width   = window.innerWidth #screen.width
-      win_height  = window.innerHeight#screen.height
+      #win_width   = window.innerWidth #screen.width
+      #win_height  = window.innerHeight#screen.height
+      win_width   = window.screen.width
+      win_height  = window.screen.height
+      console.info "window size",  win_width, win_height
       game_width  = $("canvas#game_canvas").width()
       game_height = $("canvas#game_canvas").height()
       offset_top  = $("canvas#game_canvas").offset().top

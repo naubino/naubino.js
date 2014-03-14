@@ -80,6 +80,10 @@ define -> class Layer
 
 
 
+  resize_to: (width, height) ->
+    @canvas.width  = width
+    @canvas.height = height
+
 
   resize_by: (ratio) ->
     @canvas.width *= ratio
