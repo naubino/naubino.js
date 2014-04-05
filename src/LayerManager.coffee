@@ -15,8 +15,8 @@ define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "T
     @overlay       = new Overlay      @canvases.overlay_canvas
     @game_standard = new StandardGame @canvases.game_canvas
 
-    Naubino.settings.canvas.width  = window.screen.width  * .7
-    Naubino.settings.canvas.height = window.screen.height * .7 - 15
+    #Naubino.settings.canvas.width  = window.screen.width  * .7
+    #Naubino.settings.canvas.height = window.screen.height * .7 - 15
 
     @game_testcase = new TestCase(@game_canvas)
     #@game_tutorial = new Tutorial(@game_canvas)
