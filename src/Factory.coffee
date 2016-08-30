@@ -1,4 +1,6 @@
-define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton })-> class Factory
+define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }) ->\
+
+class Factory
   constructor: (@layer) ->
 
   add_button: (pos, callback, shapes) =>

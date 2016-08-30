@@ -4,7 +4,9 @@
 #   speed up
 #
 # @extends Game
-define ["Game"], (Game) -> class StandardGame extends Game
+define ["Game"], (Game) ->\
+
+class StandardGame extends Game
   constructor: (canvas) ->
     super(canvas)
     @version = 2 # please raise when makeing changes to this file

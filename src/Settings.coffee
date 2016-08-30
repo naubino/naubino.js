@@ -11,7 +11,7 @@ define -> Settings = {
   game:
     creation_offset: 50
     min_joining_force: 1000
-    font: "Helvetica"
+    font: "Verdana"
 
   naub:
     size:          42

@@ -1,5 +1,7 @@
 # TODO clean up menu code -- will do in naub_rethought
-define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { Ball, StringShape, PlayButton, PauseButton, MainButton }, Factory) -> class Menu extends Layer
+define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { Ball, StringShape, PlayButton, PauseButton, MainButton }, Factory) ->\
+
+class Menu extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "menu"

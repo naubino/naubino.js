@@ -1,4 +1,6 @@
-define ["Game"], (Game) -> class Tutorial extends Game
+define ["Game"], (Game) ->\
+
+class Tutorial extends Game
   @name = "Tutorial"
 
   ###

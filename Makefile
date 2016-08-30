@@ -6,7 +6,8 @@ all_TARGETS = $(FULL_TARGET) $(MIN_TARGET) $(JOINED_TARGET)
 COFFEE	= /usr/bin/coffee
 #COFFEE	= ~/code/hub/coffee-script/bin/coffee
 #COFFEE	= ~/code/hub/CoffeeScriptRedux/bin/coffee
-RJS			= r.js
+RJS			= ./node_modules/requirejs/bin/r.js
+CODO		= ./node_modules/codo/bin/codo
 INDEX	  = dist.html
 SCORE 	= highscore.html
 SRC_DIR = src/
@@ -62,7 +63,7 @@ $(TMP_DIR)%.js: $(SRC_DIR)%.coffee
 	$(COFFEE) -o $(TMP_DIR) -m -c $<
 
 $(DOC_DIR): $(SRC_DIR)
-	codo -o $@ $<
+	$(CODO) -o $@ $<
 
 $(TMP_DIR):
 	mkdir $(TMP_DIR) -p

@@ -1,4 +1,6 @@
-define ["Layer"], (Layer) -> class Physical_Layer extends Layer
+define ["Layer"], (Layer) ->\
+
+class Physical_Layer extends Layer
 
   setup_physics: ->
     @GRABABLE_MASK_BIT = 1<<31

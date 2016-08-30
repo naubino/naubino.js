@@ -1,4 +1,3 @@
-define ->
 #upper case function to avoid overwriting defaults
 cp.Vect::Copy   = -> new cp.Vect @.x, @.y
 cp.Vect::Length = -> Math.sqrt(@.x * @.x + @.y * @.y)

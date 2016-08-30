@@ -7,7 +7,9 @@
                                         /___/        
 ###
 
-define ["Audio","Keybindings", "Settings", "LayerManager","Util"], (Audio, KeyBindings, Settings, LayerManager) -> class Naubino extends LayerManager
+define ["Audio","Keybindings", "Settings", "LayerManager","Util"], (Audio, KeyBindings, Settings, LayerManager) ->\
+
+class Naubino extends LayerManager
 
   constructor: () ->
     @name = "Naubino (unstable master)"

@@ -4,7 +4,9 @@
 # @param layer [Layer] the layer on which to draw
 # @param color_id [int] representing the color from color palett, also neccessary for joining
 # @param size [int] size, what else
-define -> class Naub
+define ->\
+
+class Naub
   constructor: (@layer, @color_id = null, @size = Naubino.settings.naub.size) ->
     @shapes       = [] # shapes this naub draws in order from bottom to top
     @joins        = {} # {id: opposing naub}

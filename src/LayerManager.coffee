@@ -1,10 +1,13 @@
-define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "Tutorial" ],(Background, Game, Menu, Overlay, StandardGame, TestCase, Tutorial)-> class LayerManager
+define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "Tutorial" ],(Background, Game, Menu, Overlay, StandardGame, TestCase, Tutorial) ->\
+
+class LayerManager
 
   setup_fsm: ->
     StateMachine.create {
       target: this
       events: Naubino.settings.events.default.concat Naubino.settings.events.game
-      error: (e, from, to, args, code, msg) -> console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
+      error: (e, from, to, args, code, msg) ->
+             console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
     }
 
 

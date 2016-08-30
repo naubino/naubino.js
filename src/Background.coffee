@@ -1,4 +1,6 @@
-define ["Layer"], (Layer) -> class Background extends Layer
+define ["Layer"], (Layer) ->\
+
+class Background extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "background"

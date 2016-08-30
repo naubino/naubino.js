@@ -1,4 +1,6 @@
-define -> class CollisionHandler
+define ->\
+
+class CollisionHandler
   constructor: (@game) ->
 	  this.a = this.b = 0
 
