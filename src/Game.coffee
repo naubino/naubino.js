@@ -19,9 +19,12 @@ class Game extends Physical_Layer
     #@points = -1
     @joining_allowed = yes
     #console.log "mousemove"
-    Naubino.mousemove.add @move_pointer
-    Naubino.mousedown.add @click
-    Naubino.mouseup.add @unfocus
+    #Naubino.mousemove.add @move_pointer
+    #Naubino.mousedown.add @click
+    #Naubino.mouseup.add @unfocus
+    Naubino.mousemove.add @touchmove
+    Naubino.mousedown.add @touchdown
+    Naubino.mouseup.add @touchup
 
     @joining_naubs = []
     @replacing_naubs = []
@@ -75,6 +78,12 @@ class Game extends Physical_Layer
       @mouseJoint.errorBias = Math.pow(1 - 0.5, 60)
       @space.addConstraint(@mouseJoint)
 
+  touchdown: (x, y) =>
+    console.log( arguments )
+
+  touchmove: =>
+
+  touchup: =>
 
 
 

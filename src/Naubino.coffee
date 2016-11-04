@@ -144,11 +144,31 @@ class Naubino extends LayerManager
       y = (e.pageY - @overlay_canvas.offsetTop) /  @scale
       @mousedown.dispatch x,y
 
+    handle_touch = (t, cb) =>
+      x = (t.pageX - @overlay_canvas.offsetLeft) / @scale
+      y = (t.pageY - @overlay_canvas.offsetTop) /  @scale
+      [ x, y, t.identifier ]
+
+    ontouchstart = (e, cb) =>
+      touches = e.changedTouches
+      t = touches[0]
+      @touchstart.dispatch handle_touch(t)...
+
+    ontouchend = (e) =>
+      touches = e.changedTouches
+      t = touches[0]
+      @touchend.dispatch handle_touch(t)...
+
+    ontouchmove = (e) =>
+      touches = e.changedTouches
+      t = touches[0]
+      @touchmove.dispatch handle_touch(t)...
+
     @overlay_canvas.addEventListener("mousedown"  , onmousedown , false)
     @overlay_canvas.addEventListener("mouseup"    , onmouseup   , false)
     @overlay_canvas.addEventListener("mousemove"  , onmousemove , false)
     @overlay_canvas.addEventListener("mouseout"   , onmouseup   , false)
 
-    @overlay_canvas.addEventListener("touchstart" , onmousedown , false)
-    @overlay_canvas.addEventListener("touchend"   , onmouseup   , false)
-    @overlay_canvas.addEventListener("touchmove"  , onmousemove , false)
+    @overlay_canvas.addEventListener("touchstart" , ontouchstart , false)
+    @overlay_canvas.addEventListener("touchend"   , ontouchend   , false)
+    @overlay_canvas.addEventListener("touchmove"  , ontouchmove  , false)
