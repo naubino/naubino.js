@@ -182,6 +182,7 @@ class Layer
     for id, obj of @objects
       if obj.isHit(pos.x, pos.y) and obj.isClickable
         return obj
+    return null
 
   clear_objects: -> @objects = {}
 

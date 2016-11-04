@@ -21,7 +21,7 @@ class LayerManager
     #Naubino.settings.canvas.width  = window.screen.width  * .7
     #Naubino.settings.canvas.height = window.screen.height * .7 - 15
 
-    @game_testcase = new TestCase(@game_canvas)
+    #@game_testcase = new TestCase(@game_canvas)
     #@game_tutorial = new Tutorial(@game_canvas)
     @game          = @game_standard
     #@game          = @game_testcase

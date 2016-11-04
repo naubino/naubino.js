@@ -62,16 +62,10 @@ class Game extends Physical_Layer
     # after this point you must be able to press play an start again
 
 
-  # callback for mousedown signal
-  click: (x, y) =>
-    @mousedown = true
-    @pointer = new cp.v x,y
-
-    shape = @space.pointQueryFirst(@pointer, @GRABABLE_MASK_BIT, cp.NO_GROUP) if @space?
-    naub = @get_object shape.naub_number if shape?
+  select_naub: (naub) =>
     if naub and naub.isClickable
-      naub.focus()
-      @focused_naub = naub
+      naub.focus() # TODO only one focus
+      @focused_naub = naub # TODO focused_naubs <- naub
 
       @mouseBody.p = @pointer
       @mouseJoint = new cp.PivotJoint(@mouseBody, naub.physical_body, cp.vzero, cp.vzero)
@@ -79,8 +73,46 @@ class Game extends Physical_Layer
       @space.addConstraint(@mouseJoint)
 
   touchstart: (x,y, id) =>
-    console.log( arguments )
-    @click(x,y)
+    return unless @space?
+
+    naub = @get_obj_in_pos(cp.v(x,y))
+    if naub
+      # attach fingerbody
+      @pointer = new cp.v(x,y)
+      @select_naub(naub)
+    else
+      # shove it around
+      console.info "create_finger_body"
+      @create_finger_body(x,y,id)
+
+  create_finger_body: (x,y,id) =>
+    console.info "there is way too much @space in"
+    friction   = Naubino.settings.naub.friction
+    elasticity = Naubino.settings.naub.elasticity
+    mass = 9001 #Naubino.settings.naub.mass
+    radius = 50
+
+    #this part will be adjusted by shape
+    momentum = cp.momentForCircle( mass, radius, radius, cp.vzero)
+    physical_body = new cp.Body( mass, momentum )
+    physical_body.name = "finger_#{id}"
+    physical_body.setAngle( 0 ) # remember to set position
+    physical_body.p = cp.v(x,y)
+    console.log physical_body
+
+
+    physical_shape = new cp.CircleShape( physical_body, radius , cp.vzero )
+    physical_shape.setElasticity(elasticity)
+    physical_shape.setFriction(friction)
+    finger = {physical_body, physical_shape}
+    finger.draw_joins= ->
+    finger.draw = ->
+    finger.attracted_to = (_) ->
+    finger.is_alone= -> true
+    @add_object(finger) #todo remember the mouse body
+
+
+
 
   touchmove: (x,y, id) =>
     @move_pointer(x,y)
@@ -199,9 +231,9 @@ class Game extends Physical_Layer
     # draws joins and naubs seperately
     @ctx.save()
 
-    #@draw_constraints()
-    #@draw_point @pointer
-    #@draw_point @mouseBody.p, "blue"
+    @draw_constraints()
+    @draw_point @pointer
+    @draw_point @mouseBody.p, "blue"
 
     for id, obj of @objects
       obj.draw_joins @ctx
