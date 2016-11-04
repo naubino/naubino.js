@@ -9,10 +9,8 @@ class Physical_Layer extends Layer
 
 
     # for pulling Naubs with your fingers
-    @fingersAttached = {}
-    # for pushing Naubs with your fingers
-    @fingersColliding = {}
-
+    @fingers = {}
+  
   add_walls: ->
     ws = 15 #wall_strength
     @walls = {}
@@ -34,8 +32,7 @@ class Physical_Layer extends Layer
   step_space: ->
     @space.step(1/@step_rate)
     # Move mouse body toward the mouse
-    finger.step() for _, finger of @fingersAttached
-    finger.step() for _, finger of @fingersColliding
+    finger.step() for _, finger of @fingers
 
 
   add_object: (obj)->

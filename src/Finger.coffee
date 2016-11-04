@@ -30,12 +30,15 @@ class Finger
     this
 
   remove: (space) ->
+    @removed = true
+
+  rly_remove: (space) ->
     switch @kind
       when "colliding"
         space.removeBody(@body)
         space.removeShape(@shape)
       when "attached"
-        #space.removeConstraint(@joint)
+        space.removeConstraint(@joint)
         space.removeBody(@body)
 
   @create_attached: (space, naub, x,y, id) ->

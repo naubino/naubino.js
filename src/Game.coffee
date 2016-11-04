@@ -67,7 +67,7 @@ class Game extends Physical_Layer
       naub.focus() # TODO only one focus
       @focused_naubs[naub.id] = naub
       finger = Finger.create_attached(@space, naub, x,y, id )
-      @fingersAttached[id] = finger
+      @fingers[id] = finger
 
 
   touchstart: (x,y, id) =>
@@ -84,12 +84,11 @@ class Game extends Physical_Layer
 
   create_finger_body: (x,y,id) =>
     finger = Finger.create_colliding(@space,x,y,id)
-    @fingersColliding[id] = finger
+    @fingers[id] = finger
 
   touchmove: (x,y, id) =>
     #@move_pointer(x,y)
-    finger = @fingersColliding[id]
-    finger ?= @fingersAttached[id]
+    finger = @fingers[id]
     if finger?
       finger.pointer.x = x
       finger.pointer.y = y
@@ -97,10 +96,9 @@ class Game extends Physical_Layer
 
   touchend: (x,y, id) =>
     @unfocus(id)
-    finger = @fingersColliding[id]
-    finger ?= @fingersAttached[id]
+    finger = @fingers[id]
     if finger?
-      delete @fingersColliding[id]
+      delete @fingers[id]
       finger.remove(@space)
 
 
@@ -218,10 +216,7 @@ class Game extends Physical_Layer
 
 
   draw_fingers: ->
-    for _, finger of @fingersAttached
-      @draw_point finger.body.p, "green", finger.radius
-
-    for _, finger of @fingersColliding
+    for _, finger of @fingers
       @draw_point finger.body.p, "green", finger.radius
 
   draw_constraints: ->
@@ -297,15 +292,13 @@ class Game extends Physical_Layer
     for id, obj of @objects
       if obj.removed
         @remove_obj id
-        @clean_up()
+    for _, finger of @fingers
+      if finger.removed
+        finger.rly_remove(@space)
+    @clean_up() # XXX FIXME
 
   clean_up: ->
     console.log "clean up run"
     for con, id in @space.constraints
       if con? and con.IsRogue()
-        try
-          @space.removeConstraint con
-        catch error
-          console.error con
-
-
+        @space.removeConstraint con
