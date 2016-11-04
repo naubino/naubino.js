@@ -78,12 +78,16 @@ class Game extends Physical_Layer
       @mouseJoint.errorBias = Math.pow(1 - 0.5, 60)
       @space.addConstraint(@mouseJoint)
 
-  touchstart: (x, y, id) =>
+  touchstart: (x,y, id) =>
     console.log( arguments )
+    @click(x,y)
 
-  touchmove: (id) =>
+  touchmove: (x,y, id) =>
+    @move_pointer(x,y)
+
 
   touchend: (id) =>
+    @unfocus()
 
 
 
