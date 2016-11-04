@@ -34,9 +34,8 @@ class Physical_Layer extends Layer
   step_space: ->
     @space.step(1/@step_rate)
     # Move mouse body toward the mouse
-    #newPoint = cp.v.lerp(@mouseBody.p, @pointer, 0.25)
-    #@mouseBody.v = cp.v.mult(cp.v.sub(newPoint, @mouseBody.p), 60)
-    #@mouseBody.p = newPoint
+    finger.step() for _, finger of @fingersAttached
+    finger.step() for _, finger of @fingersColliding
 
 
   add_object: (obj)->
@@ -65,10 +64,6 @@ class Physical_Layer extends Layer
   remove_obj: (id) ->
     obj = @get_object id
     @remove_body_and_shape obj
-    if @space?
-      for constraint in obj.constraints
-        #console.log constraint
-        @space.removeConstraint constraint
     delete @objects[id]
 
   remove_body_and_shape: (obj) ->

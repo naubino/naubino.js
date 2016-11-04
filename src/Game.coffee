@@ -91,8 +91,8 @@ class Game extends Physical_Layer
     finger = @fingersColliding[id]
     finger ?= @fingersAttached[id]
     if finger?
-      finger.pos.x = x
-      finger.pos.y = y
+      finger.pointer.x = x
+      finger.pointer.y = y
 
 
   touchend: (x,y, id) =>
@@ -108,9 +108,6 @@ class Game extends Physical_Layer
   unfocus: (id) =>
     if @focused_naubs[id]
       @focused_naubs[id].unfocus()
-    if @space? && @mouseJoint?
-      @space.removeConstraint @mouseJoint
-      @mouseJoint = null
     @active_tree = []
 
 
@@ -206,9 +203,10 @@ class Game extends Physical_Layer
     # draws joins and naubs seperately
     @ctx.save()
 
-    @draw_constraints()
-    @draw_fingers()
-    @draw_point @pointer
+    if Naubino.draw_constraints
+      @draw_constraints()
+      @draw_fingers()
+      @draw_point @pointer
 
     for id, obj of @objects
       obj.draw_joins @ctx
@@ -221,10 +219,10 @@ class Game extends Physical_Layer
 
   draw_fingers: ->
     for _, finger of @fingersAttached
-      @draw_point finger.pos, "green", finger.radius
+      @draw_point finger.body.p, "green", finger.radius
 
     for _, finger of @fingersColliding
-      @draw_point finger.pos, "green", finger.radius
+      @draw_point finger.body.p, "green", finger.radius
 
   draw_constraints: ->
     for con, id in @space.constraints
@@ -302,8 +300,12 @@ class Game extends Physical_Layer
         @clean_up()
 
   clean_up: ->
-    #console.log "clean up run"
+    console.log "clean up run"
     for con, id in @space.constraints
       if con? and con.IsRogue()
-        @space.removeConstraint con
+        try
+          @space.removeConstraint con
+        catch error
+          console.error con
+
 

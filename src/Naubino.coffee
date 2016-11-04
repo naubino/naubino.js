@@ -19,6 +19,7 @@ class Naubino extends LayerManager
     @add_listeners()
     @scale = 1 # will be changed by fullscreen
     @load_highscores()
+    @draw_constraints = on
     #@audio = new Audio
 
   load_highscores: ->
