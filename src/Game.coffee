@@ -29,10 +29,10 @@ class Game extends Physical_Layer
     @joining_naubs = []
     @replacing_naubs = []
     @active_tree = []
-    
+
     @setup_fsm Naubino.settings.events.game
 
-    
+
 
   oninit: (e,f,t) ->
     console.log "game INIT"
@@ -49,7 +49,7 @@ class Game extends Physical_Layer
     @setup_physics()
     @space.defaultHandler = new CollisionHandler this
 
-    
+
 
 
   onstopped: (e,f,t) -> @clear_objects() unless e is 'init'
@@ -86,29 +86,8 @@ class Game extends Physical_Layer
       @create_finger_body(x,y,id)
 
   create_finger_body: (x,y,id) =>
-    console.info "there is way too much @space in"
-    friction   = Naubino.settings.naub.friction
-    elasticity = Naubino.settings.naub.elasticity
-    mass = 9001 #Naubino.settings.naub.mass
-    radius = 50
-
-    #this part will be adjusted by shape
-    momentum = cp.momentForCircle( mass, radius, radius, cp.vzero)
-    physical_body = new cp.Body( mass, momentum )
-    physical_body.name = "finger_#{id}"
-    physical_body.setAngle( 0 ) # remember to set position
-    physical_body.p = cp.v(x,y)
-    console.log physical_body
-
-
-    physical_shape = new cp.CircleShape( physical_body, radius , cp.vzero )
-    physical_shape.setElasticity(elasticity)
-    physical_shape.setFriction(friction)
-    finger = {physical_body, physical_shape}
-    finger.draw_joins= ->
-    finger.draw = ->
-    finger.attracted_to = (_) ->
-    finger.is_alone= -> true
+    finger = new Finger(x,y,id)
+    @fingersCollide[id] = finger
     @add_object(finger) #todo remember the mouse body
 
 
@@ -120,6 +99,7 @@ class Game extends Physical_Layer
 
   touchend: (id) =>
     @unfocus()
+    delete @fingersCollide[id]
 
 
 
@@ -232,6 +212,7 @@ class Game extends Physical_Layer
     @ctx.save()
 
     @draw_constraints()
+    @draw_fingers()
     @draw_point @pointer
     @draw_point @mouseBody.p, "blue"
 
@@ -243,6 +224,13 @@ class Game extends Physical_Layer
     @game_draw.dispatch()
 
 
+
+  draw_fingers: ->
+    for _, finger of @fingersAttach
+      @draw_point finger.pos, "green"
+
+    for _, finger of @fingersCollide
+      @draw_point finger.pos, "green"
 
   draw_constraints: ->
     for con, id in @space.constraints
@@ -281,7 +269,7 @@ class Game extends Physical_Layer
         @ctx.font= "10px Courier"
         @ctx.fillText(join_string, 0, 6)
         @ctx.restore()
-        
+
 
 
 

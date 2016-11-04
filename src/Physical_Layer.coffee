@@ -1,5 +1,4 @@
-define ["Layer"], (Layer) ->\
-
+define ["Layer", "Finger"], (Layer, Finger) ->\
 class Physical_Layer extends Layer
 
   setup_physics: ->
@@ -8,6 +7,13 @@ class Physical_Layer extends Layer
     @space = new cp.Space() # so far so good
     @space.damping = Naubino.settings.physics.damping
 
+
+    # for pulling Naubs with your fingers
+    @fingersAttach = {}
+    # for pushing Naubs with your fingers
+    @fingersCollide = {}
+
+    # deprecated
     @mouseBody = new cp.Body(Infinity, Infinity)
     @mouseBody.name = "mouseBody"
     @mouseBody.p = cp.vzero

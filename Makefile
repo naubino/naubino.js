@@ -87,7 +87,7 @@ $(DIST_DIR):
 	mkdir $(DIST_DIR) -p
 
 watch: $(TMP_DIR)
-	$(COFFEE) -o $(TMP_DIR) -cw $(SRC_DIR)
+	$(COFFEE) -o $(TMP_DIR) -cmw $(SRC_DIR)
 
 $(LIB):
 	git submodule update --init
