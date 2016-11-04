@@ -46,11 +46,14 @@ class Physical_Layer extends Layer
 
 
   add_object: (obj)->
+    @add_body_and_shape obj
+    super obj
+
+  add_body_and_shape: (obj) ->
     #chipmunk
     if @space?
       @space.addShape obj.physical_shape if obj.physical_shape?
       @space.addBody obj.physical_body if obj.physical_body?
-    super(obj)
 
 
   # asks all objects whether they have been hit by pointer
@@ -67,12 +70,14 @@ class Physical_Layer extends Layer
 
   remove_obj: (id) ->
     obj = @get_object id
+    @remove_body_and_shape obj
     if @space?
-      @space.removeShape obj.physical_shape if obj.physical_shape?
-      @space.removeBody obj.physical_body if obj.physical_body?
       for constraint in obj.constraints
         #console.log constraint
         @space.removeConstraint constraint
     delete @objects[id]
 
-
+  remove_body_and_shape: (obj) ->
+    if @space?
+      @space.removeShape obj.physical_shape if obj.physical_shape?
+      @space.removeBody obj.physical_body if obj.physical_body?

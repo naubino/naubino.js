@@ -1,6 +1,6 @@
 # controlls everything that has to do with logic and gameplay or menus
 # @extends Layer
-define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physical_Layer, Naub, Graph, CollisionHandler, Factory) ->\
+define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory", "Finger"], (Physical_Layer, Naub, Graph, CollisionHandler, Factory, Finger) ->\
 
 class Game extends Physical_Layer
 
@@ -78,29 +78,35 @@ class Game extends Physical_Layer
     naub = @get_obj_in_pos(cp.v(x,y))
     if naub
       # attach fingerbody
+      @mousedown = true
       @pointer = new cp.v(x,y)
       @select_naub(naub)
     else
       # shove it around
-      console.info "create_finger_body"
       @create_finger_body(x,y,id)
 
   create_finger_body: (x,y,id) =>
     finger = new Finger(x,y,id)
     @fingersCollide[id] = finger
-    @add_object(finger) #todo remember the mouse body
+    @add_body_and_shape(finger) #todo remember the mouse body
 
 
 
 
   touchmove: (x,y, id) =>
     @move_pointer(x,y)
+    finger = @fingersCollide[id]
+    if finger?
+      finger.pos.x = x
+      finger.pos.y = y
 
 
-  touchend: (id) =>
+  touchend: (x,y, id) =>
     @unfocus()
-    delete @fingersCollide[id]
-
+    finger = @fingersCollide[id]
+    if finger?
+      delete @fingersCollide[id]
+      @remove_body_and_shape finger
 
 
   # callback for mouseup signal
@@ -227,10 +233,10 @@ class Game extends Physical_Layer
 
   draw_fingers: ->
     for _, finger of @fingersAttach
-      @draw_point finger.pos, "green"
+      @draw_point finger.pos, "green", finger.radius
 
     for _, finger of @fingersCollide
-      @draw_point finger.pos, "green"
+      @draw_point finger.pos, "green", finger.radius
 
   draw_constraints: ->
     for con, id in @space.constraints

@@ -199,9 +199,9 @@ class Layer
       callback2()
   
   ### visible utilites ###
-  draw_point: (pos, color = "black") ->
+  draw_point: (pos, color = "black", r = 4) ->
     @ctx.beginPath()
-    @ctx.arc(pos.x, pos.y, 4, 0, 2 * Math.PI, false)
+    @ctx.arc(pos.x, pos.y, r, 0, 2 * Math.PI, false)
     @ctx.arc(pos.x, pos.y, 1, 0, 2 * Math.PI, false)
     @ctx.lineWidth = 1
     @ctx.strokeStyle = color
