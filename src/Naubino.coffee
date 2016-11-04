@@ -132,17 +132,17 @@ class Naubino extends LayerManager
     onmousemove = (e) =>
       x = (e.pageX - @overlay_canvas.offsetLeft) / @scale
       y = (e.pageY - @overlay_canvas.offsetTop) /  @scale
-      @mousemove.dispatch x,y
+      @touchmove.dispatch x,y, "MOUSE"
 
     onmouseup = (e) =>
       x = (e.pageX - @overlay_canvas.offsetLeft) / @scale
       y = (e.pageY - @overlay_canvas.offsetTop) /  @scale
-      @mouseup.dispatch x,y
+      @touchend.dispatch x,y, "MOUSE"
 
     onmousedown = (e) =>
       x = (e.pageX - @overlay_canvas.offsetLeft) / @scale
       y = (e.pageY - @overlay_canvas.offsetTop) /  @scale
-      @mousedown.dispatch x,y
+      @touchstart.dispatch x,y, "MOUSE"
 
     handle_touch = (t, cb) =>
       x = (t.pageX - @overlay_canvas.offsetLeft) / @scale
