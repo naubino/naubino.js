@@ -14,7 +14,7 @@ class Game extends Physical_Layer
     @begin_time = Date.now()
 
     # display stuff
-    @focused_naub = null # points to the naub you click on
+    @focused_naubs = {} # points to the naubs you touched
 
     #@points = -1
     @joining_allowed = yes
@@ -62,15 +62,13 @@ class Game extends Physical_Layer
     # after this point you must be able to press play an start again
 
 
-  select_naub: (naub) =>
+  select_naub: (naub, x,y, id) =>
     if naub and naub.isClickable
       naub.focus() # TODO only one focus
-      @focused_naub = naub # TODO focused_naubs <- naub
+      @focused_naubs[naub.id] = naub
+      finger = Finger.create_attached(@space, naub, x,y, id )
+      @fingersAttached[id] = finger
 
-      @mouseBody.p = @pointer
-      @mouseJoint = new cp.PivotJoint(@mouseBody, naub.physical_body, cp.vzero, cp.vzero)
-      @mouseJoint.errorBias = Math.pow(1 - 0.5, 60)
-      @space.addConstraint(@mouseJoint)
 
   touchstart: (x,y, id) =>
     return unless @space?
@@ -78,51 +76,42 @@ class Game extends Physical_Layer
     naub = @get_obj_in_pos(cp.v(x,y))
     if naub
       # attach fingerbody
-      @mousedown = true
       @pointer = new cp.v(x,y)
-      @select_naub(naub)
+      @select_naub(naub, x,y, id)
     else
       # shove it around
       @create_finger_body(x,y,id)
 
   create_finger_body: (x,y,id) =>
-    finger = new Finger(x,y,id)
-    @fingersCollide[id] = finger
-    @add_body_and_shape(finger) #todo remember the mouse body
-
-
-
+    finger = Finger.create_colliding(@space,x,y,id)
+    @fingersColliding[id] = finger
 
   touchmove: (x,y, id) =>
-    @move_pointer(x,y)
-    finger = @fingersCollide[id]
+    #@move_pointer(x,y)
+    finger = @fingersColliding[id]
+    finger ?= @fingersAttached[id]
     if finger?
       finger.pos.x = x
       finger.pos.y = y
 
 
   touchend: (x,y, id) =>
-    @unfocus()
-    finger = @fingersCollide[id]
+    @unfocus(id)
+    finger = @fingersColliding[id]
+    finger ?= @fingersAttached[id]
     if finger?
-      delete @fingersCollide[id]
-      @remove_body_and_shape finger
+      delete @fingersColliding[id]
+      finger.remove(@space)
 
 
   # callback for mouseup signal
-  unfocus: =>
-    if @mousedown
-      @mousedown = false
-
-      if @focused_naub
-        @focused_naub.unfocus()
-
-      @focused_naub = null
-      if @space? && @mouseJoint?
-        @space.removeConstraint @mouseJoint
-        @mouseJoint = null
-
-      @active_tree = []
+  unfocus: (id) =>
+    if @focused_naubs[id]
+      @focused_naubs[id].unfocus()
+    if @space? && @mouseJoint?
+      @space.removeConstraint @mouseJoint
+      @mouseJoint = null
+    @active_tree = []
 
 
   # counts how many naubs would be inside the circle
@@ -220,7 +209,6 @@ class Game extends Physical_Layer
     @draw_constraints()
     @draw_fingers()
     @draw_point @pointer
-    @draw_point @mouseBody.p, "blue"
 
     for id, obj of @objects
       obj.draw_joins @ctx
@@ -232,10 +220,10 @@ class Game extends Physical_Layer
 
 
   draw_fingers: ->
-    for _, finger of @fingersAttach
+    for _, finger of @fingersAttached
       @draw_point finger.pos, "green", finger.radius
 
-    for _, finger of @fingersCollide
+    for _, finger of @fingersColliding
       @draw_point finger.pos, "green", finger.radius
 
   draw_constraints: ->

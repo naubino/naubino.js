@@ -9,15 +9,9 @@ class Physical_Layer extends Layer
 
 
     # for pulling Naubs with your fingers
-    @fingersAttach = {}
+    @fingersAttached = {}
     # for pushing Naubs with your fingers
-    @fingersCollide = {}
-
-    # deprecated
-    @mouseBody = new cp.Body(Infinity, Infinity)
-    @mouseBody.name = "mouseBody"
-    @mouseBody.p = cp.vzero
-    @space.addBody @mouseBody
+    @fingersColliding = {}
 
   add_walls: ->
     ws = 15 #wall_strength
@@ -40,9 +34,9 @@ class Physical_Layer extends Layer
   step_space: ->
     @space.step(1/@step_rate)
     # Move mouse body toward the mouse
-    newPoint = cp.v.lerp(@mouseBody.p, @pointer, 0.25)
-    @mouseBody.v = cp.v.mult(cp.v.sub(newPoint, @mouseBody.p), 60)
-    @mouseBody.p = newPoint
+    #newPoint = cp.v.lerp(@mouseBody.p, @pointer, 0.25)
+    #@mouseBody.v = cp.v.mult(cp.v.sub(newPoint, @mouseBody.p), 60)
+    #@mouseBody.p = newPoint
 
 
   add_object: (obj)->

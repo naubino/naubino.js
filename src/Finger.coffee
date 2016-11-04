@@ -1,9 +1,14 @@
 define ["Shapes"], (Shapes) ->\
 class Finger
 
-  constructor: (x,y,@id) ->
+  constructor: (@id,x,y) ->
+    @pos = cp.v x,y
 
-    @pos = cp.v(x,y)
+  @create_colliding: (space, x,y, id) ->
+    new Finger(id,x,y).colliding(space)
+
+  colliding: (space) ->
+    @kind = "colliding"
 
     @friction   = Naubino.settings.naub.friction
     @elasticity = Naubino.settings.naub.elasticity
@@ -12,14 +17,40 @@ class Finger
 
     #this part will be adjusted by shape
     @momentum = cp.momentForCircle( @mass, @radius, @radius, cp.vzero)
-    @physical_body = new cp.Body( @mass, @momentum )
-    @physical_body.name = "finger_#{@id}"
-    @physical_body.setAngle( 0 ) # remember to set position
-    @physical_body.p = @pos
+    @body = new cp.Body( @mass, @momentum )
+    @body.name = "finger_#{@id}"
+    @body.setAngle( 0 ) # remember to set position
+    @body.p = @pos
+    space.addBody(@body)
 
-    @physical_shape = new cp.CircleShape( @physical_body, @radius , cp.vzero )
-    @physical_shape.setElasticity(@elasticity)
-    @physical_shape.setFriction(@friction)
+    @shape = new cp.CircleShape( @body, @radius , cp.vzero )
+    @shape.setElasticity(@elasticity)
+    @shape.setFriction(@friction)
+    space.addShape(@shape)
+    this
+
+  remove: (space) ->
+    switch @kind
+      when "colliding"
+        space.removeBody(@body)
+        space.removeShape(@shape)
+      when "attached"
+        space.removeBody(@body)
+        space.removeConstraint(@joint)
+
+  @create_attached: (space, naub, x,y, id) ->
+    new Finger(id,x,y).attach(space, naub)
+
+  attach: (space, naub) ->
+    @kind = "attached"
+    @body = new cp.Body(Infinity, Infinity)
+    @body.name = "finger_#{@id}"
+    @body.p = @pos
+    space.addBody(@body)
+    @joint = new cp.PivotJoint(@body, naub.physical_body, cp.vzero, cp.vzero)
+    @joint.errorBias = Math.pow(1 - 0.5, 60)
+    space.addConstraint(@joint)
+    this
 
   draw_joins: ->
 
