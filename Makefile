@@ -3,7 +3,7 @@ FULL_TARGET = Naubino.full.js
 MIN_TARGET = Naubino.min.js
 all_TARGETS = $(FULL_TARGET) $(MIN_TARGET) $(JOINED_TARGET)
 
-COFFEE	= /usr/bin/coffee
+COFFEE	= coffee
 #COFFEE	= ~/code/hub/coffee-script/bin/coffee
 #COFFEE	= ~/code/hub/CoffeeScriptRedux/bin/coffee
 RJS			= ./node_modules/requirejs/bin/r.js
