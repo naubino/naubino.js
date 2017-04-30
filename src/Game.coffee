@@ -99,7 +99,7 @@ class Game extends Physical_Layer
     finger = @fingers[id]
     if finger?
       delete @fingers[id]
-      finger.remove(@space)
+      finger.remove()
 
 
   # callback for mouseup signal
@@ -298,7 +298,6 @@ class Game extends Physical_Layer
     @clean_up() # XXX FIXME
 
   clean_up: ->
-    console.log "clean up run"
     for con, id in @space.constraints
       if con? and con.IsRogue()
         @space.removeConstraint con

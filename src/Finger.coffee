@@ -29,10 +29,11 @@ class Finger
     space.addShape(@shape)
     this
 
-  remove: (space) ->
+  remove: () ->
     @removed = true
 
   rly_remove: (space) ->
+    console.info "rly remove"
     switch @kind
       when "colliding"
         space.removeBody(@body)
