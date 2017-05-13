@@ -1,5 +1,5 @@
 # all colors (except color_output) found at colorlovers.com
-define -> Settings = {
+export Settings = {
 
   graphics:
     fps:           35 # mind stepper_rate

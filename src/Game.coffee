@@ -1,13 +1,17 @@
 # controlls everything that has to do with logic and gameplay or menus
 # @extends Layer
-define ["Physical_Layer", "Naub", "Graph", "CollisionHandler","Factory"], (Physical_Layer, Naub, Graph, CollisionHandler, Factory) ->\
+import {Physical_Layer} from "./Physical_Layer"
+import {Naub} from "./Naub"
+import {Graph} from "./Graph"
+import {CollisionHandler} from "./CollisionHandler"
+import {Factory} from "./Factory"
 
-class Game extends Physical_Layer
+export class Game extends Physical_Layer
 
   # get this started
   constructor: (canvas) ->
-    @version = 0
     super(canvas)
+    @version = 0
     @name = "game"
     @graph = new Graph(this)
     @factory = new Factory this

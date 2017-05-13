@@ -1,6 +1,10 @@
-define ["Naub", "Shapes"], (Naub,{ Ball, Box, Frame, FrameCircle, Clock, NumberShape, StringShape, PlayButton, PauseButton }) ->\
+import {Naub} from "./Naub"
+import {Util} from './Util'
+import {Ball, Box, Frame, FrameCircle} from "./Shapes"
+import {Clock, NumberShape, StringShape} from "./Shapes"
+import {PlayButton, PauseButton} from "./Shapes"
 
-class Factory
+export class Factory
   constructor: (@layer) ->
 
   add_button: (pos, callback, shapes) =>

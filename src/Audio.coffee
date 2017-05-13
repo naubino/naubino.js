@@ -1,4 +1,4 @@
-define -> class Audio
+export class Audio
 
   path: "sound/"
   blubs:[]

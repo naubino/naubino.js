@@ -1,6 +1,11 @@
-define [ "Background", "Game", "Menu", "Overlay", "StandardGame", "TestCase", "Tutorial" ],(Background, Game, Menu, Overlay, StandardGame, TestCase, Tutorial) ->\
+import {Background} from './Background'
+import {Game} from './Game'
+import {Menu} from './Menu'
+import {Overlay} from './Overlay'
+import {StandardGame} from './StandardGame'
+import {TestCase} from './TestCase'
 
-class LayerManager
+export class LayerManager
 
   setup_fsm: ->
     StateMachine.create {
@@ -9,8 +14,6 @@ class LayerManager
       error: (e, from, to, args, code, msg) ->
              console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
     }
-
-
 
   setup_layers: ->
     @background    = new Background   @canvases.background_canvas
@@ -22,10 +25,8 @@ class LayerManager
     #Naubino.settings.canvas.height = window.screen.height * .7 - 15
 
     @game_testcase = new TestCase(@game_canvas)
-    #@game_tutorial = new Tutorial(@game_canvas)
     @game          = @game_standard
     #@game          = @game_testcase
-    #@game          = @game_tutorial
     #@game = new Game @game_canvas
     @layers = [ @background, @game, @menu, @overlay ]
 
@@ -65,7 +66,7 @@ class LayerManager
       ratio = Naubino.settings.canvas.scale/oscale
       for layer in  @layers
         layer.resize_by ratio
-      
+
   stretch: (width = "100%")->
     for name in 'background game menu overlay'.split ' '
       document.querySelector("canvas##{name}_canvas").style.width = width

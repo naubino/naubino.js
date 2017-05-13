@@ -11,7 +11,7 @@ cp.Constraint::IsRogue= ->
   (@a.isRogue() and not @a.isStatic()) or
   (@b.isRogue() and not @b.isStatic())
 
-window.Util =
+export Util =
   shuffle: (a) ->
     b = a.slice()
     for x, i in b

@@ -9,3 +9,5 @@ stats/
 node_modules/
 lib/*
 dist
+.direnv
+.DS_Store

@@ -1,8 +1,6 @@
-define ->\
-
-class CollisionHandler
+export class CollisionHandler
   constructor: (@game) ->
-	  this.a = this.b = 0
+    this.a = this.b = 0
 
   # Collision begin event callback
   # Returning false from a begin callback causes the collision to be ignored until

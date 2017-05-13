@@ -1,6 +1,4 @@
-define ->\
-
-class Layer
+export class Layer
 
   constructor: (@canvas) ->
     @name = "unnamed layer"

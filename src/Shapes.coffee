@@ -1,5 +1,5 @@
-define -> Shapes = {
-Shape: class Shape
+import {Util} from './Util'
+export class Shape
   constructor: ->
 
   setup: (@naub) ->
@@ -77,7 +77,7 @@ Shape: class Shape
   destroy_animation: (duration) -> @naub.life_rendering = on
 
 
-Ball: class Ball extends Shape
+export  class Ball extends Shape
 
   # actual painting routines
   render: (ctx, x = 42, y = x) ->
@@ -96,7 +96,7 @@ Ball: class Ball extends Shape
   setup: (naub) ->
     super(naub)
 
-Box: class Box extends Shape
+export class Box extends Shape
   constructor: ->
     super()
     @rot = Math.random() * Math.PI
@@ -133,7 +133,7 @@ Box: class Box extends Shape
     ctx.isPointInPath(pos.x,pos.y)
 
 
-Clock: class Clock extends Shape
+export class Clock extends Shape
   constructor: ->
     super()
     @start = 0
@@ -165,7 +165,7 @@ Clock: class Clock extends Shape
 
 
 
-Frame: class Frame extends Shape
+export class Frame extends Shape
   # draws a frame around the buffered image for analysis
   # @param ctx [canvas.context] context of the target layer
   constructor: (@margin = null) ->
@@ -192,7 +192,7 @@ Frame: class Frame extends Shape
     ctx.closePath()
 
 
-FrameCircle: class FrameCircle extends Frame
+export class FrameCircle extends Frame
   render: (ctx, x = 42, y = x) ->
     ctx.beginPath()
     r = @naub.physics.margin * @naub.size
@@ -207,7 +207,7 @@ FrameCircle: class FrameCircle extends Frame
     ctx.closePath()
 
 
-PlayButton: class PlayButton extends Shape
+export class PlayButton extends Shape
   draw: (ctx, x,y) ->
     ctx.save()
     ctx.beginPath()
@@ -221,7 +221,7 @@ PlayButton: class PlayButton extends Shape
     ctx.restore()
 
 
-PauseButton: class PauseButton extends Shape
+export class PauseButton extends Shape
   draw: (ctx, x,y) ->
     ctx.save()
     ctx.fillStyle = "#ffffff"
@@ -235,7 +235,7 @@ PauseButton: class PauseButton extends Shape
     ctx.restore()
 
 
-MainButton: class MainButton extends Box
+export class MainButton extends Box
   draw: (ctx, x, y) ->
     text = Naubino.game.points ? ""
     size=38
@@ -280,7 +280,7 @@ MainButton: class MainButton extends Box
     ctx.restore()
 
 
-StringShape: class StringShape extends Shape
+export class StringShape extends Shape
   constructor: (@string, @color = "black") ->
     super()
 
@@ -303,5 +303,3 @@ StringShape: class StringShape extends Shape
     ctx.font= "#{size}px #{Naubino.settings.game.font}"
     ctx.fillText(string, 0, 7)
     ctx.restore()
-
-}

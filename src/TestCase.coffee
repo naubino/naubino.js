@@ -1,6 +1,9 @@
-define ["Naub","Game","Shapes","StandardGame"], (Naub,Game,{StringShape, NumberShape, Ball, FrameCircle}, StandardGame) ->\
+import {Naub} from './Naub'
+import {Game} from './Game'
+import {StringShape, NumberShape, Ball, FrameCircle} from './Shapes'
+import {StandardGame} from './StandardGame'
 
-class TestCase extends Game 
+export class TestCase extends Game 
   #  constructor: ->
   #    super()
   oninit: ->

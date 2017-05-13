@@ -1,6 +1,6 @@
-define ["Layer"], (Layer) ->\
+import {Layer} from './Layer'
 
-class Physical_Layer extends Layer
+export class Physical_Layer extends Layer
 
   setup_physics: ->
     @GRABABLE_MASK_BIT = 1<<31

@@ -1,6 +1,5 @@
-define ["Layer"], (Layer) ->\
-
-class Overlay extends Layer
+import {Layer} from './Layer'
+export class Overlay extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "overlay"

@@ -1,6 +1,7 @@
-define ["Layer"], (Layer) ->\
+import {Layer} from './Layer'
+import {Util} from './Util'
 
-class Background extends Layer
+export class Background extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "background"

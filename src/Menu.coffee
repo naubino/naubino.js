@@ -1,7 +1,11 @@
 # TODO clean up menu code -- will do in naub_rethought
-define ["Layer", "Naub", "Graph", "Shapes", "Factory"], (Layer, Naub, Graph, { Ball, StringShape, PlayButton, PauseButton, MainButton }, Factory) ->\
+import {Layer} from "./Layer"
+import {Naub} from "./Naub"
+import {Graph} from "./Graph"
+import { Ball, StringShape, PlayButton, PauseButton, MainButton } from "./Shapes"
+import {Factory} from "./Factory"
 
-class Menu extends Layer
+export class Menu extends Layer
   constructor: (canvas) ->
     super(canvas)
     @name = "menu"

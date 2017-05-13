@@ -1,6 +1,4 @@
-define ->\
-
-class Graph
+export class Graph
   constructor: (@layer) ->
     @join_id_sequence = 0 # sequential join id
     @naubs = []

@@ -1,12 +1,13 @@
+import {Util} from './Util'
 # TODO LEVEL UP
 #   number of colors
 #   number of naubs per spam
 #   speed up
 #
 # @extends Game
-define ["Game"], (Game) ->\
+import {Game} from './Game'
 
-class StandardGame extends Game
+export class StandardGame extends Game
   constructor: (canvas) ->
     super(canvas)
     @version = 2 # please raise when makeing changes to this file
@@ -17,7 +18,7 @@ class StandardGame extends Game
     factor = (max_grow-1) / @max_naubs
     p = Math.floor(factor * list.length * list.length)
     @points += p
-    Naubino.overlay.fade_in_and_out_message ("\n\nChain Bonus "+p) if p > 0
+    #Naubino.overlay.fade_in_and_out_message ("\n\nChain Bonus "+p) if p > 0
     # Newlines prevent Level + Bonus messages overlapping
 
 
@@ -45,8 +46,8 @@ class StandardGame extends Game
 
       @level = level
       name = "Level #{@level}"
-      Naubino.overlay.fade_in_and_out_message name unless level < 1
-      Naubino.menu.for_each (naub)->naub.set_random_palette_color() unless level < 2
+      #Naubino.overlay.fade_in_and_out_message name unless level < 1
+      #Naubino.menu.for_each (naub)->naub.set_random_palette_color() unless level < 2
 
       set = @level_details[@level]
 
@@ -103,7 +104,7 @@ class StandardGame extends Game
   onplaying: ->
     @spamming = setInterval @event, 100 unless @spamming
     @checking = setInterval @check, 300 unless @checking
-    Naubino.overlay.set_osd { text:'level0', pos:{x:10,y:@height}, fontsize:8, align:'', life:true, color:'gray' } unless @OSD?
+    #Naubino.overlay.set_osd { text:'level0', pos:{x:10,y:@height}, fontsize:8, align:'', life:true, color:'gray' } unless @OSD?
 
   onleaveplaying: ->
     clearInterval @spamming
@@ -164,7 +165,7 @@ class StandardGame extends Game
     @loose() if @capacity() < 5
 
     @load_level(@level+1) if @level_details[@level].limit < @ex_naubs
-    Naubino.overlay.set_osd "| level: #{@level} | points: #{@points} | destroyed naubs: #{@ex_naubs} | capacity:#{Math.round(@capacity())}% |"
+    #Naubino.overlay.set_osd "| level: #{@level} | points: #{@points} | destroyed naubs: #{@ex_naubs} | capacity:#{Math.round(@capacity())}% |"
 
   # recurring event (@spamming)
   event: =>

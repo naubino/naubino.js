@@ -7,11 +7,14 @@
                                         /___/        
 ###
 
-define ["Audio","Keybindings", "Settings", "LayerManager","Util"], (Audio, KeyBindings, Settings, LayerManager) ->\
+import {KeyBindings} from './KeyBindings'
+import {Settings} from './Settings'
+import {LayerManager} from './LayerManager'
 
-class Naubino extends LayerManager
+export class Naubino extends LayerManager
 
   constructor: () ->
+    super()
     @name = "Naubino (unstable master)"
     @settings = Settings
     @Signal = window.signals.Signal
@@ -75,27 +78,6 @@ class Naubino extends LayerManager
       @gamediv.appendChild canvas
       @canvases[name] = canvas
 
-  #tutorial: ->
-  #  @game_tutorial = new Tutorial(@game_canvas)
-  #  @soft_switch @game_tutorial
-
-  #leave_tutorial: ->
-  #  @soft_switch @oldgame
-  #  @overlay       = new Overlay(@overlay_canvas)
-  #  delete @game_tutorial
-  #  delete @oldgame
-
-  #soft_switch: (new_game) ->
-  #  @pause() if @current == "playing"
-  #  @oldgame = @game
-
-  #  @game.fade_out =>
-  #    @game.clear()
-  #    @game = new_game
-  #    @game.draw()
-  #    @game.init() if @game.current == "none"
-  #    @game.fade_in => @play()
-
   ###
   Signals connect everything else that does not react to events
   ###
@@ -118,7 +100,6 @@ class Naubino extends LayerManager
     @menu_blur       = new @Signal()
 
   add_listeners: ->
-  tutorial: ->
 
   setup_keybindings: () ->
     @keybindings = new KeyBindings()

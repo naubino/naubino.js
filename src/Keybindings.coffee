@@ -1,6 +1,4 @@
-define ->\
-
-class KeyBindings
+export class KeyBindings
     constructor: ->
         # down, up, during
         @bindings = {}
