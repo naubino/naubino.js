@@ -4,25 +4,25 @@ export class KeyBindings
     @bindings = {}
     @active_bindings = {}
 
-  enable: (key, down, up, during) =>
+  enable: (key, down, up, during) ->
     @bindings[key] =
       down: down
       up: up
       during: during
 
-  disable: (key) =>
+  disable: (key) ->
     active_binding = @active_bindings[key]
     # if key is pressed, call up()
     @bindings[key]?.up?()
     delete @bindings[key]
     delete @active_bindings[key]
 
-  step: (dt) =>
+  step: (dt) ->
     for own i of @active_bindings
       during = @active_bindings[i].during?(dt)
       @active_bindings[i].called = true
 
-  keydown: (key) =>
+  keydown: (key) ->
     k = key.which
     console.log("keydown", k, key)
     if k of @bindings && !(k of @active_bindings)
@@ -31,7 +31,7 @@ export class KeyBindings
         during: @bindings[k].during
         called: false
 
-  keyup: (key) =>
+  keyup: (key) ->
     console.log key
     k = key.which
     if k of @active_bindings
