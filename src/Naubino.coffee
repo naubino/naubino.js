@@ -7,7 +7,7 @@
                                         /___/
 ###
 
-import {KeyBindings} from './KeyBindings'
+import {KeyBindings} from './Keybindings'
 import {Settings} from './Settings'
 import {LayerManager} from './LayerManager'
 
