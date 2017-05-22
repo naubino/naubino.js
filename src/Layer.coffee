@@ -140,7 +140,7 @@ export class Layer
 
 
   # callback for mousedown signal
-  click: (x, y) =>
+  click: (x, y) ->
     @mousedown = true
     [@pointer.x, @pointer.y] = [x,y]
 
@@ -150,14 +150,14 @@ export class Layer
       @focused_naub = naub
 
   # callback for mouseup signal
-  unfocus: =>
+  unfocus: ->
     @mousedown = false
     if @focused_naub
       @focused_naub.unfocus()
     @focused_naub = null
 
   # callback for mousemove signal
-  move_pointer: (x,y) =>
+  move_pointer: (x,y) ->
     [@pointer.x, @pointer.y] = [x,y] if @mousedown
 
   ### housekeeping ###
@@ -187,7 +187,7 @@ export class Layer
     callback(v) for k, v of @objects
     return
 
-  one_after_another: (callback, callback2, list = Object.keys(@objects)) =>
+  one_after_another: (callback, callback2, list = Object.keys(@objects)) ->
     i = list.shift()
     if i?
       setTimeout (=> @one_after_another(callback,callback2,list)), 150

@@ -7,7 +7,7 @@ import {PlayButton, PauseButton} from "./Shapes"
 export class Factory
   constructor: (@layer) ->
 
-  add_button: (pos, callback, shapes) =>
+  add_button: (pos, callback, shapes) ->
     ball = new Ball
     naub = new Naub @layer, null
     naub.pos = naub.fixed_pos = pos
@@ -26,7 +26,7 @@ export class Factory
   # 
   # @param pos [cp.v] position
   # @param color [int]  color_id
-  add_ball: (pos = @random_outside(), color = null) =>
+  add_ball: (pos = @random_outside(), color = null) ->
     naub = new Naub @layer, color
     ball = new Ball
 
@@ -45,7 +45,7 @@ export class Factory
   # 
   # @param pos [cp.v] position
   # @param color [int]  color_id
-  add_box: (pos = @random_outside(), color = null) =>
+  add_box: (pos = @random_outside(), color = null) ->
     naub = new Naub @layer, color
     box = new Box
 
@@ -71,7 +71,7 @@ export class Factory
   # @param color [int] color id of naub 1
   # @param color [int] color id of naub 2
   # IMPLICIT if game has a @max_colors int random colors will only be picked out range [1..@max_colors]
-  create_naub_pair: (pos = null, color_a = null, color_b = null, boxes = 0) =>
+  create_naub_pair: (pos = null, color_a = null, color_b = null, boxes = 0) ->
     pos = @random_outside() unless pos?
     dir = Math.random() * Math.PI
     pos_a = pos.Copy()
@@ -102,7 +102,7 @@ export class Factory
   # works almost like create_naub_pair
   # @param x [int] x-ordinate
   # @param y [int] y-ordinate
-  create_naub_triple: (pos = null, color_a = null, color_b = null, color_c = null) =>
+  create_naub_triple: (pos = null, color_a = null, color_b = null, color_c = null) ->
     pos = @random_outside() unless pos?
     dir = Math.random() * Math.PI
     pos_a = pos.Copy()

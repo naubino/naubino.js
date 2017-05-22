@@ -141,7 +141,7 @@ export class StandardGame extends Game
         return
 
   # recurring check (@checking)
-  check: =>
+  check: ->
 
     @duration = Date.now() - @begin_time
     Naubino.set_score()
@@ -168,7 +168,7 @@ export class StandardGame extends Game
     #Naubino.overlay.set_osd "| level: #{@level} | points: #{@points} | destroyed naubs: #{@ex_naubs} | capacity:#{Math.round(@capacity())}% |"
 
   # recurring event (@spamming)
-  event: =>
+  event: ->
     @spam() if @inner_clock == 0
     @inner_clock = (@inner_clock + 1) % @spammer_interval
     @spammer_interval

@@ -171,7 +171,7 @@ export class Naub
 
   # runs draw_join on all partners, if this naub is the one drawing the join
   # Otherwise the partner will draw the join.
-  draw_outlines: (context) =>
+  draw_outlines: (context) ->
     # drawing joins
     for id, partner of @joins
       if @drawing_join[id]
@@ -181,7 +181,7 @@ export class Naub
 
   # runs draw_join on all partners, if this naub is the one drawing the join
   # Otherwise the partner will draw the join.
-  draw_joins: (context) =>
+  draw_joins: (context) ->
     # drawing joins
     for id, partner of @joins
       if @drawing_join[id]
@@ -263,7 +263,7 @@ export class Naub
   enable: -> @disabled = false
 
   # removes the reference to this naub from all its partners
-  remove: =>
+  remove: ->
     for id, naub of @joins
       @split_join id
     @removed = true
@@ -312,10 +312,10 @@ export class Naub
     @life_rendering = on
     @animation @pulse
 
-  pulse: (dt) =>
+  pulse: (dt) ->
     @style.scale = 1 +  Math.sin(3* Math.PI * dt)*0.2
 
-  shrink: (dt) =>
+  shrink: (dt) ->
     @style.scale = 1.1-dt
     @style.fill[3]= 1.1-dt
     @join_style.width *= 0.3

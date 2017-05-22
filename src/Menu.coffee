@@ -86,7 +86,7 @@ export class Menu extends Layer
   ## can I touch this?
   move_pointer: (x,y) -> [@pointer.x, @pointer.y] = [x,y]
 
-  click: (x, y) =>
+  click: (x, y) ->
     @mousedown = true
 
     for name, naub of @objects

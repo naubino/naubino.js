@@ -64,7 +64,7 @@ export class Overlay extends Layer
     mes.duration = text.duration ? Naubino.settings.overlay.duration
 
 
-  queue_messages: (messages = ["hello..", "...world"], qcallback) =>
+  queue_messages: (messages = ["hello..", "...world"], qcallback) ->
     if m = messages.shift()
       messages = messages[0..]
       @fade_in_and_out_message( m, (=> @queue_messages messages, qcallback))

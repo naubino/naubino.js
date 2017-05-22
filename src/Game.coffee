@@ -64,7 +64,7 @@ export class Game extends Physical_Layer
 
 
   # callback for mousedown signal
-  click: (x, y) =>
+  click: (x, y) ->
     @mousedown = true
     @pointer = new cp.v x,y
 
@@ -83,7 +83,7 @@ export class Game extends Physical_Layer
 
 
   # callback for mouseup signal
-  unfocus: =>
+  unfocus: ->
     if @mousedown
       @mousedown = false
 

@@ -32,7 +32,7 @@ export class TestCase extends Game
   event:->
   #check: =>
 
-  add_ball: (pos = @factory.random_outside(), color = null) =>
+  add_ball: (pos = @factory.random_outside(), color = null) ->
     naub = new Naub this, color
     ball = new Ball
 
