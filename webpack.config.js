@@ -10,12 +10,17 @@ module.exports = {
 
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".coffee", ".js", ".json"]
+        extensions: [
+            ".ts",
+            ".coffee",
+            ".json"
+        ]
     },
 
     module: {
         rules: [
             { test: /\.coffee$/, loader: "coffeescript-loader" },
+            { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
 
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }

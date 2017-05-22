@@ -1,10 +1,10 @@
 ###
-     _   __            __    _                 _     
+     _   __            __    _                 _
     / | / /___ ___  __/ /_  (_)___  ____      (_)____
    /  |/ / __ `/ / / / __ \/ / __ \/ __ \    / / ___/
-  / /|  / /_/ / /_/ / /_/ / / / / / /_/ /   / (__  ) 
- /_/ |_/\__,_/\__,_/_.___/_/_/ /_/\____(_)_/ /____/  
-                                        /___/        
+  / /|  / /_/ / /_/ / /_/ / / / / / /_/ /   / (__  )
+ /_/ |_/\__,_/\__,_/_.___/_/_/ /_/\____(_)_/ /____/
+                                        /___/
 ###
 
 import {KeyBindings} from './KeyBindings'
@@ -32,14 +32,14 @@ export class Naubino extends LayerManager
       else [ {name:"nobody", points: 0, time: 0, naubs: 0, level: 0 } ]
 
   set_score: ->
-    @temp_score = {
-        name:"nobody"
-        points: @game.points
-        time: @game.duration
-        naubs: @game.ex_naubs
-        game_version: @game.version
-        level: @game.level
-    }
+    @temp_score =
+      name: "nobody"
+      points: @game.points
+      time: @game.duration
+      naubs: @game.ex_naubs
+      game_version: @game.version
+      level: @game.level
+    
 
   store_score: (name = 'nobody')->
     @temp_score.name = name
@@ -107,6 +107,8 @@ export class Naubino extends LayerManager
     window.onkeyup = (key) => @keybindings.keyup(key)
     @keybindings.enable 32, => @toggle()
     @keybindings.enable 27, => @stop()
+    @keybindings.enable 77, => @game.spam()
+    @keybindings.enable 77, => @game.spam()
 
   setup_cursorbindings: () ->
     # TODO mouse events should be handled though Signals

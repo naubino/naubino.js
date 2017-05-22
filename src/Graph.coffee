@@ -57,7 +57,7 @@ export class Graph
   # @return [array] list of naubs connected to the parameter
   # @param [id] naub naub in question
   #
-  # returns list of joined naubs expect a certain predecessor
+  # returns list of joined naubs except a certain predecessor
   partners: (naub, pre = null) ->
     partners = []
     for id, join of @joins

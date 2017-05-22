@@ -81,14 +81,14 @@ export class Factory
     pos_b.AddPolar(dir, -15)
 
     if boxes == 0
-      console.log('0 boxes')
+      #console.log('0 boxes')
       factory1 = factory2 = @add_ball
     else if boxes == 1
-      console.log('1 boxe')
+      #console.log('1 boxe')
       factory1 = @add_ball
       factory2 = @add_box
     else
-      console.log('2 boxes')
+      #console.log('2 boxes')
       factory1 = factory2 = @add_box
 
     naub_a = factory1 pos_a, color_a
