@@ -11,7 +11,7 @@ module.exports = {
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [
-            ".ts",
+            //".ts",
             ".coffee",
             ".json"
         ]
@@ -26,6 +26,7 @@ module.exports = {
             { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
         ]
     },
+    target: "node",
 
     // When importing a module whose path matches one of the following, just
     // assume a corresponding global variable exists and use that instead.

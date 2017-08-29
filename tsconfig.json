@@ -5,6 +5,7 @@
         "target": "es6",
         "noImplicitAny": false,
         "sourceMap": true ,
+        "allowJs": true, // for testing
         "outDir": "./js/",
         "moduleResolution": "node",
         "jsx": "react",

@@ -2,6 +2,8 @@ import {Naubino} from './Naubino'
 import {Util} from './Util'
 console.time("loading")
 
+window = {} unless window # for testing
+
 window.onresize = ->
   if $("#maximizeCheck").is(":checked")
     clearTimeout window.resizetimeout if window.resizetimeout?

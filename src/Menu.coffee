@@ -1,4 +1,6 @@
 # TODO clean up menu code -- will do in naub_rethought
+import * as cp from 'chipmunk'
+
 import {Layer} from "./Layer"
 import {Naub} from "./Naub"
 import {Graph} from "./Graph"

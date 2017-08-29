@@ -46,7 +46,7 @@ class Graph {
   layer: Layer
   naubs: NaubId[]
   joins: Joins
-  dfs_map: Map<NaubId, DFS>
+  dfs_map: DFS[] //Map<NaubId, DFS>
   join_id_sequence: number
   seq_num: number
 
@@ -98,14 +98,16 @@ class Graph {
 
   cycle_test(first: NaubId) {
     let cycles = []
-    this.dfs_map = new Map()
+    this.dfs_map = []
     for(let inaub of this.naubs ) {
-      this.dfs_map.set(inaub, {naub: inaub, dfs_num: 0, color: 0})
+      this.dfs_map[inaub] = {naub: inaub, dfs_num: 0, color: 0}
       console.log(`adding ${inaub} to ${this.dfs_map}`)
     }
     this.seq_num = 1
 
-    for (let [naub_id, dfs] of this.dfs_map) {
+    console.log(this.dfs_map);
+    for (let naub_id in this.dfs_map) {
+      let [id, dfs] = naub_id;
       if(dfs.dfs_num === 0) {
         let dfs_cycle = this.dfs(naub_id, null, first)
         cycles = cycles.filter(x => dfs_cycle.indexOf(x) >= 0 )
@@ -117,32 +119,33 @@ class Graph {
   dfs (naub: NaubId, pre?: NaubId, first?: NaubId): any[] {
     let cycles = []
 
-    this.dfs_map.get(naub).dfs_num = this.seq_num
+    this.dfs_map[naub].dfs_num = this.seq_num
     this.seq_num++
-    this.dfs_map.get(naub).color = 1
+    this.dfs_map[naub].color = 1
 
     this.partners(naub, pre).forEach((partner_id) => {
     console.log("dfs_map", this.dfs_map)
     console.log("getting", partner_id)
-      if(this.dfs_map.get(partner_id).dfs_num === 0) {
+      if(this.dfs_map[partner_id].dfs_num === 0) {
         cycles = this.dfs(partner_id, naub, first).filter(x => cycles.indexOf(x) >= 0 )
       }
-      if(this.dfs_map.get(partner_id).color === 1) {
+      if(this.dfs_map[partner_id].color === 1) {
         let list =  this.cycle_list(naub, partner_id, first)
         if(list.length > 0) {
           this.layer.cycle_found.dispatch(list)
         }
       }
     })
-    this.dfs_map.get(naub).color = 2
+    this.dfs_map[naub].color = 2
     return cycles
 
   }
+  
 
   cycle_list(v, w, first = null): any[]{
-    let cycle = Array.from(this.dfs_map.values())
-    cycle.filter(({dfs_num, color}) => {
-           dfs_num >= this.dfs_map.get(w).dfs_num && color == 1
+    //let cycle = Array.from(this.dfs_map.values())
+    let cycle = this.dfs_map.filter(({dfs_num, color}) => {
+           dfs_num >= this.dfs_map[w].dfs_num && color == 1
          })
          .sort((a,b) => a.dfs_num - b.dfs_num)
     
@@ -157,7 +160,7 @@ class Graph {
   }
 
   tree(naub, visited = null) {
-    console.error("Graph::tree is unimplemented")
+    //console.error("Graph::tree is unimplemented")
   }
 
 }
