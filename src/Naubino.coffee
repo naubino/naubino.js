@@ -7,7 +7,7 @@
                                         /___/        
 ###
 
-import {KeyBindings} from './KeyBindings'
+import {KeyBindings} from './Keybindings'
 import {Settings} from './Settings'
 import {LayerManager} from './LayerManager'
 
@@ -93,7 +93,7 @@ export class Naubino extends LayerManager
     @touchend        = new @Signal()
     @touchmove       = new @Signal()
 
-    
+
     # menu
     @menu_button     = new @Signal()
     @menu_focus      = new @Signal()

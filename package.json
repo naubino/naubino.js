@@ -3,10 +3,13 @@
   "name": "naubino.js",
   "description": "A fun browser game with touch in mind",
   "version": "0.0.0",
+  "private": true,
+  "type": "module",
   "homepage": "github.com/hoodie/naubino.js",
   "scripts": {
-    "postinstall": "npm run build",
-    "build": "webpack"
+    "dev": "vite",
+    "build": "vite build --mode index && vite build --mode highscore",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -15,15 +18,13 @@
   "dependencies": {
     "chipmunk": "^6.1.1",
     "javascript-state-machine": "^2.4.0",
-    "signals": "^1.0.0"
+    "signals": "^1.0.0",
+    "underscore": "^1.13.8",
+    "zepto": "^1.2.0"
   },
   "devDependencies": {
-    "awesome-typescript-loader": "^3.1.3",
-    "coffee-script": ">= 1.2.0",
-    "coffeescript": "^2.0.0-beta1",
-    "coffeescript-loader": "0.0.10",
-    "source-map-loader": "^0.2.1",
-    "typescript": "^2.3.2",
-    "webpack": "^2.5.1"
+    "coffeescript": "^2.7.0",
+    "vite": "^5.4.0",
+    "vite-plugin-singlefile": "^2.3.3"
   }
 }

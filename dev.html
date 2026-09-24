@@ -3,15 +3,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>naubino.js</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/naubino.css" type="text/css" />
-    <link rel="stylesheet" href="css/github-badge.css" type="text/css" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/naubino.css" type="text/css" />
+    <link rel="stylesheet" href="/css/github-badge.css" type="text/css" />
 
     <script type="text/javascript" src="node_modules/signals/dist/signals.js"></script>
     <script type="text/javascript" src="node_modules/javascript-state-machine/state-machine.js"></script>
     <script type="text/javascript" src="node_modules/chipmunk/cp.js"></script>
     <script type="text/javascript" src="node_modules/zepto/dist/zepto.js"></script>
-  
+
   </head>
   <body>
 
@@ -30,7 +30,7 @@
       <input type="checkbox" id="prerenderingCheck" class="btn btn-mini" onchange="Util.togglePrerendering()"/>
       <label for="prerenderingCheck" class="checkbox">prerendering</label>
 
-      <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="Util.toggleMaximized()"   />
+      <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="Util.toggleMaximized()"/>
       <label for="maximizeCheck" class="checkbox">maximize</label>
 
       <input type="checkbox" id="fullScreenCheck" class="checkbox" onchange="Util.toggleFullscreen()"/>
@@ -54,7 +54,6 @@
         event.preventDefault();
       }
     </script>
-    <script type="text/javascript" src="dist/index.js/"></script>
+    <script type="module" src="/src/Load.coffee"></script>
   </body>
 </html>
-

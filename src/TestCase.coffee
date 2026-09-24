@@ -1,6 +1,6 @@
 import {Naub} from './Naub'
 import {Game} from './Game'
-import {StringShape, NumberShape, Ball, FrameCircle} from './Shapes'
+import {StringShape, Ball, FrameCircle} from './Shapes'
 import {StandardGame} from './StandardGame'
 
 export class TestCase extends Game 

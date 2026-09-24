@@ -7,6 +7,13 @@ cp.Vect::AddPolar = (dir, len) ->
     @x += Math.cos(dir) * len
     @y += Math.sin(dir) * len
 
+# cp.js 6.1.2 bug: BBTree::reindexQuery calls collideStatic(this, staticIndex, func)
+# but the signature is (staticIndex, func). Hits whenever the static index is empty.
+collideStatic = cp.SpatialIndex::collideStatic
+cp.SpatialIndex::collideStatic = (staticIndex, func) ->
+  [staticIndex, func] = [func, arguments[2]] if typeof func isnt 'function'
+  collideStatic.call this, staticIndex, func
+
 cp.Constraint::IsRogue= ->
   (@a.isRogue() and not @a.isStatic()) or
   (@b.isRogue() and not @b.isStatic())
