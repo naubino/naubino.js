@@ -28,6 +28,7 @@ canvas, .canvas
     display:block;
     border:1px solid gray;
     background-color: rgba(255,255,255,0);
+    touch-action: none;
 }
 
 #background_canvas 
@@ -104,6 +105,28 @@ form label
 {
     position:absolute;
     top: 550px;
+}
+
+
+/* touch devices: game only, the in-canvas menu has play/stop */
+html.touch, html.touch body
+{
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html.touch form
+{
+    display: none;
+}
+
+html.touch #gamediv > canvas
+{
+    top: 0;
+    border: none;
 }
 
 select.btn

@@ -14,12 +14,13 @@ export class Menu extends Layer
 
     @objects = {}
     @hovering = off
+    @opened_without_interaction = no
 
     @listener_size = @default_listener_size = 45
     Naubino.mousemove.add @move_pointer
     Naubino.mousedown.add @click
     Naubino.menu_button.active = false
-   
+
     @center = new cp.v(20,25)
     @cube_size = 45
     @default_fps = @fps = 35
@@ -28,7 +29,7 @@ export class Menu extends Layer
 
 
     @min_fps = 3
-    
+
     @setup_fsm()
 
   # changing the state a little
@@ -84,16 +85,26 @@ export class Menu extends Layer
         naub.isClickable = no
 
   ## can I touch this?
-  move_pointer: (x,y) -> [@pointer.x, @pointer.y] = [x,y]
+  move_pointer: (x,y) ->
+    @opened_without_interaction = no
+    [@pointer.x, @pointer.y] = [x,y]
 
   click: (x, y) =>
     @mousedown = true
+    @opened_without_interaction = no
+    # touch has no preceding mousemove, so the pointer may be stale
+    [@pointer.x, @pointer.y] = [x, y]
+    @draw_listener_region()
 
     for name, naub of @objects
       if naub.isHit @pointer
         naub.focus()
         @focused_naub = naub
         break
+
+  open: ->
+    @opened_without_interaction = yes
+    @activate_menu()
 
   draw: ->
     @draw_menu()
@@ -136,16 +147,10 @@ export class Menu extends Layer
 
 
   draw_listener_region: ->
-    @ctx.save()
-    @ctx.beginPath()
-    @ctx.arc 0, 15, @listener_size, 0, Math.PI*2, true
+    # isPointInPath works in device pixels, the pointer is in game units
+    inside = Math.hypot(@pointer.x, @pointer.y - 15) < @listener_size
 
-    if @ctx.isPointInPath(@pointer.x,@pointer.y)
+    if inside or @opened_without_interaction
       @activate_menu() unless @hovering
     else
       @deactivate_menu() if @hovering
-
-    #@ctx.stroke() # like to see it
-    @ctx.closePath()
-    @ctx.restore()
-

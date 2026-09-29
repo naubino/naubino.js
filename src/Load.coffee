@@ -19,12 +19,10 @@ window.onload = ->
   naubino.setup()
   $("#highscorelink").on "click", -> confirm "do you want to leave this page?"
 
-  if navigator.platform.indexOf("iPad") != -1
+  if navigator.maxTouchPoints > 0 and matchMedia("(pointer: coarse)").matches
+    document.documentElement.classList.add "touch"
     $("#maximizeCheck").prop "checked", true
-    $("#github").hide()
-    $("form label").hide()
-    $("form input[type=checkbox]").hide()
-    
+    naubino.menu.open()
 
 
   Util.toggleMaximized()
@@ -48,7 +46,3 @@ window.onload = ->
   document.addEventListener("fullscreenchange",       ( => Util.changeFullscreen (document.fullscreen)         ), false)
   document.addEventListener("mozfullscreenchange",    ( => Util.changeFullscreen (document.mozFullScreen)      ), false)
   document.addEventListener("webkitfullscreenchange", ( => Util.changeFullscreen (document.webkitIsFullScreen) ), false)
-
-
-
-
