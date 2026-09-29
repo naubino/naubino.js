@@ -1,5 +1,6 @@
 import {Naubino} from './Naubino'
 import {Util} from './Util'
+window.Util = Util
 console.time("loading")
 
 window.onresize = ->

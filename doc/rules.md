@@ -1,67 +1,71 @@
 # Game Modes
 
-##Stay Alive Mode 
-  **(Original Mode)**
-  **NOT IMPLEMENTED**
+## Stay Alive Mode
 
-  * Naubs fall into the screen
-  * Try to keep field from filling
+**(Original Mode)**
+**NOT IMPLEMENTED**
 
-###Level Ups:
+- Naubs fall into the screen
+- Try to keep field from filling
 
-  * spawns faster
-  * more colors
+### Level Ups:
 
+- spawns faster
+- more colors
 
-##New Stay Alive Mode
-  *StandardGame.coffee*
-  **IMPLEMENTED**
+## New Stay Alive Mode
 
-  * Naubs fall into the screen
-  * Try to keep field from filling
+_StandardGame.coffee_
+**IMPLEMENTED**
 
-###Level Ups:
+- Naubs fall into the screen
+- Try to keep field from filling
 
-  * more colors
-  * more shapes
-  * definite max number of naubs in basket
-    * basket grows slightly
+### Level Ups:
 
+- more colors
+- more shapes
+- definite max number of naubs in basket
+  - basket grows slightly
 
-##Empty the Field Mode
-  **NOT IMPLEMENTED**
+## Empty the Field Mode
 
-  New Naubs appear as you destroy them.
-  Perhaps they become more over time?
-  * Try to Destroy all
-  * predetermined colors try to solve bigger and bigger cycles at once
+**NOT IMPLEMENTED**
 
+New Naubs appear as you destroy them.
+Perhaps they become more over time?
 
+- Try to Destroy all
+- predetermined colors try to solve bigger and bigger cycles at once
 
-#Speciel Naubs:
-## not yet implemented 
-  * **"Time Bomb"** starts selfdestruct when joined
-  * **"Big Time Bomb"** selfdestructs too and takes joined naubs with him (think about special points for blasting naubs)
-  * **"Color Shifter"** changes color every n seconds
-  * **"Grow Naub"** grows extensions
-  * **"Decay Naub"** unjoin after n seconds
-  * **"Glue Naub"** Joins with any color ( up to n times)
-  * **"Mythosis Naub"** replecates itself
-  * **"Coin Naubs"** extra points if destroyed quickly
+# Speciel Naubs:
 
-#bonuses:
-## not yet implemented 
-  * spammer timeout for n seconds
-  * self joining for n seconds
+## not yet implemented
+
+- **"Time Bomb"** starts selfdestruct when joined
+- **"Big Time Bomb"** selfdestructs too and takes joined naubs with him (think about special points for blasting naubs)
+- **"Color Shifter"** changes color every n seconds
+- **"Grow Naub"** grows extensions
+- **"Decay Naub"** unjoin after n seconds
+- **"Glue Naub"** Joins with any color ( up to n times)
+- **"Mythosis Naub"** replecates itself
+- **"Coin Naubs"** extra points if destroyed quickly
+
+# Bonuses:
+
+## not yet implemented
+
+- spammer timeout for n seconds
+- self joining for n seconds
 
 ### Plans for after 1.0
 
- * achievments
- * speciel rules
-  * coin naubs ? with countdown
-  * exponential points per cycle length
-  * destroy things inside a cycle?
-  * glue naub ? (binds first 6 naubs )
-  * slow down time
-  * mythosis naub vs. naubs that die if joined
-  * different colorthemes as rewards?
+- achievments
+- speciel rules
+- coin naubs ? with countdown
+- exponential points per cycle length
+- destroy things inside a cycle?
+- glue naub ? (binds first 6 naubs )
+- slow down time
+- mythosis naub vs. naubs that die if joined
+- different colorthemes as rewards?
