@@ -144,7 +144,7 @@ class Tutorial extends Game
         onsuccess: =>
           console.info
 
-            
+
       }
     }
 
@@ -168,7 +168,7 @@ class Tutorial extends Game
 
 
 
-  ### utility ###
+  # utility
 
   toggle_joining: =>
     @joining_allowed = !@joining_allowed

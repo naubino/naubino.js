@@ -52,7 +52,7 @@ export class Layer
   #onchangestate: (e,f,t)-> console.info "#{@name} changed state #{e}: #{f} -> #{t}"
     #return true
 
-  ### manage timers for drawing and stepping ###
+  # manage timers for drawing and stepping
   start_stepping: -> @step_loop = setInterval((=> @step()),  1000 / @step_rate) unless @step_loop?
   stop_stepping: ->
     clearInterval @step_loop
@@ -74,7 +74,7 @@ export class Layer
     @start_drawing()
 
 
-  ### overwrite these ###
+  # overwrite these
   step: ->
   draw: ->
 
@@ -85,17 +85,18 @@ export class Layer
     @canvas.height = height
 
 
-  resize_by: (ratio) ->
-    @canvas.width *= ratio
-    @canvas.height*= ratio
-    @ctx.scale ratio, ratio
+  # scale: css px per game unit; backing store additionally scaled by dpr for crisp rendering
+  scale_to: (scale) ->
+    { width, height } = Naubino.settings.canvas
+    dpr = window.devicePixelRatio or 1
+    @canvas.style.width  = "#{width  * scale}px"
+    @canvas.style.height = "#{height * scale}px"
+    @canvas.width  = Math.round width  * scale * dpr
+    @canvas.height = Math.round height * scale * dpr
+    @ctx.setTransform scale * dpr, 0, 0, scale * dpr, 0, 0
     @clear()
 
-  reset_resize: ->
-    @ctx.setTransform 1,0,0,1,0,0
-    @canvas.width  = Naubino.settings.canvas.width
-    @canvas.height = Naubino.settings.canvas.height
-    @clear()
+  reset_resize: -> @scale_to 1
 
   fade_in: (callback = null) ->
     #console.log "fade in", @fadeloop
@@ -133,7 +134,7 @@ export class Layer
   hide: -> @canvas.style.opacity = 0
 
   clear: -> @ctx.clearRect(0, 0, @canvas.width, @canvas.height)
-  
+
   cache: -> @backup_ctx = @ctx
 
   restore: -> @ctx = @backup_ctx
@@ -160,7 +161,7 @@ export class Layer
   move_pointer: (x,y) =>
     [@pointer.x, @pointer.y] = [x,y] if @mousedown
 
-  ### housekeeping ###
+  # housekeeping
   add_object: (obj)->
     obj.center = @center()
     ++@objects_count
@@ -194,8 +195,8 @@ export class Layer
       callback(@get_object(i))
     else
       callback2()
-  
-  ### visible utilites ###
+
+  # visible utilites
   draw_point: (pos, color = "black") ->
     @ctx.beginPath()
     @ctx.arc(pos.x, pos.y, 4, 0, 2 * Math.PI, false)
@@ -204,5 +205,3 @@ export class Layer
     @ctx.strokeStyle = color
     @ctx.stroke()
     @ctx.closePath()
-
-

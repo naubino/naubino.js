@@ -6,7 +6,7 @@ export Settings = {
     updating:      yes
     draw_shadows:  on
     draw_borders:  no
-    effects:       off
+    effects:       on
 
   game:
     creation_offset: 50
@@ -17,7 +17,7 @@ export Settings = {
     size:          42
     margin:        8
     mass:          5
-    friction:         0.1
+    friction:      0.1
     elasticity:    0.3
     min_join_len:  1.2 # times size
     max_join_len:  2 # times size
@@ -64,7 +64,7 @@ export Settings = {
         { name: 'pause',       from: 'pulsing',       to: 'paused_pulse' }
         { name: 'play',        from: 'paused_pulse',  to: 'pulsing'      }
       ]
-      
+
   menu:
     font: "Helvetica"
     color: "white"
@@ -137,7 +137,7 @@ export Settings = {
      [ 12,  47,  56, 1] # db
      [110, 155,  88, 1] # lg
     ]
-    # http://www.colourlovers.com/palette/433018 (EXTENDED)	
+    # http://www.colourlovers.com/palette/433018 (EXTENDED)
     'Gasoline Rainbow': [
      [189,  42,  51, 1] # RED
      [147, 163,  28, 1] # GREEN

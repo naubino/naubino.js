@@ -78,9 +78,7 @@ export class Naubino extends LayerManager
       @gamediv.appendChild canvas
       @canvases[name] = canvas
 
-  ###
-  Signals connect everything else that does not react to events
-  ###
+  # Signals connect everything else that does not react to events
 
   setup_signals: ->
     # user interface
@@ -128,9 +126,29 @@ export class Naubino extends LayerManager
     @overlay_canvas.addEventListener("mousemove"  , onmousemove , false)
     @overlay_canvas.addEventListener("mouseout"   , onmouseup   , false)
 
-    ontouchstart = (e) => onmousedown e
-    ontouchmove  = (e) => onmousemove e
-    ontouchend   = (e) => onmouseup e
+    # two finger tap toggles play/pause
+    gesture = null
+
+    ontouchstart = (e) =>
+      if e.touches.length is 2
+        onmouseup e # let go of whatever the first finger grabbed
+        gesture = { start: Date.now() }
+      else if gesture?
+        e.preventDefault()
+      else
+        onmousedown e
+
+    ontouchmove = (e) =>
+      if gesture? then e.preventDefault() else onmousemove e
+
+    ontouchend = (e) =>
+      if gesture?
+        e.preventDefault()
+        if e.touches.length is 0
+          @toggle() if e.type is "touchend" and Date.now() - gesture.start < 400
+          gesture = null
+      else
+        onmouseup e
 
     @overlay_canvas.addEventListener("touchstart" , ontouchstart , false)
     @overlay_canvas.addEventListener("touchend"   , ontouchend   , false)
