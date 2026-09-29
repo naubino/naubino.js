@@ -1,10 +1,10 @@
 ###
-     _   __            __    _                 _     
+     _   __            __    _                 _
     / | / /___ ___  __/ /_  (_)___  ____      (_)____
    /  |/ / __ `/ / / / __ \/ / __ \/ __ \    / / ___/
-  / /|  / /_/ / /_/ / /_/ / / / / / /_/ /   / (__  ) 
- /_/ |_/\__,_/\__,_/_.___/_/_/ /_/\____(_)_/ /____/  
-                                        /___/        
+  / /|  / /_/ / /_/ / /_/ / / / / / /_/ /   / (__  )
+ /_/ |_/\__,_/\__,_/_.___/_/_/ /_/\____(_)_/ /____/
+                                        /___/
 ###
 
 import {KeyBindings} from './Keybindings'
@@ -110,26 +110,29 @@ export class Naubino extends LayerManager
 
   setup_cursorbindings: () ->
     # TODO mouse events should be handled though Signals
-    onmousemove = (e) =>
-      x = (e.pageX - @overlay_canvas.offsetLeft) / @scale
-      y = (e.pageY - @overlay_canvas.offsetTop) /  @scale
-      @mousemove.dispatch x,y
+    # touch events carry coordinates in changedTouches, not on the event itself
+    game_coords = (e) =>
+      point = e.changedTouches?[0] ? e
+      rect  = @overlay_canvas.getBoundingClientRect()
+      x = (point.clientX - rect.left - @overlay_canvas.clientLeft) / @scale
+      y = (point.clientY - rect.top  - @overlay_canvas.clientTop)  / @scale
+      e.preventDefault() if e.changedTouches? # no emulated mouse events after touch
+      [x, y]
 
-    onmouseup = (e) =>
-      x = (e.pageX - @overlay_canvas.offsetLeft) / @scale
-      y = (e.pageY - @overlay_canvas.offsetTop) /  @scale
-      @mouseup.dispatch x,y
-
-    onmousedown = (e) =>
-      x = (e.pageX - @overlay_canvas.offsetLeft) / @scale
-      y = (e.pageY - @overlay_canvas.offsetTop) /  @scale
-      @mousedown.dispatch x,y
+    onmousemove = (e) => @mousemove.dispatch game_coords(e)...
+    onmouseup   = (e) => @mouseup.dispatch   game_coords(e)...
+    onmousedown = (e) => @mousedown.dispatch game_coords(e)...
 
     @overlay_canvas.addEventListener("mousedown"  , onmousedown , false)
     @overlay_canvas.addEventListener("mouseup"    , onmouseup   , false)
     @overlay_canvas.addEventListener("mousemove"  , onmousemove , false)
     @overlay_canvas.addEventListener("mouseout"   , onmouseup   , false)
 
-    @overlay_canvas.addEventListener("touchstart" , onmousedown , false)
-    @overlay_canvas.addEventListener("touchend"   , onmouseup   , false)
-    @overlay_canvas.addEventListener("touchmove"  , onmousemove , false)
+    ontouchstart = (e) => onmousedown e
+    ontouchmove  = (e) => onmousemove e
+    ontouchend   = (e) => onmouseup e
+
+    @overlay_canvas.addEventListener("touchstart" , ontouchstart , false)
+    @overlay_canvas.addEventListener("touchend"   , ontouchend   , false)
+    @overlay_canvas.addEventListener("touchcancel", ontouchend   , false)
+    @overlay_canvas.addEventListener("touchmove"  , ontouchmove  , false)

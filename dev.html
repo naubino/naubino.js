@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>naubino.js</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/naubino.css" type="text/css" />
@@ -49,10 +50,12 @@
     <div id="gamediv">
     </div> 
 
+
     <script>
-      document.ontouchmove = function(event) {
+      // document-level touch listeners are passive by default on iOS, preventDefault would be ignored
+      document.addEventListener("touchmove", function(event) {
         event.preventDefault();
-      }
+      }, { passive: false });
     </script>
     <script type="module" src="/src/Load.coffee"></script>
   </body>
