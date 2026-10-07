@@ -19,6 +19,9 @@ window.onload = ->
 
   Util.toggleMaximized()
 
+  # reflect initial settings in the UI (settings are the source of truth on load)
+  $('#effectsCheck').prop 'checked', naubino.settings.graphics.effects == on
+
 
   #populate color selector
   for name, colors of naubino.settings.colors then $('select#colors').append("<option value=\"#{name}\">#{name}</option>")
