@@ -18,7 +18,7 @@ function coffeescriptPlugin() {
       server.middlewares.use((req, _res, next) => {
         const [pathname, query = ""] = req.url.split("?");
         if (pathname === "/") {
-          req.url = "/dev.html";
+          req.url = "/index.html";
         } else if (pathname.endsWith(".coffee") && !/(^|&)import(&|=|$)/.test(query)) {
           req.url = `${pathname}?${query ? `${query}&` : ""}import`;
         }
@@ -74,7 +74,7 @@ function inlineVendorScriptsPlugin() {
 // all dynamic imports), so each page is built as its own pass, selected via
 // `--mode`. `npm run build` chains both passes into the same dist/ dir.
 const entries = {
-  index: "dev.html",
+  index: "index.html",
   highscore: "highscore.html",
 };
 
