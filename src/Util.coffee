@@ -71,7 +71,7 @@ export Util =
 
   toggleMaximized: (force = false) ->
     if force or @shouldMaximize()
-      Naubino.fit_field_to_viewport() if @isTouch()
+      Naubino.fit_field_to_viewport()# if @isTouch()
       Naubino.maximize()
     else
       Naubino.demaximize()
