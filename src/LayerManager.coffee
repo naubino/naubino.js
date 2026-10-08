@@ -1,5 +1,4 @@
 import {Background} from './Background'
-import {Game} from './Game'
 import {Menu} from './Menu'
 import {Overlay} from './Overlay'
 import {StandardGame} from './StandardGame'

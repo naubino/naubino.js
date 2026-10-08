@@ -1,5 +1,5 @@
 @media screen and (view-mode: minimized) {
-    body 
+    body
     {
         background: #ffffff;
         background-image:  url('../images/game.png');
@@ -12,26 +12,59 @@
     }
 }
 
-body 
+/* default, or 'auto' */
+html {
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  canvas {
+    filter: brightness(.8) contrast(1.2);
+  }
+  body {
+    color: #fff;
+    background-color:rgb(8%,8%,8%);
+  }
+  :root {
+    color-scheme: dark;
+    --game-background-color: rgb(8%,8%,8%);
+    --canvas-background-color: rgba(25,25,25,0);
+  }
+}
+
+
+@media (prefers-color-scheme: light) {
+  body {
+    color: #000;
+    background-color:rgb(88%,88%,88%);
+  }
+  :root {
+    color-scheme: light;
+    --game-background-color: rgb(88%,88%,88%);
+    --canvas-background-color: rgba(255,255,255,0);
+  }
+}
+
+body
 {
     margin:0;
-    background-color:rgb(88%,88%,88%);
 }
+
 .container{
     display:block;
     border:1px solid gray;
     background-color: #fff;
 }
 
-canvas, .canvas 
+canvas, .canvas
 {
     display:block;
     border:1px solid gray;
-    background-color: rgba(255,255,255,0);
+    background-color: var(--canvas-background-color);
     touch-action: none;
 }
 
-#background_canvas 
+#background_canvas
 {
     background-color: #fff;
 }
@@ -44,18 +77,10 @@ canvas, .canvas
 header
 {
     margin:auto;
-    align:center;
 }
 
-/*h1 
-{
-    font-family: "Comfortaa";
-    font-size:32pt;
-    color: white;
-    text-shadow: hsl(0,0%,022%) 2px 2px 4px;
-}*/
 
-#footerdiv 
+#footerdiv
 {
     text-align:center;
     display:block;
@@ -65,9 +90,9 @@ header
 }
 
 
-#gamediv 
+#gamediv
 {
-    background-color: #fff;
+    background-color: var(--game-background-color);
     display:block;
 }
 
@@ -135,5 +160,3 @@ select.btn
     height: 1.6em;
     width: 120px;
 }
-
-
