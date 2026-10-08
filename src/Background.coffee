@@ -16,7 +16,7 @@ export class Background extends Layer
 
     @target = undefined
     @default_thickness = @basket_thickness = 4
-    @color = @default_color = [100,100,100]
+    @color = @default_color = if Util.isDarkMode() then [190,190,190] else [100,100,100]
     @pulse_speed = 10
     @pulsating = off
     @pulse_ends = false
@@ -105,7 +105,7 @@ export class Background extends Layer
       @ctx.fillText(char, 0, 0)
       @ctx.restore()
     @ctx.restore()
-    
+
 
   draw_line: (x0, y0, x1 = @center().x, y1 = @center().y, color = 'black') ->
     @ctx.beginPath()

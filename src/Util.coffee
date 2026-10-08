@@ -69,6 +69,8 @@ export Util =
 
   isTouch: -> document.documentElement.classList.contains "touch"
 
+  isDarkMode: -> matchMedia("(prefers-color-scheme: dark)").matches
+
   toggleMaximized: (force = false) ->
     if force or @shouldMaximize()
       Naubino.fit_field_to_viewport()# if @isTouch()

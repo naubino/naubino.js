@@ -41,7 +41,7 @@ export class Shape
      
   draw_border: (ctx) ->
     ctx.lineWidth = 2
-    ctx.strokeStyle = Util.color_to_rgba @naub.join_style.fill
+    ctx.strokeStyle = Util.color_to_rgba Naubino.color_scheme().foreground()
     ctx.stroke()
 
   draw_gradient: (ctx) ->

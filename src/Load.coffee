@@ -9,7 +9,11 @@ window.addEventListener "orientationchange", -> Util.relayout(300) if window.Nau
 window.onload = ->
   naubino = window.Naubino = new Naubino()
   naubino.setup()
+  naubino.apply_color_scheme()
   $("#highscorelink").on "click", -> confirm "do you want to leave this page?"
+
+  matchMedia("(prefers-color-scheme: dark)").addEventListener "change", ->
+    naubino.apply_color_scheme()
 
   if navigator.maxTouchPoints > 0 and matchMedia("(pointer: coarse)").matches
     document.documentElement.classList.add "touch"
@@ -24,7 +28,7 @@ window.onload = ->
 
 
   #populate color selector
-  for name, colors of naubino.settings.colors then $('select#colors').append("<option value=\"#{name}\">#{name}</option>")
+  for name, _colors of naubino.settings.colors then $('select#colors').append("<option value=\"#{name}\">#{name}</option>")
   $('select#colors option').each (index,option) -> if option.value == naubino.settings.color then option.selected = true
   $('select#colors').change ->
     naubino.settings.color = this.value
@@ -33,6 +37,7 @@ window.onload = ->
       naubino.settings.graphics.draw_borders = true
     else if naubino.settings.graphics.draw_borders_old?
       naubino.settings.graphics.draw_borders = naubino.settings.graphics.draw_borders_old
+    naubino.apply_color_scheme()
     naubino.menu.for_each (naub) -> naub.recolor()
     naubino.game.for_each (naub) -> naub.recolor()
     naubino.game.draw()
