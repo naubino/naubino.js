@@ -29,7 +29,7 @@ export class Overlay extends Layer
       @ctx.globalAlpha = 1
     @ctx.restore()
 
-  
+
   fade_in_message: (text, callback) ->
     mes_id = @message text
     mes = @get_object mes_id
@@ -38,8 +38,8 @@ export class Overlay extends Layer
     mes.callback = callback
     mes_id
 
-  
-  ### fading out a specific message by id ###
+
+  # fading out a specific message by id
   fade_out_message: (mes_id, callback) ->
     @play() if @can "play"
     mes = @get_object(mes_id)
@@ -48,7 +48,7 @@ export class Overlay extends Layer
     mes.alpha_delta = -Naubino.settings.overlay.fade_duration / @fps if mes?
 
 
-  ### fading out all messages ###
+  # fading out all messages
   fade_out_messages: (callback) ->
     @play() if @can "play"
     @fade_out_message id for id, message of @objects when message.life isnt on

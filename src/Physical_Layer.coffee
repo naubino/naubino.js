@@ -66,5 +66,3 @@ export class Physical_Layer extends Layer
         #console.log constraint
         @space.removeConstraint constraint
     delete @objects[id]
-
-

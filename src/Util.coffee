@@ -65,12 +65,27 @@ export Util =
         on
 
 
+  shouldMaximize: -> $("#maximizeCheck").is(":checked") or @isFullscreen()
+
+  isTouch: -> document.documentElement.classList.contains "touch"
+
   toggleMaximized: (force = false) ->
-    if $("#maximizeCheck").is(":checked") or force
+    if force or @shouldMaximize()
+      Naubino.fit_field_to_viewport()# if @isTouch()
       Naubino.maximize()
     else
       Naubino.demaximize()
     window.Naubino.center()
+
+  # debounced; mobile browsers report the final viewport size late (rotation, toolbars, fullscreen)
+  relayout: (delay = 150) ->
+    clearTimeout @relayout_timeout
+    @relayout_timeout = setTimeout (=>
+      if @shouldMaximize()
+        Naubino.fit_field_to_viewport() if @isTouch()
+        Naubino.maximize()
+      Naubino.center()
+    ), delay
 
   toggleEffects: ->
     if $('#effectsCheck').is(":checked")
@@ -99,30 +114,29 @@ export Util =
 
 
   # https://developer.mozilla.org/en/DOM/Using_full-screen_mode
+  isFullscreen: ->
+    !!(document.fullscreenElement or document.webkitFullscreenElement or document.mozFullScreenElement)
+
   requestFullscreen: ->
-    docElm = document.documentElement
-    if (docElm.requestFullscreen?)
-      docElm.requestFullscreen()
-    else if (docElm.mozRequestFullScreen?)
-      docElm.mozRequestFullScreen()
-    else if (docElm.oRequestFullScreen?)
-      docElm.oRequestFullScreen()
-    else if (docElm.webkitRequestFullScreen?)
-      docElm.webkitRequestFullScreen()
+    el = document.documentElement
+    request = el.requestFullscreen ? el.webkitRequestFullscreen ? el.webkitRequestFullScreen ? el.mozRequestFullScreen
+    unless request?
+      # e.g. iPhone Safari has no element fullscreen
+      $('#fullScreenCheck').prop 'checked', false
+      return
+    Promise.resolve(request.call el).then(
+      # game is 16:9, portrait on a phone would be tiny
+      (-> screen.orientation?.lock?('landscape')?.catch? (->)),
+      (-> $('#fullScreenCheck').prop 'checked', false)
+    )
 
   exitFullscreen: ->
-    if (document.exitFullscreen)
-      document.exitFullscreen()
-    else if (document.mozCancelFullScreen)
-      document.mozCancelFullScreen()
-    else if (document.webkitCancelFullScreen)
-      document.webkitCancelFullScreen()
+    return unless @isFullscreen()
+    exit = document.exitFullscreen ? document.webkitExitFullscreen ? document.webkitCancelFullScreen ? document.mozCancelFullScreen
+    exit?.call document
 
-
-  changeFullscreen: (fullScreen) ->
-    if fullScreen or (document.fullscreen) or (document.mozFullScreen) or (document.webkitIsFullScreen)
-      @toggleMaximized(on)
-    else
-      @toggleMaximized()
-
-
+  changeFullscreen: ->
+    # keep checkbox in sync when leaving via Esc / back gesture
+    $('#fullScreenCheck').prop 'checked', @isFullscreen()
+    @toggleMaximized()
+    @relayout()

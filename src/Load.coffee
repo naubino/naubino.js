@@ -3,31 +3,24 @@ import {Util} from './Util'
 window.Util = Util
 console.time("loading")
 
-window.onresize = ->
-  if $("#maximizeCheck").is(":checked")
-    clearTimeout window.resizetimeout if window.resizetimeout?
-    window.resizetimeout = setTimeout (
-      ->
-        window.Naubino.maximize()
-        window.Naubino.center()
-    ) , 1000
-  else
-    window.Naubino.center()
+window.addEventListener "resize", -> Util.relayout() if window.Naubino?
+window.addEventListener "orientationchange", -> Util.relayout(300) if window.Naubino?
 
 window.onload = ->
   naubino = window.Naubino = new Naubino()
   naubino.setup()
   $("#highscorelink").on "click", -> confirm "do you want to leave this page?"
 
-  if navigator.platform.indexOf("iPad") != -1
+  if navigator.maxTouchPoints > 0 and matchMedia("(pointer: coarse)").matches
+    document.documentElement.classList.add "touch"
     $("#maximizeCheck").prop "checked", true
-    $("#github").hide()
-    $("form label").hide()
-    $("form input[type=checkbox]").hide()
-    
+    naubino.menu.open()
 
 
   Util.toggleMaximized()
+
+  # reflect initial settings in the UI (settings are the source of truth on load)
+  $('#effectsCheck').prop 'checked', naubino.settings.graphics.effects == on
 
 
   #populate color selector
@@ -45,10 +38,5 @@ window.onload = ->
     naubino.game.draw()
 
 
-  document.addEventListener("fullscreenchange",       ( => Util.changeFullscreen (document.fullscreen)         ), false)
-  document.addEventListener("mozfullscreenchange",    ( => Util.changeFullscreen (document.mozFullScreen)      ), false)
-  document.addEventListener("webkitfullscreenchange", ( => Util.changeFullscreen (document.webkitIsFullScreen) ), false)
-
-
-
-
+  for event in ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange"]
+    document.addEventListener event, (-> Util.changeFullscreen()), false

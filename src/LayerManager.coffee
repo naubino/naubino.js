@@ -38,34 +38,50 @@ export class LayerManager
     for layer in @layers then layer.canvas.style.left = "#{left}px"
 
 
-  demaximize: ->
-    for layer in  @layers
-      layer.reset_resize()
-    @scale = 1
+  scale_to: (scale) ->
+    @scale = Naubino.settings.canvas.scale = scale
+    for layer in @layers
+      layer.scale_to scale
+    # resizing wipes the canvases, don't wait for the next frame (paused layers have none)
+    layer.draw() for layer in [@background, @game, @menu]
 
-  maximize: ()->
-    @demaximize()
+  demaximize: -> @scale_to 1
 
-    if @scale is 1
-      #win_width   = window.innerWidth #screen.width
-      #win_height  = window.innerHeight#screen.height
-      win_width   = window.screen.width
-      win_height  = window.screen.height
-      console.info "window size",  win_width, win_height
-      game_width  = $("canvas#game_canvas").width()
-      game_height = $("canvas#game_canvas").height()
-      offset_top  = $("canvas#game_canvas").offset().top
-      oscale      = 1
+  # css px available for the canvases
+  available_size: ->
+    canvas = @game_canvas
+    border = canvas.offsetWidth - canvas.clientWidth
+    width:  window.innerWidth  - border
+    height: window.innerHeight - canvas.offsetTop - border
 
-      @scale = Naubino.settings.canvas.scale = win_width / game_width
+  maximize: ->
+    { width, height } = Naubino.settings.canvas
+    avail = @available_size()
+    console.info "viewport size", window.innerWidth, window.innerHeight
+    @scale_to Math.max 0.1, Math.min(avail.width / width, avail.height / height)
 
-      if game_height * @scale > win_height
-        @scale = Naubino.settings.canvas.scale = (win_height-offset_top) / game_height
+  # short side keeps the base size (the basket needs it at max level),
+  # long side follows the viewport's aspect ratio
+  fit_field_to_viewport: ->
+    @base_field ?= { width: Naubino.settings.canvas.width, height: Naubino.settings.canvas.height }
+    short = Math.min @base_field.width, @base_field.height
+    { width, height } = @available_size()
+    if width >= height
+      @resize_field Math.round(short * width / height), short
+    else
+      @resize_field short, Math.round(short * height / width)
 
-      document.querySelector("#gamediv").style.width = ""
-      ratio = Naubino.settings.canvas.scale/oscale
-      for layer in  @layers
-        layer.resize_by ratio
+  resize_field: (width, height) ->
+    Naubino.settings.canvas.width  = width
+    Naubino.settings.canvas.height = height
+    for layer in @layers
+      layer.width  = width
+      layer.height = height
+    # naubs hang on springs anchored at the old center
+    center = @game.center()
+    @game.for_each (naub) ->
+      naub.center = center.Copy()
+      naub.constraints?.center?.anchr2 = center.Copy()
 
   stretch: (width = "100%")->
     for name in 'background game menu overlay'.split ' '
