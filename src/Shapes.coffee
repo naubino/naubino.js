@@ -15,7 +15,7 @@ export class Shape
 
   apply_filter: (filter, ctx )->
     @[filter](ctx) if filter in [ "alpha", "draw_glow", "draw_border", "draw_shadow", "draw_gradient","draw_gradient_soft" ]
-  
+
   alpha: (ctx) ->
     ctx.globalAlpha = 0.4
 
@@ -38,10 +38,10 @@ export class Shape
         @apply_filter "draw_gradient_soft", ctx
 
     ctx.restore()
-     
+
   draw_border: (ctx) ->
     ctx.lineWidth = 2
-    ctx.strokeStyle = Util.color_to_rgba @naub.join_style.fill
+    ctx.strokeStyle = Util.color_to_rgba Naubino.color_scheme().foreground()
     ctx.stroke()
 
   draw_gradient: (ctx) ->
@@ -60,7 +60,7 @@ export class Shape
 
   draw_glow: (ctx) ->
     ctx.shadowColor = Util.color_to_rgba(@naub.style.fill)
-    ctx.shadowBlur = 10
+    ctx.shadowBlur = if Util.isDarkMode() then 120 else 10
     ctx.shadowOffsetX = 0
     ctx.shadowOffsetY = 0
     ctx.fill()
@@ -112,7 +112,7 @@ export class Box extends Shape
   # actual painting routines
   render: (ctx,x,y) ->
     ctx.rotate @naub.physical_body.a if @naub.physical_body?
-     
+
     ctx.beginPath()
     ctx.rect(-@naub.width/2,-@naub.height/2,@naub.width,@naub.height)
     ctx.fillStyle = Util.color_to_rgba(@naub.style.fill)
@@ -149,7 +149,7 @@ export class Clock extends Shape
     end = @naub.clock_progress * Math.PI/100
 
     ctx.translate( x, y)
-     
+
     ctx.beginPath()
     ctx.arc(0, 0, size, @start, end, false)
     #ctx.closePath()
@@ -264,7 +264,7 @@ export class MainButton extends Box
     ctx.save()
     ctx.translate(x,y)
     ctx.scale ratio, ratio
-    
+
     ctx.font= "bold #{size}px #{Naubino.settings.menu.font}"
     ctx.textAlign = 'center'
     if Naubino.settings.graphics.draw_borders

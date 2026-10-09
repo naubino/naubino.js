@@ -10,6 +10,7 @@
 import {KeyBindings} from './Keybindings'
 import {Settings} from './Settings'
 import {LayerManager} from './LayerManager'
+import {Util} from './Util'
 
 export class Naubino extends LayerManager
 
@@ -59,8 +60,17 @@ export class Naubino extends LayerManager
     @init()
     console.timeEnd("loading")
 
-  colors: -> @settings.colors[@settings.color]
+  color_scheme: -> @settings.colors[@settings.color]
+  colors: -> @color_scheme().naubs
   recolor: -> @game.for_each (naub) -> naub.recolor()
+
+  # pushes the active scheme's background onto the page so CSS (e.g.
+  # #background_canvas) can pick it up via --canvas-background-color.
+  # an inline custom property wins over whatever the prefers-color-scheme
+  # media query would otherwise set on :root.
+  apply_color_scheme: ->
+    color = Util.color_to_rgba @color_scheme().background()
+    document.documentElement.style.setProperty '--canvas-background-color', color
   print: -> @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
 
   setup_dom: () ->

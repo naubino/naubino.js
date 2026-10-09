@@ -1,8 +1,8 @@
 import {Util} from './Util'
 
 # a Naub is everything in the game that you can move around
-# Naubs can be joined under certain circumstances 
-# Naubs can be given shapes 
+# Naubs can be joined under certain circumstances
+# Naubs can be given shapes
 # @param layer [Layer] the layer on which to draw
 # @param color_id [int] representing the color from color palett, also neccessary for joining
 # @param size [int] size, what else
@@ -11,7 +11,7 @@ export class Naub
     @shapes       = [] # shapes this naub draws in order from bottom to top
     @joins        = {} # {id: opposing naub}
     @drawing_join = {} # {id: true/false if this naub draws the join}
-   
+
     @ctx         = @layer.ctx
     @frame       = @size*1.5 # defines buffer canvas
 
@@ -96,7 +96,7 @@ export class Naub
     r = @size/2
     Math.floor r*r*Math.PI
 
-  # Either renders shapes or draws buffer 
+  # Either renders shapes or draws buffer
   #
   # @param ctx [canvas.context] context of the target layer
   # set @life_rendering to true if you want to have an animated naub
@@ -213,8 +213,9 @@ export class Naub
     #ctx.moveTo pos.x, pos.y
     #ctx.lineTo pos2.x, pos2.y
     ctx.lineWidth = 1
-    ctx.fillStyle = '#000000'
-    ctx.strokeStyle = '#ffffff'
+    scheme = Naubino.color_scheme()
+    ctx.fillStyle = Util.color_to_rgba scheme.foreground()
+    ctx.strokeStyle = Util.color_to_rgba scheme.background()
     ctx.translate pos.x, pos.y
     ctx.rotate diff.Angle()
     ctx.rect 0, -stretched_width/2, l, stretched_width
@@ -223,7 +224,7 @@ export class Naub
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
- 
+
   # Renders join between this naub and the partner
   # @param ctx [canvas.context] context of the target layer
   # @param partner [naub] target naub
@@ -243,8 +244,9 @@ export class Naub
     #ctx.moveTo pos.x, pos.y
     #ctx.lineTo pos2.x, pos2.y
     ctx.lineWidth = 1
-    ctx.fillStyle = '#000000'
-    ctx.strokeStyle = '#ffffff'
+    scheme = Naubino.color_scheme()
+    ctx.fillStyle = Util.color_to_rgba scheme.foreground()
+    ctx.strokeStyle = Util.color_to_rgba scheme.background()
     ctx.rotate diff.Angle()
     ctx.translate pos.x, pos.y
     ctx.rect 0, @size/2, l, @size
@@ -253,7 +255,7 @@ export class Naub
     ctx.stroke()
     ctx.closePath()
     ctx.restore()
- 
+
 
   # makes a naub clickable and joinable again
   disable: -> @disabled = true
@@ -283,8 +285,8 @@ export class Naub
   # 1 for "normal" naub
   # >1 for "bonus" naubs
   points_on_destroy: -> 1
-    
-  # animated remove with disabling  
+
+  # animated remove with disabling
   destroy: (is_last = false) ->
     @destroying = true
     duration = 270
@@ -393,7 +395,7 @@ export class Naub
       -1
 
 
-  # the 'other' naub takes my place 
+  # the 'other' naub takes my place
   replace_with: (other) ->
     for id, naub of @joins
       if naub.constraints[id]?
@@ -483,4 +485,3 @@ export class Naub
     @focused = false
     @onclick()
     @layer.naub_unfocused.dispatch(@)
-

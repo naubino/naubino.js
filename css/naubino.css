@@ -1,116 +1,119 @@
 @media screen and (view-mode: minimized) {
-    body 
-    {
+    body {
         background: #ffffff;
-        background-image:  url('../images/game.png');
+        background-image: url("../images/game.png");
         background-size: 120% auto;
     }
-    body > *
-
-    {
+    body > * {
         display: none;
     }
 }
 
-body 
-{
-    margin:0;
-    background-color:rgb(88%,88%,88%);
-}
-.container{
-    display:block;
-    border:1px solid gray;
-    background-color: #fff;
+html {
+    color-scheme: light dark;
 }
 
-canvas, .canvas 
-{
-    display:block;
-    border:1px solid gray;
-    background-color: rgba(255,255,255,0);
+@media (prefers-color-scheme: dark) {
+    canvas {
+        filter: brightness(0.8) contrast(1.2);
+    }
+    body {
+        color: #fff;
+        background-color: rgb(8%, 8%, 8%);
+    }
+    :root {
+        color-scheme: dark;
+        --game-background-color: rgb(8%, 8%, 8%);
+        --canvas-background-color: rgba(25, 25, 25, .5);
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    body {
+        color: #000;
+        background-color:rgb(99%,88%,88%);
+    }
+    :root {
+        color-scheme: light;
+        --game-background-color: rgb(88%, 88%, 88%);
+        --canvas-background-color: rgb(255, 255, 255);
+    }
+}
+
+body {
+    margin: 0;
+}
+
+.container {
+    display: block;
+    border: 1px solid gray;
+}
+
+canvas,
+.canvas {
+    display: block;
+    border: 1px solid gray;
     touch-action: none;
 }
 
-#background_canvas 
-{
-    background-color: #fff;
+#background_canvas {
+    background-color: var(--canvas-background-color);
 }
 
-#highscore
-{
-    display:none;
+#highscore {
+    display: none;
 }
 
-header
-{
-    margin:auto;
-    align:center;
+header {
+    margin: auto;
 }
 
-/*h1 
-{
-    font-family: "Comfortaa";
-    font-size:32pt;
-    color: white;
-    text-shadow: hsl(0,0%,022%) 2px 2px 4px;
-}*/
-
-#footerdiv 
-{
-    text-align:center;
-    display:block;
-    margin:auto;
-    max-width:1024px;
-    padding:0 1em;
+#footerdiv {
+    text-align: center;
+    display: block;
+    margin: auto;
+    max-width: 1024px;
+    padding: 0 1em;
 }
 
-
-#gamediv 
-{
-    background-color: #fff;
-    display:block;
+#gamediv {
+    background-color: var(--game-background-color);
+    display: block;
 }
 
-
-#gamediv > canvas, #gamediv .canvas
-{
+#gamediv > canvas,
+#gamediv .canvas {
     position: absolute;
-    z-index:0;
-    left:auto;
+    z-index: 0;
+    left: auto;
     top: 20px;
 }
 
-form
-{
+form {
     position: absolute;
-    text-align:center;
+    text-align: center;
 }
 
-#gamediv > span
-{
+#gamediv > span {
     position: absolute;
-    text-align:center;
-    width:600px;
-    height:400px;
-    padding-top:50px;
-    z-index:10;
+    text-align: center;
+    width: 600px;
+    height: 400px;
+    padding-top: 50px;
+    z-index: 10;
 }
 
-form label
-{
-    font-size:11px;
+form label {
+    font-size: 11px;
 }
 
-.flattr
-{
-    position:absolute;
+.flattr {
+    position: absolute;
     top: 550px;
 }
 
-
-/* touch devices: game only, the in-canvas menu has play/stop */
-html.touch, html.touch body
-{
+html.touch,
+html.touch body {
     overscroll-behavior: none;
     -webkit-user-select: none;
     user-select: none;
@@ -118,22 +121,17 @@ html.touch, html.touch body
     -webkit-tap-highlight-color: transparent;
 }
 
-html.touch form
-{
+html.touch form {
     display: none;
 }
 
-html.touch #gamediv > canvas
-{
+html.touch #gamediv > canvas {
     top: 0;
     border: none;
 }
 
-select.btn
-{
+select.btn {
     text-align: left;
     height: 1.6em;
     width: 120px;
 }
-
-
