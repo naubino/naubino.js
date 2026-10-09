@@ -4,7 +4,6 @@
     "npm:chipmunk@^6.1.1": "6.1.2",
     "npm:coffeescript@^2.7.0": "2.7.0",
     "npm:javascript-state-machine@^2.4.0": "2.4.0",
-    "npm:signals@1": "1.0.0",
     "npm:vite-plugin-singlefile@^2.3.3": "2.3.3_vite@5.4.21",
     "npm:vite@^5.4.0": "5.4.21"
   },
@@ -372,9 +371,6 @@
       ],
       "bin": true
     },
-    "signals@1.0.0": {
-      "integrity": "sha512-dE3lBiqgrgIvpGHYBy6/kiYKfh0HXRmbg0ocakBKiOefbal6ZeTtNlQlxsu9ADkNzv5OmRwRKu+IaTPSqJdZDg=="
-    },
     "source-map-js@1.2.1": {
       "integrity": "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA=="
     },
@@ -410,7 +406,6 @@
         "npm:chipmunk@^6.1.1",
         "npm:coffeescript@^2.7.0",
         "npm:javascript-state-machine@^2.4.0",
-        "npm:signals@1",
         "npm:vite-plugin-singlefile@^2.3.3",
         "npm:vite@^5.4.0"
       ]

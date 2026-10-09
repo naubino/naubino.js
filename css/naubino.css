@@ -31,7 +31,7 @@ html {
 @media (prefers-color-scheme: light) {
     body {
         color: #000;
-        background-color:rgb(99%,88%,88%);
+        background-color:rgb(88%,88%,88%);
     }
     :root {
         color-scheme: light;
