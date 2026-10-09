@@ -40,8 +40,8 @@ function coffeescriptPlugin() {
   };
 }
 
-// The legacy vendor libs (signals, javascript-state-machine, chipmunk,
-// underscore) are plain global-attaching scripts, loaded via <script src=...>
+// The legacy vendor libs (signals, javascript-state-machine, chipmunk) are
+// plain global-attaching scripts, loaded via <script src=...>
 // pointing at node_modules. That works in dev (Vite serves node_modules), but
 // node_modules isn't shipped in the dist output, so for a real single-file
 // build we inline their file contents verbatim as a real <script> tag - same
