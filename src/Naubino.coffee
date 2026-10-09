@@ -11,6 +11,7 @@ import {KeyBindings} from './Keybindings'
 import {Settings} from './Settings'
 import {LayerManager} from './LayerManager'
 import {Util} from './Util'
+import {Signal} from './Signal'
 
 export class Naubino extends LayerManager
 
@@ -18,7 +19,7 @@ export class Naubino extends LayerManager
     super()
     @name = "Naubino (unstable master)"
     @settings = Settings
-    @Signal = window.signals.Signal
+    @Signal = Signal
     @setup_signals()
     @add_listeners()
     @scale = 1 # will be changed by fullscreen
