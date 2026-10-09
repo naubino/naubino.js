@@ -10,27 +10,33 @@ window.onload = ->
   naubino = window.Naubino = new Naubino()
   naubino.setup()
   naubino.apply_color_scheme()
-  $("#highscorelink").on "click", -> confirm "do you want to leave this page?"
+  document.querySelector("#highscorelink").addEventListener "click", -> confirm "do you want to leave this page?"
 
   matchMedia("(prefers-color-scheme: dark)").addEventListener "change", ->
     naubino.apply_color_scheme()
 
   if navigator.maxTouchPoints > 0 and matchMedia("(pointer: coarse)").matches
     document.documentElement.classList.add "touch"
-    $("#maximizeCheck").prop "checked", true
+    document.querySelector("#maximizeCheck").checked = true
     naubino.menu.open()
 
 
   Util.toggleMaximized()
 
   # reflect initial settings in the UI (settings are the source of truth on load)
-  $('#effectsCheck').prop 'checked', naubino.settings.graphics.effects == on
+  document.querySelector('#effectsCheck').checked = naubino.settings.graphics.effects == on
 
 
   #populate color selector
-  for name, _colors of naubino.settings.colors then $('select#colors').append("<option value=\"#{name}\">#{name}</option>")
-  $('select#colors option').each (index,option) -> if option.value == naubino.settings.color then option.selected = true
-  $('select#colors').change ->
+  colors_select = document.querySelector('select#colors')
+  for name, _colors of naubino.settings.colors
+    option = document.createElement('option')
+    option.value = name
+    option.textContent = name
+    colors_select.appendChild option
+  for option in document.querySelectorAll('select#colors option')
+    option.selected = true if option.value == naubino.settings.color
+  colors_select.addEventListener "change", ->
     naubino.settings.color = this.value
     if this.value == 'high_contrast'
       naubino.settings.graphics.draw_borders_old = naubino.settings.graphics.draw_borders

@@ -7,8 +7,7 @@
     "npm:signals@1": "1.0.0",
     "npm:underscore@^1.13.8": "1.13.8",
     "npm:vite-plugin-singlefile@^2.3.3": "2.3.3_vite@5.4.21",
-    "npm:vite@^5.4.0": "5.4.21",
-    "npm:zepto@^1.2.0": "1.2.0"
+    "npm:vite@^5.4.0": "5.4.21"
   },
   "npm": {
     "@esbuild/aix-ppc64@0.21.5": {
@@ -407,9 +406,6 @@
         "fsevents"
       ],
       "bin": true
-    },
-    "zepto@1.2.0": {
-      "integrity": "sha512-C1x6lfvBICFTQIMgbt3JqMOno3VOtkWat/xEakLTOurskYIHPmzJrzd1e8BnmtdDVJlGuk5D+FxyCA8MPmkIyA=="
     }
   },
   "workspace": {
@@ -421,8 +417,7 @@
         "npm:signals@1",
         "npm:underscore@^1.13.8",
         "npm:vite-plugin-singlefile@^2.3.3",
-        "npm:vite@^5.4.0",
-        "npm:zepto@^1.2.0"
+        "npm:vite@^5.4.0"
       ]
     }
   }

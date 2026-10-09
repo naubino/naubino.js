@@ -31,7 +31,7 @@ export class LayerManager
 
   center: () ->
     win_width   = window.innerWidth #screen.width
-    game_width  = $("canvas#game_canvas").width()
+    game_width  = document.querySelector("canvas#game_canvas").clientWidth
     left = win_width/2 - game_width/2
     document.querySelector('form').style.left = "#{left}px"
     for layer in @layers then layer.canvas.style.left = "#{left}px"

@@ -59,13 +59,13 @@ export Util =
 
   togglePrerendering: ->
     Naubino.settings.graphics.updating =
-      if $('#prerenderingCheck').is(":checked")
+      if document.querySelector('#prerenderingCheck').checked
         off
       else
         on
 
 
-  shouldMaximize: -> $("#maximizeCheck").is(":checked") or @isFullscreen()
+  shouldMaximize: -> document.querySelector("#maximizeCheck").checked or @isFullscreen()
 
   isTouch: -> document.documentElement.classList.contains "touch"
 
@@ -90,7 +90,7 @@ export Util =
     ), delay
 
   toggleEffects: ->
-    if $('#effectsCheck').is(":checked")
+    if document.querySelector('#effectsCheck').checked
       Naubino.settings.graphics.effects = on
       for layer in Naubino.layers
         layer.refresh_draw_rate(layer.min_fps) if layer.min_fps?
@@ -102,7 +102,7 @@ export Util =
         layer.refresh_step_rate(layer.default_step_rate)
 
   toggleFullscreen: ->
-    if $('#fullScreenCheck').is(":checked")
+    if document.querySelector('#fullScreenCheck').checked
       @requestFullscreen()
     else
       @exitFullscreen()
@@ -124,12 +124,12 @@ export Util =
     request = el.requestFullscreen ? el.webkitRequestFullscreen ? el.webkitRequestFullScreen ? el.mozRequestFullScreen
     unless request?
       # e.g. iPhone Safari has no element fullscreen
-      $('#fullScreenCheck').prop 'checked', false
+      document.querySelector('#fullScreenCheck').checked = false
       return
     Promise.resolve(request.call el).then(
       # game is 16:9, portrait on a phone would be tiny
       (-> screen.orientation?.lock?('landscape')?.catch? (->)),
-      (-> $('#fullScreenCheck').prop 'checked', false)
+      (-> document.querySelector('#fullScreenCheck').checked = false)
     )
 
   exitFullscreen: ->
@@ -139,6 +139,6 @@ export Util =
 
   changeFullscreen: ->
     # keep checkbox in sync when leaving via Esc / back gesture
-    $('#fullScreenCheck').prop 'checked', @isFullscreen()
+    document.querySelector('#fullScreenCheck').checked = @isFullscreen()
     @toggleMaximized()
     @relayout()
