@@ -17,8 +17,13 @@ export class Layer
 
     @actual_fps       = null
     @last_draw_time   = null
-    @actual_step_rate = null
-    @last_step_time   = null
+    @draw_accumulator = 0
+
+    @actual_step_rate       = null
+    @step_accumulator       = 0
+    @step_rate_window_steps = 0
+    @step_rate_window_time  = 0
+
     @fps_label_depth  = 0 # set by LayerManager so overlapping layers don't draw on top of each other
 
     @show()
@@ -58,45 +63,34 @@ export class Layer
   #onchangestate: (e,f,t)-> console.info "#{@name} changed state #{e}: #{f} -> #{t}"
     #return true
 
-  # manage timers for drawing and stepping
-  start_stepping: -> @step_loop = setInterval((=> @step(); @measure_step_rate()),  1000 / @step_rate) unless @step_loop?
-  stop_stepping: ->
-    clearInterval @step_loop
-    @step_loop = null
-    @last_step_time = null
+  # stepping and drawing no longer own a timer each. a single shared
+  # requestAnimationFrame loop (LayerManager#start_loop) calls @advance(dt)
+  # on every layer, every frame, so all layers share one clock instead of
+  # competing setInterval/rAF callbacks on the main thread.
+  start_stepping: ->
+    @step_accumulator = 0
+    @stepping = yes
 
-  # layers that set @use_raf run their draw loop via requestAnimationFrame
-  # instead of setInterval, drawing as fast as the browser allows (@fps is
-  # then ignored, the fps overlay shows whatever rate actually comes out)
+  stop_stepping: ->
+    @stepping = no
+
+  # layers that set @use_raf draw on every tick of the shared loop instead
+  # of being throttled to @fps, i.e. as fast as the browser allows
   start_drawing: ->
-    return if @draw_loop? or @raf_id?
-    if @use_raf
-      tick = =>
-        @draw()
-        @draw_fps_overlay()
-        @raf_id = requestAnimationFrame tick
-      @raf_id = requestAnimationFrame tick
-    else
-      @draw_loop = setInterval (=> @draw(); @draw_fps_overlay()), 1000 / @fps
+    @draw_accumulator = 0
+    @drawing = yes
 
   stop_drawing: ->
-    if @raf_id?
-      cancelAnimationFrame @raf_id
-      @raf_id = null
-    if @draw_loop?
-      clearInterval @draw_loop
-      @draw_loop = null
+    @drawing = no
     @last_draw_time = null
 
   refresh_draw_rate: (fps = false) ->
     @fps = fps if fps
-    @stop_drawing()
-    @start_drawing()
+    @draw_accumulator = 0
 
   refresh_step_rate: (fps = false) ->
     @step_rate = fps if fps
-    @stop_drawing()
-    @start_drawing()
+    @step_accumulator = 0
 
 
   # overwrite these
@@ -104,16 +98,45 @@ export class Layer
   draw: ->
 
 
-  # measures the actual time between physics steps, so a stalling or
-  # overloaded step loop (e.g. the physics engine) shows up independently
-  # from the draw loop
-  measure_step_rate: ->
-    now = performance.now()
-    if @last_step_time?
-      delta          = now - @last_step_time
-      instant_rate   = 1000 / delta
-      @actual_step_rate = if @actual_step_rate? then @actual_step_rate * 0.9 + instant_rate * 0.1 else instant_rate
-    @last_step_time = now
+  # called every animation frame by LayerManager#start_loop with the real
+  # time (ms) that passed since the previous frame. steps physics at a
+  # fixed timestep (so simulation speed doesn't depend on frame rate) and
+  # draws at @fps, or every frame if @use_raf is set.
+  max_steps_per_frame = 5
+
+  advance: (dt) ->
+    @advance_stepping(dt) if @stepping
+    @advance_drawing(dt)  if @drawing
+
+  advance_stepping: (dt) ->
+    @step_accumulator += dt
+    step_interval = 1000 / @step_rate
+    steps = 0
+    while @step_accumulator >= step_interval and steps < max_steps_per_frame
+      @step()
+      @step_accumulator -= step_interval
+      steps++
+    @step_accumulator = 0 if steps == max_steps_per_frame # drop backlog, don't spiral
+
+    @step_rate_window_steps += steps
+    @step_rate_window_time  += dt
+    if @step_rate_window_time >= 500
+      @actual_step_rate = @step_rate_window_steps * 1000 / @step_rate_window_time
+      @step_rate_window_steps = 0
+      @step_rate_window_time  = 0
+
+  advance_drawing: (dt) ->
+    if @use_raf
+      @draw()
+      @draw_fps_overlay()
+    else
+      @draw_accumulator += dt
+      draw_interval = 1000 / @fps
+      if @draw_accumulator >= draw_interval
+        @draw()
+        @draw_fps_overlay()
+        @draw_accumulator -= draw_interval
+        @draw_accumulator = 0 if @draw_accumulator > draw_interval # drop backlog
 
 
   # measures the actual time between rendered frames and draws it, together

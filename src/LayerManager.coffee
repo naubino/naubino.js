@@ -34,6 +34,25 @@ export class LayerManager
     for layer, index in @layers
       layer.fps_label_depth = @layers.length - 1 - index
 
+    @start_loop()
+
+  # a single requestAnimationFrame loop drives every layer, instead of each
+  # layer running its own setInterval/rAF timers for stepping and drawing.
+  # this avoids several independent timers fighting over the main thread.
+  start_loop: ->
+    return if @animation_frame_id?
+    last = performance.now()
+    tick = (now) =>
+      dt   = now - last
+      last = now
+      layer.advance(dt) for layer in @layers
+      @animation_frame_id = requestAnimationFrame tick
+    @animation_frame_id = requestAnimationFrame tick
+
+  stop_loop: ->
+    cancelAnimationFrame @animation_frame_id if @animation_frame_id?
+    @animation_frame_id = null
+
   center: () ->
     win_width   = window.innerWidth #screen.width
     game_width  = document.querySelector("canvas#game_canvas").clientWidth
