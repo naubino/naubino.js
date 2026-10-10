@@ -29,6 +29,11 @@ export class LayerManager
     #@game = new Game @game_canvas
     @layers = [ @background, @game, @menu, @overlay ]
 
+    # topmost layer keeps its fps counter in the bottom right corner,
+    # layers further down the stack get pushed further up so the counters don't overlap
+    for layer, index in @layers
+      layer.fps_label_depth = @layers.length - 1 - index
+
   center: () ->
     win_width   = window.innerWidth #screen.width
     game_width  = document.querySelector("canvas#game_canvas").clientWidth

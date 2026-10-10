@@ -13,6 +13,7 @@ export class Game extends Physical_Layer
     super(canvas)
     @version = 0
     @name = "game"
+    @use_raf = yes # draw as fast as the browser allows, see how many frames we get
     @graph = new Graph(this)
     @factory = new Factory this
     @begin_time = Date.now()

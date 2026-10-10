@@ -8,6 +8,7 @@ export Settings = {
     draw_shadows:  on
     draw_borders:  no
     effects:       on
+    show_fps:      yes
 
   game:
     creation_offset: 50

@@ -15,6 +15,12 @@ export class Layer
     @fps       =   @default_fps       = Naubino.settings.graphics.fps
     @step_rate =   @default_step_rate = Naubino.settings.step_rate
 
+    @actual_fps       = null
+    @last_draw_time   = null
+    @actual_step_rate = null
+    @last_step_time   = null
+    @fps_label_depth  = 0 # set by LayerManager so overlapping layers don't draw on top of each other
+
     @show()
 
 
@@ -53,15 +59,34 @@ export class Layer
     #return true
 
   # manage timers for drawing and stepping
-  start_stepping: -> @step_loop = setInterval((=> @step()),  1000 / @step_rate) unless @step_loop?
+  start_stepping: -> @step_loop = setInterval((=> @step(); @measure_step_rate()),  1000 / @step_rate) unless @step_loop?
   stop_stepping: ->
     clearInterval @step_loop
     @step_loop = null
+    @last_step_time = null
 
-  start_drawing: -> @draw_loop = setInterval (=> @draw()), 1000 / @fps  unless @draw_loop?
+  # layers that set @use_raf run their draw loop via requestAnimationFrame
+  # instead of setInterval, drawing as fast as the browser allows (@fps is
+  # then ignored, the fps overlay shows whatever rate actually comes out)
+  start_drawing: ->
+    return if @draw_loop? or @raf_id?
+    if @use_raf
+      tick = =>
+        @draw()
+        @draw_fps_overlay()
+        @raf_id = requestAnimationFrame tick
+      @raf_id = requestAnimationFrame tick
+    else
+      @draw_loop = setInterval (=> @draw(); @draw_fps_overlay()), 1000 / @fps
+
   stop_drawing: ->
-    clearInterval @draw_loop
-    @draw_loop = null
+    if @raf_id?
+      cancelAnimationFrame @raf_id
+      @raf_id = null
+    if @draw_loop?
+      clearInterval @draw_loop
+      @draw_loop = null
+    @last_draw_time = null
 
   refresh_draw_rate: (fps = false) ->
     @fps = fps if fps
@@ -78,6 +103,47 @@ export class Layer
   step: ->
   draw: ->
 
+
+  # measures the actual time between physics steps, so a stalling or
+  # overloaded step loop (e.g. the physics engine) shows up independently
+  # from the draw loop
+  measure_step_rate: ->
+    now = performance.now()
+    if @last_step_time?
+      delta          = now - @last_step_time
+      instant_rate   = 1000 / delta
+      @actual_step_rate = if @actual_step_rate? then @actual_step_rate * 0.9 + instant_rate * 0.1 else instant_rate
+    @last_step_time = now
+
+
+  # measures the actual time between rendered frames and draws it, together
+  # with the actual step rate, as a small label in the bottom right corner
+  # of the layer's canvas
+  draw_fps_overlay: ->
+    return unless Naubino.settings.graphics.show_fps
+
+    now = performance.now()
+    if @last_draw_time?
+      delta       = now - @last_draw_time
+      instant_fps = 1000 / delta
+      @actual_fps = if @actual_fps? then @actual_fps * 0.9 + instant_fps * 0.1 else instant_fps
+    @last_draw_time = now
+
+    return unless @actual_fps?
+
+    line_height = 12
+    y = @height - 4 - @fps_label_depth * line_height
+
+    label = "#{@name}: #{Math.round(@actual_fps)} fps draw"
+    label += " / #{Math.round(@actual_step_rate)} fps step" if @actual_step_rate?
+
+    @ctx.save()
+    @ctx.fillStyle    = "lime"
+    @ctx.font         = "10px monospace"
+    @ctx.textAlign    = "right"
+    @ctx.textBaseline = "bottom"
+    @ctx.fillText label, @width - 4, y
+    @ctx.restore()
 
 
   resize_to: (width, height) ->
