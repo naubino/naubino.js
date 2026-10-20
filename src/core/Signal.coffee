@@ -2,7 +2,9 @@ export class Signal extends EventTarget
   active: true
 
   add: (listener, context) =>
-    @addEventListener "dispatch", (e) -> listener.apply(context, e.detail)
+    handler = (e) -> listener.apply(context, e.detail)
+    @addEventListener "dispatch", handler
+    => @removeEventListener "dispatch", handler
 
   dispatch: (args...) =>
     @dispatchEvent new CustomEvent "dispatch", detail: args if @active

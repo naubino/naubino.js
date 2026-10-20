@@ -43,14 +43,14 @@ class Tutorial extends Game
           console.info "#{f} --(#{e})--> #{t}"
 
         onwelcome: (e, f, t) =>
-          Naubino.mousedown.active = false
-          Naubino.mousedown.add => @lessons.click()
+          Naubino.events.input.pointer_start.active = false
+          Naubino.events.input.pointer_start.add => @lessons.click()
 
          # give instructions
           Naubino.overlay.fade_in_message({text:"Tutorial", fontsize:24})
           setTimeout ->
             Naubino.overlay.fade_in_message({text:"\n\nclick to continue", fontsize:12})
-            Naubino.mousedown.active = true
+            Naubino.events.input.pointer_start.active = true
           ,10*@multiplicator
           setTimeout =>
             pos = @center.Copy()

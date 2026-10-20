@@ -32,10 +32,10 @@
       <label for="prerenderingCheck" class="checkbox">prerendering</label>
       -->
 
-      <input type="checkbox" id="maximizeCheck" class="btn btn-mini" onchange="Util.toggleMaximized()"/>
+      <input type="checkbox" id="maximizeCheck" class="btn btn-mini"/>
       <label for="maximizeCheck" class="checkbox">maximize</label>
 
-      <input type="checkbox" id="fullScreenCheck" class="checkbox" onchange="Util.toggleFullscreen()"/>
+      <input type="checkbox" id="fullScreenCheck" class="checkbox"/>
       <label for="fullScreenCheck" class="checkbox">fullscreen</label>
 
       <input type="checkbox" id="effectsCheck" class="checkbox" onchange="Util.toggleEffects()"/>
@@ -58,6 +58,6 @@
         event.preventDefault();
       }, { passive: false });
     </script>
-    <script type="module" src="/src/Load.coffee"></script>
+    <script type="module" src="/src/main.coffee"></script>
   </body>
 </html>

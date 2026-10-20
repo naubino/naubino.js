@@ -65,29 +65,11 @@ export Util =
         on
 
 
-  shouldMaximize: -> document.querySelector("#maximizeCheck").checked or @isFullscreen()
 
   isTouch: -> document.documentElement.classList.contains "touch"
 
   isDarkMode: -> matchMedia("(prefers-color-scheme: dark)").matches
 
-  toggleMaximized: (force = false) ->
-    if force or @shouldMaximize()
-      Naubino.fit_field_to_viewport()# if @isTouch()
-      Naubino.maximize()
-    else
-      Naubino.demaximize()
-    window.Naubino.center()
-
-  # debounced; mobile browsers report the final viewport size late (rotation, toolbars, fullscreen)
-  relayout: (delay = 150) ->
-    clearTimeout @relayout_timeout
-    @relayout_timeout = setTimeout (=>
-      if @shouldMaximize()
-        Naubino.fit_field_to_viewport() if @isTouch()
-        Naubino.maximize()
-      Naubino.center()
-    ), delay
 
   toggleEffects: ->
     if document.querySelector('#effectsCheck').checked
@@ -106,13 +88,6 @@ export Util =
       @requestFullscreen()
     else
       @exitFullscreen()
-
-  toggleAll: ->
-    @toggleEffects()
-    @toggleFullscreen()
-    @toggleMaximized()
-    @togglePrerendering
-
 
 
   # https://developer.mozilla.org/en/DOM/Using_full-screen_mode
@@ -136,9 +111,3 @@ export Util =
     return unless @isFullscreen()
     exit = document.exitFullscreen ? document.webkitExitFullscreen ? document.webkitCancelFullScreen ? document.mozCancelFullScreen
     exit?.call document
-
-  changeFullscreen: ->
-    # keep checkbox in sync when leaving via Esc / back gesture
-    document.querySelector('#fullScreenCheck').checked = @isFullscreen()
-    @toggleMaximized()
-    @relayout()
