@@ -13,6 +13,8 @@ export class Game extends Physical_Layer
     super(canvas)
     @version = 0
     @name = "game"
+    @variable_timestep = yes
+    @use_raf = yes
     @graph = new Graph(this)
     @factory = new Factory this
     @begin_time = Date.now()
@@ -30,10 +32,10 @@ export class Game extends Physical_Layer
     @joining_naubs = []
     @replacing_naubs = []
     @active_tree = []
-    
+
     @setup_fsm Naubino.settings.events.game
 
-    
+
 
   oninit: (e,f,t) ->
     console.log "game INIT"
@@ -50,7 +52,7 @@ export class Game extends Physical_Layer
     @setup_physics()
     @space.defaultHandler = new CollisionHandler this
 
-    
+
 
 
   onstopped: (e,f,t) -> @clear_objects() unless e is 'init'
@@ -240,7 +242,7 @@ export class Game extends Physical_Layer
         @ctx.font= "10px Courier"
         @ctx.fillText(join_string, 0, 6)
         @ctx.restore()
-        
+
 
 
 
@@ -259,7 +261,7 @@ export class Game extends Physical_Layer
 
   # run naub_forces, check for joinings and clean up
   step: (dt) ->
-    @step_space()
+    @step_space(dt)
 
     for pair in @replacing_naubs
       pair[0].replace_with pair[1]
@@ -283,4 +285,3 @@ export class Game extends Physical_Layer
     for con, id in @space.constraints
       if con? and con.IsRogue()
         @space.removeConstraint con
-
