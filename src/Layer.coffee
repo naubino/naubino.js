@@ -133,7 +133,7 @@ export class Layer
       @step_rate_window_time  = 0
 
   advance_drawing: (dt) ->
-    if Naubino.settings.graphics.use_raf
+    if @use_raf and Naubino.settings.graphics.use_raf
       @draw()
       @draw_fps_overlay()
     else
@@ -143,7 +143,7 @@ export class Layer
         @draw()
         @draw_fps_overlay()
         @draw_accumulator -= draw_interval
-        @draw_accumulator = 0 if @draw_accumulator > draw_interval # drop backlog
+        @draw_accumulator = 0 if @draw_accumulator > draw_interval
 
 
   draw_fps_overlay: ->

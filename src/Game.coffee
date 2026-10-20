@@ -14,6 +14,7 @@ export class Game extends Physical_Layer
     @version = 0
     @name = "game"
     @variable_timestep = yes
+    @use_raf = yes
     @graph = new Graph(this)
     @factory = new Factory this
     @begin_time = Date.now()
