@@ -25,7 +25,7 @@ export class CollisionHandler
   separate: (arb, space) ->
 
   naub: (a)->
-    @game.get_object arb.a.naub_number
+    @game.get_object a.naub_number
 
   naubs: (arb)->
     a = @game.get_object arb.a.naub_number

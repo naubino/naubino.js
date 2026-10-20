@@ -1,14 +1,14 @@
 # TODO clean up menu code -- will do in naub_rethought
-import {Layer} from "./Layer"
-import {Naub} from "./Naub"
-import {Graph} from "./Graph"
-import { Ball, StringShape, PlayButton, PauseButton, MainButton } from "./Shapes"
-import {Factory} from "./Factory"
+import {Layer} from "../core/Layer"
+import {Naub} from "../game/Naub"
+import {Graph} from "../game/Graph"
+import { Ball, StringShape, PlayButton, PauseButton, MainButton } from "../game/Shapes"
+import {Factory} from "../game/Factory"
 
 export class Menu extends Layer
   DEFAULT_STEP_RATE = 40
 
-  constructor: (canvas) ->
+  constructor: (canvas, @events = Naubino.events) ->
     super(canvas)
     @name = "menu"
     @graph = new Graph this
@@ -19,9 +19,11 @@ export class Menu extends Layer
     @opened_without_interaction = no
 
     @listener_size = @default_listener_size = 45
-    Naubino.mousemove.add @move_pointer
-    Naubino.mousedown.add @click
-    Naubino.menu_button.active = false
+    @input_subscriptions = [
+      @events.input.pointer_move.add @move_pointer
+      @events.input.pointer_start.add @click
+    ]
+    @events.menu.button.active = false
 
     @center = new cp.v(20,25)
     @cube_size = 45
@@ -35,6 +37,13 @@ export class Menu extends Layer
     @step_rate = @default_step_rate = DEFAULT_STEP_RATE
 
     @setup_fsm()
+
+  dispose: ->
+    unsubscribe() for unsubscribe in @input_subscriptions
+    @input_subscriptions = []
+    clearTimeout @deactivation_timeout if @deactivation_timeout?
+    @stop_stepping()
+    @stop_drawing()
 
   # changing the state a little
   oninit: ->
@@ -50,7 +59,7 @@ export class Menu extends Layer
       shapes: [new MainButton]
       #shapes: []
     play:
-      function: -> Naubino.play()
+      command: 'play'
       position: new cp.v(70,32)
       shapes: [new Ball, new PlayButton]
     help:
@@ -58,24 +67,28 @@ export class Menu extends Layer
       position: new cp.v(55,65)
       shapes: [new Ball, new StringShape "?", "white"]
     exit:
-      function: -> Naubino.stop()
+      command: 'stop'
       position: new cp.v(20,80)
       shapes: [new Ball, new StringShape "X", "white"]
 
+  command_callback: (command) -> => @events.commands[command].dispatch()
+
   add_buttons: ->
-    @objects[name] = @factory.add_button(button.position, button.function, button.shapes) for name, button of @buttons
+    for name, button of @buttons
+      callback = if button.command? then @command_callback(button.command) else button.function
+      @objects[name] = @factory.add_button button.position, callback, button.shapes
     @objects.main.life_rendering = on
 
   check_game_state: (game = Naubino.game) ->
     #console.log "checking game state"
     if @objects.play?
       if game.current == "playing"
-        @objects.play.focus = -> Naubino.pause()
+        @objects.play.focus = => @events.commands.pause.dispatch()
         @objects.play.shapes.pop()
         @objects.play.add_shape new PauseButton
         @objects.play.update()
       else
-        @objects.play.focus = -> Naubino.play()
+        @objects.play.focus = => @events.commands.play.dispatch()
         @objects.play.shapes.pop()
         @objects.play.add_shape new PlayButton
         @objects.play.update()
@@ -118,7 +131,7 @@ export class Menu extends Layer
     @draw_listener_region()
 
   draw_menu: ->
-    @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
+    @clear()
     @ctx.save()
     for name, naub of @objects
       naub.draw_join(@ctx,@objects.main)

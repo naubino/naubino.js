@@ -180,7 +180,7 @@ export class Layer
 
   # scale: css px per game unit; backing store additionally scaled by dpr for crisp rendering
   scale_to: (scale) ->
-    { width, height } = Naubino.settings.canvas
+    { width, height } = this
     dpr = window.devicePixelRatio or 1
     @canvas.style.width  = "#{width  * scale}px"
     @canvas.style.height = "#{height * scale}px"

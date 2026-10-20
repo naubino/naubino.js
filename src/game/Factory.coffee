@@ -1,5 +1,5 @@
 import {Naub} from "./Naub"
-import {Util} from './Util'
+import {Util} from '../core/Util'
 import {Ball, Box, Frame, FrameCircle} from "./Shapes"
 import {Clock, StringShape} from "./Shapes"
 import {PlayButton, PauseButton} from "./Shapes"
@@ -144,7 +144,7 @@ export class Factory
 
   # produces a random set of coordinates outside the field
   random_outside: ->
-    offset = Naubino.settings.game.creation_offset
+    offset = @layer.config?.game?.creation_offset ? Naubino.settings.game.creation_offset
     seed = Math.round (Math.random() * 3)+1
     switch seed
       when 1

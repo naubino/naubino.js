@@ -1,5 +1,5 @@
-import {Layer} from './Layer'
-import {Util} from './Util'
+import {Layer} from '../core/Layer'
+import {Util} from '../core/Util'
 
 export class Background extends Layer
   DEFAULT_STEP_RATE = 40
@@ -13,6 +13,7 @@ export class Background extends Layer
     @min_step_rate= 15
 
     @step_rate = @default_step_rate = DEFAULT_STEP_RATE
+    @basket_size_provider = null
 
   set_defaults: ->
     @p_min= { color: [130,130,130], thick: 2 }
@@ -61,14 +62,27 @@ export class Background extends Layer
     @stop_stepping()
     @stop_drawing()
 
+  # severity 0..1, 0 is all good
+  warn_overflow: (severity) ->
+    if severity > 0
+      @pulse() if @pulsating == off
+      @pulse_speed = Util.interpolate(3,25,severity)
+    else if @pulsating == on
+      @stop_pulse()
+
   draw: ->
     @clear()
     @draw_basket()
 
+  set_basket_size_provider: (provider) ->
+    @basket_size_provider = provider
+    @draw() if @current isnt 'none'
+
   draw_basket: () ->
 
+    @basket_size = @basket_size_provider?()
+    return unless @basket_size?
     center = @center()
-    @basket_size = Naubino.game.basket_size() ? 150
 
     @ctx.save()
     @ctx.beginPath()

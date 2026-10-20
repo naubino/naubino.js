@@ -1,4 +1,4 @@
-import {Layer} from './Layer'
+import {Layer} from '../core/Layer'
 export class Overlay extends Layer
   constructor: (canvas) ->
     super(canvas)
@@ -18,7 +18,7 @@ export class Overlay extends Layer
   draw: ->
     @pause() if @active_objects() == 0 and @can 'pause'
 
-    @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
+    @clear()
     @ctx.save()
     # objects are all full size buffers
     for id, buffer of @objects
@@ -122,8 +122,8 @@ export class Overlay extends Layer
 class TextBuffer
   constructor: (text,@layer) ->
     @buffer        = document.createElement('canvas')
-    @buffer.width  = Naubino.settings.canvas.width
-    @buffer.height = Naubino.settings.canvas.height
+    @buffer.width  = @layer.width
+    @buffer.height = @layer.height
     @alpha  = 1
     @ctx = @buffer.getContext('2d')
 
