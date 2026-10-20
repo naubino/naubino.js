@@ -90,6 +90,10 @@ export default defineConfig(({ mode }) => {
       allowedHosts: [".local"],
     },
     plugins: [coffeescriptPlugin(), viteSingleFile(), inlineVendorScriptsPlugin()],
+    test: {
+      include: ["test/**/*.test.coffee", "test/**/*.test.ts"],
+      setupFiles: ["test/setup.js"],
+    },
     build: {
       outDir: "dist",
       emptyOutDir: entry === entries.index,

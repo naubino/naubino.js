@@ -3,6 +3,7 @@
   "tasks": {
     "dev": "vite --host",
     "build": "vite build --mode index && vite build --mode highscore",
-    "preview": "vite preview --host"
+    "preview": "vite preview --host",
+    "test": "vitest run"
   }
 }
