@@ -8,6 +8,8 @@ export Settings = {
     draw_shadows:  on
     draw_borders:  no
     effects:       on
+    show_fps:      yes
+    use_raf:       yes
 
   game:
     creation_offset: 50
@@ -23,7 +25,8 @@ export Settings = {
     min_join_len:  1.2 # times size
     max_join_len:  2 # times size
 
-  step_rate:            40
+  step_rate:            60
+  step_floor_rate:      30
 
   physics:
     center_join:
