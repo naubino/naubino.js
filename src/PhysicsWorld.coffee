@@ -40,3 +40,30 @@ export class PhysicsWorld
     @space.removeBody obj.physical_body if obj.physical_body?
     for constraint in obj.constraints
       @space.removeConstraint constraint
+
+  # creates the constraints that hold two joined bodies together
+  join_bodies: (body_a, body_b, minlen, maxlen) ->
+    spring = new cp.DampedSpring( body_a, body_b, cp.vzero, cp.vzero, minlen, 10, 30)
+    spring.name = "DampedSpring"
+    @space.addConstraint(spring)
+
+    slide = new cp.SlideJoint( body_a, body_b, cp.vzero, cp.vzero, minlen, maxlen)
+    slide.name = "SlideJoint"
+    @space.addConstraint(slide)
+
+    [slide]
+
+  # removes a list of constraints (as returned by join_bodies) from the space
+  unjoin: (constraints) ->
+    for con in constraints
+      @space.removeConstraint con
+
+  # creates the spring that pulls a body toward the center of the field
+  attract_to_center: (body, center) ->
+    rstl = Naubino.settings.physics.center_join.restLength
+    stfs = Naubino.settings.physics.center_join.stiffness
+    dmpg = Naubino.settings.physics.center_join.damping
+    spring = new cp.DampedSpring( body, @space.staticBody, cp.vzero, center, rstl, stfs, dmpg)
+    spring.centerjoin = true
+    @space.addConstraint(spring)
+    spring

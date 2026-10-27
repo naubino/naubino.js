@@ -276,9 +276,7 @@ export class Naub
       @layer.graph.remove_join id
       delete partner.joins[id]
       delete @joins[id]
-      if @constraints[id]?
-        for con in @constraints[id]
-          @layer.space.removeConstraint con
+      @layer.physics.unjoin(@constraints[id]) if @constraints[id]?
 
 
   # the amount of points the user is awarded if this naub is included in a cycle
@@ -347,13 +345,7 @@ export class Naub
 
   attracted_to: ( center ) ->
     unless @centerjoin?
-      #restLength, stiffness, damping
-      rstl = Naubino.settings.physics.center_join.restLength
-      stfs =  Naubino.settings.physics.center_join.stiffness
-      dmpg =  Naubino.settings.physics.center_join.damping
-      @centerjoin = new cp.DampedSpring( @physical_body, @layer.space.staticBody, cp.vzero, center, rstl, stfs, dmpg)
-      @centerjoin.centerjoin = true
-      @layer.space.addConstraint( @centerjoin )
+      @centerjoin = @layer.physics.attract_to_center(@physical_body, center)
       @constraints['center'] = @centerjoin
     else
       console.warn "object is already attached to a point"
@@ -371,17 +363,7 @@ export class Naub
       minlen = Naubino.settings.naub.min_join_len * @size
       maxlen = Naubino.settings.naub.max_join_len * @size
 
-      joint = new cp.DampedSpring( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, 10, 30)
-      joint.name = "DampedSpring"
-      @layer.space.addConstraint( joint )
-
-      joint2 = new cp.SlideJoint( @physical_body, other.physical_body, cp.vzero, cp.vzero, minlen, maxlen)
-      joint2.name = "SlideJoint"
-      @layer.space.addConstraint( joint2 )
-
-      @constraints[join] = []
-      #@constraints[join].push joint
-      @constraints[join].push joint2
+      @constraints[join] = @layer.physics.join_bodies(@physical_body, other.physical_body, minlen, maxlen)
 
       @joins[join]      = other
       other.joins[join] = this
@@ -398,9 +380,7 @@ export class Naub
   # the 'other' naub takes my place
   replace_with: (other) ->
     for id, naub of @joins
-      if naub.constraints[id]?
-        for c in naub.constraints[id]
-          @layer.space.removeConstraint c
+      @layer.physics.unjoin(naub.constraints[id]) if naub.constraints[id]?
 
       other.join_with(naub)
       delete naub.joins[id]
