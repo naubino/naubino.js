@@ -1,48 +1,28 @@
 import {Layer} from './Layer'
+import {PhysicsWorld} from './PhysicsWorld'
 
 export class Physical_Layer extends Layer
 
   setup_physics: ->
-    @GRABABLE_MASK_BIT = 1<<31
-    @NOT_GRABABLE_MASK = ~@GRABABLE_MASK_BIT
-    @space = new cp.Space() # so far so good
-    @space.damping = Naubino.settings.physics.damping
-    @mouseBody = new cp.Body(Infinity, Infinity)
-    @mouseBody.name = "mouseBody"
-    @mouseBody.p = cp.vzero
-    @space.addBody @mouseBody
+    @physics = new PhysicsWorld(@width, @height)
+    # kept directly on the layer: Game and Naub reach into these
+    @space             = @physics.space
+    @mouseBody         = @physics.mouseBody
+    @GRABABLE_MASK_BIT = @physics.GRABABLE_MASK_BIT
+    @NOT_GRABABLE_MASK = @physics.NOT_GRABABLE_MASK
 
   add_walls: ->
-    ws = 15 #wall_strength
-    @walls = {}
-    walls=
-      ceil  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(@width, 0), ws)
-      floor : new cp.SegmentShape(@space.staticBody, cp.v(0,@height), cp.v(@width, @height), ws)
-      left  : new cp.SegmentShape(@space.staticBody, cp.vzero, cp.v(0,@height), ws)
-      right : new cp.SegmentShape(@space.staticBody, cp.v(@width, 0), cp.v(@width ,@height), ws)
-
-    for w, wall of walls
-      @walls[w] = @space.addShape(wall)
-      @walls[w].setElasticity(.01)
-      @walls[w].setFriction(3)
-      @walls[w].setLayers(@NOT_GRABABLE_MASK)
-      @walls[w].group = 1
-
+    @physics.add_walls()
+    @walls = @physics.walls
 
 
   step_space: (dt) ->
-    @space.step(dt)
-    # Move mouse body toward the mouse
-    newPoint = cp.v.lerp(@mouseBody.p, @pointer, 0.25)
-    @mouseBody.v = cp.v.mult(cp.v.sub(newPoint, @mouseBody.p), 60)
-    @mouseBody.p = newPoint
+    @physics.step(dt, @pointer)
 
 
   add_object: (obj)->
     #chipmunk
-    if @space?
-      @space.addShape obj.physical_shape if obj.physical_shape?
-      @space.addBody obj.physical_body if obj.physical_body?
+    @physics.add_object(obj) if @space?
     super(obj)
 
 
@@ -59,10 +39,5 @@ export class Physical_Layer extends Layer
 
   remove_obj: (id) ->
     obj = @get_object id
-    if @space?
-      @space.removeShape obj.physical_shape if obj.physical_shape?
-      @space.removeBody obj.physical_body if obj.physical_body?
-      for constraint in obj.constraints
-        #console.log constraint
-        @space.removeConstraint constraint
+    @physics.remove_object(obj) if @space?
     delete @objects[id]
