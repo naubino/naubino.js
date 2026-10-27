@@ -447,7 +447,7 @@ export class Naub
     list = []
     for id, naub of @joins
       list.push naub.number
-    @joins
+    list
 
 
 

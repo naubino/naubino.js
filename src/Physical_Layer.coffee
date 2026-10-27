@@ -49,9 +49,9 @@ export class Physical_Layer extends Layer
   # asks all objects whether they have been hit by pointer
   get_obj_in_pos: (pos) ->
     if @space?
-      shape = @space.pointQueryFirst(@pointer, @GRABABLE_MASK_BIT, cp.NO_GROUP) if @space?
+      shape = @space.pointQueryFirst(pos, @GRABABLE_MASK_BIT, cp.NO_GROUP)
       naub = @get_object shape.naub_number if shape?
-      if naub.isClickable
+      if naub? and naub.isClickable
         return naub
     else
       super(pos)
