@@ -51,7 +51,7 @@ export class PhysicsWorld
     slide.name = "SlideJoint"
     @space.addConstraint(slide)
 
-    [slide]
+    [spring, slide]
 
   # removes a list of constraints (as returned by join_bodies) from the space
   unjoin: (constraints) ->
