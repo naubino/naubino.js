@@ -407,13 +407,6 @@ export class Naub
   # is this naub not joined with any other naub?
   is_alone: -> Object.keys(@joins).length == 0
 
-  # checks whether this naub wants to join with the other
-  # OVERWRITE ME
-  agrees_with: (other) ->
-    @color_id? and @kind? and
-    @color_id == other.color_id and
-    @kind     == other.kind
-
   is_joined_with: (other) ->
     joined = false
     for id, opnaub of @joins
