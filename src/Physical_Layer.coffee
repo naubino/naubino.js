@@ -1,5 +1,5 @@
 import {Layer} from './Layer'
-import {PhysicsWorld} from './PhysicsWorld'
+import {PhysicsWorld} from './world/PhysicsWorld'
 
 export class Physical_Layer extends Layer
 

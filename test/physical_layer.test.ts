@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Physical_Layer } from "../src/Physical_Layer";
-import { PhysicsWorld } from "../src/PhysicsWorld";
+import { PhysicsWorld } from "../src/world/PhysicsWorld";
 
 interface NaubLike {
   number: number;

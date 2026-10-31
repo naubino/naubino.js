@@ -1,5 +1,4 @@
-# Decides whether two colliding naubs should join, or have one replace the
-# other. Extracted from Game.check_joining / Naub.agrees_with.
+# join, replace or nothing, asked on every collision
 export class JoinPolicy
   constructor: (@game) ->
 

@@ -5,8 +5,8 @@ import {Naub} from "./Naub"
 import {Graph} from "./Graph"
 import {CollisionHandler} from "./CollisionHandler"
 import {Factory} from "./Factory"
-import {JoinPolicy} from "./JoinPolicy"
-import {DragSystem} from "./DragSystem"
+import {JoinPolicy} from "./rules/JoinPolicy"
+import {DragSystem} from "./helpers/DragSystem"
 
 export class Game extends Physical_Layer
 

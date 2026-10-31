@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PhysicsWorld } from "../src/PhysicsWorld";
+import { PhysicsWorld } from "../src/world/PhysicsWorld";
 
 interface ObjLike {
   physical_body?: unknown;

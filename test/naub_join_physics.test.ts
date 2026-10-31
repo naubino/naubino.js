@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { Naub } from "../src/Naub";
-import { PhysicsWorld } from "../src/PhysicsWorld";
+import { PhysicsWorld } from "../src/world/PhysicsWorld";
 import { Graph } from "../src/Graph";
 
 interface FakeLayer {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { DragSystem } from "../src/DragSystem";
-import { PhysicsWorld } from "../src/PhysicsWorld";
+import { DragSystem } from "../src/helpers/DragSystem";
+import { PhysicsWorld } from "../src/world/PhysicsWorld";
 
 interface NaubLike {
   number: number;

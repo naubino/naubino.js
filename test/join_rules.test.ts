@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { JoinPolicy } from "../src/JoinPolicy";
+import { JoinPolicy } from "../src/rules/JoinPolicy";
 import { Naub } from "../src/Naub";
 
 interface NaubLike {
