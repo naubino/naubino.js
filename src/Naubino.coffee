@@ -40,7 +40,7 @@ export class Naubino extends LayerManager
         time: @game.duration
         naubs: @game.ex_naubs
         game_version: @game.version
-        level: @game.level
+        level: @game.levels?.level
     }
 
   store_score: (name = 'nobody')->

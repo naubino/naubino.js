@@ -24,6 +24,7 @@ export class Game extends Layer
     @factory = new Factory this
     @join_policy = new JoinPolicy(this)
     @drag = new DragSystem(this)
+    @rules = [] # modes fill this in
     @begin_time = Date.now()
 
     # display stuff
@@ -69,6 +70,25 @@ export class Game extends Layer
     #chipmunk
     @setup_physics()
     @space.defaultHandler = new CollisionHandler this
+
+    rule.init() for rule in @rules
+    return
+
+  onplaying: ->
+    rule.start() for rule in @rules
+    @checking = setInterval @check, 300 unless @checking
+    return
+
+  onleaveplaying: ->
+    rule.stop() for rule in @rules
+    clearInterval @checking
+    @checking = null
+    return
+
+  # recurring check (@checking)
+  check: =>
+    rule.check() for rule in @rules
+    return
 
   setup_physics: ->
     @world.reset_physics @width, @height
