@@ -107,8 +107,7 @@ describe("Naub join predicates", () => {
     it("is falsy when its own kind is missing", () =>
       expect(
         policy.agrees_with(makeNaub(1, 2, { kind: undefined }), makeNaub(2, 2)),
-      ).toBeFalsy()
-    );
+      ).toBeFalsy());
 
     it("agrees with color 0 when the other naub is also color 0", () => {
       // color_id? must not treat 0 as missing
