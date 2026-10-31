@@ -1,6 +1,7 @@
 # controlls everything that has to do with logic and gameplay or menus
 # @extends Layer
-import {Physical_Layer} from "./Physical_Layer"
+import {Layer} from "./Layer"
+import {World} from "./world/World"
 import {Naub} from "./Naub"
 import {Graph} from "./Graph"
 import {CollisionHandler} from "./CollisionHandler"
@@ -8,11 +9,13 @@ import {Factory} from "./Factory"
 import {JoinPolicy} from "./rules/JoinPolicy"
 import {DragSystem} from "./helpers/DragSystem"
 
-export class Game extends Physical_Layer
+export class Game extends Layer
 
   # get this started
   constructor: (canvas) ->
     super(canvas)
+    @world = new World(@width, @height)
+    @expose_world()
     @version = 0
     @name = "game"
     @variable_timestep = yes
@@ -41,20 +44,35 @@ export class Game extends Physical_Layer
 
 
 
+  # plenty of code still reads these off the game directly
+  # rerun whenever the world swaps one out
+  expose_world: ->
+    @objects           = @world.objects
+    @physics           = @world.physics
+    @space             = @physics.space
+    @mouseBody         = @physics.mouseBody
+    @GRABABLE_MASK_BIT = @physics.GRABABLE_MASK_BIT
+    @NOT_GRABABLE_MASK = @physics.NOT_GRABABLE_MASK
+    @naub_destroyed    = @world.naub_destroyed
+    @naub_focused      = @world.naub_focused
+    @naub_unfocused    = @world.naub_unfocused
+
   oninit: (e,f,t) ->
     console.log "game INIT"
     # gameplay
     @game_draw       = new Naubino.Signal()
     @naub_replaced   = new Naubino.Signal()
     @naub_joined     = new Naubino.Signal()
-    @naub_destroyed  = new Naubino.Signal()
     @cycle_found     = new Naubino.Signal()
-    @naub_focused    = new Naubino.Signal()
-    @naub_unfocused  = new Naubino.Signal()
+    @world.reset_signals()
 
     #chipmunk
     @setup_physics()
     @space.defaultHandler = new CollisionHandler this
+
+  setup_physics: ->
+    @world.reset_physics @width, @height
+    @expose_world()
 
 
 
@@ -200,21 +218,27 @@ export class Game extends Physical_Layer
 
 
   add_object:(obj) ->
-    super obj
-    obj.physical_body.naub_number = @objects_count if obj.physical_body?
-    obj.physical_shape.naub_number = @objects_count if obj.physical_shape?
+    obj.center = @center()
+    number = @world.add_object obj
+    obj.physical_body.naub_number = number if obj.physical_body?
+    obj.physical_shape.naub_number = number if obj.physical_shape?
     obj.attracted_to @center()
 
+  get_object: (id) -> @world.get_object id
+
+  remove_obj: (id) -> @world.remove_object id
+
+  get_obj_in_pos: (pos) -> @world.naub_at pos
 
   # clears the graph as well, just in case
   clear_objects: ->
-    super()
-    @setup_physics()
+    @world.clear @width, @height
+    @expose_world()
     @graph.clear()
 
   # run naub_forces, check for joinings and clean up
   step: (dt) ->
-    @step_space(dt)
+    @physics.step(dt, @pointer)
 
     for pair in @replacing_naubs
       pair[0].replace_with pair[1]
