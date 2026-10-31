@@ -27,6 +27,10 @@ export class Game extends Layer
     @rules = [] # modes fill this in
     @begin_time = Date.now()
 
+    # view signals, oninit doesn't replace these so LayerManager subscribes once
+    @overflow_warning = new Naubino.Signal() # severity 0..1, 0 is all good
+    @basket_changed   = new Naubino.Signal()
+
     # display stuff
     @focused_naub = null # points to the naub you click on
 

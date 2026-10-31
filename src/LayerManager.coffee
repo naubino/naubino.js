@@ -29,6 +29,10 @@ export class LayerManager
     #@game = new Game @game_canvas
     @layers = [ @background, @game, @menu, @overlay ]
 
+    for game in [ @game_standard, @game_testcase ]
+      game.overflow_warning.add (severity) => @background.warn_overflow severity
+      game.basket_changed.add => @background.draw()
+
     for layer, index in @layers
       layer.fps_label_depth = @layers.length - 1 - index
 

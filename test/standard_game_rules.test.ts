@@ -34,7 +34,7 @@ const makeSpawner = (fields: Record<string, unknown> = {}) =>
 const levelDetails = StandardGame.prototype.level_details;
 
 const makeLevelRig = (level = 0, spammers = makeSpammers()) => {
-  const game = { max_naubs: 20 };
+  const game = { max_naubs: 20, basket_changed: { dispatch: vi.fn() } };
   const spawner = { number_of_colors: 3, spammer_interval: 40, spammers };
   const levels = new Levels(game, spawner, levelDetails);
   levels.level = level;
@@ -258,7 +258,8 @@ describe("Levels init", () => {
   it("loads level 0 into the spawner", () => {
     const spawner = new Spawner({ factory: {} });
     spawner.init();
-    const levels = new Levels({}, spawner, levelDetails);
+    const game = { basket_changed: { dispatch: vi.fn() } };
+    const levels = new Levels(game, spawner, levelDetails);
 
     levels.init();
 
@@ -268,7 +269,7 @@ describe("Levels init", () => {
     expect(spawner.spammers.mixed_1.probability).toBe(0);
     expect(spawner.spammers.mixed_2.probability).toBe(0);
     expect(spawner.spammers.triple.probability).toBe(0);
-    expect(Naubino.background.draw).toHaveBeenCalledTimes(1);
+    expect(game.basket_changed.dispatch).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -286,7 +287,7 @@ describe("Levels load_level", () => {
     expect(spawner.spammers.mixed_1.probability).toBe(0);
     expect(spawner.spammers.mixed_2.probability).toBe(0);
     expect(spawner.spammers.triple.probability).toBe(1);
-    expect(Naubino.background.draw).toHaveBeenCalledTimes(1);
+    expect(game.basket_changed.dispatch).toHaveBeenCalledTimes(1);
   });
 
   it("does not load level 0 when going up", () => {
@@ -337,28 +338,27 @@ describe("Levels load_level", () => {
     expect(spawner.spammers.triple.probability).toBe(2);
   });
 
-  // quirk: the guard is >= instead of >, so level_details.length itself passes.
-  // level_details[15] is undefined and the lookup throws. level is already
-  // set to 15 by then, and background.draw is never reached
+  // quirk: guard is >= not >, so length itself gets through and the lookup throws
+  // level is already 15 by then, basket_changed never fires
   it("throws a TypeError for level_details.length and leaves level at that value", () => {
-    const { levels } = makeLevelRig(0);
+    const { game, levels } = makeLevelRig(0);
     const levelCount = levelDetails.length;
 
     expect(() => levels.load_level(levelCount)).toThrow(TypeError);
     expect(levels.level).toBe(levelCount);
-    expect(Naubino.background.draw).not.toHaveBeenCalled();
+    expect(game.basket_changed.dispatch).not.toHaveBeenCalled();
   });
 
   // quirk: levels above level_details.length are silently ignored
   it("ignores levels above level_details.length", () => {
-    const { spawner, levels } = makeLevelRig(0);
+    const { game, spawner, levels } = makeLevelRig(0);
     const levelCount = levelDetails.length;
 
     levels.load_level(levelCount + 1);
 
     expect(levels.level).toBe(0);
     expect(spawner.spammer_interval).toBe(40);
-    expect(Naubino.background.draw).not.toHaveBeenCalled();
+    expect(game.basket_changed.dispatch).not.toHaveBeenCalled();
   });
 });
 
@@ -542,7 +542,7 @@ describe("Rule", () => {
 describe("Levels is generic", () => {
   // no built in table, another mode can bring its own progression
   it("uses whatever level_details it was constructed with", () => {
-    const game = { max_naubs: 0 };
+    const game = { max_naubs: 0, basket_changed: { dispatch: vi.fn() } };
     const spawner = { number_of_colors: 0, spammer_interval: 0, spammers: {} };
     const customLevelDetails = [
       { limit: -1, max_naubs: 5, number_of_colors: 1, interval: 1000 },

@@ -4,6 +4,7 @@ import { Scoring } from "../src/rules/Scoring";
 import { Overflow } from "../src/rules/Overflow";
 import { Levels } from "../src/rules/Levels";
 import { StandardGame } from "../src/StandardGame";
+import { Background } from "../src/Background";
 
 beforeEach(() => {
   Naubino.background = {
@@ -124,48 +125,93 @@ describe("Scoring check", () => {
 });
 
 const makeOverflow = (capacity: number) =>
-  new Overflow({ capacity: vi.fn(() => capacity), loose: vi.fn() });
+  new Overflow({
+    capacity: vi.fn(() => capacity),
+    loose: vi.fn(),
+    overflow_warning: { dispatch: vi.fn() },
+  });
 
 describe("Overflow warning", () => {
-  it("leaves the background alone with plenty of room", () => {
+  it("warns with severity 0 when there is plenty of room", () => {
     const overflow = makeOverflow(100);
+
+    overflow.check();
+
+    expect(overflow.game.overflow_warning.dispatch).toHaveBeenCalledWith(0);
+  });
+
+  it("warns with (45 - capacity) / 45 below 45% capacity", () => {
+    const overflow = makeOverflow(30);
+
+    overflow.check();
+
+    expect(overflow.game.overflow_warning.dispatch).toHaveBeenCalledWith(
+      15 / 45,
+    );
+  });
+
+  it("warns with severity 0 at exactly 45%", () => {
+    const overflow = makeOverflow(45);
+
+    overflow.check();
+
+    expect(overflow.game.overflow_warning.dispatch).toHaveBeenCalledWith(0);
+  });
+
+  it("does not touch the background directly", () => {
+    const overflow = makeOverflow(30);
 
     overflow.check();
 
     expect(Naubino.background.pulse).not.toHaveBeenCalled();
     expect(Naubino.background.stop_pulse).not.toHaveBeenCalled();
-    expect(Naubino.background.ttl).toBeUndefined();
+  });
+});
+
+// skips the constructor, only the pulse state matters
+const makeBackground = (pulsating: boolean) =>
+  Object.assign(Object.create(Background.prototype), {
+    pulsating,
+    pulse_speed: 10,
+    pulse: vi.fn(),
+    stop_pulse: vi.fn(),
   });
 
-  it("starts pulsing below 45% capacity and scales ttl and speed", () => {
-    const overflow = makeOverflow(30);
+describe("Background warn_overflow", () => {
+  it("stays calm at severity 0", () => {
+    const background = makeBackground(false);
 
-    overflow.check();
+    background.warn_overflow(0);
 
-    expect(Naubino.background.pulse).toHaveBeenCalledTimes(1);
-    expect(Naubino.background.ttl).toBe(15);
-    // interpolate(3, 25, (45 - 30) / 45)
-    expect(Naubino.background.pulse_speed).toBeCloseTo(3 + 22 / 3);
+    expect(background.pulse).not.toHaveBeenCalled();
+    expect(background.stop_pulse).not.toHaveBeenCalled();
+    expect(background.pulse_speed).toBe(10);
+  });
+
+  it("starts pulsing and scales the speed from 3 to 25 by severity", () => {
+    const background = makeBackground(false);
+
+    background.warn_overflow(1 / 3);
+
+    expect(background.pulse).toHaveBeenCalledTimes(1);
+    expect(background.pulse_speed).toBeCloseTo(3 + 22 / 3);
   });
 
   it("does not restart a pulse that is already running", () => {
-    Naubino.background.pulsating = true;
-    const overflow = makeOverflow(30);
+    const background = makeBackground(true);
 
-    overflow.check();
+    background.warn_overflow(0.5);
 
-    expect(Naubino.background.pulse).not.toHaveBeenCalled();
-    expect(Naubino.background.ttl).toBe(15);
+    expect(background.pulse).not.toHaveBeenCalled();
+    expect(background.pulse_speed).toBeCloseTo(14);
   });
 
-  it("stops pulsing once capacity is back at 45%", () => {
-    Naubino.background.pulsating = true;
-    const overflow = makeOverflow(45);
+  it("stops pulsing when the severity drops back to 0", () => {
+    const background = makeBackground(true);
 
-    overflow.check();
+    background.warn_overflow(0);
 
-    expect(Naubino.background.stop_pulse).toHaveBeenCalledTimes(1);
-    expect(Naubino.background.ttl).toBe(45);
+    expect(background.stop_pulse).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -209,6 +255,7 @@ describe("Game check", () => {
       loose: vi.fn(() => calls.push("loose")),
       begin_time: 0,
       ex_naubs: 0,
+      overflow_warning: { dispatch: vi.fn() },
     };
     const levels = new Levels(game, {}, StandardGame.prototype.level_details);
     levels.level = 0;

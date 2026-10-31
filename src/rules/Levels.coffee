@@ -20,7 +20,7 @@ export class Levels extends Rule
       @spawner.number_of_colors = set['number_of_colors'] ? @spawner.number_of_colors
       @spawner.spammer_interval = set['interval']         ? @spawner.spammer_interval
 
-      Naubino.background.draw()
+      @game.basket_changed.dispatch()
 
       for name, probability of set['probabilities']
         @spawner.spammers[name].probability = probability

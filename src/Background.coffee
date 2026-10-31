@@ -61,6 +61,14 @@ export class Background extends Layer
     @stop_stepping()
     @stop_drawing()
 
+  # severity 0..1, 0 is all good
+  warn_overflow: (severity) ->
+    if severity > 0
+      @pulse() if @pulsating == off
+      @pulse_speed = Util.interpolate(3,25,severity)
+    else if @pulsating == on
+      @stop_pulse()
+
   draw: ->
     @clear()
     @draw_basket()
