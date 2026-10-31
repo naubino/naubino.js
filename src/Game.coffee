@@ -6,6 +6,7 @@ import {Graph} from "./Graph"
 import {CollisionHandler} from "./CollisionHandler"
 import {Factory} from "./Factory"
 import {JoinPolicy} from "./JoinPolicy"
+import {DragSystem} from "./DragSystem"
 
 export class Game extends Physical_Layer
 
@@ -19,6 +20,7 @@ export class Game extends Physical_Layer
     @graph = new Graph(this)
     @factory = new Factory this
     @join_policy = new JoinPolicy(this)
+    @drag = new DragSystem(this)
     @begin_time = Date.now()
 
     # display stuff
@@ -71,35 +73,13 @@ export class Game extends Physical_Layer
   click: (x, y) =>
     @mousedown = true
     @pointer = new cp.v x,y
-
-    shape = @space.pointQueryFirst(@pointer, @GRABABLE_MASK_BIT, cp.NO_GROUP) if @space?
-    naub = @get_object shape.naub_number if shape?
-    if naub and naub.isClickable
-      naub.focus()
-      @focused_naub = naub
-
-      @mouseBody.p = @pointer
-      @mouseJoint = new cp.PivotJoint(@mouseBody, naub.physical_body, cp.vzero, cp.vzero)
-      @mouseJoint.errorBias = Math.pow(1 - 0.5, 60)
-      @space.addConstraint(@mouseJoint)
-
-
-
+    @drag.start(@pointer)
 
   # callback for mouseup signal
   unfocus: =>
     if @mousedown
       @mousedown = false
-
-      if @focused_naub
-        @focused_naub.unfocus()
-
-      @focused_naub = null
-      if @space? && @mouseJoint?
-        @space.removeConstraint @mouseJoint
-        @mouseJoint = null
-
-      @active_tree = []
+      @drag.stop()
 
 
   # counts how many naubs would be inside the circle
