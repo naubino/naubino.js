@@ -3,16 +3,21 @@ import {Menu} from './Menu'
 import {Overlay} from './Overlay'
 import {StandardGame} from './StandardGame'
 import {TestCase} from './TestCase'
+import {Session} from './session/Session'
 
 export class LayerManager
 
-  setup_fsm: ->
-    StateMachine.create {
-      target: this
-      events: Naubino.settings.events.default.concat Naubino.settings.events.game
-      error: (e, from, to, args, code, msg) ->
-             console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
-    }
+  setup_session: ->
+    @session = new Session this
+
+  # lifecycle lives in Session now, these keep Naubino.play() & co working
+  init:   (args...) -> @session.init args...
+  play:   (args...) -> @session.play args...
+  pause:  (args...) -> @session.pause args...
+  stop:   (args...) -> @session.stop args...
+  loose:  (args...) -> @session.loose args...
+  toggle: -> @session.toggle()
+  can:    (event) -> @session.can event
 
   setup_layers: ->
     @background    = new Background   @canvases.background_canvas
@@ -112,73 +117,11 @@ export class LayerManager
 
 
   list_states: ->
-    @.name = "Naubino"
-    for o in [ @, @menu, @game, @overlay, @background]
+    @session.name = "Naubino"
+    for o in [ @session, @menu, @game, @overlay, @background]
       switch o.current
         when 'playing' then console.info o.name, o.current, o.fps, o.step_rate
         when 'paused'  then console.warn o.name, o.current, o.fps, o.step_rate
         when 'stopped' then console.warn o.name, o.current, o.fps, o.step_rate
         else console.error o.name, o.current
 
-
-  # switching between pause and play
-  toggle: ->
-    switch @current
-      when 'playing' then @pause()
-      when 'paused'  then @play()
-      when 'stopped' then @play()
-
-  oninit: ->
-    for layer in @layers
-      layer.init()
-
-  onchangestate: (e,f,t) -> console.info "Naubino changed states #{e}: #{f} -> #{t}"
-
-  onleavestopped: ->
-    @menu.play() #if @menu.can 'play'
-    #@overlay.fade_out_messages()
-
-  onplay: (event, from, to) ->
-    for layer in [ @game, @overlay, @background ]
-      layer.play()
-    @menu.check_game_state @game
-
-  onbeforepause: -> @game.can("pause") and @background.can("pause")
-
-  onpause: (event, from, to) ->
-    for layer in [ @game, @overlay, @background ]
-      layer.pause() if @overlay.can 'pause'
-    @menu.check_game_state @game
-
-  onbeforestop: (event, from, to, @override = off) ->
-    @game.stop()
-    if @game.current == 'stopped'
-      @overlay.stop()
-      @background.stop()
-    else
-      return false
-
-  onstopped: (e,f,t) ->
-    console.warn 'stopped'
-    for layer in [ @game, @overlay, @background ]
-      layer.init()
-    #setTimeout (=> @overlay.fade_in_message({text:'naubino', fontsize:75})), 100
-    @menu.check_game_state @game
-    unless f == 'none' or @temp_score.points == 0
-      name = prompt("Enter your name for the highscore")
-      Naubino.store_score name if name?
-
-
-  onloose:(e,f,t,msg="Game Over") ->
-    @game.loose() if @game.can 'loose'
-    @overlay.warning (msg)
-
-    leavelost= =>
-      console.warn 'leaving lost'
-      @overlay.stop()
-      @background.stop()
-      @game.fade_out(=> (setTimeout (=> @stop(yes)), 2000))
-
-    @game.one_after_another ((n) -> n.grey_out()), leavelost
-
-  onleavelost: ->

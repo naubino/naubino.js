@@ -57,7 +57,7 @@ export class Naubino extends LayerManager
     @setup_layers()
     @setup_keybindings()
     @setup_cursorbindings()
-    @setup_fsm()
+    @setup_session()
     @init()
     console.timeEnd("loading")
 
