@@ -1,8 +1,9 @@
 import {Background} from './Background'
 import {Menu} from './Menu'
 import {Overlay} from './Overlay'
-import {StandardGame} from './StandardGame'
-import {TestCase} from './TestCase'
+import {Game} from './Game'
+import {StandardMode} from './modes/standard/StandardMode'
+import {TestMode} from './modes/test/TestMode'
 import {Session} from './session/Session'
 
 export class LayerManager
@@ -23,15 +24,14 @@ export class LayerManager
     @background    = new Background   @canvases.background_canvas
     @menu          = new Menu         @canvases.menu_canvas
     @overlay       = new Overlay      @canvases.overlay_canvas
-    @game_standard = new StandardGame @canvases.game_canvas
+    @game_standard = new Game @canvases.game_canvas, new StandardMode
 
     #Naubino.settings.canvas.width  = window.screen.width  * .7
     #Naubino.settings.canvas.height = window.screen.height * .7 - 15
 
-    @game_testcase = new TestCase(@game_canvas)
+    @game_testcase = new Game @game_canvas, new TestMode
     @game          = @game_standard
     #@game          = @game_testcase
-    #@game = new Game @game_canvas
     @layers = [ @background, @game, @menu, @overlay ]
 
     for game in [ @game_standard, @game_testcase ]

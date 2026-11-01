@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Game } from "../src/Game";
 import { Scoring } from "../src/rules/Scoring";
 import { Overflow } from "../src/rules/Overflow";
-import { Levels } from "../src/rules/Levels";
-import { StandardGame } from "../src/StandardGame";
+import { Levels } from "../src/modes/standard/Levels";
+import { StandardMode } from "../src/modes/standard/StandardMode";
 import { Background } from "../src/Background";
 
 beforeEach(() => {
@@ -247,7 +247,7 @@ describe("Game check", () => {
   });
 
   // a level up grows the basket, must not run before the lose check
-  // mirrors StandardGame's @rules order (the constructor needs a canvas)
+  // same order as StandardMode.rules
   it("checks for losing before leveling up when Overflow comes before Levels", () => {
     const calls: string[] = [];
     const game = {
@@ -257,7 +257,7 @@ describe("Game check", () => {
       ex_naubs: 0,
       overflow_warning: { dispatch: vi.fn() },
     };
-    const levels = new Levels(game, {}, StandardGame.prototype.level_details);
+    const levels = new Levels(game, {}, StandardMode.prototype.level_details);
     levels.level = 0;
     levels.load_level = vi.fn(() => calls.push("level up"));
     const runner = Object.assign(Object.create(Game.prototype), {

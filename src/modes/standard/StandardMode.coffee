@@ -2,25 +2,14 @@
 #   number of colors
 #   number of naubs per spam
 #   speed up
-#
-# @extends Game
-import {Game} from './Game'
-import {Spawner} from './rules/Spawner'
-import {Levels} from './rules/Levels'
-import {Scoring} from './rules/Scoring'
-import {Overflow} from './rules/Overflow'
+import {Mode} from '../Mode'
+import {Spawner} from '../../rules/Spawner'
+import {Scoring} from '../../rules/Scoring'
+import {Overflow} from '../../rules/Overflow'
+import {Levels} from './Levels'
 
-export class StandardGame extends Game
-  constructor: (canvas) ->
-    super(canvas)
-    @version = 2 # please raise when makeing changes to this file
-    @spawner  = new Spawner this
-    @scoring  = new Scoring this
-    @overflow = new Overflow this
-    @levels   = new Levels this, @spawner, @level_details
-    # order matters: Levels writes into Spawner so it inits after it
-    # and the lose check has to run before a level up grows the basket
-    @rules    = [@spawner, @scoring, @overflow, @levels]
+export class StandardMode extends Mode
+  version: 2 # please raise when makeing changes to this file
 
   level_details: [
     { limit:-1,    number_of_colors: 3, interval: 40, max_naubs: 20 } # initial state
@@ -40,20 +29,21 @@ export class StandardGame extends Game
     { limit:500,   number_of_colors: 7, interval: 15, max_naubs: 50, probabilities:{ pair:3, mixed_1:3, mixed_2:3, triple: 2 } } #14
   ]
 
-  ### state machine ###
-  # rules init in super
-  oninit: ->
-    super()
-    @naub_replaced.add   (number) => @graph.cycle_test(number)
-    @cycle_found.add     (list)   => @destroy_naubs(list)
-    @naub_focused.add    (n)      => @active_tree = @graph.tree n.number
+  rules: (game) ->
+    # still hung on the game, Naubino.set_score reads game.levels
+    game.spawner  = new Spawner game
+    game.scoring  = new Scoring game
+    game.overflow = new Overflow game
+    game.levels   = new Levels game, game.spawner, @level_details
+    # order matters: Levels writes into Spawner so it inits after it
+    # and the lose check has to run before a level up grows the basket
+    [game.spawner, game.scoring, game.overflow, game.levels]
 
-    #Naubino.audio.connect_to_game this
+  init: (game) ->
+    game.naub_replaced.add   (number) -> game.graph.cycle_test(number)
+    game.cycle_found.add     (list)   -> game.destroy_naubs(list)
+    game.naub_focused.add    (n)      -> game.active_tree = game.graph.tree n.number
 
-  onbeforestop: (e,f,t, override) ->
-    if Naubino.override or override
-      #console.log "killed"
-      delete Naubino.override
-      return true
-    else
-      confirm "Do you realy want to stop the game?"
+    #Naubino.audio.connect_to_game game
+
+  confirm_stop: -> confirm "Do you realy want to stop the game?"

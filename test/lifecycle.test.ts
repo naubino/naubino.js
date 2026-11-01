@@ -23,7 +23,7 @@ const makeLayer = (
   return layer;
 };
 
-// confirmStop plays the user answering StandardGame's stop confirm
+// confirmStop plays the user answering StandardMode's stop confirm
 const makeNaubino = ({ points = 10, confirmStop = true } = {}) => {
   const calls: string[] = [];
   const naubino: any = Object.create(LayerManager.prototype);
@@ -38,7 +38,7 @@ const makeNaubino = ({ points = 10, confirmStop = true } = {}) => {
       done();
     }),
   });
-  // mirrors StandardGame.onbeforestop
+  // mirrors Game.onbeforestop with StandardMode
   game.onbeforestop = () => {
     if (naubino.override) {
       delete naubino.override;

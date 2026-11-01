@@ -8,15 +8,16 @@ import {CollisionHandler} from "./CollisionHandler"
 import {Factory} from "./Factory"
 import {JoinPolicy} from "./rules/JoinPolicy"
 import {DragSystem} from "./helpers/DragSystem"
+import {Mode} from "./modes/Mode"
 
 export class Game extends Layer
 
   # get this started
-  constructor: (canvas) ->
+  constructor: (canvas, @mode = new Mode) ->
     super(canvas)
     @world = new World(@width, @height)
     @expose_world()
-    @version = 0
+    @version = @mode.version
     @name = "game"
     @variable_timestep = yes
     @use_raf = yes
@@ -24,7 +25,6 @@ export class Game extends Layer
     @factory = new Factory this
     @join_policy = new JoinPolicy(this)
     @drag = new DragSystem(this)
-    @rules = [] # modes fill this in
     @begin_time = Date.now()
 
     # view signals, oninit doesn't replace these so LayerManager subscribes once
@@ -47,6 +47,8 @@ export class Game extends Layer
 
     @setup_fsm Naubino.settings.events.game
 
+    # last, rules may want everything above
+    @rules = @mode.rules this
 
 
   # plenty of code still reads these off the game directly
@@ -76,11 +78,13 @@ export class Game extends Layer
     @space.defaultHandler = new CollisionHandler this
 
     rule.init() for rule in @rules
+    @mode.init this
     return
 
-  onplaying: ->
+  onplaying: (e,f,t) ->
     rule.start() for rule in @rules
     @checking = setInterval @check, 300 unless @checking
+    @mode.playing this, f
     return
 
   onleaveplaying: ->
@@ -100,6 +104,13 @@ export class Game extends Layer
 
 
 
+
+  # stop(yes) on Naubino skips the mode's confirm
+  onbeforestop: (e,f,t, override) ->
+    if Naubino.override or override
+      delete Naubino.override
+      return true
+    @mode.confirm_stop()
 
   onstopped: (e,f,t) -> @clear_objects() unless e is 'init'
 

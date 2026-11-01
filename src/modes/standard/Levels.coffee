@@ -1,4 +1,4 @@
-import {Rule} from './Rule'
+import {Rule} from '../../rules/Rule'
 
 export class Levels extends Rule
   constructor: (game, @spawner, @level_details) ->

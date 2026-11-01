@@ -42,7 +42,7 @@ export class Session
       layer.pause() if overlay.can 'pause'
     menu.check_game_state game
 
-  # StandardGame.onbeforestop checks this to skip the confirm
+  # Game.onbeforestop checks this to skip the mode's confirm
   onbeforestop: (event, from, to, override = off) ->
     @naubino.override = override
     {game, overlay, background} = @naubino

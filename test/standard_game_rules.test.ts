@@ -1,9 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { StandardGame } from "../src/StandardGame";
 import { Game } from "../src/Game";
+import { World } from "../src/world/World";
+import { Mode } from "../src/modes/Mode";
+import { StandardMode } from "../src/modes/standard/StandardMode";
+import { TestMode } from "../src/modes/test/TestMode";
+import { Scoring } from "../src/rules/Scoring";
+import { Overflow } from "../src/rules/Overflow";
 import { Rule } from "../src/rules/Rule";
 import { Spawner } from "../src/rules/Spawner";
-import { Levels } from "../src/rules/Levels";
+import { Levels } from "../src/modes/standard/Levels";
 
 const makeSpammer = (probability: number) => ({
   probability,
@@ -30,8 +35,8 @@ const makeSpawner = (fields: Record<string, unknown> = {}) =>
     fields,
   );
 
-// the real table StandardGame hands to Levels
-const levelDetails = StandardGame.prototype.level_details;
+// the real table StandardMode hands to Levels
+const levelDetails = StandardMode.prototype.level_details;
 
 const makeLevelRig = (level = 0, spammers = makeSpammers()) => {
   const game = { max_naubs: 20, basket_changed: { dispatch: vi.fn() } };
@@ -405,30 +410,179 @@ describe("Levels check", () => {
   });
 });
 
-describe("StandardGame oninit", () => {
-  const makeInitGame = () =>
-    Object.assign(Object.create(StandardGame.prototype), {
-      naub_replaced: { add: vi.fn() },
-      naub_destroyed: { add: vi.fn() },
-      cycle_found: { add: vi.fn() },
-      naub_focused: { add: vi.fn() },
-    });
+const makeSignalGame = () => ({
+  naub_replaced: { add: vi.fn() },
+  naub_destroyed: { add: vi.fn() },
+  cycle_found: { add: vi.fn() },
+  naub_focused: { add: vi.fn() },
+});
 
-  beforeEach(() => {
-    vi.spyOn(Game.prototype, "oninit").mockImplementation(() => {});
+describe("StandardMode", () => {
+
+  it("builds spawner, scoring, overflow and levels in that order", () => {
+    const game: any = {};
+
+    const rules = new StandardMode().rules(game);
+
+    expect(rules).toEqual([game.spawner, game.scoring, game.overflow, game.levels]);
+    expect(game.spawner).toBeInstanceOf(Spawner);
+    expect(game.scoring).toBeInstanceOf(Scoring);
+    expect(game.overflow).toBeInstanceOf(Overflow);
+    expect(game.levels).toBeInstanceOf(Levels);
+    expect(game.levels.spawner).toBe(game.spawner);
+    expect(game.levels.level_details).toBe(levelDetails);
   });
 
-  // scoring listeners and counters are Scoring's now
+  // scoring listeners and counters are Scoring's
   it("wires the cycle reaction and the active tree", () => {
-    const game = makeInitGame();
+    const game = makeSignalGame();
 
-    game.oninit();
+    new StandardMode().init(game);
 
-    expect(Game.prototype.oninit).toHaveBeenCalledTimes(1);
     expect(game.naub_replaced.add).toHaveBeenCalledTimes(1);
     expect(game.naub_destroyed.add).not.toHaveBeenCalled();
     expect(game.cycle_found.add).toHaveBeenCalledTimes(1);
     expect(game.naub_focused.add).toHaveBeenCalledTimes(1);
+  });
+
+  it("asks the user before stopping", () => {
+    vi.stubGlobal("confirm", vi.fn(() => false));
+
+    expect(new StandardMode().confirm_stop()).toBe(false);
+    expect(confirm).toHaveBeenCalledTimes(1);
+    vi.unstubAllGlobals();
+  });
+
+  it("is version 2", () => {
+    expect(new StandardMode().version).toBe(2);
+  });
+});
+
+describe("Mode defaults", () => {
+  it("has no rules, version 0 and allows stopping", () => {
+    const mode = new Mode();
+
+    expect(mode.rules({})).toEqual([]);
+    expect(mode.version).toBe(0);
+    expect(mode.confirm_stop()).toBe(true);
+    expect(mode.init({})).toBeUndefined();
+    expect(mode.playing({}, "stopped")).toBeUndefined();
+  });
+});
+
+describe("TestMode", () => {
+  const savedUpdating = Naubino.settings.graphics.updating;
+  const savedOffset = Naubino.settings.game.creation_offset;
+
+  afterEach(() => {
+    Naubino.settings.graphics.updating = savedUpdating;
+    Naubino.settings.game.creation_offset = savedOffset;
+  });
+
+  it("wires the cycle reaction, tweaks settings and auto plays after 300ms", () => {
+    vi.useFakeTimers();
+    Naubino.play = vi.fn();
+    const game = makeSignalGame();
+
+    new TestMode().init(game);
+
+    expect(game.naub_replaced.add).toHaveBeenCalledTimes(1);
+    expect(game.cycle_found.add).toHaveBeenCalledTimes(1);
+    expect(game.naub_focused.add).not.toHaveBeenCalled();
+    expect(Naubino.settings.graphics.updating).toBe(false);
+    expect(Naubino.settings.game.creation_offset).toBe(-200);
+    vi.advanceTimersByTime(300);
+    expect(Naubino.play).toHaveBeenCalledTimes(1);
+    delete Naubino.play;
+    vi.useRealTimers();
+  });
+
+  it("adds six balls and the matching pairs when starting from stopped", () => {
+    const mode = new TestMode();
+    mode.add_ball = vi.fn();
+    const game = { factory: { create_matching_naubs: vi.fn() } };
+
+    mode.playing(game, "stopped");
+
+    expect(game.factory.create_matching_naubs).toHaveBeenCalledTimes(1);
+    expect(mode.add_ball).toHaveBeenCalledTimes(6);
+    expect(mode.add_ball).toHaveBeenCalledWith(game);
+  });
+
+  // quirk: resuming from pause adds six more balls
+  it("adds six more balls but no pairs when resuming from paused", () => {
+    const mode = new TestMode();
+    mode.add_ball = vi.fn();
+    const game = { factory: { create_matching_naubs: vi.fn() } };
+
+    mode.playing(game, "paused");
+
+    expect(game.factory.create_matching_naubs).not.toHaveBeenCalled();
+    expect(mode.add_ball).toHaveBeenCalledTimes(6);
+  });
+
+  it("has no rules and never asks before stopping", () => {
+    const mode = new TestMode();
+
+    expect(mode.rules({})).toEqual([]);
+    expect(mode.confirm_stop()).toBe(true);
+  });
+});
+
+describe("Game mode hooks", () => {
+  const makeModeGame = (mode: any, rules: any[] = []) =>
+    Object.assign(Object.create(Game.prototype), {
+      width: 400,
+      height: 300,
+      world: new World(400, 300),
+      rules,
+      mode,
+    });
+
+  beforeEach(() => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  it("inits the rules, then the mode", () => {
+    const calls: string[] = [];
+    const rule = { init: () => calls.push("rule") };
+    const mode = { init: vi.fn(() => calls.push("mode")) };
+    const game = makeModeGame(mode, [rule]);
+
+    game.oninit();
+
+    expect(calls).toEqual(["rule", "mode"]);
+    expect(mode.init).toHaveBeenCalledWith(game);
+  });
+
+  it("hands the previous state to the mode's playing hook", () => {
+    vi.useFakeTimers();
+    const mode = { playing: vi.fn() };
+    const game = makeModeGame(mode);
+
+    game.onplaying("play", "stopped", "playing");
+
+    expect(mode.playing).toHaveBeenCalledWith(game, "stopped");
+    game.onleaveplaying();
+    vi.useRealTimers();
+  });
+
+  it("lets the mode confirm a stop", () => {
+    const mode = { confirm_stop: vi.fn(() => false) };
+    const game = makeModeGame(mode);
+
+    expect(game.onbeforestop("stop", "playing", "stopped")).toBe(false);
+    expect(mode.confirm_stop).toHaveBeenCalledTimes(1);
+  });
+
+  it("skips the confirm on Naubino.override and clears it", () => {
+    const mode = { confirm_stop: vi.fn(() => false) };
+    const game = makeModeGame(mode);
+    Naubino.override = true;
+
+    expect(game.onbeforestop("stop", "playing", "stopped")).toBe(true);
+    expect(mode.confirm_stop).not.toHaveBeenCalled();
+    expect(Naubino.override).toBeUndefined();
   });
 });
 
@@ -444,9 +598,10 @@ describe("onplaying and onleaveplaying", () => {
   const makePlayingGame = () => {
     const spawner = new Spawner({});
     spawner.event = vi.fn();
-    const game = Object.assign(Object.create(StandardGame.prototype), {
+    const game = Object.assign(Object.create(Game.prototype), {
       rules: [spawner],
       check: vi.fn(),
+      mode: new Mode(),
     });
     return { game, spawner };
   };
@@ -501,7 +656,17 @@ describe("Game rule hooks", () => {
   const makeHookGame = (calls: string[]) =>
     Object.assign(Object.create(Game.prototype), {
       rules: [makeHookRule("a", calls), makeHookRule("b", calls)],
+      mode: new Mode(),
     });
+
+  // onplaying starts the check interval, keep it off the real clock
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   it("starts the rules in list order on playing", () => {
     const calls: string[] = [];
