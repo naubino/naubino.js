@@ -1,4 +1,4 @@
-import {Rule} from './Rule'
+import {Rule} from '../Rule'
 
 export class Spawner extends Rule
 

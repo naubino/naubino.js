@@ -1,5 +1,5 @@
-import {Layer} from './Layer'
-import {Util} from './Util'
+import {Layer} from '../core/Layer'
+import {Util} from '../core/Util'
 
 export class Background extends Layer
   DEFAULT_STEP_RATE = 40

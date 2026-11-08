@@ -1,4 +1,4 @@
-import {Rule} from './Rule'
+import {Rule} from '../Rule'
 
 # warns harder the fuller the basket gets, loses when it's nearly full
 export class Overflow extends Rule

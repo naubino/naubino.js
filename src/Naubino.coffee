@@ -7,22 +7,30 @@
                                         /___/
 ###
 
-import {KeyBindings} from './Keybindings'
-import {Settings} from './Settings'
-import {LayerManager} from './LayerManager'
-import {Util} from './Util'
-import {Signal} from './Signal'
+import {Input} from './Input'
+import {Settings} from './config/Settings'
+import {Viewport} from './Viewport'
+import {GameLoop} from './GameLoop'
+import {Session} from './Session'
+import {Background} from './ui/Background'
+import {Menu} from './ui/Menu'
+import {Overlay} from './ui/Overlay'
+import {Game} from './game/Game'
+import {StandardMode} from './modes/standard/StandardMode'
+import {Util} from './core/Util'
+import {Signal} from './core/Signal'
 
-export class Naubino extends LayerManager
+export class Naubino
 
   constructor: () ->
-    super()
+
     @name = "Naubino (unstable master)"
     @settings = Settings
+
     @Signal = Signal
     @setup_signals()
-    @add_listeners()
-    @scale = 1 # will be changed by fullscreen
+
+
     @load_highscores()
     #@audio = new Audio
 
@@ -33,15 +41,13 @@ export class Naubino extends LayerManager
         JSON.parse string
       else [ {name:"nobody", points: 0, time: 0, naubs: 0, level: 0 } ]
 
-  set_score: ->
-    @temp_score = {
-        name:"nobody"
-        points: @game.points
-        time: @game.duration
-        naubs: @game.ex_naubs
-        game_version: @game.version
-        level: @game.levels?.level
-    }
+  set_score: -> @temp_score = @game.score_snapshot()
+
+  finish_run: (score) ->
+    @temp_score = score
+    return unless score.points > 0
+    name = prompt "Enter your name for the highscore"
+    @store_score name if name?
 
   store_score: (name = 'nobody')->
     @temp_score.name = name
@@ -54,11 +60,11 @@ export class Naubino extends LayerManager
 
   setup: ->
     @setup_dom()
-    @setup_layers()
-    @setup_keybindings()
-    @setup_cursorbindings()
+    @setup_components()
     @setup_session()
+    @setup_input()
     @init()
+    @start_loop()
     console.timeEnd("loading")
 
   color_scheme: -> @settings.colors[@settings.color]
@@ -72,22 +78,68 @@ export class Naubino extends LayerManager
   apply_color_scheme: ->
     color = Util.color_to_rgba @color_scheme().background()
     document.documentElement.style.setProperty '--canvas-background-color', color
-  print: -> @gamediv.insertAdjacentHTML("afterend","<img src=\"#{@game_canvas.toDataURL()}\"/>")
+  print: -> @viewport.container.insertAdjacentHTML("afterend","<img src=\"#{@game.canvas.toDataURL()}\"/>")
 
-  setup_dom: () ->
-    @gamediv = document.querySelector("#gamediv")
-    @gamediv.max-width = @settings.canvas.width
-    @canvases = {}
-    { width, height } = @settings.canvas
-    for name in 'background game menu overlay'.split ' '
-      name += '_canvas'
-      canvas = document.createElement 'canvas'
-      canvas.width = width
-      canvas.height = height
-      canvas.setAttribute 'id', name
-      @[name] = canvas
-      @gamediv.appendChild canvas
-      @canvases[name] = canvas
+  setup_dom: ->
+    container = document.querySelector '#gamediv'
+    form = document.querySelector 'form'
+    @viewport = new Viewport container, @settings.canvas, {
+      centered_elements: if form? then [form] else []
+    }
+
+  setup_components: ->
+    canvases = @viewport.canvases
+    @background = new Background canvases.background_canvas
+    @menu = new Menu canvases.menu_canvas
+    @overlay = new Overlay canvases.overlay_canvas
+    @game = new Game canvases.game_canvas, new StandardMode
+    @layers = [@background, @game, @menu, @overlay]
+
+    @game.overflow_warning.add (severity) => @background.warn_overflow severity
+    @game.basket_changed.add => @background.draw()
+    @viewport.set_layers @layers, [@background, @game, @menu]
+    @viewport.on_resize = (width, height) => @game.resize width, height
+    @loop = new GameLoop @layers
+
+  setup_session: ->
+    @session = new Session {
+      game: @game
+      menu: @menu
+      overlay: @overlay
+      background: @background
+      events: @settings.events
+      name: @name
+      on_finished: (score) => @finish_run score
+    }
+
+  init:   (args...) -> @session.init args...
+  play:   (args...) -> @session.play args...
+  pause:  (args...) -> @session.pause args...
+  stop:   (args...) -> @session.stop args...
+  loose:  (args...) -> @session.loose args...
+  toggle: -> @session.toggle()
+  can:    (event) -> @session.can event
+
+  start_loop: -> @loop.start()
+  stop_loop: -> @loop.stop()
+
+  center: -> @viewport.center()
+  scale_to: (scale) -> @viewport.scale_to scale
+  demaximize: -> @viewport.demaximize()
+  available_size: -> @viewport.available_size()
+  maximize: -> @viewport.maximize()
+  fit_field_to_viewport: -> @viewport.fit_field_to_viewport()
+  resize_field: (width, height) -> @viewport.resize_field width, height
+  stretch: (width) -> @viewport.stretch width
+
+
+  list_states: ->
+    for o in [@session, @menu, @game, @overlay, @background]
+      switch o.current
+        when 'playing' then console.info o.name, o.current, o.fps, o.step_rate
+        when 'paused'  then console.warn o.name, o.current, o.fps, o.step_rate
+        when 'stopped' then console.warn o.name, o.current, o.fps, o.step_rate
+        else console.error o.name, o.current
 
   # Signals connect everything else that does not react to events
 
@@ -108,60 +160,15 @@ export class Naubino extends LayerManager
     @menu_focus      = new @Signal()
     @menu_blur       = new @Signal()
 
-  add_listeners: ->
-
-  setup_keybindings: () ->
-    @keybindings = new KeyBindings()
-    window.onkeydown = (key) => @keybindings.keydown(key)
-    window.onkeyup = (key) => @keybindings.keyup(key)
-    @keybindings.enable 32, => @toggle()
-    @keybindings.enable 27, => @stop()
-
-  setup_cursorbindings: () ->
-    # TODO mouse events should be handled though Signals
-    # touch events carry coordinates in changedTouches, not on the event itself
-    game_coords = (e) =>
-      point = e.changedTouches?[0] ? e
-      rect  = @overlay_canvas.getBoundingClientRect()
-      x = (point.clientX - rect.left - @overlay_canvas.clientLeft) / @scale
-      y = (point.clientY - rect.top  - @overlay_canvas.clientTop)  / @scale
-      e.preventDefault() if e.changedTouches? # no emulated mouse events after touch
-      [x, y]
-
-    onmousemove = (e) => @mousemove.dispatch game_coords(e)...
-    onmouseup   = (e) => @mouseup.dispatch   game_coords(e)...
-    onmousedown = (e) => @mousedown.dispatch game_coords(e)...
-
-    @overlay_canvas.addEventListener("mousedown"  , onmousedown , false)
-    @overlay_canvas.addEventListener("mouseup"    , onmouseup   , false)
-    @overlay_canvas.addEventListener("mousemove"  , onmousemove , false)
-    @overlay_canvas.addEventListener("mouseout"   , onmouseup   , false)
-
-    # two finger tap toggles play/pause
-    gesture = null
-
-    ontouchstart = (e) =>
-      if e.touches.length is 2
-        onmouseup e # let go of whatever the first finger grabbed
-        gesture = { start: Date.now() }
-      else if gesture?
-        e.preventDefault()
-      else
-        onmousedown e
-
-    ontouchmove = (e) =>
-      if gesture? then e.preventDefault() else onmousemove e
-
-    ontouchend = (e) =>
-      if gesture?
-        e.preventDefault()
-        if e.touches.length is 0
-          @toggle() if e.type is "touchend" and Date.now() - gesture.start < 400
-          gesture = null
-      else
-        onmouseup e
-
-    @overlay_canvas.addEventListener("touchstart" , ontouchstart , false)
-    @overlay_canvas.addEventListener("touchend"   , ontouchend   , false)
-    @overlay_canvas.addEventListener("touchcancel", ontouchend   , false)
-    @overlay_canvas.addEventListener("touchmove"  , ontouchmove  , false)
+  setup_input: ->
+    @input = new Input {
+      canvas: @viewport.canvases.overlay_canvas
+      viewport: @viewport
+      signals:
+        mousedown: @mousedown
+        mouseup: @mouseup
+        mousemove: @mousemove
+      toggle: => @toggle()
+      stop: => @stop()
+    }
+    @input.bind()

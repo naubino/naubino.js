@@ -3,9 +3,9 @@
 #   number of naubs per spam
 #   speed up
 import {Mode} from '../Mode'
-import {Spawner} from '../../rules/Spawner'
-import {Scoring} from '../../rules/Scoring'
-import {Overflow} from '../../rules/Overflow'
+import {Spawner} from './Spawner'
+import {Scoring} from './Scoring'
+import {Overflow} from './Overflow'
 import {Levels} from './Levels'
 
 export class StandardMode extends Mode

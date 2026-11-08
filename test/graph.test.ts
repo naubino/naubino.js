@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Graph } from "../src/Graph";
+import { Graph } from "../src/game/Graph";
 
 interface MinimalNaub {
   number: number;

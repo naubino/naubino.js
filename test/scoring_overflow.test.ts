@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Game } from "../src/Game";
-import { Scoring } from "../src/rules/Scoring";
-import { Overflow } from "../src/rules/Overflow";
+import { Game } from "../src/game/Game";
+import { Scoring } from "../src/modes/standard/Scoring";
+import { Overflow } from "../src/modes/standard/Overflow";
 import { Levels } from "../src/modes/standard/Levels";
 import { StandardMode } from "../src/modes/standard/StandardMode";
-import { Background } from "../src/Background";
+import { Background } from "../src/ui/Background";
 
 beforeEach(() => {
   Naubino.background = {

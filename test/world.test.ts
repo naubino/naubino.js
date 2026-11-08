@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { World } from "../src/world/World";
-import { PhysicsWorld } from "../src/world/PhysicsWorld";
+import { World } from "../src/game/World";
+import { PhysicsWorld } from "../src/game/PhysicsWorld";
 
 interface ObjLike {
   number?: number;

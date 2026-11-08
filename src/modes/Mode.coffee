@@ -6,7 +6,7 @@
 export class Mode
   version: 0
 
-  rules: (game) -> []
-  init: (game) ->
-  playing: (game, from) ->
+  rules: (_game) -> []
+  init: (_game) ->
+  playing: (_game, _from) ->
   confirm_stop: -> yes

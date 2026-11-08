@@ -1,14 +1,14 @@
 # controlls everything that has to do with logic and gameplay or menus
 # @extends Layer
-import {Layer} from "./Layer"
-import {World} from "./world/World"
+import {Layer} from "../core/Layer"
+import {World} from "./World"
 import {Naub} from "./Naub"
 import {Graph} from "./Graph"
 import {CollisionHandler} from "./CollisionHandler"
 import {Factory} from "./Factory"
-import {JoinPolicy} from "./rules/JoinPolicy"
-import {DragSystem} from "./helpers/DragSystem"
-import {Mode} from "./modes/Mode"
+import {JoinPolicy} from "./JoinPolicy"
+import {DragSystem} from "./DragSystem"
+import {Mode} from "../modes/Mode"
 
 export class Game extends Layer
 
@@ -27,7 +27,7 @@ export class Game extends Layer
     @drag = new DragSystem(this)
     @begin_time = Date.now()
 
-    # view signals, oninit doesn't replace these so LayerManager subscribes once
+    # View signals survive resets; the application subscribes once.
     @overflow_warning = new Naubino.Signal() # severity 0..1, 0 is all good
     @basket_changed   = new Naubino.Signal()
 
@@ -102,14 +102,27 @@ export class Game extends Layer
     @world.reset_physics @width, @height
     @expose_world()
 
+  resize: (@width, @height) ->
+    # Springs must follow the field's new center.
+    center = @center()
+    @for_each (naub) ->
+      naub.center = center.Copy()
+      naub.constraints?.center?.anchr2 = center.Copy()
+
+  score_snapshot: ->
+    name: 'nobody'
+    points: @points
+    time: @duration
+    naubs: @ex_naubs
+    game_version: @version
+    level: @levels?.level
 
 
 
-  # stop(yes) on Naubino skips the mode's confirm
-  onbeforestop: (e,f,t, override) ->
-    if Naubino.override or override
-      delete Naubino.override
-      return true
+
+  # Forced stops skip the mode's confirmation.
+  onbeforestop: (e,f,t, force = no) ->
+    return true if force
     @mode.confirm_stop()
 
   onstopped: (e,f,t) -> @clear_objects() unless e is 'init'

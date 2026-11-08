@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { Game } from "../src/Game";
-import { World } from "../src/world/World";
+import { Game } from "../src/game/Game";
+import { World } from "../src/game/World";
 
 // skips the constructor, no canvas or fsm needed for the world plumbing
 const makeGame = () =>
@@ -35,6 +35,32 @@ const expectExposed = (game: any) => {
 };
 
 describe("Game world plumbing", () => {
+  it("resizes the field and updates each naub's center and spring anchor", () => {
+    const game = makeGame();
+    game.center = () => new cp.Vect(game.width / 2, game.height / 2);
+    const naub: any = { constraints: { center: { anchr2: new cp.Vect(200, 150) } } };
+    const unanchored: any = {};
+    game.for_each = (visit: (naub: any) => void) => [naub, unanchored].forEach(visit);
+
+    game.resize(800, 600);
+
+    expect(game.width).toBe(800);
+    expect(game.height).toBe(600);
+    expect(naub.center).toEqual(new cp.Vect(400, 300));
+    expect(naub.constraints.center.anchr2).toEqual(new cp.Vect(400, 300));
+    expect(naub.constraints.center.anchr2).not.toBe(naub.center);
+    expect(unanchored.center).toEqual(new cp.Vect(400, 300));
+  });
+
+  it("captures a score independently of subsequent game resets", () => {
+    const game = makeGame();
+    Object.assign(game, { points: 42, duration: 1200, ex_naubs: 8, version: 2, levels: { level: 3 } });
+    const score = game.score_snapshot();
+    game.points = 0;
+    game.levels.level = 0;
+
+    expect(score).toEqual({ name: "nobody", points: 42, time: 1200, naubs: 8, game_version: 2, level: 3 });
+  });
   it("expose_world copies the world's live references onto the game", () => {
     const game = makeGame();
     game.expose_world();

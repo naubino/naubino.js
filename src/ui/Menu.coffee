@@ -1,9 +1,9 @@
 # TODO clean up menu code -- will do in naub_rethought
-import {Layer} from "./Layer"
-import {Naub} from "./Naub"
-import {Graph} from "./Graph"
-import { Ball, StringShape, PlayButton, PauseButton, MainButton } from "./Shapes"
-import {Factory} from "./Factory"
+import {Layer} from "../core/Layer"
+import {Naub} from "../game/Naub"
+import {Graph} from "../game/Graph"
+import { Ball, StringShape, PlayButton, PauseButton, MainButton } from "../game/Shapes"
+import {Factory} from "../game/Factory"
 
 export class Menu extends Layer
   DEFAULT_STEP_RATE = 40
@@ -118,7 +118,7 @@ export class Menu extends Layer
     @draw_listener_region()
 
   draw_menu: ->
-    @ctx.clearRect(0, 0, Naubino.game_canvas.width, Naubino.game_canvas.height)
+    @clear()
     @ctx.save()
     for name, naub of @objects
       naub.draw_join(@ctx,@objects.main)

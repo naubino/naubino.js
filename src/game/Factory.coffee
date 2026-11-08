@@ -1,5 +1,5 @@
 import {Naub} from "./Naub"
-import {Util} from './Util'
+import {Util} from '../core/Util'
 import {Ball, Box, Frame, FrameCircle} from "./Shapes"
 import {Clock, StringShape} from "./Shapes"
 import {PlayButton, PauseButton} from "./Shapes"

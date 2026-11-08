@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Naub } from "../src/Naub";
+import { Naub } from "../src/game/Naub";
 
 interface NaubLike {
   joins: Record<string, { number: number }>;

@@ -1,10 +1,8 @@
 import {Naubino} from './Naubino'
-import {Util} from './Util'
+import {Util} from './core/Util'
 window.Util = Util
 console.time("loading")
 
-window.addEventListener "resize", -> Util.relayout() if window.Naubino?
-window.addEventListener "orientationchange", -> Util.relayout(300) if window.Naubino?
 
 window.onload = ->
   naubino = window.Naubino = new Naubino()
@@ -21,7 +19,18 @@ window.onload = ->
     naubino.menu.open()
 
 
-  Util.toggleMaximized()
+  maximize_check = document.querySelector '#maximizeCheck'
+  fullscreen_check = document.querySelector '#fullScreenCheck'
+  layout_options = (fit = Util.isTouch()) ->
+    maximized: maximize_check.checked or Util.isFullscreen()
+    fit: fit
+
+  maximize_check.addEventListener 'change', -> naubino.viewport.layout layout_options(true)
+  fullscreen_check.addEventListener 'change', -> Util.toggleFullscreen()
+  window.addEventListener 'resize', -> naubino.viewport.schedule_layout layout_options()
+  window.addEventListener 'orientationchange', -> naubino.viewport.schedule_layout layout_options(), 300
+
+  naubino.viewport.layout layout_options(true)
 
   # reflect initial settings in the UI (settings are the source of truth on load)
   document.querySelector('#effectsCheck').checked = naubino.settings.graphics.effects == on
@@ -49,5 +58,10 @@ window.onload = ->
     naubino.game.draw()
 
 
+  on_fullscreen_change = ->
+    fullscreen_check.checked = Util.isFullscreen()
+    naubino.viewport.layout layout_options(true)
+    naubino.viewport.schedule_layout layout_options()
+
   for event in ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange"]
-    document.addEventListener event, (-> Util.changeFullscreen()), false
+    document.addEventListener event, on_fullscreen_change, false

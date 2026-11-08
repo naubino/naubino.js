@@ -1,9 +1,9 @@
-import {Mode} from '../Mode'
-import {Naub} from '../../Naub'
-import {StringShape, Ball} from '../../Shapes'
+import {Mode} from './Mode'
+import {Naub} from '../game/Naub'
+import {StringShape, Ball} from '../game/Shapes'
 
 # debug playground: numbered balls, no spawning, no losing
-export class TestMode extends Mode
+export class DebugMode extends Mode
 
   init: (game) ->
     Naubino.settings.graphics.updating = off

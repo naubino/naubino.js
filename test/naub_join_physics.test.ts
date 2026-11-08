@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import { Naub } from "../src/Naub";
-import { PhysicsWorld } from "../src/world/PhysicsWorld";
-import { Graph } from "../src/Graph";
+import { Naub } from "../src/game/Naub";
+import { PhysicsWorld } from "../src/game/PhysicsWorld";
+import { Graph } from "../src/game/Graph";
 
 interface FakeLayer {
   physics: PhysicsWorld;

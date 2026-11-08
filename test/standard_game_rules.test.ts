@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Game } from "../src/Game";
-import { World } from "../src/world/World";
+import { Game } from "../src/game/Game";
+import { World } from "../src/game/World";
 import { Mode } from "../src/modes/Mode";
 import { StandardMode } from "../src/modes/standard/StandardMode";
-import { TestMode } from "../src/modes/test/TestMode";
-import { Scoring } from "../src/rules/Scoring";
-import { Overflow } from "../src/rules/Overflow";
-import { Rule } from "../src/rules/Rule";
-import { Spawner } from "../src/rules/Spawner";
+import { DebugMode } from "../src/modes/DebugMode";
+import { Scoring } from "../src/modes/standard/Scoring";
+import { Overflow } from "../src/modes/standard/Overflow";
+import { Rule } from "../src/modes/Rule";
+import { Spawner } from "../src/modes/standard/Spawner";
 import { Levels } from "../src/modes/standard/Levels";
 
 const makeSpammer = (probability: number) => ({
@@ -470,7 +470,7 @@ describe("Mode defaults", () => {
   });
 });
 
-describe("TestMode", () => {
+describe("DebugMode", () => {
   const savedUpdating = Naubino.settings.graphics.updating;
   const savedOffset = Naubino.settings.game.creation_offset;
 
@@ -484,7 +484,7 @@ describe("TestMode", () => {
     Naubino.play = vi.fn();
     const game = makeSignalGame();
 
-    new TestMode().init(game);
+    new DebugMode().init(game);
 
     expect(game.naub_replaced.add).toHaveBeenCalledTimes(1);
     expect(game.cycle_found.add).toHaveBeenCalledTimes(1);
@@ -498,7 +498,7 @@ describe("TestMode", () => {
   });
 
   it("adds six balls and the matching pairs when starting from stopped", () => {
-    const mode = new TestMode();
+    const mode = new DebugMode();
     mode.add_ball = vi.fn();
     const game = { factory: { create_matching_naubs: vi.fn() } };
 
@@ -511,7 +511,7 @@ describe("TestMode", () => {
 
   // quirk: resuming from pause adds six more balls
   it("adds six more balls but no pairs when resuming from paused", () => {
-    const mode = new TestMode();
+    const mode = new DebugMode();
     mode.add_ball = vi.fn();
     const game = { factory: { create_matching_naubs: vi.fn() } };
 
@@ -522,7 +522,7 @@ describe("TestMode", () => {
   });
 
   it("has no rules and never asks before stopping", () => {
-    const mode = new TestMode();
+    const mode = new DebugMode();
 
     expect(mode.rules({})).toEqual([]);
     expect(mode.confirm_stop()).toBe(true);
@@ -575,14 +575,12 @@ describe("Game mode hooks", () => {
     expect(mode.confirm_stop).toHaveBeenCalledTimes(1);
   });
 
-  it("skips the confirm on Naubino.override and clears it", () => {
+  it("skips the confirm when force is passed directly", () => {
     const mode = { confirm_stop: vi.fn(() => false) };
     const game = makeModeGame(mode);
-    Naubino.override = true;
 
-    expect(game.onbeforestop("stop", "playing", "stopped")).toBe(true);
+    expect(game.onbeforestop("stop", "playing", "stopped", true)).toBe(true);
     expect(mode.confirm_stop).not.toHaveBeenCalled();
-    expect(Naubino.override).toBeUndefined();
   });
 });
 

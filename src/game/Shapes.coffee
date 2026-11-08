@@ -1,4 +1,4 @@
-import {Util} from './Util'
+import {Util} from '../core/Util'
 export class Shape
   constructor: ->
 

@@ -1,4 +1,4 @@
-import {Util} from './Util'
+import {Util} from '../core/Util'
 
 export BLACK = [0,  0,  0, 1, "black"]
 export WHITE = [255,  255,  255, 1, "white"]

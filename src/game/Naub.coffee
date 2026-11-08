@@ -1,4 +1,4 @@
-import {Util} from './Util'
+import {Util} from '../core/Util'
 
 # a Naub is everything in the game that you can move around
 # Naubs can be joined under certain circumstances

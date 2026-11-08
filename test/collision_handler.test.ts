@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { CollisionHandler } from '../src/CollisionHandler'
+import { CollisionHandler } from '../src/game/CollisionHandler'
 
 interface GameLike {
   get_object: ReturnType<typeof vi.fn>

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { JoinPolicy } from "../src/rules/JoinPolicy";
-import { Naub } from "../src/Naub";
+import { JoinPolicy } from "../src/game/JoinPolicy";
+import { Naub } from "../src/game/Naub";
 
 interface NaubLike {
   number: number;
