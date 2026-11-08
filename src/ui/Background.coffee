@@ -13,6 +13,7 @@ export class Background extends Layer
     @min_step_rate= 15
 
     @step_rate = @default_step_rate = DEFAULT_STEP_RATE
+    @basket_size_provider = null
 
   set_defaults: ->
     @p_min= { color: [130,130,130], thick: 2 }
@@ -73,10 +74,15 @@ export class Background extends Layer
     @clear()
     @draw_basket()
 
+  set_basket_size_provider: (provider) ->
+    @basket_size_provider = provider
+    @draw() if @current isnt 'none'
+
   draw_basket: () ->
 
+    @basket_size = @basket_size_provider?()
+    return unless @basket_size?
     center = @center()
-    @basket_size = Naubino.game.basket_size() ? 150
 
     @ctx.save()
     @ctx.beginPath()

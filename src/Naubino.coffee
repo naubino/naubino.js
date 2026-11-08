@@ -19,16 +19,17 @@ import {Game} from './game/Game'
 import {StandardMode} from './modes/standard/StandardMode'
 import {Util} from './core/Util'
 import {Signal} from './core/Signal'
+import {Events} from './Events'
 
 export class Naubino
 
-  constructor: () ->
+  constructor: (@mode = new StandardMode) ->
 
     @name = "Naubino (unstable master)"
     @settings = Settings
 
     @Signal = Signal
-    @setup_signals()
+    @events = new Events
 
 
     @load_highscores()
@@ -45,7 +46,7 @@ export class Naubino
 
   finish_run: (score) ->
     @temp_score = score
-    return unless score.points > 0
+    return unless score? and score.points > 0
     name = prompt "Enter your name for the highscore"
     @store_score name if name?
 
@@ -64,6 +65,7 @@ export class Naubino
     @setup_session()
     @setup_input()
     @init()
+    @play() if @mode.auto_start
     @start_loop()
     console.timeEnd("loading")
 
@@ -90,13 +92,16 @@ export class Naubino
   setup_components: ->
     canvases = @viewport.canvases
     @background = new Background canvases.background_canvas
-    @menu = new Menu canvases.menu_canvas
+    @menu = new Menu canvases.menu_canvas, @events
     @overlay = new Overlay canvases.overlay_canvas
-    @game = new Game canvases.game_canvas, new StandardMode
+    @game = new Game canvases.game_canvas, @mode, @events
     @layers = [@background, @game, @menu, @overlay]
 
-    @game.overflow_warning.add (severity) => @background.warn_overflow severity
-    @game.basket_changed.add => @background.draw()
+    @view_subscriptions = [
+      @events.game.overflow_warning.add (severity) => @background.warn_overflow severity
+      @events.game.basket_changed.add => @background.draw()
+    ]
+    @background.set_basket_size_provider => @game.basket?.basket_size()
     @viewport.set_layers @layers, [@background, @game, @menu]
     @viewport.on_resize = (width, height) => @game.resize width, height
     @loop = new GameLoop @layers
@@ -107,10 +112,12 @@ export class Naubino
       menu: @menu
       overlay: @overlay
       background: @background
-      events: @settings.events
+      transitions: @settings.events
+      events: @events
       name: @name
       on_finished: (score) => @finish_run score
     }
+
 
   init:   (args...) -> @session.init args...
   play:   (args...) -> @session.play args...
@@ -122,6 +129,15 @@ export class Naubino
 
   start_loop: -> @loop.start()
   stop_loop: -> @loop.stop()
+
+  dispose: ->
+    @input?.unbind()
+    @session?.dispose()
+    @game?.dispose()
+    @menu?.dispose()
+    unsubscribe() for unsubscribe in (@view_subscriptions ? [])
+    @view_subscriptions = []
+    @loop?.stop()
 
   center: -> @viewport.center()
   scale_to: (scale) -> @viewport.scale_to scale
@@ -141,34 +157,11 @@ export class Naubino
         when 'stopped' then console.warn o.name, o.current, o.fps, o.step_rate
         else console.error o.name, o.current
 
-  # Signals connect everything else that does not react to events
-
-  setup_signals: ->
-    # user interface
-    @mousedown       = new @Signal()
-    @mouseup         = new @Signal()
-    @mousemove       = new @Signal()
-    @keydown         = new @Signal()
-    @keyup           = new @Signal()
-    @touchstart      = new @Signal()
-    @touchend        = new @Signal()
-    @touchmove       = new @Signal()
-
-
-    # menu
-    @menu_button     = new @Signal()
-    @menu_focus      = new @Signal()
-    @menu_blur       = new @Signal()
 
   setup_input: ->
     @input = new Input {
       canvas: @viewport.canvases.overlay_canvas
       viewport: @viewport
-      signals:
-        mousedown: @mousedown
-        mouseup: @mouseup
-        mousemove: @mousemove
-      toggle: => @toggle()
-      stop: => @stop()
+      events: @events
     }
     @input.bind()

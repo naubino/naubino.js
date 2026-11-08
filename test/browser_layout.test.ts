@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({
   application: null as any,
   isFullscreen: false,
   isTouch: false,
-  Naubino: vi.fn(function () {
+  Naubino: vi.fn(function (_mode: any) {
     return mocks.application;
   }),
   toggleFullscreen: vi.fn(),
@@ -50,7 +50,7 @@ let windowTarget: ReturnType<typeof eventTarget>;
 let mediaQuery: ReturnType<typeof eventTarget> & { matches: boolean };
 let app: any;
 
-const boot = async ({ touch = false, fullscreen = false } = {}) => {
+const boot = async ({ touch = false, fullscreen = false, search = "" } = {}) => {
   mocks.isTouch = touch;
   mocks.isFullscreen = fullscreen;
 
@@ -59,7 +59,7 @@ const boot = async ({ touch = false, fullscreen = false } = {}) => {
   effectsCheck = element();
   colorsSelect = element();
   documentTarget = eventTarget();
-  windowTarget = eventTarget();
+  windowTarget = Object.assign(eventTarget(), { location: { search } });
   mediaQuery = Object.assign(eventTarget(), { matches: touch });
 
   app = {
@@ -109,6 +109,25 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+});
+
+describe("browser mode selection", () => {
+  it.each(["", "?mode=standard", "?mode=unknown", "?mode=DEBUG", "?mode="])(
+    "starts standard for %s",
+    async (search) => {
+      await boot({ search });
+
+      expect(mocks.Naubino.mock.calls[0][0].id).toBe("standard");
+    },
+  );
+
+  it("passes the auto-starting debug mode to the application", async () => {
+    await boot({ search: "?mode=debug" });
+
+    const mode = mocks.Naubino.mock.calls[0][0];
+    expect(mode.id).toBe("debug");
+    expect(mode.auto_start).toBe(true);
+  });
 });
 
 describe("browser layout wiring", () => {

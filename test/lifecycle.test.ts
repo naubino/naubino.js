@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Session } from "../src/Session";
+import { Events } from "../src/Events";
 
-const events = {
+const transitions = {
   default: [
     { name: "init", from: ["none", "stopped"], to: "stopped" },
     { name: "play", from: ["paused", "stopped"], to: "playing" },
@@ -19,7 +20,7 @@ const lifecycleEvents = ["init", "play", "pause", "stop", "loose"];
 const makeLayer = (
   name: string,
   calls: string[],
-  layerEvents = events.default,
+  layerEvents = transitions.default,
   fields: Record<string, unknown> = {},
 ) => {
   const layer: any = { name, ...fields };
@@ -36,7 +37,8 @@ const makeSession = ({
 } = {}) => {
   const calls: string[] = [];
   const on_finished = vi.fn(() => calls.push("finished"));
-  const game = makeLayer("game", calls, events.default.concat(events.game), {
+  const events = new Events();
+  const game = makeLayer("game", calls, transitions.default.concat(transitions.game), {
     confirm: vi.fn(() => confirmStop),
     score_snapshot: vi.fn(() => {
       calls.push("game snapshot");
@@ -69,11 +71,12 @@ const makeSession = ({
     overlay,
     background,
     menu,
+    transitions,
     events,
     on_finished,
   });
 
-  return { session, calls, game, overlay, background, menu, on_finished, snapshot };
+  return { session, calls, game, overlay, background, menu, events, on_finished, snapshot };
 };
 
 const makePlayingSession = (options = {}) => {
@@ -96,6 +99,17 @@ afterEach(() => {
 });
 
 describe("startup", () => {
+  it("publishes each lifecycle state through the event hub", () => {
+    const { session, events } = makeSession();
+    const states: string[] = [];
+    events.session.state_changed.add((state: string) => states.push(state));
+
+    session.init();
+    session.play();
+
+    expect(states).toEqual(["stopped", "playing"]);
+  });
+
   it("inits game, overlay and background twice, the menu once", () => {
     const { session, calls, on_finished } = makeSession();
 
@@ -127,6 +141,29 @@ describe("startup", () => {
 });
 
 describe("play and pause", () => {
+  it("routes hub commands through the lifecycle", () => {
+    const { session, events } = makeSession();
+    session.init();
+
+    events.commands.play.dispatch();
+    expect(session.current).toBe("playing");
+    events.commands.toggle.dispatch();
+    expect(session.current).toBe("paused");
+    events.commands.stop.dispatch();
+    expect(session.current).toBe("stopped");
+  });
+
+  it("removes command and outcome subscriptions when disposed", () => {
+    const { session, events } = makeSession();
+    session.init();
+    session.dispose();
+
+    events.commands.play.dispatch();
+    events.game.outcome.dispatch("late outcome");
+
+    expect(session.current).toBe("stopped");
+  });
+
   it("plays the menu first, then game, overlay and background", () => {
     const { session, calls } = makeSession();
     session.init();
@@ -216,6 +253,15 @@ describe("stop", () => {
     expect(on_finished).not.toHaveBeenCalled();
   });
 
+  it("tolerates an unranked null result without calling the completion handler", () => {
+    const { session, on_finished } = makePlayingSession({ snapshot: null as any });
+
+    session.stop();
+
+    expect(session.current).toBe("stopped");
+    expect(on_finished).not.toHaveBeenCalled();
+  });
+
   it("reports a zero-point snapshot", () => {
     const snapshot = { name: "nobody", points: 0, time: 0, naubs: 0, game_version: 2, level: 0 };
     const { session, on_finished } = makePlayingSession({ snapshot });
@@ -293,6 +339,18 @@ describe("loose", () => {
     session.loose();
 
     expect(calls).toContain("overlay warning Game Over");
+  });
+
+  it("accepts a generic game outcome from the event hub", () => {
+    const { session, game, calls, events } = makePlayingSession();
+    const gameLoose = vi.spyOn(game, "loose");
+
+    events.game.outcome.dispatch("custom outcome");
+
+    expect(game.current).toBe("lost");
+    expect(gameLoose).toHaveBeenCalledWith("custom outcome");
+    expect(calls).toContain("overlay warning custom outcome");
+    expect(session.current).toBe("lost");
   });
 
   it("does not lose the game again when the game lost first", () => {

@@ -1,12 +1,26 @@
 # Coordinates the game, menu, and visual layers through one lifecycle FSM.
 export class Session
-  constructor: ({@game, @menu, @overlay, @background, @events, @name = 'Naubino', @on_finished = ->}) ->
+  constructor: ({@game, @menu, @overlay, @background, @transitions, @events, @name = 'Naubino', @on_finished = ->}) ->
+    @disposed = no
     StateMachine.create {
       target: this
-      events: @events.default.concat @events.game
+      events: @transitions.default.concat @transitions.game
       error: (e, from, to, args, code, msg) =>
         console.error "#{@name}.#{e}: #{from} -> #{to}\n#{code}::#{msg}"
     }
+    @subscriptions = [
+      @events.commands.play.add (args...) => @play args...
+      @events.commands.pause.add (args...) => @pause args...
+      @events.commands.stop.add (args...) => @stop args...
+      @events.commands.toggle.add => @toggle()
+      @events.game.outcome.add (reason) => @report_outcome reason
+    ]
+
+  dispose: ->
+    @disposed = yes
+    clearTimeout @loss_timeout if @loss_timeout?
+    unsubscribe() for unsubscribe in @subscriptions
+    @subscriptions = []
 
   # switching between pause and play
   toggle: ->
@@ -18,7 +32,9 @@ export class Session
   oninit: ->
     layer.init() for layer in [@background, @game, @menu, @overlay]
 
-  onchangestate: (e, f, t) -> console.info "#{@name} changed states #{e}: #{f} -> #{t}"
+  onchangestate: (e, f, t) ->
+    console.info "#{@name} changed states #{e}: #{f} -> #{t}"
+    @events.session.state_changed.dispatch t
 
   onleavestopped: ->
     @menu.play()
@@ -55,14 +71,23 @@ export class Session
       @completed_snapshot = null
       @on_finished snapshot
 
+  report_outcome: (reason = 'Game Over') ->
+    return if @handling_outcome or @current is 'lost'
+    @loose reason if @can 'loose'
+
   onloose: (e, from, to, msg = 'Game Over') ->
-    @game.loose() if @game.can 'loose'
+    @handling_outcome = yes
+    @game.loose(msg) if @game.can 'loose'
+    @handling_outcome = no
     @overlay.warning msg
 
     leave_lost = =>
+      return if @disposed
       @overlay.stop()
       @background.stop()
-      @game.fade_out => setTimeout (=> @stop yes), 2000
+      @game.fade_out =>
+        return if @disposed
+        @loss_timeout = setTimeout (=> @stop yes unless @disposed), 2000
 
     @game.one_after_another ((n) -> n.grey_out()), leave_lost
 

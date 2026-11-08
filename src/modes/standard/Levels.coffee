@@ -16,11 +16,11 @@ export class Levels extends Rule
 
       set = @level_details[@level]
 
-      @game.max_naubs           = set['max_naubs']        ? @game.max_naubs
+      @game.basket.max_naubs    = set['max_naubs']        ? @game.basket.max_naubs
       @spawner.number_of_colors = set['number_of_colors'] ? @spawner.number_of_colors
       @spawner.spammer_interval = set['interval']         ? @spawner.spammer_interval
 
-      @game.basket_changed.dispatch()
+      @game.events.game.basket_changed.dispatch()
 
       for name, probability of set['probabilities']
         @spawner.spammers[name].probability = probability

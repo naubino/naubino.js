@@ -6,40 +6,38 @@ import {Naub} from "./Naub"
 import {Graph} from "./Graph"
 import {CollisionHandler} from "./CollisionHandler"
 import {Factory} from "./Factory"
-import {JoinPolicy} from "./JoinPolicy"
 import {DragSystem} from "./DragSystem"
 import {Mode} from "../modes/Mode"
 
 export class Game extends Layer
 
   # get this started
-  constructor: (canvas, @mode = new Mode) ->
+  constructor: (canvas, @mode = new Mode, @events = Naubino.events) ->
     super(canvas)
-    @world = new World(@width, @height)
+    @config = @build_config()
+    @world = new World(@width, @height, @config.physics)
     @expose_world()
     @version = @mode.version
+    @mode_id = @mode.id
     @name = "game"
     @variable_timestep = yes
     @use_raf = yes
     @graph = new Graph(this)
-    @factory = new Factory this
-    @join_policy = new JoinPolicy(this)
+    @factory = new Factory(this)
+    @join_policy = @mode.join_policy this
     @drag = new DragSystem(this)
     @begin_time = Date.now()
 
-    # View signals survive resets; the application subscribes once.
-    @overflow_warning = new Naubino.Signal() # severity 0..1, 0 is all good
-    @basket_changed   = new Naubino.Signal()
 
     # display stuff
     @focused_naub = null # points to the naub you click on
 
     #@points = -1
     @joining_allowed = yes
-    #console.log "mousemove"
-    Naubino.mousemove.add @move_pointer
-    Naubino.mousedown.add @click
-    Naubino.mouseup.add @unfocus
+    @input_unsubscribers = []
+    @input_unsubscribers.push @events.input.pointer_move.add @move_pointer
+    @input_unsubscribers.push @events.input.pointer_start.add @click
+    @input_unsubscribers.push @events.input.pointer_end.add @unfocus
 
     @joining_naubs = []
     @replacing_naubs = []
@@ -49,7 +47,15 @@ export class Game extends Layer
 
     # last, rules may want everything above
     @rules = @mode.rules this
+    @mode_unsubscribe = @mode.bind this, @events
 
+
+  build_config: ->
+    game = Object.assign {}, Naubino.settings.game, @mode.game_config ? {}
+    physics_overrides = @mode.physics_config ? {}
+    physics = Object.assign {}, Naubino.settings.physics, physics_overrides
+    physics.center_join = Object.assign {}, Naubino.settings.physics.center_join, physics_overrides.center_join ? {}
+    {game, physics}
 
   # plenty of code still reads these off the game directly
   # rerun whenever the world swaps one out
@@ -65,6 +71,8 @@ export class Game extends Layer
     @naub_unfocused    = @world.naub_unfocused
 
   oninit: (e,f,t) ->
+    @cancel_destroy_batches()
+    @mode.reset? this
     console.log "game INIT"
     # gameplay
     @game_draw       = new Naubino.Signal()
@@ -82,6 +90,8 @@ export class Game extends Layer
     return
 
   onplaying: (e,f,t) ->
+    @begin_time = Date.now() if f is 'stopped'
+    @duration = 0 if f is 'stopped'
     rule.start() for rule in @rules
     @checking = setInterval @check, 300 unless @checking
     @mode.playing this, f
@@ -89,6 +99,7 @@ export class Game extends Layer
 
   onleaveplaying: ->
     rule.stop() for rule in @rules
+    @mode.stop? this
     clearInterval @checking
     @checking = null
     return
@@ -99,7 +110,7 @@ export class Game extends Layer
     return
 
   setup_physics: ->
-    @world.reset_physics @width, @height
+    @world.reset_physics @width, @height, @config.physics
     @expose_world()
 
   resize: (@width, @height) ->
@@ -109,13 +120,7 @@ export class Game extends Layer
       naub.center = center.Copy()
       naub.constraints?.center?.anchr2 = center.Copy()
 
-  score_snapshot: ->
-    name: 'nobody'
-    points: @points
-    time: @duration
-    naubs: @ex_naubs
-    game_version: @version
-    level: @levels?.level
+  score_snapshot: -> @mode.result this
 
 
 
@@ -125,12 +130,28 @@ export class Game extends Layer
     return true if force
     @mode.confirm_stop()
 
-  onstopped: (e,f,t) -> @clear_objects() unless e is 'init'
+  onstopped: (e,f,t) ->
+    unless e is 'init'
+      @cancel_destroy_batches()
+      @clear_objects()
 
-  onloose: ->
-    Naubino.loose('Naub Overflow') if Naubino.can 'loose'
-    Naubino.background.pause()
+  onloose: (e, from, to, reason = 'Game Over') ->
     @stop_stepping()
+    @events.game.outcome.dispatch reason
+
+  dispose: ->
+    rule.stop() for rule in @rules
+    @mode.stop? this
+    @mode_unsubscribe?()
+    @mode_unsubscribe = null
+    @mode.dispose? this
+    @stop_stepping()
+    @stop_drawing()
+    @cancel_destroy_batches()
+    clearInterval @checking if @checking?
+    @checking = null
+    unsubscribe() for unsubscribe in (@input_unsubscribers ? []) when typeof unsubscribe is 'function'
+    @input_unsubscribers = []
 
     # after this point you must be able to press play an start again
 
@@ -148,56 +169,44 @@ export class Game extends Layer
       @drag.stop()
 
 
-  # counts how many naubs would be inside the circle
-  # important for gameplay
-  count_basket: (margin) ->
-    count = []
-    b_s = @basket_size()
-    for id, naub of @objects
-      diff = @center()
-      diff.sub naub.physical_body.p
-      if cp.v.len(diff) < b_s*(1+margin) - naub.size/2
-        count.push naub
-    count
 
   point_in_field: (pos) ->
     0 < pos.x < @width and 0 < pos.y < @height
 
-  #calculates the size of the basket
-  basket_size: ->
-    if @max_naubs?
-      n_r = Naubino.settings.naub.size / 2
-      special_factor = .62 # discovered with scientific methods, don't ask
-      b_r = Math.sqrt(@max_naubs * n_r * n_r / special_factor)
-
-  # number of naubs currently in the basket
-  cur_naubs: -> @count_basket(0.08).length
-
-  # current space in basket in %
-  # mainly here for compatibility reasons
-  capacity: -> 100 - @cur_naubs() * 100 / @max_naubs
-
-#   #shows how much room other.s available in the basket
-#   capacity: ->
-#     r = @basket_size
-#     size= Math.ceil r * r * Math.PI * 0.68 # don't ask me why
-#     filling =0
-#     for naub in @count_basket()
-#       filling += naub.area()
-#     100-Math.ceil(filling*100 / size)
+  cancel_destroy_batches: ->
+    clearTimeout batch.timer for batch in (@destroy_batches ? []) when batch.timer?
+    @destroy_batches = []
+    @destroying_naubs = {}
 
   # destroys every naub in a list of IDs by calling its own destroy function
-  destroy_naubs: (list)->
-    for naub in list
-      @get_object(naub).disable()
+  destroy_naubs: (list) ->
+    @destroy_batches ?= []
+    @destroying_naubs ?= {}
+    ids = []
+    for id in list
+      naub = @get_object id
+      continue unless naub? and not naub.removed and not naub.destroying and not @destroying_naubs[id]
+      naub.disable()
+      @destroying_naubs[id] = yes
+      ids.push id
+    return unless ids.length
 
-    i = 0
-    one_after_another= =>
-      if i < list.length
-        @get_object(list[i]).destroy(i == list.length-1)
-        i++
-      setTimeout one_after_another, 120
-    one_after_another()
+    batch = {ids, index: 0, timer: null}
+    @destroy_batches.push batch
+    destroy_next = =>
+      return unless batch in @destroy_batches
+      id = batch.ids[batch.index]
+      naub = @get_object id
+      if naub? and not naub.removed and not naub.destroying
+        naub.destroy(batch.index == batch.ids.length - 1)
+      else unless naub?
+        delete @destroying_naubs[id]
+      batch.index++
+      if batch.index < batch.ids.length
+        batch.timer = setTimeout destroy_next, 120
+      else
+        @destroy_batches.splice @destroy_batches.indexOf(batch), 1
+    destroy_next()
 
 
   # is one naub allowed to join with another
@@ -211,7 +220,7 @@ export class Game extends Layer
     # draws joins and naubs seperately
     @ctx.save()
 
-    #@draw_constraints()
+    @draw_constraints()
     #@draw_point @pointer
     #@draw_point @mouseBody.p, "blue"
 
@@ -274,7 +283,9 @@ export class Game extends Layer
 
   get_object: (id) -> @world.get_object id
 
-  remove_obj: (id) -> @world.remove_object id
+  remove_obj: (id) ->
+    delete @destroying_naubs[id] if @destroying_naubs?
+    @world.remove_object id
 
   get_obj_in_pos: (pos) -> @world.naub_at pos
 

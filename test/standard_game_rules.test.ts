@@ -9,6 +9,9 @@ import { Overflow } from "../src/modes/standard/Overflow";
 import { Rule } from "../src/modes/Rule";
 import { Spawner } from "../src/modes/standard/Spawner";
 import { Levels } from "../src/modes/standard/Levels";
+import { Basket } from "../src/modes/standard/Basket";
+import { JoinPolicy } from "../src/game/JoinPolicy";
+import { Events } from "../src/Events";
 
 const makeSpammer = (probability: number) => ({
   probability,
@@ -39,11 +42,12 @@ const makeSpawner = (fields: Record<string, unknown> = {}) =>
 const levelDetails = StandardMode.prototype.level_details;
 
 const makeLevelRig = (level = 0, spammers = makeSpammers()) => {
-  const game = { max_naubs: 20, basket_changed: { dispatch: vi.fn() } };
+  const events = { game: { basket_changed: { dispatch: vi.fn() } } };
+  const game = { basket: { max_naubs: 20 }, events };
   const spawner = { number_of_colors: 3, spammer_interval: 40, spammers };
   const levels = new Levels(game, spawner, levelDetails);
   levels.level = level;
-  return { game, spawner, levels };
+  return { game, events, spawner, levels };
 };
 
 beforeEach(() => {
@@ -263,7 +267,8 @@ describe("Levels init", () => {
   it("loads level 0 into the spawner", () => {
     const spawner = new Spawner({ factory: {} });
     spawner.init();
-    const game = { basket_changed: { dispatch: vi.fn() } };
+    const events = { game: { basket_changed: { dispatch: vi.fn() } } };
+    const game = { basket: { max_naubs: 20 }, events };
     const levels = new Levels(game, spawner, levelDetails);
 
     levels.init();
@@ -274,7 +279,7 @@ describe("Levels init", () => {
     expect(spawner.spammers.mixed_1.probability).toBe(0);
     expect(spawner.spammers.mixed_2.probability).toBe(0);
     expect(spawner.spammers.triple.probability).toBe(0);
-    expect(game.basket_changed.dispatch).toHaveBeenCalledTimes(1);
+    expect(game.events.game.basket_changed.dispatch).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -285,14 +290,14 @@ describe("Levels load_level", () => {
     levels.load_level(3);
 
     expect(levels.level).toBe(3);
-    expect(game.max_naubs).toBe(30);
+    expect(game.basket.max_naubs).toBe(30);
     expect(spawner.number_of_colors).toBe(4);
     expect(spawner.spammer_interval).toBe(30);
     expect(spawner.spammers.pair.probability).toBe(9);
     expect(spawner.spammers.mixed_1.probability).toBe(0);
     expect(spawner.spammers.mixed_2.probability).toBe(0);
     expect(spawner.spammers.triple.probability).toBe(1);
-    expect(game.basket_changed.dispatch).toHaveBeenCalledTimes(1);
+    expect(game.events.game.basket_changed.dispatch).toHaveBeenCalledTimes(1);
   });
 
   it("does not load level 0 when going up", () => {
@@ -316,7 +321,7 @@ describe("Levels load_level", () => {
     // spy logs the outer call on entry, so [1] before the nested [0]
     expect(loadSpy.mock.calls).toEqual([[1], [0]]);
     expect(levels.level).toBe(1);
-    expect(game.max_naubs).toBe(20);
+    expect(game.basket.max_naubs).toBe(20);
     expect(spawner.number_of_colors).toBe(3);
     expect(spawner.spammer_interval).toBe(38);
     expect(spawner.spammers.pair.probability).toBe(1);
@@ -337,7 +342,7 @@ describe("Levels load_level", () => {
     levels.load_level(0);
 
     expect(levels.level).toBe(0);
-    expect(game.max_naubs).toBe(20);
+    expect(game.basket.max_naubs).toBe(20);
     expect(spawner.spammer_interval).toBe(40);
     expect(spawner.spammers.pair.probability).toBe(9);
     expect(spawner.spammers.triple.probability).toBe(2);
@@ -351,7 +356,7 @@ describe("Levels load_level", () => {
 
     expect(() => levels.load_level(levelCount)).toThrow(TypeError);
     expect(levels.level).toBe(levelCount);
-    expect(game.basket_changed.dispatch).not.toHaveBeenCalled();
+    expect(game.events.game.basket_changed.dispatch).not.toHaveBeenCalled();
   });
 
   // quirk: levels above level_details.length are silently ignored
@@ -363,7 +368,7 @@ describe("Levels load_level", () => {
 
     expect(levels.level).toBe(0);
     expect(spawner.spammer_interval).toBe(40);
-    expect(game.basket_changed.dispatch).not.toHaveBeenCalled();
+    expect(game.events.game.basket_changed.dispatch).not.toHaveBeenCalled();
   });
 });
 
@@ -445,12 +450,34 @@ describe("StandardMode", () => {
     expect(game.naub_focused.add).toHaveBeenCalledTimes(1);
   });
 
+  it("binds a two-finger tap to the toggle command and cleans it up", () => {
+    const events = new Events();
+    const toggle = vi.fn();
+    events.commands.toggle.add(toggle);
+    const unbind = new StandardMode().bind({}, events);
+
+    events.input.two_finger_tap.dispatch();
+    unbind();
+    events.input.two_finger_tap.dispatch();
+
+    expect(toggle).toHaveBeenCalledOnce();
+  });
+
   it("asks the user before stopping", () => {
     vi.stubGlobal("confirm", vi.fn(() => false));
 
     expect(new StandardMode().confirm_stop()).toBe(false);
     expect(confirm).toHaveBeenCalledTimes(1);
     vi.unstubAllGlobals();
+  });
+
+  it("returns the historical highscore fields with a stable standard mode id", () => {
+    const mode = new StandardMode();
+    const game = { points: 12, duration: 34, ex_naubs: 5, version: 2, levels: { level: 1 } };
+
+    expect(mode.result(game)).toEqual({
+      name: "nobody", points: 12, time: 34, naubs: 5, game_version: 2, level: 1, mode: "standard",
+    });
   });
 
   it("is version 2", () => {
@@ -465,23 +492,15 @@ describe("Mode defaults", () => {
     expect(mode.rules({})).toEqual([]);
     expect(mode.version).toBe(0);
     expect(mode.confirm_stop()).toBe(true);
+    expect(mode.join_policy({})).toBeInstanceOf(JoinPolicy);
     expect(mode.init({})).toBeUndefined();
     expect(mode.playing({}, "stopped")).toBeUndefined();
+    expect(typeof mode.bind({}, new Events())).toBe("function");
   });
 });
 
 describe("DebugMode", () => {
-  const savedUpdating = Naubino.settings.graphics.updating;
-  const savedOffset = Naubino.settings.game.creation_offset;
-
-  afterEach(() => {
-    Naubino.settings.graphics.updating = savedUpdating;
-    Naubino.settings.game.creation_offset = savedOffset;
-  });
-
-  it("wires the cycle reaction, tweaks settings and auto plays after 300ms", () => {
-    vi.useFakeTimers();
-    Naubino.play = vi.fn();
+  it("wires cycle reactions without mutating shared settings or starting timers", () => {
     const game = makeSignalGame();
 
     new DebugMode().init(game);
@@ -489,12 +508,10 @@ describe("DebugMode", () => {
     expect(game.naub_replaced.add).toHaveBeenCalledTimes(1);
     expect(game.cycle_found.add).toHaveBeenCalledTimes(1);
     expect(game.naub_focused.add).not.toHaveBeenCalled();
-    expect(Naubino.settings.graphics.updating).toBe(false);
-    expect(Naubino.settings.game.creation_offset).toBe(-200);
-    vi.advanceTimersByTime(300);
-    expect(Naubino.play).toHaveBeenCalledTimes(1);
-    delete Naubino.play;
-    vi.useRealTimers();
+    expect(Naubino.settings.graphics.updating).toBe(true);
+    expect(Naubino.settings.game.creation_offset).toBe(50);
+    expect(new DebugMode().game_config.creation_offset).toBe(-200);
+    expect(new DebugMode().auto_start).toBe(true);
   });
 
   it("adds six balls and the matching pairs when starting from stopped", () => {
@@ -509,8 +526,7 @@ describe("DebugMode", () => {
     expect(mode.add_ball).toHaveBeenCalledWith(game);
   });
 
-  // quirk: resuming from pause adds six more balls
-  it("adds six more balls but no pairs when resuming from paused", () => {
+  it("does not add more entities when resuming from pause", () => {
     const mode = new DebugMode();
     mode.add_ball = vi.fn();
     const game = { factory: { create_matching_naubs: vi.fn() } };
@@ -518,7 +534,35 @@ describe("DebugMode", () => {
     mode.playing(game, "paused");
 
     expect(game.factory.create_matching_naubs).not.toHaveBeenCalled();
-    expect(mode.add_ball).toHaveBeenCalledTimes(6);
+    expect(mode.add_ball).not.toHaveBeenCalled();
+  });
+
+  it("spawns while a two-finger hold is active and stops on pause, stop, reset, or disposal", () => {
+    vi.useFakeTimers();
+    const mode = new DebugMode();
+    mode.spawn_pair = vi.fn();
+    const game = { current: "playing" };
+    const events = new Events();
+    const unbind = mode.bind(game, events);
+
+    events.input.two_finger_start.dispatch();
+    expect(mode.spawn_pair).toHaveBeenCalledTimes(1);
+    vi.advanceTimersByTime(600);
+    expect(mode.spawn_pair).toHaveBeenCalledTimes(3);
+    mode.stop(game);
+    vi.advanceTimersByTime(600);
+    expect(mode.spawn_pair).toHaveBeenCalledTimes(3);
+
+    events.input.two_finger_start.dispatch();
+    expect(mode.spawn_pair).toHaveBeenCalledTimes(4);
+    mode.reset(game);
+    vi.advanceTimersByTime(600);
+    expect(mode.spawn_pair).toHaveBeenCalledTimes(4);
+    mode.dispose(game);
+    unbind();
+    events.input.two_finger_start.dispatch();
+    expect(mode.spawn_pair).toHaveBeenCalledTimes(4);
+    vi.useRealTimers();
   });
 
   it("has no rules and never asks before stopping", () => {
@@ -535,12 +579,36 @@ describe("Game mode hooks", () => {
       width: 400,
       height: 300,
       world: new World(400, 300),
+      config: { physics: Naubino.settings.physics },
       rules,
       mode,
     });
 
   beforeEach(() => {
     vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  it("keeps one mode input subscription through repeated inits and removes it on disposal", () => {
+    const mode = new DebugMode();
+    const events = new Events();
+    const game = {
+      ...makeSignalGame(),
+      current: "playing",
+      graph: { cycle_test: vi.fn() },
+      destroy_naubs: vi.fn(),
+    };
+    mode.spawn_pair = vi.fn();
+    const unbind = mode.bind(game, events);
+
+    mode.init(game);
+    mode.init(game);
+    events.input.two_finger_start.dispatch();
+    expect(mode.spawn_pair).toHaveBeenCalledOnce();
+
+    mode.dispose(game);
+    unbind();
+    events.input.two_finger_start.dispatch();
+    expect(mode.spawn_pair).toHaveBeenCalledOnce();
   });
 
   it("inits the rules, then the mode", () => {
@@ -705,7 +773,7 @@ describe("Rule", () => {
 describe("Levels is generic", () => {
   // no built in table, another mode can bring its own progression
   it("uses whatever level_details it was constructed with", () => {
-    const game = { max_naubs: 0, basket_changed: { dispatch: vi.fn() } };
+    const game = { basket: { max_naubs: 0 }, events: { game: { basket_changed: { dispatch: vi.fn() } } } };
     const spawner = { number_of_colors: 0, spammer_interval: 0, spammers: {} };
     const customLevelDetails = [
       { limit: -1, max_naubs: 5, number_of_colors: 1, interval: 1000 },
@@ -715,7 +783,7 @@ describe("Levels is generic", () => {
     levels.init();
 
     expect(levels.level).toBe(0);
-    expect(game.max_naubs).toBe(5);
+    expect(game.basket.max_naubs).toBe(5);
     expect(spawner.number_of_colors).toBe(1);
     expect(spawner.spammer_interval).toBe(1000);
     expect(levels.level_details).toBe(customLevelDetails);

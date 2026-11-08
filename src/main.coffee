@@ -1,11 +1,14 @@
 import {Naubino} from './Naubino'
+import {StandardMode} from './modes/standard/StandardMode'
+import {DebugMode} from './modes/DebugMode'
 import {Util} from './core/Util'
 window.Util = Util
 console.time("loading")
 
 
 window.onload = ->
-  naubino = window.Naubino = new Naubino()
+  mode = modeFromSearch window.location.search
+  naubino = window.Naubino = new Naubino mode
   naubino.setup()
   naubino.apply_color_scheme()
   document.querySelector("#highscorelink").addEventListener "click", -> confirm "do you want to leave this page?"
@@ -65,3 +68,10 @@ window.onload = ->
 
   for event in ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange"]
     document.addEventListener event, on_fullscreen_change, false
+
+modeFromSearch = (search = '') ->
+  params = new URLSearchParams search
+  switch params.get('mode')
+    when 'debug' then new DebugMode
+    when null, 'standard' then new StandardMode
+    else new StandardMode

@@ -12,12 +12,11 @@ export class Scoring extends Rule
 
   check: ->
     @game.duration = Date.now() - @game.begin_time
-    Naubino.set_score()
 
   calculate_points: (list) ->
     @game.ex_naubs += list.length
     max_grow = 3 # may be moved to settings some day
-    factor = (max_grow-1) / @game.max_naubs
+    factor = (max_grow-1) / @game.basket.max_naubs
     p = Math.floor(factor * list.length * list.length)
     @game.points += p
     #Naubino.overlay.fade_in_and_out_message ("\n\nChain Bonus "+p) if p > 0

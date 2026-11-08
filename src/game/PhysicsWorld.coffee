@@ -1,9 +1,9 @@
 export class PhysicsWorld
-  constructor: (@width, @height) ->
+  constructor: (@width, @height, @config = Naubino.settings.physics) ->
     @GRABABLE_MASK_BIT = 1<<31
     @NOT_GRABABLE_MASK = ~@GRABABLE_MASK_BIT
     @space = new cp.Space()
-    @space.damping = Naubino.settings.physics.damping
+    @space.damping = @config.damping
     @mouseBody = new cp.Body(Infinity, Infinity)
     @mouseBody.name = "mouseBody"
     @mouseBody.p = cp.vzero
@@ -60,9 +60,9 @@ export class PhysicsWorld
 
 
   attract_to_center: (body, center) ->
-    rstl = Naubino.settings.physics.center_join.restLength
-    stfs = Naubino.settings.physics.center_join.stiffness
-    dmpg = Naubino.settings.physics.center_join.damping
+    rstl = @config.center_join.restLength
+    stfs = @config.center_join.stiffness
+    dmpg = @config.center_join.damping
     spring = new cp.DampedSpring( body, @space.staticBody, cp.vzero, center, rstl, stfs, dmpg)
     spring.centerjoin = true
     @space.addConstraint(spring)

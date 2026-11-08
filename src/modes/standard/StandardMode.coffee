@@ -7,8 +7,10 @@ import {Spawner} from './Spawner'
 import {Scoring} from './Scoring'
 import {Overflow} from './Overflow'
 import {Levels} from './Levels'
+import {Basket} from './Basket'
 
 export class StandardMode extends Mode
+  id: 'standard'
   version: 2 # please raise when makeing changes to this file
 
   level_details: [
@@ -30,7 +32,7 @@ export class StandardMode extends Mode
   ]
 
   rules: (game) ->
-    # still hung on the game, Naubino.set_score reads game.levels
+    game.basket  = new Basket game
     game.spawner  = new Spawner game
     game.scoring  = new Scoring game
     game.overflow = new Overflow game
@@ -39,11 +41,23 @@ export class StandardMode extends Mode
     # and the lose check has to run before a level up grows the basket
     [game.spawner, game.scoring, game.overflow, game.levels]
 
+  result: (game) ->
+    name: 'nobody'
+    points: game.points
+    time: game.duration
+    naubs: game.ex_naubs
+    game_version: game.version
+    level: game.levels?.level
+    mode: @id
+
   init: (game) ->
     game.naub_replaced.add   (number) -> game.graph.cycle_test(number)
     game.cycle_found.add     (list)   -> game.destroy_naubs(list)
     game.naub_focused.add    (n)      -> game.active_tree = game.graph.tree n.number
 
     #Naubino.audio.connect_to_game game
+
+  bind: (game, events) ->
+    events.input.two_finger_tap.add -> events.commands.toggle.dispatch()
 
   confirm_stop: -> confirm "Do you realy want to stop the game?"

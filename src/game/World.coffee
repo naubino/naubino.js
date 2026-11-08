@@ -3,14 +3,15 @@ import {PhysicsWorld} from './PhysicsWorld'
 # the mode agnostic part: object registry, physics, naub lifecycle signals
 # no canvas, no graph
 export class World
-  constructor: (width, height) ->
+  constructor: (width, height, physics_config = Naubino.settings.physics) ->
+    @physics_config = physics_config
     @objects       = {}
     @objects_count = 0 # never reset, old timers may still look up ids after a new game starts
-    @reset_physics width, height
+    @reset_physics width, height, @physics_config
     @reset_signals()
 
-  reset_physics: (width, height) ->
-    @physics = new PhysicsWorld(width, height)
+  reset_physics: (width, height, physics_config = @physics_config) ->
+    @physics = new PhysicsWorld(width, height, physics_config)
 
   # new signals, so last game's listeners are gone
   reset_signals: ->
@@ -34,7 +35,7 @@ export class World
   # objects_count keeps going on purpose, see constructor
   clear: (width, height) ->
     @objects = {}
-    @reset_physics width, height
+    @reset_physics width, height, @physics_config
 
   # clickable naubs only
   naub_at: (pos) ->

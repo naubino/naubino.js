@@ -253,6 +253,14 @@ describe("check_joining guards", () => {
     expect(decide(game, focused, other, impulse)).toBe(true);
     expect(game.joining_naubs.length).toBe(1);
   });
+
+  it("uses the game-local joining force override", () => {
+    const game = Object.assign(makeGame(), { config: { game: { min_joining_force: 10 } } });
+    const { focused, other } = joinPair();
+
+    expect(decide(game, focused, other, 9)).toBe(false);
+    expect(decide(game, focused, other, 10)).toBe(true);
+  });
 });
 
 describe("check_joining replace", () => {

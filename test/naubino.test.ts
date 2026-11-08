@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Naubino as Application } from "../src/Naubino";
+import { Events } from "../src/Events";
+import { StandardMode } from "../src/modes/standard/StandardMode";
 
 const makeApplication = () => Object.create(Application.prototype);
+const touch = (clientX: number, clientY: number) => ({ clientX, clientY });
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -32,6 +35,24 @@ describe("Naubino composition", () => {
     expect(app.session.can).toHaveBeenCalledWith("play");
   });
 
+  it("auto-starts the selected mode only after session initialization", () => {
+    const app = makeApplication();
+    const calls: string[] = [];
+    app.mode = { auto_start: true };
+    app.setup_dom = () => calls.push("dom");
+    app.setup_components = () => calls.push("components");
+    app.setup_session = () => calls.push("session");
+    app.setup_input = () => calls.push("input");
+    app.init = () => calls.push("init");
+    app.play = () => calls.push("play");
+    app.start_loop = () => calls.push("loop");
+    vi.spyOn(console, "timeEnd").mockImplementation(() => {});
+
+    app.setup();
+
+    expect(calls).toEqual(["dom", "components", "session", "input", "init", "play", "loop"]);
+  });
+
   it("delegates field resizing to the viewport", () => {
     const app = makeApplication();
     app.viewport = { resize_field: vi.fn() };
@@ -41,7 +62,7 @@ describe("Naubino composition", () => {
     expect(app.viewport.resize_field).toHaveBeenCalledWith(640, 480);
   });
 
-  it("wires input signals and session commands without copying canvas aliases", () => {
+  it("wires Input to the application event hub without canvas aliases or callbacks", () => {
     const app = makeApplication();
     const canvasListeners: Record<string, (event: any) => void> = {};
     const keyListeners: Record<string, (event: any) => void> = {};
@@ -53,26 +74,65 @@ describe("Naubino composition", () => {
       addEventListener: vi.fn((name, listener) => { keyListeners[name] = listener; }),
       removeEventListener: vi.fn(),
     });
+    app.events = new Events();
     app.viewport = {
       canvases: { overlay_canvas: canvas },
       to_local: vi.fn(() => ({ x: 20, y: 30 })),
     };
-    app.mousedown = { dispatch: vi.fn() };
-    app.mousemove = { dispatch: vi.fn() };
-    app.mouseup = { dispatch: vi.fn() };
-    app.session = { toggle: vi.fn(), stop: vi.fn() };
+    const pointerStart = vi.fn();
+    const toggle = vi.fn();
+    const stop = vi.fn();
+    app.events.input.pointer_start.add(pointerStart);
+    app.events.commands.toggle.add(toggle);
+    app.events.commands.stop.add(stop);
 
     app.setup_input();
     canvasListeners.mousedown({ clientX: 100, clientY: 200 });
     keyListeners.keydown({ which: 32 });
     keyListeners.keydown({ which: 27 });
 
-    expect(app.mousedown.dispatch).toHaveBeenCalledWith(20, 30);
+    expect(pointerStart).toHaveBeenCalledWith(20, 30);
     expect(app.viewport.to_local).toHaveBeenCalledWith(100, 200, canvas);
-    expect(app.session.toggle).toHaveBeenCalledOnce();
-    expect(app.session.stop).toHaveBeenCalledOnce();
+    expect(toggle).toHaveBeenCalledOnce();
+    expect(stop).toHaveBeenCalledOnce();
+    expect(app.mousedown).toBeUndefined();
     expect(app.canvases).toBeUndefined();
     expect(app.overlay_canvas).toBeUndefined();
+    app.input.unbind();
+  });
+
+  it("routes an actual standard two-finger tap from app Input through the hub command", () => {
+    const app = makeApplication();
+    const canvasListeners: Record<string, (event: any) => void> = {};
+    const keyboard = { addEventListener: vi.fn(), removeEventListener: vi.fn() };
+    const canvas = {
+      addEventListener: vi.fn((name, listener) => { canvasListeners[name] = listener; }),
+      removeEventListener: vi.fn(),
+    };
+    vi.stubGlobal("window", keyboard);
+    app.events = new Events();
+    app.viewport = {
+      canvases: { overlay_canvas: canvas },
+      to_local: vi.fn(() => ({ x: 20, y: 30 })),
+    };
+    const toggle = vi.fn();
+    app.events.commands.toggle.add(toggle);
+    const unbindMode = new StandardMode().bind({}, app.events);
+
+    app.setup_input();
+    const touchEvent = (type: string, count: number) => ({
+      type,
+      changedTouches: [touch(10, 20)],
+      touches: Array.from({ length: count }, (_unused, index) => touch(index + 10, index + 20)),
+      preventDefault: vi.fn(),
+    });
+    canvasListeners.touchstart(touchEvent("touchstart", 1));
+    canvasListeners.touchstart(touchEvent("touchstart", 2));
+    canvasListeners.touchend(touchEvent("touchend", 1));
+    canvasListeners.touchend(touchEvent("touchend", 0));
+
+    expect(toggle).toHaveBeenCalledOnce();
+    unbindMode();
     app.input.unbind();
   });
 
