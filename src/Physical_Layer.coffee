@@ -30,8 +30,8 @@ export class Physical_Layer extends Layer
 
 
 
-  step_space: ->
-    @space.step(1/@step_rate)
+  step_space: (dt) ->
+    @space.step(dt)
     # Move mouse body toward the mouse
     newPoint = cp.v.lerp(@mouseBody.p, @pointer, 0.25)
     @mouseBody.v = cp.v.mult(cp.v.sub(newPoint, @mouseBody.p), 60)

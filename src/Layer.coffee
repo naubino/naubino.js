@@ -1,5 +1,7 @@
 export class Layer
 
+  MAX_FRAME_TIME = 250
+
   constructor: (@canvas) ->
     @name = "unnamed layer"
 
@@ -12,8 +14,20 @@ export class Layer
     @objects       = {}
     @objects_count = 0
 
-    @fps       =   @default_fps       = Naubino.settings.graphics.fps
-    @step_rate =   @default_step_rate = Naubino.settings.step_rate
+    @fps            =   @default_fps       = Naubino.settings.graphics.fps
+    @step_rate      =   @default_step_rate = Naubino.settings.step_rate
+    @step_floor_rate =   Naubino.settings.step_floor_rate
+
+    @actual_fps       = null
+    @last_draw_time   = null
+    @draw_accumulator = 0
+
+    @actual_step_rate       = null
+    @step_accumulator       = 0
+    @step_rate_window_steps = 0
+    @step_rate_window_time  = 0
+
+    @fps_label_depth  = 0
 
     @show()
 
@@ -52,32 +66,111 @@ export class Layer
   #onchangestate: (e,f,t)-> console.info "#{@name} changed state #{e}: #{f} -> #{t}"
     #return true
 
-  # manage timers for drawing and stepping
-  start_stepping: -> @step_loop = setInterval((=> @step()),  1000 / @step_rate) unless @step_loop?
-  stop_stepping: ->
-    clearInterval @step_loop
-    @step_loop = null
+  start_stepping: ->
+    @step_accumulator = 0
+    @stepping = yes
 
-  start_drawing: -> @draw_loop = setInterval (=> @draw()), 1000 / @fps  unless @draw_loop?
+  stop_stepping: ->
+    @stepping = no
+
+  start_drawing: ->
+    @draw_accumulator = 0
+    @drawing = yes
+
   stop_drawing: ->
-    clearInterval @draw_loop
-    @draw_loop = null
+    @drawing = no
+    @last_draw_time = null
 
   refresh_draw_rate: (fps = false) ->
     @fps = fps if fps
-    @stop_drawing()
-    @start_drawing()
+    @draw_accumulator = 0
 
   refresh_step_rate: (fps = false) ->
     @step_rate = fps if fps
-    @stop_drawing()
-    @start_drawing()
+    @step_accumulator = 0
 
 
   # overwrite these
   step: ->
   draw: ->
 
+
+  advance: (dt) ->
+    if @stepping
+      if @variable_timestep then @advance_stepping_variable(dt) else @advance_stepping_fixed(dt)
+    @advance_drawing(dt) if @drawing
+
+  advance_stepping_fixed: (dt) ->
+    dt = Math.min dt, MAX_FRAME_TIME
+    @step_accumulator += dt
+
+    step_interval = 1000 / @step_rate
+    steps = 0
+    while @step_accumulator >= step_interval
+      @step()
+      @step_accumulator -= step_interval
+      steps++
+
+    @measure_step_rate steps, dt
+
+  advance_stepping_variable: (dt) ->
+    @step_accumulator += dt
+    target_interval = 1000 / @step_rate
+    return if @step_accumulator < target_interval
+
+    max_dt = 1000 / @step_floor_rate
+    step_dt = Math.min @step_accumulator, max_dt
+    @step step_dt / 1000
+    @measure_step_rate 1, step_dt
+    @step_accumulator = 0
+
+  measure_step_rate: (steps, dt) ->
+    @step_rate_window_steps += steps
+    @step_rate_window_time  += dt
+    if @step_rate_window_time >= 500
+      @actual_step_rate = @step_rate_window_steps * 1000 / @step_rate_window_time
+      @step_rate_window_steps = 0
+      @step_rate_window_time  = 0
+
+  advance_drawing: (dt) ->
+    if @use_raf and Naubino.settings.graphics.use_raf
+      @draw()
+      @draw_fps_overlay()
+    else
+      @draw_accumulator += dt
+      draw_interval = 1000 / @fps
+      if @draw_accumulator >= draw_interval
+        @draw()
+        @draw_fps_overlay()
+        @draw_accumulator -= draw_interval
+        @draw_accumulator = 0 if @draw_accumulator > draw_interval
+
+
+  draw_fps_overlay: ->
+    return unless Naubino.settings.graphics.show_fps
+
+    now = performance.now()
+    if @last_draw_time?
+      delta       = now - @last_draw_time
+      instant_fps = 1000 / delta
+      @actual_fps = if @actual_fps? then @actual_fps * 0.9 + instant_fps * 0.1 else instant_fps
+    @last_draw_time = now
+
+    return unless @actual_fps?
+
+    line_height = 12
+    y = @height - 4 - @fps_label_depth * line_height
+
+    label = "#{@name}: #{Math.round(@actual_fps)} fps draw"
+    label += " / #{Math.round(@actual_step_rate)} fps step" if @actual_step_rate?
+
+    @ctx.save()
+    @ctx.fillStyle    = "lime"
+    @ctx.font         = "10px monospace"
+    @ctx.textAlign    = "right"
+    @ctx.textBaseline = "bottom"
+    @ctx.fillText label, @width - 4, y
+    @ctx.restore()
 
 
   resize_to: (width, height) ->

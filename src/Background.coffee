@@ -2,6 +2,8 @@ import {Layer} from './Layer'
 import {Util} from './Util'
 
 export class Background extends Layer
+  DEFAULT_STEP_RATE = 40
+
   constructor: (canvas) ->
     super(canvas)
     @name = "background"
@@ -9,6 +11,8 @@ export class Background extends Layer
     @fps = @default_fps = 2
     @min_fps = 15
     @min_step_rate= 15
+
+    @step_rate = @default_step_rate = DEFAULT_STEP_RATE
 
   set_defaults: ->
     @p_min= { color: [130,130,130], thick: 2 }
@@ -24,11 +28,21 @@ export class Background extends Layer
 
   onstopped: -> @set_defaults()
 
+  onplay: (e,f,t) ->
+    @show()
+    if @pulsating
+      @start_stepping()
+      @start_drawing()
+    else
+      @draw()
+
   onbeforepulse: ->
     if Naubino.settings.graphics.effects == on
       @refresh_draw_rate 25
     else
       @refresh_draw_rate 10
+    @start_stepping()
+    @start_drawing()
 
   onenterpulsing: ->
     @pulsating = on
@@ -44,6 +58,8 @@ export class Background extends Layer
   onstop_pulse: ->
     @pulsating = off
     @refresh_draw_rate @default_fps
+    @stop_stepping()
+    @stop_drawing()
 
   draw: ->
     @clear()

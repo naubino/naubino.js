@@ -56,6 +56,8 @@ export class StandardGame extends Game
       @number_of_colors = set['number_of_colors'] ? @number_of_colors
       @spammer_interval = set['interval']         ? @spammer_interval
 
+      Naubino.background.draw()
+
       #console.log "limit"            , set['limit']
       #console.log "basket size"      , @basket_size
       #console.log "number of colors" , @number_of_colors
@@ -75,7 +77,7 @@ export class StandardGame extends Game
     @cycle_found.add     (list)   => @destroy_naubs(list)
     @cycle_found.add     (list)   => @calculate_points(list)
     @naub_focused.add    (n)      => @active_tree = @graph.tree n.number
-    
+
     #Naubino.audio.connect_to_game this
     @number_of_colors = @default_number_of_colors = 3
     #@basket_size      = @default_basket_size      = 160
@@ -149,7 +151,7 @@ export class StandardGame extends Game
     capacity = @capacity()
     critical_capacity = 45
 
-    # start warning 
+    # start warning
     if capacity < critical_capacity
       if Naubino.background.pulsating == off
         Naubino.background.pulse()
@@ -172,6 +174,3 @@ export class StandardGame extends Game
     @spam() if @inner_clock == 0
     @inner_clock = (@inner_clock + 1) % @spammer_interval
     @spammer_interval
-
-
-

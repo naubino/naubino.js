@@ -6,6 +6,8 @@ import { Ball, StringShape, PlayButton, PauseButton, MainButton } from "./Shapes
 import {Factory} from "./Factory"
 
 export class Menu extends Layer
+  DEFAULT_STEP_RATE = 40
+
   constructor: (canvas) ->
     super(canvas)
     @name = "menu"
@@ -30,6 +32,8 @@ export class Menu extends Layer
 
     @min_fps = 3
 
+    @step_rate = @default_step_rate = DEFAULT_STEP_RATE
+
     @setup_fsm()
 
   # changing the state a little
@@ -37,6 +41,7 @@ export class Menu extends Layer
     @add_buttons()
     @start_stepping()
     @start_drawing()
+    @deactivate_menu()
 
   buttons:
     main:
@@ -74,6 +79,7 @@ export class Menu extends Layer
         @objects.play.shapes.pop()
         @objects.play.add_shape new PlayButton
         @objects.play.update()
+      @draw()
 
   step: ->
     for name, naub of @objects
@@ -85,9 +91,10 @@ export class Menu extends Layer
         naub.isClickable = no
 
   ## can I touch this?
-  move_pointer: (x,y) ->
+  move_pointer: (x,y) =>
     @opened_without_interaction = no
     [@pointer.x, @pointer.y] = [x,y]
+    @draw_listener_region()
 
   click: (x, y) =>
     @mousedown = true
@@ -128,6 +135,8 @@ export class Menu extends Layer
       @deactivation_timeout = null
     else
       @refresh_draw_rate @default_fps
+      @start_stepping()
+      @start_drawing()
 
     @listener_size = 90
 
@@ -140,7 +149,8 @@ export class Menu extends Layer
     unless @deactivation_timeout?
       @deactivation_timeout = setTimeout (
         =>
-          @refresh_draw_rate @min_fps
+          @stop_stepping()
+          @stop_drawing()
           @deactivation_timeout = null
       ),1000
 
