@@ -91,7 +91,7 @@ export class Factory
     naub_a = factory1 pos_a, color_a
     naub_b = factory2 pos_b, color_b
 
-    naub_a.join_with naub_b
+    naub_a.join_with(naub_b, "silent")
     [naub_a.color_id, naub_b.color_id]
 
   # create a triple of joined naubs

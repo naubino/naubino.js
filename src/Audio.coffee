@@ -35,5 +35,6 @@ export class Audio
     source.start 0
 
   connect_to_game: (game) ->
+    game.naub_joined.add @random_blub
     game.naub_replaced.add @random_blub
     game.naub_destroyed.add @random_blub

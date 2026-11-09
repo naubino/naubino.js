@@ -66,6 +66,7 @@ export class Game extends Layer
     @mouseBody         = @physics.mouseBody
     @GRABABLE_MASK_BIT = @physics.GRABABLE_MASK_BIT
     @NOT_GRABABLE_MASK = @physics.NOT_GRABABLE_MASK
+    @naub_joined       = @world.naub_joined
     @naub_destroyed    = @world.naub_destroyed
     @naub_focused      = @world.naub_focused
     @naub_unfocused    = @world.naub_unfocused
@@ -77,9 +78,9 @@ export class Game extends Layer
     # gameplay
     @game_draw       = new Naubino.Signal()
     @naub_replaced   = new Naubino.Signal()
-    @naub_joined     = new Naubino.Signal()
     @cycle_found     = new Naubino.Signal()
     @world.reset_signals()
+    @naub_joined    = @world.naub_joined
     @naub_destroyed = @world.naub_destroyed
 
     #chipmunk

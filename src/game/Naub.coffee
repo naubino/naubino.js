@@ -352,7 +352,7 @@ export class Naub
 
 
   # do things a naub is supposed to do
-  join_with: (other) ->
+  join_with: (other, silent = false) ->
     if typeof other == 'number'
       other = @layer.get_object other
 
@@ -371,7 +371,9 @@ export class Naub
       @drawing_join[join]      = true
       other.drawing_join[join] = false
 
-      @layer.naub_joined.dispatch() if @layer.naub_joined?
+      if !silent
+        @layer.naub_joined.dispatch() if @layer.naub_joined?
+
       join
     else
       -1

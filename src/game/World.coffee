@@ -15,6 +15,7 @@ export class World
 
   # new signals, so last game's listeners are gone
   reset_signals: ->
+    @naub_joined    = new Naubino.Signal()
     @naub_destroyed = new Naubino.Signal()
     @naub_focused   = new Naubino.Signal()
     @naub_unfocused = new Naubino.Signal()
