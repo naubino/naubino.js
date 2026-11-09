@@ -26,7 +26,7 @@ export class Naubino
 
   constructor: (@mode = new StandardMode) ->
 
-    @name = "Naubino (unstable master)"
+    @name = "Naubino (#{import.meta.env.MODE})"
     @settings = Settings
 
     @Signal = Signal
