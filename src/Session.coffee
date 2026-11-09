@@ -1,5 +1,6 @@
 # Coordinates the game, menu, and visual layers through one lifecycle FSM.
 export class Session
+
   constructor: ({@game, @menu, @overlay, @background, @transitions, @events, @name = 'Naubino', @on_finished = ->}) ->
     @disposed = no
     StateMachine.create {

@@ -12,10 +12,9 @@ window.onload = ->
   naubino = window.Naubino = new Naubino(mode, '#gamediv')
   naubino.setup()
   naubino.apply_color_scheme()
-  document.querySelector("#highscorelink").addEventListener "click", -> confirm "do you want to leave this page?"
+  document.querySelector("#highscorelink").addEventListener("click", -> confirm "do you want to leave this page?")
 
-  matchMedia("(prefers-color-scheme: dark)").addEventListener "change", ->
-    naubino.apply_color_scheme()
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", -> naubino.apply_color_scheme())
 
   if navigator.maxTouchPoints > 0 and matchMedia("(pointer: coarse)").matches
     document.documentElement.classList.add "touch"
@@ -54,10 +53,7 @@ window.onload = ->
   colors_select.addEventListener "change", ->
     naubino.settings.color = this.value
     if this.value == 'high_contrast'
-      naubino.settings.graphics.draw_borders_old = naubino.settings.graphics.draw_borders
       naubino.settings.graphics.draw_borders = true
-    else if naubino.settings.graphics.draw_borders_old?
-      naubino.settings.graphics.draw_borders = naubino.settings.graphics.draw_borders_old
     naubino.apply_color_scheme()
     naubino.menu.for_each (naub) -> naub.recolor()
     naubino.game.for_each (naub) -> naub.recolor()

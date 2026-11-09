@@ -23,14 +23,12 @@ import {Events} from './Events'
 import {Audio} from './Audio'
 
 export class Naubino
+  name: "Naubino (#{import.meta.env.MODE})"
+  events: new Events()
+  settings: Settings
+  Signal: Signal
 
   constructor: (@mode = new StandardMode, @root_element_id) ->
-    @name = "Naubino (#{import.meta.env.MODE})"
-    @settings = Settings
-
-    @Signal = Signal
-    @events = new Events
-
 
     @load_highscores()
     @audio = new Audio(@settings)
@@ -57,8 +55,6 @@ export class Naubino
     string = JSON.stringify @scores
     localStorage.setItem("naubino_hiscore",string)
 
-
-
   setup: ->
     @setup_dom()
     @setup_components()
@@ -70,7 +66,9 @@ export class Naubino
     console.timeEnd("loading")
 
   color_scheme: -> @settings.colors[@settings.color]
-  colors: -> @color_scheme().naubs
+  colors: ->
+    @color_scheme()
+
   recolor: -> @game.for_each (naub) -> naub.recolor()
 
   # pushes the active scheme's background onto the page so CSS (e.g.
@@ -80,6 +78,7 @@ export class Naubino
   apply_color_scheme: ->
     color = Util.color_to_rgba @color_scheme().background()
     document.documentElement.style.setProperty '--canvas-background-color', color
+    @recolor()
 
   print: -> @viewport.container.insertAdjacentHTML("afterend","<img src=\"#{@game.canvas.toDataURL()}\"/>")
 
@@ -109,13 +108,13 @@ export class Naubino
 
   setup_session: ->
     @session = new Session {
-      game: @game
-      menu: @menu
-      overlay: @overlay
-      background: @background
+      @game
+      @menu
+      @overlay
+      @background
       transitions: @settings.events
-      events: @events
-      name: @name
+      @events
+      @name
       on_finished: (score) => @finish_run score
     }
 

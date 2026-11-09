@@ -68,7 +68,9 @@ export Util =
 
   isTouch: -> document.documentElement.classList.contains "touch"
 
-  isDarkMode: -> matchMedia("(prefers-color-scheme: dark)").matches
+  isDarkMode: ->
+    console.log("dark?", matchMedia("(prefers-color-scheme: dark)").matches)
+    matchMedia("(prefers-color-scheme: dark)").matches
 
 
 

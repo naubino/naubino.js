@@ -101,7 +101,7 @@ export Settings = {
     fade_duration: 1 # in seconds
 
   color: "output"
-  #please sort colors by
+  #plase sort colors by
   # red
   # green
   # blue
@@ -109,7 +109,7 @@ export Settings = {
   # misc...
   # a palett must have 7 colors
   colors: {
-    output: new ColorScheme [
+    output: new ColorScheme({naubs:[
       # [RRR, GGG, BBB, alpha, name,    is_background,    is_joincolor ]
       [229,  53,  23, 1, "red"      ]
       [151, 190,  13, 1, "green"    ]
@@ -117,9 +117,10 @@ export Settings = {
       [255, 204,   0, 1, "yellow"   ]
       [226,   0, 122, 1, "pink"     ]
       [100,  31, 128, 1, "purple"   ]
-      [ 91,  42,   3, 1, "tell me"  ] # (brown)
-    ]
-    high_contrast: new ColorScheme [
+      [ 91,  42,   13, 1, "tell me"  ] # (brown)
+      [ 61,  4,   3, 1, "tell me"  ] # (brown)
+    ], warn: "red"})
+    high_contrast: new ColorScheme({naubs: [
       [255,   0,   0, 1, "hcred"    ]
       [  0, 224,   0, 1, "hcgreen"  ]
       [  0, 128, 224, 1, "hcblue"   ]
@@ -127,22 +128,22 @@ export Settings = {
       [  0,   0,   0, 1, "hcblack"  ]
       [255, 255, 255, 1, "hcwhite"  ]
       [128,   0, 128, 1, "hcpurple" ]
-    ]
-    pop_is_everything: new ColorScheme [
+    ], warn: "hcred"})
+    pop_is_everything: new ColorScheme({naubs: [
      [ 255,   0, 170, 1, "Hue 320 Degrees"]
      [ 170, 255,   0, 1, "Hue 80 Degrees"]
      [   0, 170, 255, 1, "Hue 200 Degrees"]
      [ 255, 170,   0, 1, "Norad Orange"]
      [ 170,   0, 255, 1, "Hue 280 Degrees"]
-    ]
-    normal_colors: new ColorScheme [
+    ], warn: 0})
+    normal_colors: new ColorScheme({naubs: [
      [255,   0,   0, 1, "red"         ]
      [255, 153,   0, 1, "Vitamin C"   ]
      [  0, 153, 204, 1, "Office Blue" ]
      [  0, 204,   0, 1, "Astroturf"   ]
      [255, 255,   0, 1, "Yellow"      ]
      [  0,   0,   0, 1, "black" ]
-    ]
+    ]})
     #cuddle_bunny: new ColorScheme [ # http://www.colourlovers.com/palette/124912/Cuddle_Bunny
     #  [174,  49,  45, 1, "cuddling red"    ]
     #  [ 75, 136,  95, 1, "cuddling green"  ]
@@ -152,7 +153,7 @@ export Settings = {
     #  [  0,   0,   0, 0.5, "black" ]
     #]
     # http://www.colourlovers.com/palette/1712615/70 (modified & extended)
-    '70': new ColorScheme [
+    '70': new ColorScheme({naubs: [
      [166,  30,  30, 1] # dr
      [ 38, 110, 128, 1] # lb
      [ 71,  44,  33, 1] # brown
@@ -161,10 +162,11 @@ export Settings = {
      [ 12,  47,  56, 1] # db
      [110, 155,  88, 1] # lg
     ],
-      { background: [237, 224, 194, 1, "70 cream"], foreground: [41, 14, 3, 1, "brown"] },
-      { background: [41, 14, 3, 1, "brown"], foreground: [237, 224, 194, 1, "70 cream"] }
+      light : { background: [237, 224, 194, 1, "70 cream"], foreground: [41, 14, 3, 1, "brown"] },
+      dark: { background: [41, 14, 3, 1, "brown"], foreground: [237, 224, 194, 1, "70 cream"] }
+    })
     # http://www.colourlovers.com/palette/433018 (EXTENDED)
-    'Gasoline Rainbow': new ColorScheme [
+    'Gasoline Rainbow': new ColorScheme({naubs: [
      [189,  42,  51, 1] # RED
      [147, 163,  28, 1] # GREEN
      [ 48,  55,  79, 1] # BLUE
@@ -172,7 +174,7 @@ export Settings = {
      [ 64, 129,  86, 1] # CYAN
      [130,  65, 108, 1] # PURPLE
      [188,  86,  43, 1] # ORANGE
-    ]
+    ]})
     #lip: new ColorScheme [
     #  [125,  97,  83, 1]
     #  [147, 208, 189, 1]

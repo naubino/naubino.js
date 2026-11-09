@@ -71,7 +71,7 @@ export class Overlay extends Layer
     else
       qcallback() if qcallback?
 
-  warning: (text) -> @fade_in_message {text: text, fontsize: 45, color: Util.color_to_rgba(Naubino.colors()[0])}
+  warning: (text) -> @fade_in_message {text: text, fontsize: 45, color: Util.color_to_rgba(Naubino.colors().warn)}
 
   reset_osd: (text) ->
     @objects['OSD'] = new TextBuffer text, this

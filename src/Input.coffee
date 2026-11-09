@@ -3,7 +3,7 @@ import {Settings} from './config/Settings'
 
 KEYS =
   SPACE: 32, ESC: 27
-  C: 67, E: 69, F: 70, M: 77
+  C: 67, E: 69, F: 70, M: 77, S: 83
 
 export class Input
   constructor: ({@canvas, @viewport, @events, @keyboard_target = window}) ->
@@ -15,6 +15,7 @@ export class Input
     @keybindings.enable KEYS.E, => Settings.toggle 'graphics.effects'
     @keybindings.enable KEYS.M, => Settings.toggle 'audio.muted'
     @keybindings.enable KEYS.C, => Settings.toggle 'graphics.draw_constraints'
+    @keybindings.enable KEYS.S, => Settings.toggle 'graphics.draw_constraints'
 
     @gesture = null
     @suppress_mouse_until = 0

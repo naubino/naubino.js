@@ -49,7 +49,7 @@ export class Naub
       width: 6
     }
 
-    palette = Naubino.colors()
+    palette = Naubino.colors().palette()
     color_id = @color_id % palette.length
     pick = palette[color_id]
     if pick?
@@ -65,7 +65,7 @@ export class Naub
 
   # colors the shape randomly and returns color id for comparison
   set_random_palette_color: ->
-    palette = Naubino.colors()
+    palette = Naubino.colors().palette()
     @color_id = Math.floor(Math.random() * (palette.length))
     @recolor()
 

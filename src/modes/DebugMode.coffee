@@ -42,7 +42,7 @@ export class DebugMode extends Mode
   dispose: -> @end_spawning()
 
   spawn_pair: (game) ->
-    color_count = Naubino.colors().length
+    color_count = Naubino.colors().palette().length
     color_a = Math.floor(Math.random() * color_count)
     color_b = Math.floor(Math.random() * color_count)
     pos = new cp.v(game.width * (0.35 + Math.random() * 0.3), game.height * (0.35 + Math.random() * 0.3))

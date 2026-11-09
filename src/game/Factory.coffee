@@ -21,9 +21,9 @@ export class Factory
     #@layer.graph.remove_join naub.join_with( @objects.main, name ) # add the object without managing the join
     naub
 
-  
+
   # factory for a naub ball
-  # 
+  #
   # @param pos [cp.v] position
   # @param color [int]  color_id
   add_ball: (pos = @random_outside(), color = null) =>
@@ -42,7 +42,7 @@ export class Factory
 
 
   # factory for a naub box
-  # 
+  #
   # @param pos [cp.v] position
   # @param color [int]  color_id
   add_box: (pos = @random_outside(), color = null) =>
@@ -81,14 +81,11 @@ export class Factory
     pos_b.AddPolar(dir, -15)
 
     if boxes == 0
-      console.log('0 boxes')
       factory1 = factory2 = @add_ball
     else if boxes == 1
-      console.log('1 boxe')
       factory1 = @add_ball
       factory2 = @add_box
     else
-      console.log('2 boxes')
       factory1 = factory2 = @add_box
 
     naub_a = factory1 pos_a, color_a
@@ -161,7 +158,7 @@ export class Factory
         y = 0 - offset
     new cp.v x,y
 
-  #returns a random 
+  #returns a random
   random_factory: ->
     factories = [
       @add_ball
@@ -170,4 +167,3 @@ export class Factory
     #console.log 'i',
     i = Math.floor(Math.random() * (factories.length))
     factories[i]
-

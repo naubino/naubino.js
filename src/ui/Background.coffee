@@ -18,7 +18,7 @@ export class Background extends Layer
 
   set_defaults: ->
     @p_min= { color: [130,130,130], thick: 2 }
-    @p_max= { color: Naubino.colors()[0], thick: 12 }
+    @p_max= { color: Naubino.colors().warn, thick: 12 }
 
     @target = undefined
     @default_thickness = @basket_thickness = 4
