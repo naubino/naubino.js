@@ -40,6 +40,7 @@ export class Menu extends Layer
   dispose: ->
     unsubscribe() for unsubscribe in @input_subscriptions
     @input_subscriptions = []
+
     clearTimeout @deactivation_timeout if @deactivation_timeout?
     @stop_stepping()
     @stop_drawing()
@@ -149,7 +150,6 @@ export class Menu extends Layer
     else
       @refresh_draw_rate @default_fps
       @start_stepping()
-      @start_drawing()
 
     @listener_size = 90
 
@@ -163,7 +163,6 @@ export class Menu extends Layer
       @deactivation_timeout = setTimeout (
         =>
           @stop_stepping()
-          @stop_drawing()
           @deactivation_timeout = null
       ),1000
 
