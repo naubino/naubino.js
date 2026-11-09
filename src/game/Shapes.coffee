@@ -234,6 +234,26 @@ export class PauseButton extends Shape
     ctx.fill()
     ctx.restore()
 
+export class ClearButton extends Shape
+  draw: (ctx, x ,y) ->
+    ctx.save()
+    ctx.translate x, y
+    ctx.fillStyle = '#ffffff'
+    ctx.strokeStyle = '#ffffff'
+    ctx.lineCap = 'round'
+    ctx.lineWidth = 4
+
+    s = 5
+
+    ctx.beginPath()
+    ctx.moveTo(  -s, -s)
+    ctx.lineTo( s,  s)
+    ctx.stroke()
+    ctx.moveTo( s, -s)
+    ctx.lineTo( -s,  s)
+    ctx.stroke()
+    ctx.restore()
+
 
 export class MainButton extends Box
   draw: (ctx, x, y) ->

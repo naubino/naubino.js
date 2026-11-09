@@ -61,7 +61,7 @@ export class Menu extends Layer
     play:
       command: 'play'
       position: new cp.v(70,32)
-      shapes: [new Ball, new PlayButton]
+      shapes: [ new PlayButton]
     help:
       function: -> alert("tutorial deactivated")#Naubino.tutorial()
       position: new cp.v(55,65)
@@ -69,7 +69,7 @@ export class Menu extends Layer
     exit:
       command: 'stop'
       position: new cp.v(20,80)
-      shapes: [new Ball, new StringShape "X", "white"]
+      shapes: [new ClearButton]
 
   command_callback: (command) -> => @events.commands[command].dispatch()
 
@@ -131,6 +131,7 @@ export class Menu extends Layer
     @draw_listener_region()
 
   draw_menu: ->
+    return unless @objects.main?
     @clear()
     @ctx.save()
     for name, naub of @objects
