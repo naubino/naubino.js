@@ -15,7 +15,7 @@ export class Audio
     probe = document.createElement 'audio'
     if probe.canPlayType('audio/ogg') isnt '' then 'ogg' else 'mp3'
 
-  constructor: ->
+  constructor: (@settings) ->
     @ctx = new AudioContext()
     @buffers = []
     @_load()
@@ -26,6 +26,7 @@ export class Audio
       @ctx.decodeAudioData await (await fetch("#{@path}#{name}.#{fmt}")).arrayBuffer()
 
   random_blub: =>
+    return if @settings.audio.muted
     return unless @buffers.length
     si = @i++ % @buffers.length
     source = @ctx.createBufferSource()

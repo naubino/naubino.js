@@ -34,7 +34,7 @@ export class Naubino
 
 
     @load_highscores()
-    @audio = new Audio
+    @audio = new Audio(@settings)
 
   load_highscores: ->
     string = localStorage.getItem("naubino_hiscore")
