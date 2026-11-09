@@ -1,11 +1,9 @@
 export class Audio
 
   path: "sound/"
-  blubs:[]
-  pool: 10
   i: 0
 
-  blub_paths:  [
+  blub_names: [
     "8000__cfork__cf-fx-bloibb"
     "8001__cfork__cf-fx-doppp-01"
     "8003__cfork__cf-fx-doppp-03-dry"
@@ -13,14 +11,27 @@ export class Audio
     "8009__cfork__cf-fx-plopp-02"
   ]
 
-  random_blub: =>
-    #i = Math.floor Math.random() * @blubs.length
-    i = @i++ % @blubs.length
-    @blubs[i].play()
+  _pick_format: ->
+    probe = document.createElement 'audio'
+    if probe.canPlayType('audio/ogg') isnt '' then 'ogg' else 'mp3'
 
   constructor: ->
-    for file, index in @blub_paths
-      @blubs[index] = AudioFX(@path+file, { formats: ['ogg','mp3'], pool: @pool } )
+    @ctx = new AudioContext()
+    @buffers = []
+    @_load()
+
+  _load: ->
+    fmt = @_pick_format()
+    @buffers = await Promise.all @blub_names.map (name) =>
+      @ctx.decodeAudioData await (await fetch("#{@path}#{name}.#{fmt}")).arrayBuffer()
+
+  random_blub: =>
+    return unless @buffers.length
+    si = @i++ % @buffers.length
+    source = @ctx.createBufferSource()
+    source.buffer = @buffers[si]
+    source.connect @ctx.destination
+    source.start 0
 
   connect_to_game: (game) ->
     game.naub_replaced.add @random_blub

@@ -2,6 +2,9 @@ import {ColorScheme} from "./ColorScheme"
 # all colors (except color_output) found at colorlovers.com
 export Settings = {
 
+  audio:
+    muted: no
+
   graphics:
     fps:           35 # mind stepper_rate
     updating:      yes

@@ -300,6 +300,40 @@ export class MainButton extends Box
     ctx.restore()
 
 
+export class SoundButton extends Shape
+  constructor: (@muted_fn) ->
+    super()
+
+  draw: (ctx, x, y) ->
+    ctx.save()
+    ctx.translate x-2, y
+    ctx.fillStyle = '#ffffff'
+    ctx.strokeStyle = '#ffffff'
+    ctx.lineWidth = 2.5
+    ctx.lineCap = 'round'
+
+    # square body (-7..-2, ±4) + triangle cone (-2..+5, ±8), total width 12 centered at -1
+    ctx.beginPath()
+    ctx.rect(-7, -4, 5, 8)      # square
+    ctx.moveTo(-2, -4)
+    ctx.lineTo( 5, -8)
+    ctx.lineTo( 5,  8)
+    ctx.lineTo(-2,  4)
+    ctx.closePath()
+    ctx.fill()
+
+    if @muted_fn()
+      ctx.beginPath()
+      ctx.moveTo(  7, -3)
+      ctx.lineTo( 13,  3)
+      ctx.stroke()
+      ctx.moveTo( 13, -3)
+      ctx.lineTo( 7,  3)
+      ctx.stroke()
+
+    ctx.restore()
+
+
 export class StringShape extends Shape
   constructor: (@string, @color = "black") ->
     super()

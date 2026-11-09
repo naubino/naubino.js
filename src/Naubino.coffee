@@ -20,6 +20,7 @@ import {StandardMode} from './modes/standard/StandardMode'
 import {Util} from './core/Util'
 import {Signal} from './core/Signal'
 import {Events} from './Events'
+import {Audio} from './Audio'
 
 export class Naubino
 
@@ -33,7 +34,7 @@ export class Naubino
 
 
     @load_highscores()
-    #@audio = new Audio
+    @audio = new Audio
 
   load_highscores: ->
     string = localStorage.getItem("naubino_hiscore")

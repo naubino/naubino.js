@@ -20,7 +20,7 @@ window.onload = ->
     document.documentElement.classList.add "touch"
     document.querySelector("#maximizeCheck").checked = true
     naubino.menu.open()
-
+    naubino.play()
 
   maximize_check = document.querySelector '#maximizeCheck'
   fullscreen_check = document.querySelector '#fullScreenCheck'

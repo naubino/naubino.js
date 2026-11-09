@@ -1,8 +1,7 @@
-# TODO clean up menu code -- will do in naub_rethought
+# TODO clean up menu code
 import {Layer} from "../core/Layer"
-import {Naub} from "../game/Naub"
 import {Graph} from "../game/Graph"
-import { Ball, StringShape, PlayButton, PauseButton, MainButton } from "../game/Shapes"
+import { SoundButton, PlayButton, PauseButton, MainButton, ClearButton } from "../game/Shapes"
 import {Factory} from "../game/Factory"
 
 export class Menu extends Layer
@@ -62,10 +61,10 @@ export class Menu extends Layer
       command: 'play'
       position: new cp.v(70,32)
       shapes: [ new PlayButton]
-    help:
-      function: -> alert("tutorial deactivated")#Naubino.tutorial()
+    mute:
+      function: -> Naubino.audio.toggle_mute()
       position: new cp.v(55,65)
-      shapes: [new Ball, new StringShape "?", "white"]
+      shapes: [new SoundButton -> Naubino.settings.audio.muted]
     exit:
       command: 'stop'
       position: new cp.v(20,80)
