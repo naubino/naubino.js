@@ -1,4 +1,5 @@
 import {Naubino} from './Naubino'
+import {Settings} from './config/Settings'
 import {StandardMode} from './modes/standard/StandardMode'
 import {DebugMode} from './modes/DebugMode'
 import {Util} from './core/Util'
@@ -8,11 +9,14 @@ console.time("loading")
 
 
 window.onload = ->
+  Settings.load_from_search window.location.search
   mode = modeFromSearch window.location.search
   naubino = window.Naubino = new Naubino(mode, '#gamediv')
   naubino.setup()
   naubino.apply_color_scheme()
   document.querySelector("#highscorelink").addEventListener("click", -> confirm "do you want to leave this page?")
+  document.querySelector("#parameterslink").addEventListener "click", -> document.querySelector("#parametersdialog").showModal()
+  document.querySelector("#closeparameters").addEventListener "click", -> document.querySelector("#parametersdialog").close()
 
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", -> naubino.apply_color_scheme())
 

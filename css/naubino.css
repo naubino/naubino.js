@@ -135,3 +135,23 @@ select.btn {
     height: 1.6em;
     width: 120px;
 }
+
+dialog#parametersdialog {
+    color: inherit;
+    background-color: var(--game-background-color);
+    border: 1px solid currentColor;
+    max-width: min(32rem, calc(100% - 2rem));
+    width: 32rem;
+}
+
+dialog#parametersdialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+dialog#parametersdialog h2 {
+    margin-top: 0;
+}
+
+dialog#parametersdialog li {
+    margin-bottom: 0.4rem;
+}

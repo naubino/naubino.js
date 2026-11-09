@@ -52,7 +52,23 @@
 
       <a class="btn btn-mini" id="highscorelink" href="highscore.html">HighScore</a>
 
+      <button class="btn btn-mini" id="parameterslink" type="button">?</button>
+
     </form>
+
+    <dialog id="parametersdialog">
+      <h2>Parameters</h2>
+      <p>Set these query parameters in the page URL to configure the game.</p>
+      <ul>
+        <li><code>mode=standard</code> or <code>mode=debug</code></li>
+        <li><code>high_contrast=true</code></li>
+        <li><code>colorscheme=output</code>, <code>high_contrast</code>, <code>pop_is_everything</code>, <code>normal_colors</code>, <code>70</code>, or <code>Gasoline%20Rainbow</code></li>
+        <li><code>sounds=on</code> or <code>sounds=off</code></li>
+        <li><code>show_fps=true</code> or <code>show_fps=false</code></li>
+        <li><code>draw_constraints=true</code> or <code>draw_constraints=false</code></li>
+      </ul>
+      <button id="closeparameters" type="button">Close</button>
+    </dialog>
 
     <div id="gamediv">
     </div>

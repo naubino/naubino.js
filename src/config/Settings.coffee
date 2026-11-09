@@ -211,6 +211,24 @@ Settings.set = (path, value) ->
 
 Settings.toggle = (path) -> Settings.set path, not Settings.get path
 
+Settings.load_from_search = (search = '') ->
+  params = new URLSearchParams search
+  setBooleanParam = (name, path) ->
+    value = params.get name
+    return unless value is 'true' or value is 'false'
+    Settings.set path, value is 'true'
+
+  colorscheme = params.get 'colorscheme'
+  Settings.set 'color', colorscheme if colorscheme? and Settings.colors[colorscheme]?
+  switch params.get 'sounds'
+    when 'on' then Settings.set 'audio.muted', no
+    when 'off' then Settings.set 'audio.muted', yes
+  if params.get('high_contrast') is 'true'
+    Settings.set 'color', 'high_contrast'
+    Settings.set 'graphics.draw_borders', yes
+  setBooleanParam 'show_fps', 'graphics.show_fps'
+  setBooleanParam 'draw_constraints', 'graphics.draw_constraints'
+
 # returns an unsubscribe function
 Settings.watch = (path, cb) ->
   (watchers[path] ?= []).push cb
