@@ -9,7 +9,7 @@ console.time("loading")
 
 window.onload = ->
   mode = modeFromSearch window.location.search
-  naubino = window.Naubino = new Naubino mode
+  naubino = window.Naubino = new Naubino(mode, '#gamediv')
   naubino.setup()
   naubino.apply_color_scheme()
   document.querySelector("#highscorelink").addEventListener "click", -> confirm "do you want to leave this page?"

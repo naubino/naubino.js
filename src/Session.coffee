@@ -12,7 +12,7 @@ export class Session
       @events.commands.play.add (args...) => @play args...
       @events.commands.pause.add (args...) => @pause args...
       @events.commands.stop.add (args...) => @stop args...
-      @events.commands.toggle.add => @toggle()
+      @events.commands.toggle.add (args...) => @toggle(args...)
       @events.game.outcome.add (reason) => @report_outcome reason
     ]
 
@@ -22,12 +22,12 @@ export class Session
     unsubscribe() for unsubscribe in @subscriptions
     @subscriptions = []
 
-  # switching between pause and play
-  toggle: ->
-    switch @current
-      when 'playing' then @pause()
-      when 'paused'  then @play()
-      when 'stopped' then @play()
+  # # switching between pause and play
+  # toggle: ->
+  #   switch @current
+  #     when 'playing' then @pause()
+  #     when 'paused'  then @play()
+  #     when 'stopped' then @play()
 
   oninit: ->
     layer.init() for layer in [@background, @game, @menu, @overlay]
@@ -39,7 +39,8 @@ export class Session
   onleavestopped: ->
     @menu.play()
 
-  onplay: (event, from, to) ->
+  onplaying: (event, from, to) ->
+    console.info("session playing")
     layer.play() for layer in [@game, @overlay, @background]
     @menu.check_game_state @game
 
@@ -48,7 +49,7 @@ export class Session
       return false unless layer.can 'pause'
     true
 
-  onpause: (event, from, to) ->
+  onpaused: (event, from, to) ->
     layer.pause() for layer in [@game, @overlay, @background]
     @menu.check_game_state @game
 

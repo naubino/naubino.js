@@ -53,7 +53,7 @@ export class Layer
     @start_drawing()
     @start_stepping()
 
-  onpause: (e,f,t) ->
+  onpaused: (e,f,t) ->
     @stop_stepping()
     @stop_drawing()
 

@@ -24,8 +24,7 @@ import {Audio} from './Audio'
 
 export class Naubino
 
-  constructor: (@mode = new StandardMode) ->
-
+  constructor: (@mode = new StandardMode, @root_element_id) ->
     @name = "Naubino (#{import.meta.env.MODE})"
     @settings = Settings
 
@@ -81,10 +80,11 @@ export class Naubino
   apply_color_scheme: ->
     color = Util.color_to_rgba @color_scheme().background()
     document.documentElement.style.setProperty '--canvas-background-color', color
+
   print: -> @viewport.container.insertAdjacentHTML("afterend","<img src=\"#{@game.canvas.toDataURL()}\"/>")
 
   setup_dom: ->
-    container = document.querySelector '#gamediv'
+    container = document.querySelector @root_element_id
     form = document.querySelector 'form'
     @viewport = new Viewport container, @settings.canvas, {
       centered_elements: if form? then [form] else []
@@ -119,13 +119,13 @@ export class Naubino
       on_finished: (score) => @finish_run score
     }
 
-
+  # state machine forwarding
   init:   (args...) -> @session.init args...
   play:   (args...) -> @session.play args...
   pause:  (args...) -> @session.pause args...
   stop:   (args...) -> @session.stop args...
   loose:  (args...) -> @session.loose args...
-  toggle: -> @session.toggle()
+  toggle: (args...)-> @session.toggle(args...)
   can:    (event) -> @session.can event
 
   start_loop: -> @loop.start()

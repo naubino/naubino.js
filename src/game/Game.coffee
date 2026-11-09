@@ -73,7 +73,7 @@ export class Game extends Layer
   oninit: (e,f,t) ->
     @cancel_destroy_batches()
     @mode.reset? this
-    console.log "game INIT"
+    console.log "Game INIT from '#{f}'"
     # gameplay
     @game_draw       = new Naubino.Signal()
     @naub_replaced   = new Naubino.Signal()

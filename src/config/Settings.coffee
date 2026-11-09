@@ -66,6 +66,11 @@ export Settings = {
         { name: 'play',   from: ['paused','stopped'], to: 'playing'}
         { name: 'pause',  from: ['paused','playing'], to: 'paused' }
         { name: 'stop',   from: '*',                  to: 'stopped'}
+        { name: 'toggle', from: ['playing'], to: 'paused'  }
+        { name: 'toggle', from: ['paused'],  to: 'playing' }
+        { name: 'toggle', from: ['playing'], to: 'paused'  }
+        { name: 'toggle', from: ['paused'],  to: 'playing' }
+        { name: 'toggle', from: ['stopped'], to: 'playing' }
       ]
 
     # game also has these:
