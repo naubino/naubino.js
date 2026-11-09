@@ -80,10 +80,14 @@ export class Game extends Layer
     @naub_joined     = new Naubino.Signal()
     @cycle_found     = new Naubino.Signal()
     @world.reset_signals()
+    @naub_destroyed = @world.naub_destroyed
 
     #chipmunk
     @setup_physics()
     @space.defaultHandler = new CollisionHandler this
+
+    # audio
+    Naubino.audio.connect_to_game this
 
     rule.init() for rule in @rules
     @mode.init this
