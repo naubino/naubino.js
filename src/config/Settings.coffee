@@ -117,7 +117,7 @@ export Settings = {
       [255, 204,   0, 1, "yellow"   ]
       [226,   0, 122, 1, "pink"     ]
       [100,  31, 128, 1, "purple"   ]
-      [ 41,  14,   3, 1, "tell me"  ] # (brown)
+      [ 91,  42,   3, 1, "tell me"  ] # (brown)
     ]
     high_contrast: new ColorScheme [
       [255,   0,   0, 1, "hcred"    ]
