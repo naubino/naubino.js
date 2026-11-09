@@ -22,6 +22,9 @@ export class Spawner extends Rule
 
     @inner_clock = 0 # to avoid resetting timer after pause
 
+    # spam the first naubs earlier
+    @spam()
+
   start: ->
     @spamming = setInterval @event, 100 unless @spamming
 
