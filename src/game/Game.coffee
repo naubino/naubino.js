@@ -220,9 +220,11 @@ export class Game extends Layer
     # draws joins and naubs seperately
     @ctx.save()
 
-    @draw_constraints()
-    #@draw_point @pointer
-    #@draw_point @mouseBody.p, "blue"
+    if Naubino.settings.graphics.draw_constraints
+        @draw_constraints()
+    if Naubino.settings.graphics.draw_pointer
+        @draw_point @pointer
+        # @draw_point @mouseBody.p, "blue"
 
     for id, obj of @objects
       obj.draw_joins @ctx
