@@ -1,5 +1,14 @@
 import {ColorScheme} from "./ColorScheme"
-# all colors (except color_output) found at colorlovers.com
+
+watchers = {}
+
+resolve = (root, path) ->
+  keys = path.split '.'
+  last = keys.pop()
+  obj = root
+  obj = obj[key] for key in keys
+  [obj, last]
+
 export Settings = {
 
   audio:
@@ -11,6 +20,7 @@ export Settings = {
     draw_shadows:  on
     draw_borders:  no
     effects:       on
+    fullscreen:    no
     show_fps:      no
     use_raf:       yes
     draw_constraints: no
@@ -179,3 +189,22 @@ export Settings = {
     # http://www.colourlovers.com/palette/1930/cheer_up_emo_kid
   }
 }
+
+# Writes that should notify go through set/toggle. Plain reads stay as they are.
+Settings.get = (path) ->
+  [obj, key] = resolve Settings, path
+  obj[key]
+
+Settings.set = (path, value) ->
+  [obj, key] = resolve Settings, path
+  return value if obj[key] is value
+  obj[key] = value
+  cb value for cb in (watchers[path] ? []).slice()
+  value
+
+Settings.toggle = (path) -> Settings.set path, not Settings.get path
+
+# returns an unsubscribe function
+Settings.watch = (path, cb) ->
+  (watchers[path] ?= []).push cb
+  -> watchers[path] = watchers[path].filter (f) -> f isnt cb

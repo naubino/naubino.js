@@ -63,7 +63,7 @@ export class Menu extends Layer
       position: new cp.v(70,32)
       shapes: [ new PlayButton]
     mute:
-      function: -> Naubino.audio.toggle_mute()
+      function: -> Naubino.settings.toggle 'audio.muted'
       position: new cp.v(55,65)
       shapes: [new SoundButton -> Naubino.settings.audio.muted]
     exit:

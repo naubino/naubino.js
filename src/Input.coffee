@@ -1,10 +1,21 @@
 import {KeyBindings} from './config/Keybindings'
+import {Settings} from './config/Settings'
+
+KEYS =
+  SPACE: 32, ESC: 27
+  C: 67, E: 69, F: 70, M: 77
 
 export class Input
   constructor: ({@canvas, @viewport, @events, @keyboard_target = window}) ->
     @keybindings = new KeyBindings()
-    @keybindings.enable 32, => @events.commands.toggle.dispatch()
-    @keybindings.enable 27, => @events.commands.stop.dispatch()
+
+    @keybindings.enable KEYS.SPACE, => @events.commands.toggle.dispatch()
+    @keybindings.enable KEYS.ESC, => @events.commands.stop.dispatch()
+    @keybindings.enable KEYS.F, => Settings.toggle 'graphics.fullscreen'
+    @keybindings.enable KEYS.E, => Settings.toggle 'graphics.effects'
+    @keybindings.enable KEYS.M, => Settings.toggle 'audio.muted'
+    @keybindings.enable KEYS.C, => Settings.toggle 'graphics.draw_constraints'
+
     @gesture = null
     @suppress_mouse_until = 0
     @bound = false

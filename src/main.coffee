@@ -2,6 +2,7 @@ import {Naubino} from './Naubino'
 import {StandardMode} from './modes/standard/StandardMode'
 import {DebugMode} from './modes/DebugMode'
 import {Util} from './core/Util'
+import {Controls} from './ui/Controls'
 window.Util = Util
 console.time("loading")
 
@@ -23,20 +24,22 @@ window.onload = ->
     naubino.play()
 
   maximize_check = document.querySelector '#maximizeCheck'
-  fullscreen_check = document.querySelector '#fullScreenCheck'
+
   layout_options = (fit = Util.isTouch()) ->
     maximized: maximize_check.checked or Util.isFullscreen()
     fit: fit
 
   maximize_check.addEventListener 'change', -> naubino.viewport.layout layout_options(true)
-  fullscreen_check.addEventListener 'change', -> Util.toggleFullscreen()
+
   window.addEventListener 'resize', -> naubino.viewport.schedule_layout layout_options()
   window.addEventListener 'orientationchange', -> naubino.viewport.schedule_layout layout_options(), 300
 
   naubino.viewport.layout layout_options(true)
 
-  # reflect initial settings in the UI (settings are the source of truth on load)
-  document.querySelector('#effectsCheck').checked = naubino.settings.graphics.effects == on
+  new Controls(naubino, on_layout: ->
+    naubino.viewport.layout layout_options(true)
+    naubino.viewport.schedule_layout layout_options()
+  ).bind()
 
 
   #populate color selector
@@ -61,13 +64,7 @@ window.onload = ->
     naubino.game.draw()
 
 
-  on_fullscreen_change = ->
-    fullscreen_check.checked = Util.isFullscreen()
-    naubino.viewport.layout layout_options(true)
-    naubino.viewport.schedule_layout layout_options()
 
-  for event in ["fullscreenchange", "webkitfullscreenchange", "mozfullscreenchange"]
-    document.addEventListener event, on_fullscreen_change, false
 
 modeFromSearch = (search = '') ->
   params = new URLSearchParams search

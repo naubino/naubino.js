@@ -71,40 +71,21 @@ export Util =
   isDarkMode: -> matchMedia("(prefers-color-scheme: dark)").matches
 
 
-  toggleEffects: ->
-    if document.querySelector('#effectsCheck').checked
-      Naubino.settings.graphics.effects = on
-      for layer in Naubino.layers
-        layer.refresh_draw_rate(layer.min_fps) if layer.min_fps?
-        layer.refresh_step_rate(layer.min_step_rate) if layer.min_step_rate?
-    else
-      Naubino.settings.graphics.effects = off
-      for layer in Naubino.layers
-        layer.refresh_draw_rate(layer.default_fps)
-        layer.refresh_step_rate(layer.default_step_rate)
-
-  toggleFullscreen: ->
-    if document.querySelector('#fullScreenCheck').checked
-      @requestFullscreen()
-    else
-      @exitFullscreen()
-
 
   # https://developer.mozilla.org/en/DOM/Using_full-screen_mode
   isFullscreen: ->
     !!(document.fullscreenElement or document.webkitFullscreenElement or document.mozFullScreenElement)
 
+  # resolves to whether fullscreen was entered
   requestFullscreen: ->
     el = document.documentElement
     request = el.requestFullscreen ? el.webkitRequestFullscreen ? el.webkitRequestFullScreen ? el.mozRequestFullScreen
-    unless request?
-      # e.g. iPhone Safari has no element fullscreen
-      document.querySelector('#fullScreenCheck').checked = false
-      return
+    # e.g. iPhone Safari has no element fullscreen
+    return Promise.resolve false unless request?
     Promise.resolve(request.call el).then(
       # game is 16:9, portrait on a phone would be tiny
-      (-> screen.orientation?.lock?('landscape')?.catch? (->)),
-      (-> document.querySelector('#fullScreenCheck').checked = false)
+      (-> screen.orientation?.lock?('landscape')?.catch? (->); true),
+      (-> false)
     )
 
   exitFullscreen: ->

@@ -14,6 +14,7 @@ export class Background extends Layer
 
     @step_rate = @default_step_rate = DEFAULT_STEP_RATE
     @basket_size_provider = null
+    @set_defaults()
 
   set_defaults: ->
     @p_min= { color: [130,130,130], thick: 2 }
