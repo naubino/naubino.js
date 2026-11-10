@@ -7,11 +7,11 @@ export class Levels extends Rule
   init: -> @load_level 0
 
   load_level: (level) ->
-    if @level_details.length >= level
+    if 0 <= level < @level_details.length
       @load_level 0 if 0 < level < @level
 
       @level = level
-      #Naubino.overlay.fade_in_and_out_message "Level #{@level}" unless level < 1
+
       #Naubino.menu.for_each (naub)->naub.set_random_palette_color() unless level < 2
 
       set = @level_details[@level]
@@ -25,5 +25,8 @@ export class Levels extends Rule
       for name, probability of set['probabilities']
         @spawner.spammers[name].probability = probability
 
+      @game.events.game.level_up.dispatch @level unless level < 1
+
   check: ->
+    return if @level >= @level_details.length - 1
     @load_level(@level+1) if @level_details[@level].limit < @game.ex_naubs

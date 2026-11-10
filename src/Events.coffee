@@ -21,6 +21,8 @@ export class Events
       outcome: new Signal
       overflow_warning: new Signal
       basket_changed: new Signal
+      level_up: new Signal
+      chain_bonus: new Signal
 
     @session =
       state_changed: new Signal

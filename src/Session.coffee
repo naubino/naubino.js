@@ -15,6 +15,9 @@ export class Session
       @events.commands.stop.add (args...) => @stop args...
       @events.commands.toggle.add (args...) => @toggle(args...)
       @events.game.outcome.add (reason) => @report_outcome reason
+      @events.game.level_up.add (level) => @overlay.fade_in_and_out_message "Level #{level}"
+      # Keep bonuses below level announcements when both arrive together.
+      @events.game.chain_bonus.add (points) => @overlay.fade_in_and_out_message "\n\nChain Bonus #{points}"
     ]
 
   dispose: ->

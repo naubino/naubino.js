@@ -19,5 +19,4 @@ export class Scoring extends Rule
     factor = (max_grow-1) / @game.basket.max_naubs
     p = Math.floor(factor * list.length * list.length)
     @game.points += p
-    #Naubino.overlay.fade_in_and_out_message ("\n\nChain Bonus "+p) if p > 0
-    # Newlines prevent Level + Bonus messages overlapping
+    @game.events.game.chain_bonus.dispatch p if p > 0
