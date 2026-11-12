@@ -43,14 +43,15 @@ class Tutorial extends Game
           console.info "#{f} --(#{e})--> #{t}"
 
         onwelcome: (e, f, t) =>
-          Naubino.events.input.pointer_start.active = false
-          Naubino.events.input.pointer_start.add => @lessons.click()
+          @welcome_input_enabled = no
+          @welcome_pointer_handler = => @lessons.click() if @welcome_input_enabled
+          Naubino.viewport.container.addEventListener 'pointerdown', @welcome_pointer_handler
 
          # give instructions
           Naubino.overlay.fade_in_message({text:"Tutorial", fontsize:24})
           setTimeout ->
             Naubino.overlay.fade_in_message({text:"\n\nclick to continue", fontsize:12})
-            Naubino.events.input.pointer_start.active = true
+            @welcome_input_enabled = yes
           ,10*@multiplicator
           setTimeout =>
             pos = @center.Copy()
@@ -62,6 +63,8 @@ class Tutorial extends Game
 
         # fade out and then change state
         onleavewelcome: =>
+          Naubino.viewport.container.removeEventListener 'pointerdown', @welcome_pointer_handler
+          @welcome_input_enabled = no
           Naubino.overlay.fade_out_messages => @lessons.transition()
           false
 

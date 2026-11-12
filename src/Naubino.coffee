@@ -87,6 +87,7 @@ export class Naubino
     form = document.querySelector 'form'
     @viewport = new Viewport container, @settings.canvas, {
       centered_elements: if form? then [form] else []
+      events: @events
     }
 
   setup_components: ->
@@ -132,12 +133,13 @@ export class Naubino
 
   dispose: ->
     @input?.unbind()
+    @loop?.stop()
+    @viewport?.dispose()
     @session?.dispose()
     @game?.dispose()
     @menu?.dispose()
     unsubscribe() for unsubscribe in (@view_subscriptions ? [])
     @view_subscriptions = []
-    @loop?.stop()
 
   center: -> @viewport.center()
   scale_to: (scale) -> @viewport.scale_to scale
@@ -159,9 +161,5 @@ export class Naubino
 
 
   setup_input: ->
-    @input = new Input {
-      canvas: @viewport.canvases.overlay_canvas
-      viewport: @viewport
-      events: @events
-    }
+    @input = new Input {@events}
     @input.bind()

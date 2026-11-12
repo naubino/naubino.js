@@ -79,6 +79,7 @@ header {
 #gamediv {
     background-color: var(--game-background-color);
     display: block;
+    touch-action: none;
 }
 
 #gamediv > canvas,
