@@ -65,7 +65,7 @@ class Tutorial extends Game
           Naubino.overlay.fade_out_messages => @lessons.transition()
           false
 
-        onclick: =>
+        onclick: ->
 
         onlesson_show: =>
           setTimeout =>
@@ -90,7 +90,7 @@ class Tutorial extends Game
         onlesson_move: =>
           @for_each (naub) -> naub.enable()
           # remember a naubs original position
-          binding1 = @naub_focused.add (naub) =>
+          binding1 = @naub_focused.add (naub) ->
             naub.old_pos = naub.physics.pos.Copy()
 
           # compare it with the new position
@@ -104,7 +104,13 @@ class Tutorial extends Game
               binding2.detach()
               @lessons.moved()
 
-          @fallback_warning_timer = setTimeout((=> Naubino.overlay.fade_in_and_out_message(["Just drag one pair across.",30*@multiplicator], null, @font_size)), 100*@multiplicator)
+          @fallback_warning_timer = setTimeout((=>
+            Naubino.overlay.fade_in_and_out_message(
+              ["Just drag one pair across.", 30*@multiplicator],
+              null,
+              @font_size
+            )
+          ), 100*@multiplicator)
 
         # fade out and then change state
         onleavelesson_move: =>
@@ -141,7 +147,7 @@ class Tutorial extends Game
             ["and see what happens...", 20*@multiplicator]
           ], @toggle_joining, @font_size)
 
-        onsuccess: =>
+        onsuccess: ->
           console.info
 
 

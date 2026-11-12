@@ -28,21 +28,21 @@ export class ColorScheme
   palette: -> if Util.isDarkMode() then @dark_palette else @light_palette
 
   build_palette: (prefer = "light") ->
-      byName = new Map
-      brightness = ([r, g, b]) -> r + g + b
+    byName = new Map
+    brightness = ([r, g, b]) -> r + g + b
 
-      for color in @naubs
-        name = color[4] || "#{color[0]}, #{color[1]}, #{color[2]}, #{color[3]}"
-        current = byName.get(name)
-        if not current?
-          byName.set(name, color)
+    for color in @naubs
+      name = color[4] || "#{color[0]}, #{color[1]}, #{color[2]}, #{color[3]}"
+      current = byName.get(name)
+      if not current?
+        byName.set(name, color)
 
-        else if prefer == "dark" && brightness(color) > brightness(current)
-          console.warn("found a brighter color for #{name}: #{color} vs #{current}")
-          byName.set(name, color)
+      else if prefer == "dark" && brightness(color) > brightness(current)
+        console.warn("found a brighter color for #{name}: #{color} vs #{current}")
+        byName.set(name, color)
 
-        else if prefer == "light" && brightness(color) < brightness(current)
-          console.warn("found a darker color for #{name}: #{color} vs #{current}")
-          byName.set(name, color)
+      else if prefer == "light" && brightness(color) < brightness(current)
+        console.warn("found a darker color for #{name}: #{color} vs #{current}")
+        byName.set(name, color)
 
-      Array.from(byName.values())
+    Array.from(byName.values())

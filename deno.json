@@ -2,6 +2,8 @@
   "nodeModulesDir": "auto",
   "tasks": {
     "dev": "vite --host",
+    "check": "coffee --bare --print src > /dev/null",
+    "lint": "coffeelint src",
     "build": "vite build --mode index && vite build --mode highscore",
     "preview": "vite preview --host"
   }

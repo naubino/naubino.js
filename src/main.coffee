@@ -14,9 +14,12 @@ window.onload = ->
   naubino = window.Naubino = new Naubino(mode, '#gamediv')
   naubino.setup()
   naubino.apply_color_scheme()
-  document.querySelector("#highscorelink").addEventListener("click", -> confirm "do you want to leave this page?")
-  document.querySelector("#parameterslink").addEventListener "click", -> document.querySelector("#parametersdialog").showModal()
-  document.querySelector("#closeparameters").addEventListener "click", -> document.querySelector("#parametersdialog").close()
+  document.querySelector("#highscorelink").addEventListener "click", ->
+    confirm "do you want to leave this page?"
+  document.querySelector("#parameterslink").addEventListener "click", ->
+    document.querySelector("#parametersdialog").showModal()
+  document.querySelector("#closeparameters").addEventListener "click", ->
+    document.querySelector("#parametersdialog").close()
 
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", -> naubino.apply_color_scheme())
 

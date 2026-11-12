@@ -15,7 +15,9 @@ export class JoinPolicy
     return no unless a.focused or b.focused
     return no if a.disabled or b.disabled
     return no if a.number is b.number
-    return no unless arbiter.totalImpulse().Length() >= (@game.config?.game?.min_joining_force ? Naubino.settings.game.min_joining_force)
+    min_joining_force = @game.config?.game?.min_joining_force ?
+      Naubino.settings.game.min_joining_force
+    return no unless arbiter.totalImpulse().Length() >= min_joining_force
 
     # assigning better names the a and b
     naub  = if a.focused then a else b

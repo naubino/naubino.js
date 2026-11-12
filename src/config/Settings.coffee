@@ -6,7 +6,8 @@ resolve = (root, path) ->
   keys = path.split '.'
   last = keys.pop()
   obj = root
-  obj = obj[key] for key in keys
+  for key in keys
+    obj = obj[key]
   [obj, last]
 
 export Settings = {

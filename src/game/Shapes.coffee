@@ -14,7 +14,10 @@ export class Shape
       @apply_filter(filter, ctx)
 
   apply_filter: (filter, ctx )->
-    @[filter](ctx) if filter in [ "alpha", "draw_glow", "draw_border", "draw_shadow", "draw_gradient","draw_gradient_soft" ]
+    @[filter](ctx) if filter in [
+      "alpha", "draw_glow", "draw_border", "draw_shadow"
+      "draw_gradient", "draw_gradient_soft"
+    ]
 
   alpha: (ctx) ->
     ctx.globalAlpha = 0.4

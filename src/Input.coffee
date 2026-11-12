@@ -11,11 +11,11 @@ export class Input
 
     @keybindings.enable KEYS.SPACE, => @events.commands.toggle.dispatch()
     @keybindings.enable KEYS.ESC, => @events.commands.stop.dispatch()
-    @keybindings.enable KEYS.F, => Settings.toggle 'graphics.fullscreen'
-    @keybindings.enable KEYS.E, => Settings.toggle 'graphics.effects'
-    @keybindings.enable KEYS.M, => Settings.toggle 'audio.muted'
-    @keybindings.enable KEYS.C, => Settings.toggle 'graphics.draw_constraints'
-    @keybindings.enable KEYS.S, => Settings.toggle 'graphics.draw_constraints'
+    @keybindings.enable KEYS.F, -> Settings.toggle 'graphics.fullscreen'
+    @keybindings.enable KEYS.E, -> Settings.toggle 'graphics.effects'
+    @keybindings.enable KEYS.M, -> Settings.toggle 'audio.muted'
+    @keybindings.enable KEYS.C, -> Settings.toggle 'graphics.draw_constraints'
+    @keybindings.enable KEYS.S, -> Settings.toggle 'graphics.draw_constraints'
 
     @gesture = null
     @suppress_mouse_until = 0

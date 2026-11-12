@@ -327,7 +327,7 @@ export class Naub
     if typeof animation == 'function'
       animation_dt = 0
       i = setInterval (
-        =>
+        ->
           if animation_dt < duration
             animation(++animation_dt/duration)
           else
