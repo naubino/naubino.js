@@ -34,10 +34,6 @@ export class Game extends Layer
 
     #@points = -1
     @joining_allowed = yes
-    @input_unsubscribers = []
-    @input_unsubscribers.push @events.input.pointer_move.add @move_pointer
-    @input_unsubscribers.push @events.input.pointer_start.add @click
-    @input_unsubscribers.push @events.input.pointer_end.add @unfocus
 
     @joining_naubs = []
     @replacing_naubs = []
@@ -155,11 +151,15 @@ export class Game extends Layer
     @cancel_destroy_batches()
     clearInterval @checking if @checking?
     @checking = null
-    unsubscribe() for unsubscribe in (@input_unsubscribers ? []) when typeof unsubscribe is 'function'
-    @input_unsubscribers = []
 
     # after this point you must be able to press play an start again
 
+
+  pointer_start: (position) ->
+    @click position.x, position.y
+    yes
+
+  pointer_end: -> @unfocus()
 
   # callback for mousedown signal
   click: (x, y) =>

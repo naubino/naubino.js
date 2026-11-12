@@ -18,10 +18,6 @@ export class Menu extends Layer
     @opened_without_interaction = no
 
     @listener_size = @default_listener_size = 45
-    @input_subscriptions = [
-      @events.input.pointer_move.add @move_pointer
-      @events.input.pointer_start.add @click
-    ]
     @events.menu.button.active = false
 
     @center = new cp.v(20,25)
@@ -38,8 +34,6 @@ export class Menu extends Layer
     @setup_fsm()
 
   dispose: ->
-    unsubscribe() for unsubscribe in @input_subscriptions
-    @input_subscriptions = []
 
     clearTimeout @deactivation_timeout if @deactivation_timeout?
     @stop_stepping()
@@ -104,6 +98,21 @@ export class Menu extends Layer
         naub.isClickable = no
 
   ## can I touch this?
+  accepts_pointer: (position) ->
+    in_listener_region = Math.hypot(position.x, position.y - 15) < @listener_size
+    over_button = no
+    if @hovering
+      for naub_name, naub of @objects when naub.isHit(cp.v(position.x, position.y))
+        over_button = yes
+        break
+    in_listener_region or over_button
+
+  pointer_start: (position) ->
+    @click position.x, position.y
+    yes
+
+  pointer_end: -> @mousedown = no
+
   move_pointer: (x,y) =>
     @opened_without_interaction = no
     [@pointer.x, @pointer.y] = [x,y]

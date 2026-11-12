@@ -4,9 +4,6 @@ import {Signal} from './core/Signal'
 export class Events
   constructor: ->
     @input =
-      pointer_start: new Signal
-      pointer_move: new Signal
-      pointer_end: new Signal
       two_finger_start: new Signal
       two_finger_end: new Signal
       two_finger_tap: new Signal
