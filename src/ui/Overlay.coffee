@@ -1,4 +1,8 @@
 import {Layer} from '../core/Layer'
+
+FLY_MIN_SCALE = 0.2
+FLY_MAX_SCALE = 5
+
 export class Overlay extends Layer
   constructor: (canvas) ->
     super(canvas)
@@ -22,11 +26,18 @@ export class Overlay extends Layer
     @ctx.save()
     # objects are all full size buffers
     for id, buffer of @objects
-      buffer.render() if buffer.life?
+      buffer.render() if buffer.life? or buffer.buffer.width isnt @canvas.width or buffer.buffer.height isnt @canvas.height or buffer.dark_mode isnt Util.isDarkMode()
       @fade_object buffer, id
+      @ctx.save()
       @ctx.globalAlpha = buffer.alpha if buffer.alpha?
-      @ctx.drawImage(buffer.buffer, 0, 0)
-      @ctx.globalAlpha = 1
+      if buffer.scale?
+        center_x = buffer.pos.x
+        center_y = buffer.pos.y
+        @ctx.translate(center_x, center_y)
+        @ctx.scale(buffer.scale, buffer.scale)
+        @ctx.translate(-center_x, -center_y)
+      @ctx.drawImage(buffer.buffer, 0, 0, @width, @height)
+      @ctx.restore()
     @ctx.restore()
 
 
@@ -64,6 +75,16 @@ export class Overlay extends Layer
     mes.duration = text.duration ? Naubino.settings.overlay.duration
 
 
+  fly_in_and_out_message: (text, callback = null) ->
+    mes_id = @message text
+    mes = @get_object mes_id
+    mes.alpha = 0
+    mes.scale = FLY_MIN_SCALE
+    mes.fly_age = 0
+    mes.fly_duration = Math.max(text.duration ? Naubino.settings.overlay.duration, 0.1)
+    mes.fly_callback = callback
+    mes_id
+
   queue_messages: (messages = ["hello..", "...world"], qcallback) =>
     if m = messages.shift()
       messages = messages[0..]
@@ -91,6 +112,18 @@ export class Overlay extends Layer
     @draw()
 
   fade_object: (buffer,id) ->
+    if buffer.fly_duration?
+      buffer.fly_age++
+      progress = Math.min(buffer.fly_age / (buffer.fly_duration * @fps), 1)
+      buffer.scale = FLY_MIN_SCALE + (FLY_MAX_SCALE - FLY_MIN_SCALE) * progress
+      buffer.alpha = Math.sin(Math.PI * progress)
+      if progress >= 1
+        delete @objects[id]
+        callback = buffer.fly_callback
+        delete buffer.fly_duration
+        callback.call() if callback?
+      return
+
     if buffer.alpha_delta? and 0 < buffer.alpha <= 1
       buffer.alpha += buffer.alpha_delta
       buffer.alpha = Math.min buffer.alpha, 1
@@ -122,8 +155,8 @@ export class Overlay extends Layer
 class TextBuffer
   constructor: (text,@layer) ->
     @buffer        = document.createElement('canvas')
-    @buffer.width  = @layer.width
-    @buffer.height = @layer.height
+    @buffer.width  = @layer.canvas.width
+    @buffer.height = @layer.canvas.height
     @alpha  = 1
     @ctx = @buffer.getContext('2d')
 
@@ -134,7 +167,7 @@ class TextBuffer
     {@life, @color, @fontsize, @font, text, @pos, @weight, @align, x, y} = text unless typeof text == "string"
     @pos = new cp.v(x,y) if x? and y?
     @pos       ?= @layer.center()
-    @color     ?= Naubino.settings.overlay.color
+
     @fontsize  ?= Naubino.settings.overlay.fontsize
     @fontsize   = Naubino.settings.overlay.fontsize unless typeof @fontsize == "number"
     @font      ?= Naubino.settings.overlay.font
@@ -143,17 +176,25 @@ class TextBuffer
     @text = text
 
   render: ->
+    @buffer.width = @layer.canvas.width if @buffer.width isnt @layer.canvas.width
+    @buffer.height = @layer.canvas.height if @buffer.height isnt @layer.canvas.height
+    @ctx.setTransform(1, 0, 0, 1, 0, 0)
     @ctx.clearRect(0, 0, @buffer.width, @buffer.height)
+    @ctx.setTransform(@buffer.width / @layer.width, 0, 0, @buffer.height / @layer.height, 0, 0)
+    dark_mode = Util.isDarkMode()
+    text_color = @color ? (if dark_mode then 'white' else 'black')
+    @dark_mode = dark_mode
     lines = @text.split("\n")
     pos = {x:@pos.x, y:@pos.y}
-    pos.y -= @fontsize * lines.length /2
+    pos.y -= @fontsize * (lines.length - 1) / 2
     for line in lines
       console.log "OVERLAY:", line unless @life
-      @ctx.fillStyle = @color
-      @ctx.shadowColor = '#fff'
-      @ctx.shadowBlur = 3
-      @ctx.strokeStyle = @color
+      @ctx.fillStyle = text_color
+      @ctx.shadowColor = if dark_mode then 'black' else 'white'
+      @ctx.shadowBlur = 2
+      @ctx.strokeStyle = text_color
       @ctx.textAlign = @align
+      @ctx.textBaseline = 'middle'
       @ctx.font= "#{@weight} #{@fontsize}px #{@font}"
       @ctx.fillText(line, pos.x,pos.y)
       pos.y += @fontsize
