@@ -76,12 +76,12 @@ Stage 4a. Claims: V9, V10.
 
 Stage 4b. Claims: V4, V5, V6, V7, V8, V12.
 
-- [ ] Pointer Events on the container, `touch-action: none`
-- [ ] Top-down routing with per-`pointerId` capture
-- [ ] Mouse-only hover for `Menu`
-- [ ] Tap on menu region opens it on touch
-- [ ] Two-finger gestures recognized in `Viewport`
-- [ ] `Input` keyboard-only, `pointer_*` signals removed
+- [x] Pointer Events on the container, `touch-action: none`
+- [x] Top-down routing with per-`pointerId` capture
+- [x] Mouse-only hover for `Menu`
+- [x] Tap on menu region opens it on touch
+- [x] Two-finger gestures recognized in `Viewport`
+- [x] `Input` keyboard-only, `pointer_*` signals removed
 - [ ] Browser: menu tap never drags, drag over menu continues
 - [ ] Browser: two-finger tap toggles pause, drops first finger's drag
 

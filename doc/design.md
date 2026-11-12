@@ -79,6 +79,23 @@ Rules for implementers:
 | L8 | A new `Game` spawns its first naubs on construction, so the field is visible in `ready`. | Matches today's behavior. | done |
 | L9 | Mode switch = finish without result + construct a `Game` with the new mode. | No `finished` snapshot is stored for a mode switch. | todo |
 
+## Viewport
+
+| ID | Claim | Check | Status |
+|---|---|---|---|
+| V1 | `Viewport` creates its canvases ordered by depth, distinguished by a CSS class rather than an `id`. | No `setAttribute 'id'` in `Viewport.coffee`; canvases carry a depth class. | todo |
+| V2 | `viewport.lease()` hands out a layer a `Game` can draw into; `lease.release()` returns it. | `lease`/`release` exist on `Viewport`; `Game` calls them instead of constructing its own layer. | todo |
+| V3 | `Game` does not extend `Layer`. It leases its field layer from `Viewport` instead. | No `extends Layer` on `class Game`. | todo |
+| V4 | `Viewport` listens for Pointer Events on the container. The container has `touch-action: none`. | `pointerdown/move/up/cancel` listeners on `@container` in `Viewport.coffee`; `touch-action: none` in `naubino.css`. | done |
+| V5 | Pointer routing is top-down over `@layers`, with a per-`pointerId` capture: the first layer that accepts a pointer keeps it until `pointer_end`/`pointer_cancel`. | `pointer_down` walks `@layers.slice().reverse()`; `@captures[pointer_id]` holds the chosen layer. | done |
+| V6 | Hover (`pointer_move` with no active capture or gesture) is routed to `Menu` only for mouse pointers. | `pointer_move` checks `event.pointerType is 'mouse'` before forwarding to the menu layer. | done |
+| V7 | A tap on the menu's region opens it even when the pointer is a touch pointer. | `Menu.accepts_pointer` and `Menu.pointer_start` are reached by `pointer_down` regardless of `pointerType`. | done |
+| V8 | Two-finger gestures (pause toggle, drag cancel) are recognized and tracked in `Viewport`, not `Input`. | Gesture state (`@gesture`, `@active_pointers`) lives in `Viewport.coffee`; `Input.coffee` has none. | done |
+| V9 | `Viewport` dispatches a `field_resized(width, height)` notification instead of calling a resize callback directly. | A `Signal` named `field_resized` on `Viewport` or `AppEvents`; no `@on_resize` callback property. | todo |
+| V10 | `Game` takes its initial field size in the constructor and updates center, anchors, spawn bounds, and physics bounds from `field_resized`. | `Game`'s constructor signature includes a field size; `Game.resize` is the `field_resized` subscriber. | partial |
+| V11 | `canvas.style` is only read or written inside `Viewport`. | `grep "canvas.style" src` has no hits outside `Viewport.coffee`. | todo |
+| V12 | `Input` is keyboard-only. The `pointer_start`/`pointer_move`/`pointer_end` signals are removed from `Events`. | `Input.coffee` takes no `canvas`/`viewport`; `Events.input` has no `pointer_*` keys. | done |
+
 ## Joining and simulation
 
 | ID | Claim | Check | Status |
