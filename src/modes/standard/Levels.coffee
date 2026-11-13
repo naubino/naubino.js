@@ -20,12 +20,12 @@ export class Levels extends Rule
       @spawner.number_of_colors = set['number_of_colors'] ? @spawner.number_of_colors
       @spawner.spammer_interval = set['interval']         ? @spawner.spammer_interval
 
-      @game.events.game.basket_changed.dispatch()
+      @game.events.basket_changed.dispatch @game.basket.basket_size()
 
       for name, probability of set['probabilities']
         @spawner.spammers[name].probability = probability
 
-      @game.events.game.level_up.dispatch @level unless level < 1
+      @game.events.level_changed.dispatch @level unless level < 1
 
   check: ->
     return if @level >= @level_details.length - 1

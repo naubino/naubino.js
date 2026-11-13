@@ -14,10 +14,7 @@ export class Session
       @events.commands.pause.add (args...) => @pause args...
       @events.commands.stop.add (args...) => @stop args...
       @events.commands.toggle.add (args...) => @toggle(args...)
-      @events.game.outcome.add (reason) => @report_outcome reason
-      @events.game.level_up.add (level) => @overlay.fade_in_and_out_message "Level #{level}"
-      # Keep bonuses below level announcements when both arrive together.
-      @events.game.chain_bonus.add (points) => @overlay.fly_in_and_out_message "\n\nChain Bonus #{points}"
+      @game.events.outcome.add (reason) => @report_outcome reason
     ]
 
   dispose: ->
@@ -46,7 +43,6 @@ export class Session
   onplaying: (event, from, to) ->
     console.info("session playing")
     layer.play() for layer in [@game, @overlay, @background]
-    @menu.check_game_state @game
 
   onbeforepause: ->
     for layer in [@game, @overlay, @background]
@@ -55,7 +51,6 @@ export class Session
 
   onpaused: (event, from, to) ->
     layer.pause() for layer in [@game, @overlay, @background]
-    @menu.check_game_state @game
 
   onbeforestop: (event, from, to, force = off) ->
     @completed_snapshot = null
@@ -70,7 +65,6 @@ export class Session
 
   onstopped: (e, from, to) ->
     layer.init() for layer in [@game, @overlay, @background]
-    @menu.check_game_state @game
     if @completed_snapshot?
       snapshot = @completed_snapshot
       @completed_snapshot = null

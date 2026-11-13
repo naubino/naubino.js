@@ -8,12 +8,14 @@ import {CollisionHandler} from "./CollisionHandler"
 import {Factory} from "./Factory"
 import {DragSystem} from "./DragSystem"
 import {Mode} from "../modes/Mode"
+import {GameEvents} from "../Events"
 
 export class Game extends Layer
 
   # get this started
-  constructor: (canvas, @mode = new Mode, @events = Naubino.events) ->
+  constructor: (canvas, @mode = new Mode, @app_events = Naubino.events) ->
     super(canvas)
+    @events = new GameEvents
     @config = @build_config()
     @world = new World(@width, @height, @config.physics)
     @expose_world()
@@ -43,7 +45,7 @@ export class Game extends Layer
 
     # last, rules may want everything above
     @rules = @mode.rules this
-    @mode_unsubscribe = @mode.bind this, @events
+    @mode_unsubscribe = @mode.bind this, @app_events
 
 
   build_config: ->
@@ -123,6 +125,11 @@ export class Game extends Layer
 
   score_snapshot: -> @mode.result this
 
+  publish_snapshot: ->
+    @events.score_changed.dispatch @points ? 0
+    @events.level_changed.dispatch @levels?.level ? 0
+    @events.basket_changed.dispatch @basket?.basket_size()
+
 
 
 
@@ -138,7 +145,7 @@ export class Game extends Layer
 
   onloose: (e, from, to, reason = 'Game Over') ->
     @stop_stepping()
-    @events.game.outcome.dispatch reason
+    @events.outcome.dispatch reason
 
   dispose: ->
     rule.stop() for rule in @rules

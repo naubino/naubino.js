@@ -16,6 +16,7 @@ export class Menu extends Layer
     @objects = {}
     @hovering = off
     @opened_without_interaction = no
+    @score = ""
 
     @listener_size = @default_listener_size = 45
     @events.menu.button.active = false
@@ -73,10 +74,9 @@ export class Menu extends Layer
       @objects[name] = @factory.add_button button.position, callback, button.shapes
     @objects.main.life_rendering = on
 
-  check_game_state: (game = Naubino.game) ->
-    #console.log "checking game state"
+  check_game_state: (state) ->
     if @objects.play?
-      if game.current == "playing"
+      if state == "playing"
         @objects.play.focus = => @events.commands.pause.dispatch()
         @objects.play.shapes.pop()
         @objects.play.add_shape new PauseButton

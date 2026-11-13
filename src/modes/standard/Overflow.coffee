@@ -12,6 +12,6 @@ export class Overflow extends Rule
       (critical_capacity-capacity)/critical_capacity
     else
       0
-    @game.events.game.overflow_warning.dispatch severity
+    @game.events.overflow_warning.dispatch severity
 
     @game.loose('Naub Overflow') if @game.basket.capacity() < 5
