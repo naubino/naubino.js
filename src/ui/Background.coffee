@@ -13,7 +13,7 @@ export class Background extends Layer
     @min_step_rate= 15
 
     @step_rate = @default_step_rate = DEFAULT_STEP_RATE
-    @basket_size_provider = null
+    @basket_size = null
     @set_defaults()
 
   set_defaults: ->
@@ -75,13 +75,9 @@ export class Background extends Layer
     @clear()
     @draw_basket()
 
-  set_basket_size_provider: (provider) ->
-    @basket_size_provider = provider
-    @draw() if @current isnt 'none'
 
   draw_basket: () ->
 
-    @basket_size = @basket_size_provider?()
     return unless @basket_size?
     center = @center()
 

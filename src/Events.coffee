@@ -14,12 +14,6 @@ export class Events
       stop: new Signal
       toggle: new Signal
 
-    @game =
-      outcome: new Signal
-      overflow_warning: new Signal
-      basket_changed: new Signal
-      level_up: new Signal
-      chain_bonus: new Signal
 
     @session =
       state_changed: new Signal
@@ -28,3 +22,12 @@ export class Events
       button: new Signal
       focus: new Signal
       blur: new Signal
+
+export class GameEvents
+  constructor: ->
+    @outcome = new Signal
+    @overflow_warning = new Signal
+    @basket_changed = new Signal
+    @level_changed = new Signal
+    @chain_bonus = new Signal
+    @score_changed = new Signal

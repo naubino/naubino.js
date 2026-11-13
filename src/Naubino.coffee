@@ -24,12 +24,11 @@ import {Audio} from './Audio'
 
 export class Naubino
   name: "Naubino (#{import.meta.env.MODE})"
-  events: new Events()
   settings: Settings
   Signal: Signal
 
   constructor: (@mode = new StandardMode, @root_element_id) ->
-
+    @events = new Events
     @load_highscores()
     @audio = new Audio(@settings)
 
@@ -97,15 +96,27 @@ export class Naubino
     @overlay = new Overlay canvases.overlay_canvas
     @game = new Game canvases.game_canvas, @mode, @events
     @layers = [@background, @game, @menu, @overlay]
-
-    @view_subscriptions = [
-      @events.game.overflow_warning.add (severity) => @background.warn_overflow severity
-      @events.game.basket_changed.add => @background.draw()
-    ]
-    @background.set_basket_size_provider => @game.basket?.basket_size()
     @viewport.set_layers @layers, [@background, @game, @menu]
     @viewport.on_resize = (width, height) => @game.resize width, height
     @loop = new GameLoop @layers
+    @detach_game = @attach @game
+
+  attach: (game) ->
+    subscriptions = [
+      game.events.score_changed.add (points) =>
+        @menu.score = points
+        @menu.draw()
+      game.events.level_changed.add (level) =>
+        @overlay.fade_in_and_out_message "Level #{level}" if level > 0
+      game.events.chain_bonus.add (points) => @overlay.fly_in_and_out_message "\n\nChain Bonus #{points}"
+      game.events.overflow_warning.add (severity) => @background.warn_overflow severity
+      game.events.basket_changed.add (size) =>
+        @background.basket_size = size
+        @background.draw()
+      @events.session.state_changed.add (state) => @menu.check_game_state state
+    ]
+    game.publish_snapshot()
+    -> unsubscribe() for unsubscribe in subscriptions
 
   setup_session: ->
     @session = new Session {
@@ -136,10 +147,10 @@ export class Naubino
     @loop?.stop()
     @viewport?.dispose()
     @session?.dispose()
+    @detach_game?()
+    @detach_game = null
     @game?.dispose()
     @menu?.dispose()
-    unsubscribe() for unsubscribe in (@view_subscriptions ? [])
-    @view_subscriptions = []
 
   center: -> @viewport.center()
   scale_to: (scale) -> @viewport.scale_to scale

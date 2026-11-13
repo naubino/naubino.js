@@ -260,7 +260,7 @@ export class ClearButton extends Shape
 
 export class MainButton extends Box
   draw: (ctx, x, y) ->
-    text = Naubino.game.points ? ""
+    text = @naub.layer.score ? ""
     size=38
     @width = @naub.size*1.2
     ctx.save()
