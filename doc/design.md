@@ -40,7 +40,7 @@ Rules for implementers:
 | O2 | `Game` is disposable. One instance per round. Restart, stop, and mode switch all dispose the current `Game` and construct a new one. | No method resets a live `Game` (`configure_run`, `switch_mode` don't exist). | done |
 | O3 | `Session` does not exist. | `src/Session.coffee` is gone; `grep Session src` finds nothing. | done |
 | O4 | `Game` owns `World`, `Graph`, rules, `Factory`, `DragSystem`, `JoinPolicy`, `CollisionHandler`, `GameEvents`, and its layers. Nothing outside `Game` constructs them. | `grep "new World\|new Graph\|new CollisionHandler" src` only hits `Game` (and `Menu`'s private `Graph`). | partial |
-| O5 | `Game` decides which layers it uses and owns them. It does not extend `Layer`. The shell registers the returned layers with `Viewport` and `GameLoop`. | `class Game` has no `extends Layer`; shell calls `viewport.set_layers` with `game.layers`. | todo |
+| O5 | `Game` decides which layers it uses and owns them. It does not extend `Layer`. The shell registers the returned layers with `Viewport` and `GameLoop`. | `class Game` has no `extends Layer`; shell calls `viewport.set_layers` with `game.layers`. | done |
 | O6 | `Menu` belongs to the shell and survives games. | `Menu` is constructed in `Naubino`, never in `Game`. | done |
 | O7 | `Mode` is data. It holds parameters (physics, spawner probabilities, level table, game config) and may name classes (for example a join policy). It runs no lifecycle code. | `Mode` has no `init`, `reset`, `playing`, `stop`, `dispose`, `bind`, `rules`. | todo |
 | O8 | Behavior that differs in code, not numbers, is a `Game` subclass (`StandardGame`, `DebugGame`) or a pluggable rule. | `DebugMode`'s lifecycle hooks live in `DebugGame`. | todo |
@@ -83,17 +83,17 @@ Rules for implementers:
 
 | ID | Claim | Check | Status |
 |---|---|---|---|
-| V1 | `Viewport` creates its canvases ordered by depth, distinguished by a CSS class rather than an `id`. | No `setAttribute 'id'` in `Viewport.coffee`; canvases carry a depth class. | todo |
-| V2 | `viewport.lease()` hands out a layer a `Game` can draw into; `lease.release()` returns it. | `lease`/`release` exist on `Viewport`; `Game` calls them instead of constructing its own layer. | todo |
-| V3 | `Game` does not extend `Layer`. It leases its field layer from `Viewport` instead. | No `extends Layer` on `class Game`. | todo |
-| V4 | `Viewport` listens for Pointer Events on the container. The container has `touch-action: none`. | `pointerdown/move/up/cancel` listeners on `@container` in `Viewport.coffee`; `touch-action: none` in `naubino.css`. | done |
+| V1 | `Viewport` creates its canvases ordered by depth, distinguished by a CSS class rather than an `id`. | No `setAttribute 'id'` in `Viewport.coffee`; canvases carry a depth class. | done |
+| V2 | `viewport.lease()` hands out a layer a `Game` can draw into; `lease.release()` returns it. | `lease`/`release` exist on `Viewport`; `Game` calls them instead of constructing its own layer. | done |
+| V3 | `Game` does not extend `Layer`. It leases its field layer from `Viewport` instead. | No `extends Layer` on `class Game`. | done |
+| V4 | `Viewport` listens for Pointer Events on the container. The container has `touch-action: none`. | Pointer listeners and container/leased-canvas `touch-action` are set by `Viewport.coffee`. | done |
 | V5 | Pointer routing is top-down over `@layers`, with a per-`pointerId` capture: the first layer that accepts a pointer keeps it until `pointer_end`/`pointer_cancel`. | `pointer_down` walks `@layers.slice().reverse()`; `@captures[pointer_id]` holds the chosen layer. | done |
 | V6 | Hover (`pointer_move` with no active capture or gesture) is routed to `Menu` only for mouse pointers. | `pointer_move` checks `event.pointerType is 'mouse'` before forwarding to the menu layer. | done |
 | V7 | A tap on the menu's region opens it even when the pointer is a touch pointer. | `Menu.accepts_pointer` and `Menu.pointer_start` are reached by `pointer_down` regardless of `pointerType`. | done |
 | V8 | Two-finger gestures (pause toggle, drag cancel) are recognized and tracked in `Viewport`, not `Input`. | Gesture state (`@gesture`, `@active_pointers`) lives in `Viewport.coffee`; `Input.coffee` has none. | done |
 | V9 | `Viewport` dispatches a `field_resized(width, height)` notification instead of calling a resize callback directly. | A `Signal` named `field_resized` on `Viewport` or `AppEvents`; no `@on_resize` callback property. | todo |
 | V10 | `Game` takes its initial field size in the constructor and updates center, anchors, spawn bounds, and physics bounds from `field_resized`. | `Game`'s constructor signature includes a field size; `Game.resize` is the `field_resized` subscriber. | partial |
-| V11 | `canvas.style` is only read or written inside `Viewport`. | `grep "canvas.style" src` has no hits outside `Viewport.coffee`. | todo |
+| V11 | `canvas.style` is only read or written inside `Viewport`. | `grep "canvas.style" src` has no hits outside `Viewport.coffee`. | done |
 | V12 | `Input` is keyboard-only. The `pointer_start`/`pointer_move`/`pointer_end` signals are removed from `Events`. | `Input.coffee` takes no `canvas`/`viewport`; `Events.input` has no `pointer_*` keys. | done |
 
 ## Joining and simulation
@@ -182,11 +182,12 @@ Exit check: `grep "configure_run\\|switch_mode\\|reset_signals\\|init:" src/mode
 
 ### Stage 4: Game owns its layers
 
-Claims: O5.
+Claims: O5, V1, V2, V3, V11.
 
-1. `Game` stops extending `Layer`. It constructs a field layer (and the
-   layers it needs) from canvases the shell passes in.
-2. Shell swaps `Viewport` and `GameLoop` layers in `start_game`.
+1. `Game` stops extending `Layer`. It leases its field and background
+   canvases from `Viewport` and releases them on dispose.
+2. The shell registers `game.layers` with `Viewport`; `GameLoop` advances
+   the shell layers and current `Game`.
 
 ### Stage 5: Game subclasses, Mode as data
 

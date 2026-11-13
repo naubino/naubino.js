@@ -55,12 +55,12 @@ Stage 3. Claims: L4, L5, E4, E12.
 
 Stage 4a. Claims: O5, V1, V2, V3, V11.
 
-- [ ] `Viewport` creates canvases by depth, CSS classes instead of IDs
-- [ ] `viewport.lease()` and `lease.release()`
-- [ ] `Game` no longer extends `Layer`, leases its field layer
-- [ ] `Background` moved into `Game`
-- [ ] `GameLoop` advances shell layers plus current `Game`
-- [ ] `canvas.style` only used in `Viewport`
+- [x] `Viewport` creates canvases by depth, CSS classes instead of IDs
+- [x] `viewport.lease()` and `lease.release()`
+- [x] `Game` no longer extends `Layer`, leases its field layer
+- [x] `Background` moved into `Game`
+- [x] `GameLoop` advances shell layers plus current `Game`
+- [x] `canvas.style` only used in `Viewport`
 - [ ] Browser: desktop and touch, restart leaves no stale canvas
 
 ## 5. `feat: Resize the game through Viewport`
