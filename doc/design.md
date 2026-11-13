@@ -55,7 +55,7 @@ Rules for implementers:
 | E1 | Events use the existing `Signal` class with concrete named signals. No string event names, no new event library. | `grep "new Signal\|new Naubino.Signal" src` covers all event definitions. | done |
 | E2 | `AppEvents` (page lifetime) holds `input`, `commands`, and settings/theme notifications. It holds nothing about score, level, basket, overflow, or outcome. | `src/Events.coffee` has no `game` namespace. | partial |
 | E3 | `AppEvents` is constructed in `Naubino`'s constructor, not as a class-body property. | No `events: new Events()` at class level in `Naubino.coffee`. | done |
-| E4 | Each `Game` owns one `GameEvents`. It contains internal simulation signals and outward notifications. Subclasses may add signals (`StandardGame` adds level and basket). | `World` and `Graph` declare no signals; naub and cycle signals live on `GameEvents`. | todo |
+| E4 | Each `Game` owns one `GameEvents`. It contains internal simulation signals and outward notifications. Subclasses may add signals (`StandardGame` adds level and basket). | `World` and `Graph` declare no signals; naub and cycle signals live on `GameEvents`. | done |
 | E5 | Outward `GameEvents`: `state_changed(state)`, `score_changed(points)`, `level_changed(level)`, `chain_bonus(points)`, `overflow_warning(severity)`, `basket_changed(size)`, `lost(reason)`, `finished(snapshot)`, plus sound cues. | Signals exist with those payloads. | partial |
 | E6 | `Game` subscribes to `AppEvents.input` and `AppEvents.commands` itself and unsubscribes on dispose. | Subscriptions collected in `Game` and released in `dispose`. | done |
 | E7 | UI never references `Game`, `Mode`, rules, or `World`. The shell's `attach(game)` is the only code that knows both sides. It returns a disposer. | `grep "game\\.\\|\\.mode\\." src/ui src/game/Shapes.coffee` finds no traversal; `MainButton` draws a cached value. | partial |
@@ -63,7 +63,7 @@ Rules for implementers:
 | E9 | A command has one handler. A request is not proof of completion (`loss_requested` is not `lost`). Listener return values are never used. | Review. | todo |
 | E10 | A multi-part mutation happens inside one owner. Only the committed result is published. Correctness never depends on subscriber order. | Review. | todo |
 | E11 | `GameEvents` signals are deactivated on dispose. Late callbacks from a disposed game reach no subscriber. | `dispose` sets `active = false` on every `GameEvents` signal. | done |
-| E12 | Unused signals are removed: `menu.button`, `menu.focus`, `menu.blur`, `Game.game_draw`. Remove `naub_unfocused` unless a consumer appears. | `grep` finds no definitions. | todo |
+| E12 | Unused signals are removed: `menu.button`, `menu.focus`, `menu.blur`, `Game.game_draw`. Remove `naub_unfocused` unless a consumer appears. | `grep` finds no definitions. | done |
 
 ## Lifecycle
 
@@ -72,8 +72,8 @@ Rules for implementers:
 | L1 | `Game` FSM states: `ready`, `playing`, `paused`, `lost`, `finished`. `finished` is terminal and dispatches `finished(snapshot)` exactly once. | FSM config in `Game.coffee`. | done |
 | L2 | On `finished` the shell stores the highscore, calls the `attach` disposer, disposes the `Game`, constructs the next one, and attaches it. | `start_game` performs replacement; the finished handler stores the result before calling it. | done |
 | L3 | `Game.dispose` stops rules, clears every interval and timeout it owns (spawner, check loop, destroy batches, `just_joined`, loss sequence), deactivates `GameEvents`, unsubscribes from `AppEvents`, and clears its canvases. Calls after dispose are no-ops. | `@disposed` guard on timer callbacks. | done |
-| L4 | A rule's constructor is its setup. `start`/`stop` mean play/pause. No `init` reset convention, no `start(from)`. | `Rule` has no `init`; `start` takes no argument. | todo |
-| L5 | Object IDs start at 1 in every `Game`. | `World` has no `objects_count` constructor parameter. | todo |
+| L4 | A rule's constructor is its setup. `start`/`stop` mean play/pause. No `init` reset convention, no `start(from)`. | `Rule` has no `init`; `start` takes no argument. | done |
+| L5 | Object IDs start at 1 in every `Game`. | Each `World` starts its own `objects_count` at zero. | done |
 | L6 | Stop confirmation happens in `Game` before entering `finished`. | `confirm_stop` called from `Game`'s FSM. | done |
 | L7 | The loss sequence (grey out, fade, wait, finish) lives in `Game`. `Overlay` shows the warning by reacting to `lost(reason)`. | No `Overlay` call inside `Game`. | done |
 | L8 | A new `Game` spawns its first naubs on construction, so the field is visible in `ready`. | Matches today's behavior. | done |
@@ -168,17 +168,17 @@ playing, paused, ready all work in the browser.
 
 ### Stage 3: Delete reset machinery
 
-Claims: L4, L5, E4, E12.
+Claims: L4, L5, E4, E12. Done.
 
 1. Remove `configure_run`, `switch_mode`, `Graph.clear`, `World.reset_signals`,
-   the `previous_count` parameter.
+   and the `previous_count` parameter.
 2. Rule constructors do setup. Remove `Rule.init` and `start(from)`.
    `Scoring` sets `begin_time` on first `start`.
 3. Move naub and cycle signals from `World`/`Graph` onto `GameEvents`.
    `Naub` dispatches through the game's events.
 4. Remove unused signals (E12).
 
-Exit check: `grep "configure_run\|switch_mode\|reset_signals\|init:" src/modes src/game` is empty.
+Exit check: `grep "configure_run\\|switch_mode\\|reset_signals\\|init:" src/modes src/game` is empty.
 
 ### Stage 4: Game owns its layers
 

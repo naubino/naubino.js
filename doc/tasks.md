@@ -44,11 +44,11 @@ Stage 2. Claims: O2, O3, E6, L1, L2, L3, L6, L7, L9, E5, E11.
 
 Stage 3. Claims: L4, L5, E4, E12.
 
-- [ ] Remove `configure_run`, `switch_mode`, `Graph.clear`, `World.reset_signals`, `previous_count`
-- [ ] Rule constructors do setup; no `Rule.init`, no `start(from)`
-- [ ] Naub and cycle signals moved onto `GameEvents`
-- [ ] Remove `menu.button`, `menu.focus`, `menu.blur`, `game_draw`, `naub_unfocused`
-- [ ] Exit check: no `configure_run`, `switch_mode`, `reset_signals`, `init:` in `src/modes`, `src/game`
+- [x] Remove `configure_run`, `switch_mode`, `Graph.clear`, `World.reset_signals`, `previous_count`
+- [x] Rule constructors do setup; no `Rule.init`, no `start(from)`
+- [x] Naub and cycle signals moved onto `GameEvents`
+- [x] Remove `menu.button`, `menu.focus`, `menu.blur`, `game_draw`, `naub_unfocused`
+- [x] Exit check: no `configure_run`, `switch_mode`, `reset_signals`, `init:` in `src/modes`, `src/game`
 - [ ] Browser: pause and resume keep elapsed time, new game starts at zero
 
 ## 4. `refactor: Lease game layers from Viewport`
