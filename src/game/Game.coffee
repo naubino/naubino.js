@@ -16,6 +16,11 @@ export class Game extends Layer
   constructor: (canvas, @mode = new Mode, @app_events = Naubino.events) ->
     super(canvas)
     @events = new GameEvents
+    @naub_replaced = new Naubino.Signal()
+    @cycle_found = new Naubino.Signal()
+    @game_draw = new Naubino.Signal()
+    @timeouts = new Set
+    @disposed = no
     @config = @build_config()
     @world = new World(@width, @height, @config.physics)
     @expose_world()
@@ -41,7 +46,29 @@ export class Game extends Layer
     @replacing_naubs = []
     @active_tree = []
 
-    @setup_fsm Naubino.settings.events.game
+    StateMachine.create {
+      target: this
+      initial: 'none'
+      events: [
+        {name: 'init', from: 'none', to: 'ready'}
+        {name: 'play', from: ['ready', 'paused'], to: 'playing'}
+        {name: 'pause', from: 'playing', to: 'paused'}
+        {name: 'toggle', from: ['ready', 'paused'], to: 'playing'}
+        {name: 'toggle', from: 'playing', to: 'paused'}
+        {name: 'stop', from: ['ready', 'playing', 'paused', 'lost'], to: 'finished'}
+        {name: 'loose', from: 'playing', to: 'lost'}
+      ]
+      error: (event, from, to, args, code, message) =>
+        console.error "#{@name}.#{event}: #{from} -> #{to}\n#{code}::#{message}"
+    }
+
+    @subscriptions = [
+      @app_events.commands.play.add => @play()
+      @app_events.commands.pause.add => @pause()
+      @app_events.commands.stop.add (force) => @stop force
+      @app_events.commands.toggle.add => @toggle()
+      @app_events.input.two_finger_tap.add => @toggle()
+    ]
 
     # last, rules may want everything above
     @rules = @mode.rules this
@@ -72,29 +99,30 @@ export class Game extends Layer
   oninit: (e,f,t) ->
     @cancel_destroy_batches()
     @mode.reset? this
+    @begin_time = Date.now()
+    @duration = 0
     console.log "Game INIT from '#{f}'"
-    # gameplay
-    @game_draw       = new Naubino.Signal()
-    @naub_replaced   = new Naubino.Signal()
-    @cycle_found     = new Naubino.Signal()
-    @world.reset_signals()
-    @naub_joined    = @world.naub_joined
-    @naub_destroyed = @world.naub_destroyed
-
     #chipmunk
     @setup_physics()
     @space.defaultHandler = new CollisionHandler this
 
-    # audio
-    Naubino.audio.connect_to_game this
 
     rule.init() for rule in @rules
     @mode.init this
     return
 
+  onbeforeinit: -> not @disposed
+
+  onbeforeplay: -> not @disposed
+
+  onbeforepause: -> not @disposed
+
+  onbeforetoggle: -> not @disposed
+
+  onbeforeloose: -> not @disposed
+
   onplaying: (e,f,t) ->
-    @begin_time = Date.now() if f is 'stopped'
-    @duration = 0 if f is 'stopped'
+    @begin_time = Date.now() if f is 'ready'
     rule.start() for rule in @rules
     @checking = setInterval @check, 300 unless @checking
     @mode.playing this, f
@@ -133,21 +161,55 @@ export class Game extends Layer
 
 
 
+  onchangestate: (event, from, to) ->
+    @events.state_changed.dispatch to
+    if to is 'finished'
+      snapshot = @completed_snapshot
+      @completed_snapshot = null
+      @events.finished.dispatch snapshot
+
   # Forced stops skip the mode's confirmation.
-  onbeforestop: (e,f,t, force = no) ->
-    return true if force
-    @mode.confirm_stop()
+  onbeforestop: (event, from, to, force = no) ->
+    return false if @disposed
+    @completed_snapshot = null
+    return false unless force or @mode.confirm_stop()
+    @completed_snapshot = @score_snapshot()
+    true
 
-  onstopped: (e,f,t) ->
-    unless e is 'init'
-      @cancel_destroy_batches()
-      @clear_objects()
-
-  onloose: (e, from, to, reason = 'Game Over') ->
+  onstop: ->
     @stop_stepping()
-    @events.outcome.dispatch reason
+    @stop_drawing()
+    @cancel_destroy_batches()
+    @clear_objects()
+    @clear()
+
+  onloose: (event, from, to, reason = 'Game Over') ->
+    @stop_stepping()
+    @events.lost.dispatch reason
+    @run_loss_sequence()
+
+  run_loss_sequence: ->
+    naub_ids = Object.keys @objects
+    grey_next = =>
+      return if @disposed
+      naub_id = naub_ids.shift()
+      if naub_id?
+        naub = @get_object naub_id
+        naub.grey_out() if naub?
+        @schedule_timeout grey_next, 150
+      else
+        @fade_out =>
+          @schedule_timeout (=> @stop yes if @can 'stop'), 2000
+    grey_next()
+
+  clear_timeout: (timeout_id) ->
+    return unless timeout_id?
+    clearTimeout timeout_id
+    @timeouts.delete timeout_id
 
   dispose: ->
+    return if @disposed
+    @disposed = yes
     rule.stop() for rule in @rules
     @mode.stop? this
     @mode_unsubscribe?()
@@ -155,11 +217,27 @@ export class Game extends Layer
     @mode.dispose? this
     @stop_stepping()
     @stop_drawing()
-    @cancel_destroy_batches()
     clearInterval @checking if @checking?
     @checking = null
-
-    # after this point you must be able to press play an start again
+    clearInterval @fadeloop if @fadeloop?
+    @fadeloop = null
+    clearTimeout timeout_id for timeout_id from @timeouts
+    @timeouts.clear()
+    @cancel_destroy_batches()
+    @clear_objects()
+    @clear()
+    signals = Object.values(@events).concat [
+      @naub_joined
+      @naub_destroyed
+      @naub_focused
+      @naub_unfocused
+      @naub_replaced
+      @cycle_found
+      @game_draw
+    ]
+    signal.active = no for signal in signals
+    unsubscribe() for unsubscribe in @subscriptions
+    @subscriptions = []
 
 
   pointer_start: (position) ->
@@ -185,8 +263,17 @@ export class Game extends Layer
   point_in_field: (pos) ->
     0 < pos.x < @width and 0 < pos.y < @height
 
+  schedule_timeout: (callback, delay) ->
+    return if @disposed
+    timeout_id = setTimeout((=>
+      @timeouts.delete timeout_id
+      callback() unless @disposed
+    ), delay)
+    @timeouts.add timeout_id
+    timeout_id
+
   cancel_destroy_batches: ->
-    clearTimeout batch.timer for batch in (@destroy_batches ? []) when batch.timer?
+    @clear_timeout batch.timer for batch in (@destroy_batches ? []) when batch.timer?
     @destroy_batches = []
     @destroying_naubs = {}
 
@@ -215,7 +302,7 @@ export class Game extends Layer
         delete @destroying_naubs[id]
       batch.index++
       if batch.index < batch.ids.length
-        batch.timer = setTimeout destroy_next, 120
+        batch.timer = @schedule_timeout destroy_next, 120
       else
         @destroy_batches.splice @destroy_batches.indexOf(batch), 1
     destroy_next()
@@ -305,6 +392,7 @@ export class Game extends Layer
 
   # clears the graph as well, just in case
   clear_objects: ->
+    naub.dispose?() for id, naub of @objects
     @world.clear @width, @height
     @expose_world()
     @graph.clear()

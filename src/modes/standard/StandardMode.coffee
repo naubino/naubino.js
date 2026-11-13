@@ -55,9 +55,6 @@ export class StandardMode extends Mode
     game.cycle_found.add     (list)   -> game.destroy_naubs(list)
     game.naub_focused.add    (n)      -> game.active_tree = game.graph.tree n.number
 
-    #Naubino.audio.connect_to_game game
 
-  bind: (game, events) ->
-    events.input.two_finger_tap.add -> events.commands.toggle.dispatch()
 
   confirm_stop: -> confirm "Do you realy want to stop the game?"

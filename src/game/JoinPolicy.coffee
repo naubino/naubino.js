@@ -38,7 +38,7 @@ export class JoinPolicy
       #console.info 'join'
       #naub.join_with other
       @game.just_joined = naub.number
-      setTimeout (=> @game.just_joined = -1), 300
+      @game.schedule_timeout (=> @game.just_joined = -1), 300
       @game.joining_naubs.push [naub, other]
       return yes
     no
