@@ -16,9 +16,6 @@ export class Game extends Layer
   constructor: (canvas, @mode = new Mode, @app_events = Naubino.events) ->
     super(canvas)
     @events = new GameEvents
-    @naub_replaced = new Naubino.Signal()
-    @cycle_found = new Naubino.Signal()
-    @game_draw = new Naubino.Signal()
     @timeouts = new Set
     @disposed = no
     @config = @build_config()
@@ -33,7 +30,7 @@ export class Game extends Layer
     @factory = new Factory(this)
     @join_policy = @mode.join_policy this
     @drag = new DragSystem(this)
-    @begin_time = Date.now()
+    @space.defaultHandler = new CollisionHandler this
 
 
     # display stuff
@@ -48,9 +45,8 @@ export class Game extends Layer
 
     StateMachine.create {
       target: this
-      initial: 'none'
+      initial: 'ready'
       events: [
-        {name: 'init', from: 'none', to: 'ready'}
         {name: 'play', from: ['ready', 'paused'], to: 'playing'}
         {name: 'pause', from: 'playing', to: 'paused'}
         {name: 'toggle', from: ['ready', 'paused'], to: 'playing'}
@@ -91,27 +87,6 @@ export class Game extends Layer
     @mouseBody         = @physics.mouseBody
     @GRABABLE_MASK_BIT = @physics.GRABABLE_MASK_BIT
     @NOT_GRABABLE_MASK = @physics.NOT_GRABABLE_MASK
-    @naub_joined       = @world.naub_joined
-    @naub_destroyed    = @world.naub_destroyed
-    @naub_focused      = @world.naub_focused
-    @naub_unfocused    = @world.naub_unfocused
-
-  oninit: (e,f,t) ->
-    @cancel_destroy_batches()
-    @mode.reset? this
-    @begin_time = Date.now()
-    @duration = 0
-    console.log "Game INIT from '#{f}'"
-    #chipmunk
-    @setup_physics()
-    @space.defaultHandler = new CollisionHandler this
-
-
-    rule.init() for rule in @rules
-    @mode.init this
-    return
-
-  onbeforeinit: -> not @disposed
 
   onbeforeplay: -> not @disposed
 
@@ -122,7 +97,6 @@ export class Game extends Layer
   onbeforeloose: -> not @disposed
 
   onplaying: (e,f,t) ->
-    @begin_time = Date.now() if f is 'ready'
     rule.start() for rule in @rules
     @checking = setInterval @check, 300 unless @checking
     @mode.playing this, f
@@ -140,9 +114,6 @@ export class Game extends Layer
     rule.check() for rule in @rules
     return
 
-  setup_physics: ->
-    @world.reset_physics @width, @height, @config.physics
-    @expose_world()
 
   resize: (@width, @height) ->
     # Springs must follow the field's new center.
@@ -226,16 +197,7 @@ export class Game extends Layer
     @cancel_destroy_batches()
     @clear_objects()
     @clear()
-    signals = Object.values(@events).concat [
-      @naub_joined
-      @naub_destroyed
-      @naub_focused
-      @naub_unfocused
-      @naub_replaced
-      @cycle_found
-      @game_draw
-    ]
-    signal.active = no for signal in signals
+    signal.active = no for signal in Object.values(@events)
     unsubscribe() for unsubscribe in @subscriptions
     @subscriptions = []
 
@@ -330,7 +292,6 @@ export class Game extends Layer
       obj.draw @ctx
 
     @ctx.restore()
-    @game_draw.dispatch()
 
 
 
@@ -390,12 +351,10 @@ export class Game extends Layer
 
   get_obj_in_pos: (pos) -> @world.naub_at pos
 
-  # clears the graph as well, just in case
   clear_objects: ->
     naub.dispose?() for id, naub of @objects
     @world.clear @width, @height
     @expose_world()
-    @graph.clear()
 
   # run naub_forces, check for joinings and clean up
   step: (dt) ->

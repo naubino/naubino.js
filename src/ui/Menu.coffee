@@ -19,7 +19,6 @@ export class Menu extends Layer
     @score = ""
 
     @listener_size = @default_listener_size = 45
-    @events.menu.button.active = false
 
     @center = new cp.v(20,25)
     @cube_size = 45

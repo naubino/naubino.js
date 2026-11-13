@@ -313,7 +313,7 @@ export class Naub
     for shape in @shapes[1..]
       shape.destroy_animation() # these are just for fun
 
-    @layer.naub_destroyed.dispatch(@number)
+    @layer.events.naub_destroyed.dispatch(@number) if @layer.events.naub_destroyed?
 
 
 
@@ -381,7 +381,7 @@ export class Naub
       other.drawing_join[join] = false
 
       if !silent
-        @layer.naub_joined.dispatch() if @layer.naub_joined?
+        @layer.events.naub_joined.dispatch() if @layer.events.naub_joined?
 
       join
     else
@@ -405,7 +405,7 @@ export class Naub
     other.physical_body.p = cp.v.lerp(p, p2, 0.5)
 
     @remove()
-    @layer.naub_replaced.dispatch(other.number)
+    @layer.events.naub_replaced.dispatch(other.number) if @layer.events.naub_replaced?
     return 42
 
   # checks whether naub shares a common partner with other naub
@@ -463,9 +463,8 @@ export class Naub
   focus: ->
     @focused = true
     @onfocus()
-    @layer.naub_focused.dispatch(@)
+    @layer.events.naub_focused.dispatch(@) if @layer.events.naub_focused?
 
   unfocus: ->
     @focused = false
     @onclick()
-    @layer.naub_unfocused.dispatch(@)

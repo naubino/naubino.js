@@ -1,6 +1,6 @@
 import {Signal} from './core/Signal'
 
-# One hub per application. Simulation-local signals stay on the game/world.
+# One hub per application. Simulation-local signals stay on each game.
 export class Events
   constructor: ->
     @input =
@@ -16,10 +16,6 @@ export class Events
 
 
 
-    @menu =
-      button: new Signal
-      focus: new Signal
-      blur: new Signal
 
 export class GameEvents
   constructor: ->
@@ -32,3 +28,8 @@ export class GameEvents
     @state_changed = new Signal
     @lost = new Signal
     @finished = new Signal
+    @naub_joined = new Signal
+    @naub_destroyed = new Signal
+    @naub_focused = new Signal
+    @naub_replaced = new Signal
+    @cycle_found = new Signal

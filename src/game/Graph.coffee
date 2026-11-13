@@ -32,11 +32,6 @@ export class Graph
     delete @joins[id]
     @update_naub_list()
 
-  # another one of those functions where documentation could require more time than reading the actuall code
-  clear: ->
-    @join_id_sequence = 0
-    @naubs = []
-    @joins = {}
 
   # prints a list of all joins to console
   join_list: ->
@@ -110,7 +105,7 @@ export class Graph
       if @dfs_map[partner].color == 1
         list =  @cycle_list(naub,partner,first)
         if list.length > 0
-          @layer.cycle_found.dispatch(list)
+          @layer.events.cycle_found.dispatch(list)
     @dfs_map[naub].color = 2
     return cycles
 

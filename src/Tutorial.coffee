@@ -93,19 +93,13 @@ class Tutorial extends Game
         onlesson_move: =>
           @for_each (naub) -> naub.enable()
           # remember a naubs original position
-          binding1 = @naub_focused.add (naub) ->
+          @lesson_focus_unsubscribe = @events.naub_focused.add (naub) ->
             naub.old_pos = naub.physics.pos.Copy()
 
-          # compare it with the new position
-          binding2 = @naub_unfocused.add (naub) =>
-            new_pos = naub.physics.pos.Copy()
-            new_pos.Subtract naub.old_pos
-            dragged_distance = new_pos.Length()
-            if dragged_distance > 180
-              # removing listeners
-              binding1.detach()
-              binding2.detach()
-              @lessons.moved()
+          @lesson_original_onclick = {}
+          for id, naub of @objects
+            @lesson_original_onclick[naub.number] = naub.onclick
+            @set_lesson_drag_handler naub
 
           @fallback_warning_timer = setTimeout((=>
             Naubino.overlay.fade_in_and_out_message(
@@ -118,13 +112,15 @@ class Tutorial extends Game
         # fade out and then change state
         onleavelesson_move: =>
           clearTimeout @fallback_warning_timer
+          @clear_lesson_drag_handlers()
           Naubino.overlay.fade_out_messages => @transition()
           false
 
 
         onlesson_join: =>
           @joining_allowed = no
-          @naub_replaced.addOnce =>
+          unsubscribe_replaced = @events.naub_replaced.add =>
+            unsubscribe_replaced()
             Naubino.overlay.queue_messages([["nicely done!",20*@multiplicator]], =>
               @lessons.joined()
             , @font_size)
@@ -140,7 +136,7 @@ class Tutorial extends Game
 
 
         onlesson_cycle: (e,f,t) =>
-          @cycle_found.add =>
+          @events.cycle_found.add =>
             Naubino.overlay.queue_messages([
               ["Great",40*@multiplicator]
             ], null, @font_size)
@@ -182,6 +178,22 @@ class Tutorial extends Game
   toggle_joining: =>
     @joining_allowed = !@joining_allowed
     console.log "joining_allowed", @joining_allowed
+
+  set_lesson_drag_handler: (naub) ->
+    naub.onclick = => @check_lesson_drag naub
+
+  check_lesson_drag: (naub) ->
+    new_pos = naub.physics.pos.Copy()
+    new_pos.Subtract naub.old_pos
+    @lessons.moved() if new_pos.Length() > 180
+
+  clear_lesson_drag_handlers: ->
+    @lesson_focus_unsubscribe?()
+    @lesson_focus_unsubscribe = null
+    for number, onclick of (@lesson_original_onclick ? {})
+      naub = @get_object number
+      naub.onclick = onclick if naub?
+    @lesson_original_onclick = null
 
   create_naubs: ->
     @gravity = on

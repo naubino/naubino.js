@@ -50,11 +50,13 @@ export class StandardMode extends Mode
     level: game.levels?.level
     mode: @id
 
-  init: (game) ->
-    game.naub_replaced.add   (number) -> game.graph.cycle_test(number)
-    game.cycle_found.add     (list)   -> game.destroy_naubs(list)
-    game.naub_focused.add    (n)      -> game.active_tree = game.graph.tree n.number
-
-
+  bind: (game) ->
+    unsubscribe_replaced = game.events.naub_replaced.add (number) -> game.graph.cycle_test(number)
+    unsubscribe_cycle = game.events.cycle_found.add (list) -> game.destroy_naubs(list)
+    unsubscribe_focused = game.events.naub_focused.add (naub) -> game.active_tree = game.graph.tree naub.number
+    ->
+      unsubscribe_replaced()
+      unsubscribe_cycle()
+      unsubscribe_focused()
 
   confirm_stop: -> confirm "Do you realy want to stop the game?"
