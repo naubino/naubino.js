@@ -29,13 +29,13 @@ Stage 1. Claims: E2, E3, E5 (partial), E7, E8.
 
 Stage 2. Claims: O2, O3, E6, L1, L2, L3, L6, L7, L9, E5, E11.
 
-- [ ] Commands (`play`, `pause`, `stop`, `toggle`) handled in `Game`
-- [ ] Stop confirmation and loss sequence in `Game`
-- [ ] `Game` dispatches `state_changed`, `lost`, `finished(snapshot)`
-- [ ] Shell reacts: `Overlay`, `Background`, `Menu` button, highscore, `Audio`
-- [ ] `start_game(mode)` for startup, finish, and mode switch
-- [ ] `Game.dispose` clears timers, deactivates signals, unsubscribes
-- [ ] Delete `Session.coffee`
+- [x] Commands (`play`, `pause`, `stop`, `toggle`) handled in `Game`
+- [x] Stop confirmation and loss sequence in `Game`
+- [x] `Game` dispatches `state_changed`, `lost`, `finished(snapshot)`
+- [x] Shell reacts: `Overlay`, `Background`, `Menu` button, highscore, `Audio`
+- [x] `start_game(mode)` for startup, finish, and mode switch
+- [x] `Game.dispose` clears timers, deactivates signals, unsubscribes
+- [x] Delete `Session.coffee`
 - [ ] Browser: restart during destruction animations
 - [ ] Browser: mode switch while ready, playing, paused
 - [ ] Browser: loss sequence, stop confirmation cancel, highscore stored

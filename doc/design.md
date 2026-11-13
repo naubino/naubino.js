@@ -37,8 +37,8 @@ Rules for implementers:
 | ID | Claim | Check | Status |
 |---|---|---|---|
 | O1 | `Naubino` is the shell. It owns `Viewport`, `GameLoop`, `Input`, `Settings`, `Audio`, `Menu`, highscores, `AppEvents`, and a reference to the current `Game`. | These are constructed in `Naubino.coffee` and nowhere else. | partial |
-| O2 | `Game` is disposable. One instance per round. Restart, stop, and mode switch all dispose the current `Game` and construct a new one. | No method resets a live `Game` (`configure_run`, `switch_mode` don't exist). | todo |
-| O3 | `Session` does not exist. | `src/Session.coffee` is gone; `grep Session src` finds nothing. | todo |
+| O2 | `Game` is disposable. One instance per round. Restart, stop, and mode switch all dispose the current `Game` and construct a new one. | No method resets a live `Game` (`configure_run`, `switch_mode` don't exist). | done |
+| O3 | `Session` does not exist. | `src/Session.coffee` is gone; `grep Session src` finds nothing. | done |
 | O4 | `Game` owns `World`, `Graph`, rules, `Factory`, `DragSystem`, `JoinPolicy`, `CollisionHandler`, `GameEvents`, and its layers. Nothing outside `Game` constructs them. | `grep "new World\|new Graph\|new CollisionHandler" src` only hits `Game` (and `Menu`'s private `Graph`). | partial |
 | O5 | `Game` decides which layers it uses and owns them. It does not extend `Layer`. The shell registers the returned layers with `Viewport` and `GameLoop`. | `class Game` has no `extends Layer`; shell calls `viewport.set_layers` with `game.layers`. | todo |
 | O6 | `Menu` belongs to the shell and survives games. | `Menu` is constructed in `Naubino`, never in `Game`. | done |
@@ -57,27 +57,27 @@ Rules for implementers:
 | E3 | `AppEvents` is constructed in `Naubino`'s constructor, not as a class-body property. | No `events: new Events()` at class level in `Naubino.coffee`. | done |
 | E4 | Each `Game` owns one `GameEvents`. It contains internal simulation signals and outward notifications. Subclasses may add signals (`StandardGame` adds level and basket). | `World` and `Graph` declare no signals; naub and cycle signals live on `GameEvents`. | todo |
 | E5 | Outward `GameEvents`: `state_changed(state)`, `score_changed(points)`, `level_changed(level)`, `chain_bonus(points)`, `overflow_warning(severity)`, `basket_changed(size)`, `lost(reason)`, `finished(snapshot)`, plus sound cues. | Signals exist with those payloads. | partial |
-| E6 | `Game` subscribes to `AppEvents.input` and `AppEvents.commands` itself and unsubscribes on dispose. | Subscriptions collected in `Game` and released in `dispose`. | partial |
+| E6 | `Game` subscribes to `AppEvents.input` and `AppEvents.commands` itself and unsubscribes on dispose. | Subscriptions collected in `Game` and released in `dispose`. | done |
 | E7 | UI never references `Game`, `Mode`, rules, or `World`. The shell's `attach(game)` is the only code that knows both sides. It returns a disposer. | `grep "game\\.\\|\\.mode\\." src/ui src/game/Shapes.coffee` finds no traversal; `MainButton` draws a cached value. | partial |
 | E8 | Payloads carry the data consumers need. A new `Game` publishes its initial snapshot (score 0, level 0, basket size or none) after `attach`. | `basket_changed` has a payload; `set_basket_size_provider` is gone. | done |
 | E9 | A command has one handler. A request is not proof of completion (`loss_requested` is not `lost`). Listener return values are never used. | Review. | todo |
 | E10 | A multi-part mutation happens inside one owner. Only the committed result is published. Correctness never depends on subscriber order. | Review. | todo |
-| E11 | `GameEvents` signals are deactivated on dispose. Late callbacks from a disposed game reach no subscriber. | `dispose` sets `active = false` on every `GameEvents` signal. | todo |
+| E11 | `GameEvents` signals are deactivated on dispose. Late callbacks from a disposed game reach no subscriber. | `dispose` sets `active = false` on every `GameEvents` signal. | done |
 | E12 | Unused signals are removed: `menu.button`, `menu.focus`, `menu.blur`, `Game.game_draw`. Remove `naub_unfocused` unless a consumer appears. | `grep` finds no definitions. | todo |
 
 ## Lifecycle
 
 | ID | Claim | Check | Status |
 |---|---|---|---|
-| L1 | `Game` FSM states: `ready`, `playing`, `paused`, `lost`, `finished`. `finished` is terminal and dispatches `finished(snapshot)` exactly once. | FSM config in `Settings.events.game`. | todo |
-| L2 | On `finished` the shell stores the highscore, calls the `attach` disposer, disposes the `Game`, constructs the next one, and attaches it. | One shell method does all five steps in that order. | todo |
-| L3 | `Game.dispose` stops rules, clears every interval and timeout it owns (spawner, check loop, destroy batches, `just_joined`, loss sequence), deactivates `GameEvents`, unsubscribes from `AppEvents`, and clears its canvases. Calls after dispose are no-ops. | `@disposed` guard on timer callbacks. | todo |
+| L1 | `Game` FSM states: `ready`, `playing`, `paused`, `lost`, `finished`. `finished` is terminal and dispatches `finished(snapshot)` exactly once. | FSM config in `Game.coffee`. | done |
+| L2 | On `finished` the shell stores the highscore, calls the `attach` disposer, disposes the `Game`, constructs the next one, and attaches it. | `start_game` performs replacement; the finished handler stores the result before calling it. | done |
+| L3 | `Game.dispose` stops rules, clears every interval and timeout it owns (spawner, check loop, destroy batches, `just_joined`, loss sequence), deactivates `GameEvents`, unsubscribes from `AppEvents`, and clears its canvases. Calls after dispose are no-ops. | `@disposed` guard on timer callbacks. | done |
 | L4 | A rule's constructor is its setup. `start`/`stop` mean play/pause. No `init` reset convention, no `start(from)`. | `Rule` has no `init`; `start` takes no argument. | todo |
 | L5 | Object IDs start at 1 in every `Game`. | `World` has no `objects_count` constructor parameter. | todo |
-| L6 | Stop confirmation happens in `Game` before entering `finished`. | `confirm_stop` called from `Game`'s FSM. | todo |
-| L7 | The loss sequence (grey out, fade, wait, finish) lives in `Game`. `Overlay` shows the warning by reacting to `lost(reason)`. | No `Overlay` call inside `Game`. | todo |
+| L6 | Stop confirmation happens in `Game` before entering `finished`. | `confirm_stop` called from `Game`'s FSM. | done |
+| L7 | The loss sequence (grey out, fade, wait, finish) lives in `Game`. `Overlay` shows the warning by reacting to `lost(reason)`. | No `Overlay` call inside `Game`. | done |
 | L8 | A new `Game` spawns its first naubs on construction, so the field is visible in `ready`. | Matches today's behavior. | done |
-| L9 | Mode switch = finish without result + construct a `Game` with the new mode. | No `finished` snapshot is stored for a mode switch. | todo |
+| L9 | Mode switch = finish without result + construct a `Game` with the new mode. | No `finished` snapshot is stored for a mode switch. | done |
 
 ## Viewport
 
