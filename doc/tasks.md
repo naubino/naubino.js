@@ -13,16 +13,16 @@ Before each commit: `deno task check`, `deno task build`, `deno task lint`.
 
 Stage 1. Claims: E2, E3, E5 (partial), E7, E8.
 
-- [ ] Construct `Events` in `Naubino`'s constructor
-- [ ] Add `GameEvents`, constructed in `Game`
-- [ ] Move `outcome`, `level_up` (as `level_changed`), `chain_bonus`, `overflow_warning`, `basket_changed`
-- [ ] `score_changed(points)` from `Scoring`
-- [ ] `basket_changed(size)` carries the basket size
-- [ ] Initial snapshot published after `attach`
-- [ ] `Naubino.attach(game)` wires `Menu`, `Overlay`, `Background`, returns a disposer
-- [ ] `MainButton` draws a cached score
-- [ ] Remove `set_basket_size_provider`
-- [ ] Exit check: no `game.mode` in `src/ui`, `Shapes.coffee`, `Naubino.coffee`
+- [x] Construct `Events` in `Naubino`'s constructor
+- [x] Add `GameEvents`, constructed in `Game`
+- [x] Move `outcome`, `level_up` (as `level_changed`), `chain_bonus`, `overflow_warning`, `basket_changed`
+- [x] `score_changed(points)` from `Scoring`
+- [x] `basket_changed(size)` carries the basket size
+- [x] Initial snapshot published after `attach`
+- [x] `Naubino.attach(game)` wires `Menu`, `Overlay`, `Background`, returns a disposer
+- [x] `MainButton` draws a cached score
+- [x] Remove `set_basket_size_provider`
+- [x] Exit check: no `game.mode` in `src/ui`, `Shapes.coffee`, `Naubino.coffee`
 - [ ] Browser: score, level, bonus, basket, overflow glow all display
 
 ## 2. `refactor: Retire Session and make Game disposable`

@@ -53,13 +53,13 @@ Rules for implementers:
 | ID | Claim | Check | Status |
 |---|---|---|---|
 | E1 | Events use the existing `Signal` class with concrete named signals. No string event names, no new event library. | `grep "new Signal\|new Naubino.Signal" src` covers all event definitions. | done |
-| E2 | `AppEvents` (page lifetime) holds `input`, `commands`, and settings/theme notifications. It holds nothing about score, level, basket, overflow, or outcome. | `src/Events.coffee` has no `game` namespace. | todo |
-| E3 | `AppEvents` is constructed in `Naubino`'s constructor, not as a class-body property. | No `events: new Events()` at class level in `Naubino.coffee`. | todo |
+| E2 | `AppEvents` (page lifetime) holds `input`, `commands`, and settings/theme notifications. It holds nothing about score, level, basket, overflow, or outcome. | `src/Events.coffee` has no `game` namespace. | partial |
+| E3 | `AppEvents` is constructed in `Naubino`'s constructor, not as a class-body property. | No `events: new Events()` at class level in `Naubino.coffee`. | done |
 | E4 | Each `Game` owns one `GameEvents`. It contains internal simulation signals and outward notifications. Subclasses may add signals (`StandardGame` adds level and basket). | `World` and `Graph` declare no signals; naub and cycle signals live on `GameEvents`. | todo |
-| E5 | Outward `GameEvents`: `state_changed(state)`, `score_changed(points)`, `level_changed(level)`, `chain_bonus(points)`, `overflow_warning(severity)`, `basket_changed(size)`, `lost(reason)`, `finished(snapshot)`, plus sound cues. | Signals exist with those payloads. | todo |
+| E5 | Outward `GameEvents`: `state_changed(state)`, `score_changed(points)`, `level_changed(level)`, `chain_bonus(points)`, `overflow_warning(severity)`, `basket_changed(size)`, `lost(reason)`, `finished(snapshot)`, plus sound cues. | Signals exist with those payloads. | partial |
 | E6 | `Game` subscribes to `AppEvents.input` and `AppEvents.commands` itself and unsubscribes on dispose. | Subscriptions collected in `Game` and released in `dispose`. | partial |
-| E7 | UI never references `Game`, `Mode`, rules, or `World`. The shell's `attach(game)` is the only code that knows both sides. It returns a disposer. | `grep "game\.\|\.mode\." src/ui src/game/Shapes.coffee` finds no traversal; `MainButton` draws a cached value. | todo |
-| E8 | Payloads carry the data consumers need. A new `Game` publishes its initial snapshot (score 0, level 0, basket size or none) after `attach`. | `basket_changed` has a payload; `set_basket_size_provider` is gone. | todo |
+| E7 | UI never references `Game`, `Mode`, rules, or `World`. The shell's `attach(game)` is the only code that knows both sides. It returns a disposer. | `grep "game\\.\\|\\.mode\\." src/ui src/game/Shapes.coffee` finds no traversal; `MainButton` draws a cached value. | partial |
+| E8 | Payloads carry the data consumers need. A new `Game` publishes its initial snapshot (score 0, level 0, basket size or none) after `attach`. | `basket_changed` has a payload; `set_basket_size_provider` is gone. | done |
 | E9 | A command has one handler. A request is not proof of completion (`loss_requested` is not `lost`). Listener return values are never used. | Review. | todo |
 | E10 | A multi-part mutation happens inside one owner. Only the committed result is published. Correctness never depends on subscriber order. | Review. | todo |
 | E11 | `GameEvents` signals are deactivated on dispose. Late callbacks from a disposed game reach no subscriber. | `dispose` sets `active = false` on every `GameEvents` signal. | todo |
