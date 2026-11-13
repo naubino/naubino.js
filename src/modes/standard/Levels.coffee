@@ -3,8 +3,7 @@ import {Rule} from '../Rule'
 export class Levels extends Rule
   constructor: (game, @spawner, @level_details) ->
     super(game)
-
-  init: -> @load_level 0
+    @load_level 0
 
   load_level: (level) ->
     if 0 <= level < @level_details.length

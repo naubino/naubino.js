@@ -11,16 +11,14 @@ export class DebugMode extends Mode
   bind: (game, events) ->
     unsubscribe_start = events.input.two_finger_start.add => @begin_spawning game
     unsubscribe_end = events.input.two_finger_end.add => @end_spawning()
+    unsubscribe_replaced = game.events.naub_replaced.add (number) -> game.graph.cycle_test(number)
+    unsubscribe_cycle = game.events.cycle_found.add (list) -> game.destroy_naubs(list)
     =>
       @end_spawning()
       unsubscribe_start()
       unsubscribe_end()
-
-  reset: -> @end_spawning()
-
-  init: (game) ->
-    game.naub_replaced.add (number) -> game.graph.cycle_test(number)
-    game.cycle_found.add (list) -> game.destroy_naubs(list)
+      unsubscribe_replaced()
+      unsubscribe_cycle()
 
   playing: (game, from) ->
     return unless from is 'ready'

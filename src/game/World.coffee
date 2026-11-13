@@ -6,19 +6,12 @@ export class World
   constructor: (width, height, physics_config = Naubino.settings.physics) ->
     @physics_config = physics_config
     @objects       = {}
-    @objects_count = 0 # never reset, old timers may still look up ids after a new game starts
+    @objects_count = 0
     @reset_physics width, height, @physics_config
-    @reset_signals()
 
   reset_physics: (width, height, physics_config = @physics_config) ->
     @physics = new PhysicsWorld(width, height, physics_config)
 
-  # new signals, so last game's listeners are gone
-  reset_signals: ->
-    @naub_joined    = new Naubino.Signal()
-    @naub_destroyed = new Naubino.Signal()
-    @naub_focused   = new Naubino.Signal()
-    @naub_unfocused = new Naubino.Signal()
 
   add_object: (obj) ->
     @physics.add_object obj

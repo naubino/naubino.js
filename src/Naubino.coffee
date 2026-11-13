@@ -127,9 +127,9 @@ export class Naubino
       game.events.finished.add (snapshot) =>
         @finish_run snapshot
         @start_game @mode
-      game.naub_joined.add @audio.random_blub
-      game.naub_replaced.add @audio.random_blub
-      game.naub_destroyed.add @audio.random_blub
+      game.events.naub_joined.add @audio.random_blub
+      game.events.naub_replaced.add @audio.random_blub
+      game.events.naub_destroyed.add @audio.random_blub
     ]
     -> unsubscribe() for unsubscribe in subscriptions
 
@@ -146,13 +146,12 @@ export class Naubino
     @viewport.on_resize = (width, height) => @game.resize width, height
     @loop.layers = @layers
     @detach_game = @attach @game
-    @game.init()
     @game.publish_snapshot()
     @menu.check_game_state @game.current
     @game
 
   # state machine forwarding
-  init:   (args...) -> @game.init args...
+
   play:   (args...) -> @game.play args...
   pause:  (args...) -> @game.pause args...
   stop:   (args...) -> @game.stop args...

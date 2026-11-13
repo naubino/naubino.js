@@ -1,8 +1,8 @@
 import {Rule} from '../Rule'
 
 export class Spawner extends Rule
-
-  init: ->
+  constructor: (game) ->
+    super game
     @number_of_colors = @default_number_of_colors = 3
 
     @spammers = {
