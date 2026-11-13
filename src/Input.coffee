@@ -9,7 +9,9 @@ export class Input
   constructor: ({@events, @keyboard_target = window}) ->
     @keybindings = new KeyBindings()
 
-    @keybindings.enable KEYS.SPACE, => @events.commands.toggle.dispatch()
+    @keybindings.enable KEYS.SPACE, =>
+      @events.commands.toggle.dispatch()
+      console.log 'space'
     @keybindings.enable KEYS.ESC, => @events.commands.stop.dispatch()
     @keybindings.enable KEYS.F, -> Settings.toggle 'graphics.fullscreen'
     @keybindings.enable KEYS.E, -> Settings.toggle 'graphics.effects'

@@ -22,7 +22,7 @@ class Tutorial extends Game
 
   configure: ->
     Naubino.overlay.animation.play()
-    Naubino.background.animation.stop() unless Naubino.background.animation.current == "stopped"
+    Naubino.game.background.animation.stop() unless Naubino.game.background.animation.current == "stopped"
     @font_size = 24
     @joining_allowed = no
 

@@ -2,7 +2,7 @@ export class Layer
 
   MAX_FRAME_TIME = 250
 
-  constructor: (@canvas) ->
+  constructor: (@canvas, @viewport) ->
     @name = "unnamed layer"
 
     @width   = @canvas.width
@@ -182,8 +182,9 @@ export class Layer
   scale_to: (scale) ->
     { width, height } = this
     dpr = window.devicePixelRatio or 1
-    @canvas.style.width  = "#{width  * scale}px"
-    @canvas.style.height = "#{height * scale}px"
+    @viewport.set_canvas_style @canvas,
+      width: "#{width  * scale}px"
+      height: "#{height * scale}px"
     @canvas.width  = Math.round width  * scale * dpr
     @canvas.height = Math.round height * scale * dpr
     @ctx.setTransform scale * dpr, 0, 0, scale * dpr, 0, 0
@@ -194,10 +195,12 @@ export class Layer
   fade_in: (callback = null) ->
     #console.log "fade in", @fadeloop
     @start_drawing()
-    @canvas.style.opacity = 0.01
+    @viewport.set_canvas_style @canvas, opacity: 0.01
     @restore() if @backup_ctx?
     fade = =>
-      if (@canvas.style.opacity *= 1.2) >= 1
+      opacity = Number(@viewport.get_canvas_style @canvas, 'opacity') * 1.2
+      @viewport.set_canvas_style @canvas, opacity: opacity
+      if opacity >= 1
         clearInterval @fadeloop
         #console.log "done"
         @show()
@@ -211,10 +214,11 @@ export class Layer
     @start_drawing()
     @cache()
     fade = =>
-      if (@canvas.style.opacity *= 0.8) <= 0.05
+      opacity = Number(@viewport.get_canvas_style @canvas, 'opacity') * 0.8
+      @viewport.set_canvas_style @canvas, opacity: opacity
+      if opacity <= 0.05
         clearInterval @fadeloop
         @hide()
-        #@canvas.style.opacity = 1
         if callback? and typeof callback == 'function'
           callback.call()
           @stop_drawing()
@@ -222,9 +226,9 @@ export class Layer
     @fadeloop = setInterval( fade, 70 )
 
 
-  show: -> @canvas.style.opacity = 1
+  show: -> @viewport.set_canvas_style @canvas, opacity: 1
 
-  hide: -> @canvas.style.opacity = 0
+  hide: -> @viewport.set_canvas_style @canvas, opacity: 0
 
   clear: -> @ctx.clearRect(0, 0, @canvas.width, @canvas.height)
 

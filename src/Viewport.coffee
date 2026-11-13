@@ -7,20 +7,22 @@ export class Viewport
     @width = @base_size.width
     @height = @base_size.height
     @scale = 1
+    @top_margin = 0
+    @set_canvas_style @container,
+      width: "#{@width}px"
+      height: "#{@height}px"
+      position: 'relative'
+      zIndex: '0'
+      isolation: 'isolate'
+      margin: "#{@top_margin}px auto 0"
+      touchAction: 'none'
     @centered_elements = options.centered_elements ? []
+    for element in @centered_elements
+      @set_canvas_style element, zIndex: '1'
     @events = options.events
     @layers = []
     @redraw_layers = []
-    @canvases = {}
-
-    for name in 'background game menu overlay'.split ' '
-      canvas_name = "#{name}_canvas"
-      canvas = document.createElement 'canvas'
-      canvas.width = @width
-      canvas.height = @height
-      canvas.setAttribute 'id', canvas_name
-      @container.appendChild canvas
-      @canvases[canvas_name] = canvas
+    @leases = new Set
 
     @captures = {}
     @active_pointers = {}
@@ -33,6 +35,33 @@ export class Viewport
     @container.addEventListener 'pointermove', @on_pointermove
     @container.addEventListener 'pointerup', @on_pointerup
     @container.addEventListener 'pointercancel', @on_pointercancel
+
+  lease: (depth = 0, class_name = null) ->
+    canvas = document.createElement 'canvas'
+    canvas.width = @width
+    canvas.height = @height
+    canvas.classList.add 'canvas', "canvas-depth-#{depth}"
+    canvas.classList.add class_name if class_name?
+    @set_canvas_style canvas,
+      position: 'absolute'
+      zIndex: "#{depth}"
+      left: '50%'
+      top: '0'
+      transform: 'translateX(-50%)'
+      touchAction: 'none'
+    @container.appendChild canvas
+
+    lease = {canvas, depth}
+    @leases.add lease
+    lease.release = =>
+      return unless @leases.delete lease
+      canvas.remove()
+    lease
+
+  set_canvas_style: (canvas, styles) ->
+    canvas.style[name] = value for name, value of styles
+
+  get_canvas_style: (canvas, name) -> canvas.style[name]
 
   pointer_down: (event) ->
     event.preventDefault()
@@ -142,6 +171,7 @@ export class Viewport
       @container.releasePointerCapture(pointer_id) if @container.hasPointerCapture(pointer_id)
     @gesture = null
     @active_pointers = {}
+    lease.release() for lease from Array.from(@leases)
 
   set_layers: (layers, redraw_layers) ->
     @layers = layers
@@ -149,12 +179,23 @@ export class Viewport
 
     for layer, index in @layers
       layer.fps_label_depth = @layers.length - 1 - index
+      layer.set_fps_label_depth? layer.fps_label_depth
+
+  reserve_controls_space: ->
+    controls_height = Math.max 0, (element.offsetHeight for element in @centered_elements)...
+    @set_canvas_style @container, marginTop: "#{@top_margin + controls_height}px"
 
   center: ->
-    game_width = @canvases.game_canvas.clientWidth
+    game_layer = (layer for layer in @layers when layer.name is 'game')[0]
+    return unless game_layer?
+    game_width = game_layer.canvas.clientWidth
     left = window.innerWidth / 2 - game_width / 2
-    element.style.left = "#{left}px" for element in @centered_elements
-    layer.canvas.style.left = "#{left}px" for layer in @layers
+    @reserve_controls_space()
+    container_top = @container.getBoundingClientRect().top + window.scrollY
+    for element in @centered_elements
+      element.style.left = "#{left}px"
+      if element.offsetHeight > 0
+        element.style.top = "#{container_top - element.offsetHeight - @top_margin}px"
 
   scale_to: (scale) ->
     @scale = scale
@@ -164,10 +205,13 @@ export class Viewport
   demaximize: -> @scale_to 1
 
   available_size: ->
-    canvas = @canvases.game_canvas
+    @reserve_controls_space()
+    game_layer = (layer for layer in @layers when layer.name is 'game')[0]
+    canvas = game_layer?.canvas
+    return {width: window.innerWidth, height: window.innerHeight} unless canvas?
     border = canvas.offsetWidth - canvas.clientWidth
     width: window.innerWidth - border
-    height: window.innerHeight - canvas.offsetTop - border
+    height: window.innerHeight - @container.offsetTop - border
 
   maximize: ->
     avail = @available_size()
@@ -190,7 +234,10 @@ export class Viewport
       layer.height = height
     @on_resize? width, height
 
-  to_local: (clientX, clientY, canvas = @canvases.overlay_canvas) ->
+  to_local: (clientX, clientY, canvas = null) ->
+    canvas ?= (layer.canvas for layer in @layers when layer.name is 'overlay')[0]
+    canvas ?= @layers[@layers.length - 1]?.canvas
+    return {x: 0, y: 0} unless canvas?
     rect = canvas.getBoundingClientRect()
     x: (clientX - rect.left - canvas.clientLeft) / @scale
     y: (clientY - rect.top - canvas.clientTop) / @scale
@@ -209,4 +256,4 @@ export class Viewport
     @layout_timeout = setTimeout (=> @layout options), delay
 
   stretch: (width = '100%') ->
-    canvas.style.width = width for name, canvas of @canvases
+    @set_canvas_style lease.canvas, {width} for lease from @leases

@@ -25,14 +25,17 @@ export class KeyBindings
   keydown: (key) =>
     k = key.which
     #console.log("keydown", k)
-    if k of @bindings && !(k of @active_bindings)
-      @bindings[k].down?()
-      @active_bindings[k] =
-        during: @bindings[k].during
-        called: false
+    if k of @bindings
+      key.preventDefault?()
+      unless k of @active_bindings
+        @bindings[k].down?()
+        @active_bindings[k] =
+          during: @bindings[k].during
+          called: false
 
   keyup: (key) =>
     k = key.which
+    key.preventDefault?() if k of @bindings
     if k of @active_bindings
       {during:during, called:called} = @active_bindings[k]
       during?() if not called

@@ -4,8 +4,8 @@ import {Util} from '../core/Util'
 export class Background extends Layer
   DEFAULT_STEP_RATE = 40
 
-  constructor: (canvas) ->
-    super(canvas)
+  constructor: (canvas, viewport) ->
+    super(canvas, viewport)
     @name = "background"
     @setup_fsm Naubino.settings.events.background
     @fps = @default_fps = 2
