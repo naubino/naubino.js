@@ -1,6 +1,6 @@
 # controlls everything that has to do with logic and gameplay or menus
-# @extends Layer
 import {Layer} from "../core/Layer"
+import {Background} from "../ui/Background"
 import {World} from "./World"
 import {Naub} from "./Naub"
 import {Graph} from "./Graph"
@@ -10,11 +10,30 @@ import {DragSystem} from "./DragSystem"
 import {Mode} from "../modes/Mode"
 import {GameEvents} from "../Events"
 
-export class Game extends Layer
+export class Game
 
   # get this started
-  constructor: (canvas, @mode = new Mode, @app_events = Naubino.events) ->
-    super(canvas)
+  constructor: (@viewport, @mode = new Mode, @app_events = Naubino.events) ->
+    @background_lease = @viewport.lease 0, 'canvas-background'
+    @field_lease = @viewport.lease 1, 'canvas-game'
+    @background = new Background @background_lease.canvas, @viewport
+    @background.init()
+    @field_layer = new Layer @field_lease.canvas, @viewport
+    @field_layer.name = 'game'
+    @field_layer.variable_timestep = yes
+    @field_layer.use_raf = yes
+    @field_layer.step = (dt) => @step dt
+    @field_layer.draw = => @draw()
+    @layers = [@background, this]
+    @canvas = @field_layer.canvas
+    @ctx = @field_layer.ctx
+    @width = @field_layer.width
+    @height = @field_layer.height
+    @pointer = @field_layer.pointer
+    @center = => @field_layer.center()
+    @fps = @field_layer.fps
+    @step_rate = @field_layer.step_rate
+    @name = 'game'
     @events = new GameEvents
     @timeouts = new Set
     @disposed = no
@@ -23,9 +42,6 @@ export class Game extends Layer
     @expose_world()
     @version = @mode.version
     @mode_id = @mode.id
-    @name = "game"
-    @variable_timestep = yes
-    @use_raf = yes
     @graph = new Graph(this)
     @factory = new Factory(this)
     @join_policy = @mode.join_policy this
@@ -70,6 +86,21 @@ export class Game extends Layer
     @rules = @mode.rules this
     @mode_unsubscribe = @mode.bind this, @app_events
 
+  advance: (dt) ->
+    @background.advance dt
+    @field_layer.advance dt
+
+  start_stepping: -> @field_layer.start_stepping()
+  stop_stepping: -> @field_layer.stop_stepping()
+  start_drawing: -> @field_layer.start_drawing()
+  stop_drawing: -> @field_layer.stop_drawing()
+  fade_out: (callback) -> @field_layer.fade_out callback
+  clear: -> @field_layer.clear()
+  scale_to: (scale) -> @field_layer.scale_to scale
+  set_fps_label_depth: (depth) -> @field_layer.fps_label_depth = depth
+  draw_point: (position, color) -> @field_layer.draw_point position, color
+  move_pointer: (x, y) ->
+    [@pointer.x, @pointer.y] = [x, y] if @mousedown
 
   build_config: ->
     game = Object.assign {}, Naubino.settings.game, @mode.game_config ? {}
@@ -97,6 +128,9 @@ export class Game extends Layer
   onbeforeloose: -> not @disposed
 
   onplaying: (e,f,t) ->
+    @field_layer.show()
+    @start_drawing()
+    @start_stepping()
     rule.start() for rule in @rules
     @checking = setInterval @check, 300 unless @checking
     @mode.playing this, f
@@ -109,6 +143,10 @@ export class Game extends Layer
     @checking = null
     return
 
+  onpaused: ->
+    @stop_stepping()
+    @stop_drawing()
+
   # recurring check (@checking)
   check: =>
     rule.check() for rule in @rules
@@ -116,6 +154,8 @@ export class Game extends Layer
 
 
   resize: (@width, @height) ->
+    @field_layer.width = @width
+    @field_layer.height = @height
     # Springs must follow the field's new center.
     center = @center()
     @for_each (naub) ->
@@ -190,13 +230,17 @@ export class Game extends Layer
     @stop_drawing()
     clearInterval @checking if @checking?
     @checking = null
-    clearInterval @fadeloop if @fadeloop?
-    @fadeloop = null
+    clearInterval @field_layer.fadeloop if @field_layer.fadeloop?
+    @field_layer.fadeloop = null
     clearTimeout timeout_id for timeout_id from @timeouts
     @timeouts.clear()
     @cancel_destroy_batches()
     @clear_objects()
     @clear()
+    @background.stop() if @background.can 'stop'
+    @background.clear()
+    @background_lease.release()
+    @field_lease.release()
     signal.active = no for signal in Object.values(@events)
     unsubscribe() for unsubscribe in @subscriptions
     @subscriptions = []
@@ -344,6 +388,10 @@ export class Game extends Layer
     obj.attracted_to @center()
 
   get_object: (id) -> @world.get_object id
+
+  for_each: (callback) ->
+    callback naub for naub_id, naub of @objects
+    return
 
   remove_obj: (id) ->
     delete @destroying_naubs[id] if @destroying_naubs?

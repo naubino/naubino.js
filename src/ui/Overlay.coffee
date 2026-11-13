@@ -4,8 +4,8 @@ FLY_MIN_SCALE = 0.2
 FLY_MAX_SCALE = 5
 
 export class Overlay extends Layer
-  constructor: (canvas) ->
-    super(canvas)
+  constructor: (canvas, viewport) ->
+    super(canvas, viewport)
     @name = "overlay"
     @fps = 20 # 5fps
 

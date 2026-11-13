@@ -53,12 +53,12 @@ canvas,
 .canvas {
     display: block;
     border: 1px solid gray;
-    touch-action: none;
 }
 
-#background_canvas {
+.canvas-background {
     background-color: var(--canvas-background-color);
 }
+
 
 #highscore {
     display: none;
@@ -79,15 +79,6 @@ header {
 #gamediv {
     background-color: var(--game-background-color);
     display: block;
-    touch-action: none;
-}
-
-#gamediv > canvas,
-#gamediv .canvas {
-    position: absolute;
-    z-index: 0;
-    left: auto;
-    top: 20px;
 }
 
 form {
@@ -123,11 +114,11 @@ html.touch body {
 }
 
 html.touch form {
+    top: 0;
     display: none;
 }
 
 html.touch #gamediv > canvas {
-    top: 0;
     border: none;
 }
 

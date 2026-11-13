@@ -11,7 +11,7 @@ import {Input} from './Input'
 import {Settings} from './config/Settings'
 import {Viewport} from './Viewport'
 import {GameLoop} from './GameLoop'
-import {Background} from './ui/Background'
+
 import {Menu} from './ui/Menu'
 import {Overlay} from './ui/Overlay'
 import {Game} from './game/Game'
@@ -68,8 +68,8 @@ export class Naubino
 
   recolor: -> @game.for_each (naub) -> naub.recolor()
 
-  # pushes the active scheme's background onto the page so CSS (e.g.
-  # #background_canvas) can pick it up via --canvas-background-color.
+  # pushes the active scheme's background onto the page so CSS can pick it up
+  # via --canvas-background-color.
   # an inline custom property wins over whatever the prefers-color-scheme
   # media query would otherwise set on :root.
   apply_color_scheme: ->
@@ -88,15 +88,14 @@ export class Naubino
     }
 
   setup_components: ->
-    canvases = @viewport.canvases
-    @background = new Background canvases.background_canvas
-    @menu = new Menu canvases.menu_canvas, @events
-    @overlay = new Overlay canvases.overlay_canvas
-    @layers = [@background, @menu, @overlay]
-    @background.init()
+    @menu_lease = @viewport.lease 2, 'canvas-menu'
+    @overlay_lease = @viewport.lease 3, 'canvas-overlay'
+    @menu = new Menu @menu_lease.canvas, @events, @viewport
+    @overlay = new Overlay @overlay_lease.canvas, @viewport
+    @layers = [@menu, @overlay]
     @menu.init()
     @overlay.init()
-    @viewport.set_layers @layers, [@background, @menu]
+    @viewport.set_layers @layers, [@menu]
     @loop = new GameLoop @layers
 
   attach: (game) ->
@@ -107,22 +106,22 @@ export class Naubino
       game.events.level_changed.add (level) =>
         @overlay.fade_in_and_out_message "Level #{level}" if level > 0
       game.events.chain_bonus.add (points) => @overlay.fly_in_and_out_message "\n\nChain Bonus #{points}"
-      game.events.overflow_warning.add (severity) => @background.warn_overflow severity
-      game.events.basket_changed.add (size) =>
-        @background.basket_size = size
-        @background.draw()
+      game.events.overflow_warning.add (severity) -> game.background.warn_overflow severity
+      game.events.basket_changed.add (size) ->
+        game.background.basket_size = size
+        game.background.draw()
       game.events.state_changed.add (state) =>
         @menu.check_game_state state
         switch state
           when 'playing'
             @overlay.play() if @overlay.can 'play'
-            @background.play() if @background.can 'play'
+            game.background.play() if game.background.can 'play'
           when 'paused'
             @overlay.pause() if @overlay.can 'pause'
-            @background.pause() if @background.can 'pause'
+            game.background.pause() if game.background.can 'pause'
           when 'finished'
             @overlay.stop() if @overlay.can 'stop'
-            @background.stop() if @background.can 'stop'
+            game.background.stop() if game.background.can 'stop'
       game.events.lost.add (reason) => @overlay.warning reason
       game.events.finished.add (snapshot) =>
         @finish_run snapshot
@@ -138,13 +137,12 @@ export class Naubino
     @detach_game = null
     @game?.dispose()
     @overlay.stop() if @overlay.can 'stop'
-    @background.stop() if @background.can 'stop'
     @mode = mode
-    @game = new Game @viewport.canvases.game_canvas, @mode, @events
-    @layers = [@background, @game, @menu, @overlay]
-    @viewport.set_layers @layers, [@background, @game, @menu]
+    @game = new Game @viewport, @mode, @events
+    @layers = @game.layers.concat [@menu, @overlay]
+    @viewport.set_layers @layers, @game.layers.concat [@menu]
     @viewport.on_resize = (width, height) => @game.resize width, height
-    @loop.layers = @layers
+    @loop.game = @game
     @detach_game = @attach @game
     @game.publish_snapshot()
     @menu.check_game_state @game.current
@@ -165,11 +163,11 @@ export class Naubino
   dispose: ->
     @input?.unbind()
     @loop?.stop()
-    @viewport?.dispose()
     @detach_game?()
     @detach_game = null
     @game?.dispose()
     @menu?.dispose()
+    @viewport?.dispose()
 
   center: -> @viewport.center()
   scale_to: (scale) -> @viewport.scale_to scale
@@ -182,7 +180,7 @@ export class Naubino
 
 
   list_states: ->
-    for o in [@menu, @game, @overlay, @background]
+    for o in [@menu, @game, @overlay, @game?.background]
       switch o.current
         when 'playing' then console.info o.name, o.current, o.fps, o.step_rate
         when 'paused'  then console.warn o.name, o.current, o.fps, o.step_rate

@@ -7,8 +7,8 @@ import {Factory} from "../game/Factory"
 export class Menu extends Layer
   DEFAULT_STEP_RATE = 40
 
-  constructor: (canvas, @events = Naubino.events) ->
-    super(canvas)
+  constructor: (canvas, @events = Naubino.events, viewport) ->
+    super(canvas, viewport)
     @name = "menu"
     @graph = new Graph this
     @factory = new Factory this

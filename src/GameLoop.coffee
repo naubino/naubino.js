@@ -1,6 +1,6 @@
 export class GameLoop
 
-  constructor: (@layers = []) ->
+  constructor: (@layers = [], @game = null) ->
     @animation_frame_id = null
     @running = false
 
@@ -13,6 +13,7 @@ export class GameLoop
       dt = now - last
       last = now
       layer.advance(dt) for layer in @layers
+      @game.advance dt if @game?
       @animation_frame_id = requestAnimationFrame tick if @running
     @animation_frame_id = requestAnimationFrame tick
 
