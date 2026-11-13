@@ -11,7 +11,6 @@ import {Input} from './Input'
 import {Settings} from './config/Settings'
 import {Viewport} from './Viewport'
 import {GameLoop} from './GameLoop'
-import {Session} from './Session'
 import {Background} from './ui/Background'
 import {Menu} from './ui/Menu'
 import {Overlay} from './ui/Overlay'
@@ -57,9 +56,8 @@ export class Naubino
   setup: ->
     @setup_dom()
     @setup_components()
-    @setup_session()
     @setup_input()
-    @init()
+    @start_game @mode
     @play() if @mode.auto_start
     @start_loop()
     console.timeEnd("loading")
@@ -94,12 +92,12 @@ export class Naubino
     @background = new Background canvases.background_canvas
     @menu = new Menu canvases.menu_canvas, @events
     @overlay = new Overlay canvases.overlay_canvas
-    @game = new Game canvases.game_canvas, @mode, @events
-    @layers = [@background, @game, @menu, @overlay]
-    @viewport.set_layers @layers, [@background, @game, @menu]
-    @viewport.on_resize = (width, height) => @game.resize width, height
+    @layers = [@background, @menu, @overlay]
+    @background.init()
+    @menu.init()
+    @overlay.init()
+    @viewport.set_layers @layers, [@background, @menu]
     @loop = new GameLoop @layers
-    @detach_game = @attach @game
 
   attach: (game) ->
     subscriptions = [
@@ -113,31 +111,54 @@ export class Naubino
       game.events.basket_changed.add (size) =>
         @background.basket_size = size
         @background.draw()
-      @events.session.state_changed.add (state) => @menu.check_game_state state
+      game.events.state_changed.add (state) =>
+        @menu.check_game_state state
+        switch state
+          when 'playing'
+            @overlay.play() if @overlay.can 'play'
+            @background.play() if @background.can 'play'
+          when 'paused'
+            @overlay.pause() if @overlay.can 'pause'
+            @background.pause() if @background.can 'pause'
+          when 'finished'
+            @overlay.stop() if @overlay.can 'stop'
+            @background.stop() if @background.can 'stop'
+      game.events.lost.add (reason) => @overlay.warning reason
+      game.events.finished.add (snapshot) =>
+        @finish_run snapshot
+        @start_game @mode
+      game.naub_joined.add @audio.random_blub
+      game.naub_replaced.add @audio.random_blub
+      game.naub_destroyed.add @audio.random_blub
     ]
-    game.publish_snapshot()
     -> unsubscribe() for unsubscribe in subscriptions
 
-  setup_session: ->
-    @session = new Session {
-      @game
-      @menu
-      @overlay
-      @background
-      transitions: @settings.events
-      @events
-      @name
-      on_finished: (score) => @finish_run score
-    }
+  start_game: (mode = @mode) ->
+    @detach_game?()
+    @detach_game = null
+    @game?.dispose()
+    @overlay.stop() if @overlay.can 'stop'
+    @background.stop() if @background.can 'stop'
+    @mode = mode
+    @game = new Game @viewport.canvases.game_canvas, @mode, @events
+    @layers = [@background, @game, @menu, @overlay]
+    @viewport.set_layers @layers, [@background, @game, @menu]
+    @viewport.on_resize = (width, height) => @game.resize width, height
+    @loop.layers = @layers
+    @detach_game = @attach @game
+    @game.init()
+    @game.publish_snapshot()
+    @menu.check_game_state @game.current
+    @game
 
   # state machine forwarding
-  init:   (args...) -> @session.init args...
-  play:   (args...) -> @session.play args...
-  pause:  (args...) -> @session.pause args...
-  stop:   (args...) -> @session.stop args...
-  loose:  (args...) -> @session.loose args...
-  toggle: (args...)-> @session.toggle(args...)
-  can:    (event) -> @session.can event
+  init:   (args...) -> @game.init args...
+  play:   (args...) -> @game.play args...
+  pause:  (args...) -> @game.pause args...
+  stop:   (args...) -> @game.stop args...
+  loose:  (args...) -> @game.loose args...
+  toggle: (args...)-> @game.toggle(args...)
+  can:    (event) -> @game.can event
 
   start_loop: -> @loop.start()
   stop_loop: -> @loop.stop()
@@ -146,7 +167,6 @@ export class Naubino
     @input?.unbind()
     @loop?.stop()
     @viewport?.dispose()
-    @session?.dispose()
     @detach_game?()
     @detach_game = null
     @game?.dispose()
@@ -163,7 +183,7 @@ export class Naubino
 
 
   list_states: ->
-    for o in [@session, @menu, @game, @overlay, @background]
+    for o in [@menu, @game, @overlay, @background]
       switch o.current
         when 'playing' then console.info o.name, o.current, o.fps, o.step_rate
         when 'paused'  then console.warn o.name, o.current, o.fps, o.step_rate

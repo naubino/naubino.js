@@ -15,8 +15,6 @@ export class Events
       toggle: new Signal
 
 
-    @session =
-      state_changed: new Signal
 
     @menu =
       button: new Signal
@@ -25,9 +23,12 @@ export class Events
 
 export class GameEvents
   constructor: ->
-    @outcome = new Signal
+
     @overflow_warning = new Signal
     @basket_changed = new Signal
     @level_changed = new Signal
     @chain_bonus = new Signal
     @score_changed = new Signal
+    @state_changed = new Signal
+    @lost = new Signal
+    @finished = new Signal

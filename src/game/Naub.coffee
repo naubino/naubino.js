@@ -19,6 +19,8 @@ export class Naub
     @width       = @size * 0.9
     @height      = @size * 0.9
     @destroying  = false
+    @timeouts = []
+    @intervals = []
 
     @removed     = false # soon to be deleted by game, garbage collector
     @focused     = false # currently activated by pointer
@@ -270,6 +272,12 @@ export class Naub
       @split_join id
     @removed = true
 
+  dispose: ->
+    clearTimeout timeout_id for timeout_id in @timeouts
+    clearInterval interval_id for interval_id in @intervals
+    @timeouts = []
+    @intervals = []
+
   split_join: (id) ->
     if id of @joins
       partner = @joins[id]
@@ -297,7 +305,8 @@ export class Naub
     @life_rendering = on
 
     #@shapes[0].destroy_animation(duration) # when this one is done the naub is removed
-    setTimeout (=> @remove()), duration
+    @remove_timeout = setTimeout((=> @remove()), duration)
+    @timeouts.push @remove_timeout
 
     @animation(@shrink,duration)
 
@@ -326,14 +335,14 @@ export class Naub
     duration = duration/interval
     if typeof animation == 'function'
       animation_dt = 0
-      i = setInterval (
-        ->
-          if animation_dt < duration
-            animation(++animation_dt/duration)
-          else
-            clearInterval i
-
-      ), interval
+      interval_id = setInterval((=>
+        if animation_dt < duration
+          animation(++animation_dt/duration)
+        else
+          clearInterval interval_id
+          @intervals = @intervals.filter (active_interval) -> active_interval isnt interval_id
+      ), interval)
+      @intervals.push interval_id
 
 
 

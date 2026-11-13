@@ -23,7 +23,7 @@ export class DebugMode extends Mode
     game.cycle_found.add (list) -> game.destroy_naubs(list)
 
   playing: (game, from) ->
-    return unless from is 'stopped'
+    return unless from is 'ready'
     game.factory.create_matching_naubs()
     @add_ball game for [0..5]
 
