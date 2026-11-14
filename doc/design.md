@@ -91,8 +91,8 @@ Rules for implementers:
 | V6 | Hover (`pointer_move` with no active capture or gesture) is routed to `Menu` only for mouse pointers. | `pointer_move` checks `event.pointerType is 'mouse'` before forwarding to the menu layer. | done |
 | V7 | A tap on the menu's region opens it even when the pointer is a touch pointer. | `Menu.accepts_pointer` and `Menu.pointer_start` are reached by `pointer_down` regardless of `pointerType`. | done |
 | V8 | Two-finger gestures (pause toggle, drag cancel) are recognized and tracked in `Viewport`, not `Input`. | Gesture state (`@gesture`, `@active_pointers`) lives in `Viewport.coffee`; `Input.coffee` has none. | done |
-| V9 | `Viewport` dispatches a `field_resized(width, height)` notification instead of calling a resize callback directly. | A `Signal` named `field_resized` on `Viewport` or `AppEvents`; no `@on_resize` callback property. | todo |
-| V10 | `Game` takes its initial field size in the constructor and updates center, anchors, spawn bounds, and physics bounds from `field_resized`. | `Game`'s constructor signature includes a field size; `Game.resize` is the `field_resized` subscriber. | partial |
+| V9 | `Viewport` dispatches a `field_resized(width, height)` notification instead of calling a resize callback directly. | A `Signal` named `field_resized` on `Viewport` or `AppEvents`; no `@on_resize` callback property. | done |
+| V10 | `Game` takes its initial field size in the constructor. Layout preserves world coordinates, anchors, walls, and physics bounds. Browser-native rotation is the default; compensation is optional. | `Game.resize` updates only `view_bounds`; `Viewport` applies the selected view transform and inversely maps pointer input. | done |
 | V11 | `canvas.style` is only read or written inside `Viewport`. | `grep "canvas.style" src` has no hits outside `Viewport.coffee`. | done |
 | V12 | `Input` is keyboard-only. The `pointer_start`/`pointer_move`/`pointer_end` signals are removed from `Events`. | `Input.coffee` takes no `canvas`/`viewport`; `Events.input` has no `pointer_*` keys. | done |
 
@@ -188,6 +188,25 @@ Claims: O5, V1, V2, V3, V11.
    canvases from `Viewport` and releases them on dispose.
 2. The shell registers `game.layers` with `Viewport`; `GameLoop` advances
    the shell layers and current `Game`.
+
+Resize follow-up (V9, V10): `Viewport.field_resized` notifies the current
+`Game`, which unsubscribes on disposal. The constructor receives the initial
+field size after initial layout. World coordinates, physics bounds, bodies,
+anchors, walls, and drag state remain unchanged by layout. Browser-native
+rotation is the default; `graphics.compensate_rotation` defaults to false.
+Experimental compensation for the game and background layers can be enabled
+with `?compensate_rotation=true` or changed through `Settings.set` at runtime.
+It does not configure individual objects. Menu and overlay stay upright in
+browser coordinates. Pointer routing applies the inverse selected world
+transform for game input, including captured drags.
+Changes to the visible world dimensions dispatch `field_resized` and update
+`Game.view_bounds` for camera framing and Factory spawning without moving
+the world. With compensation enabled, a pure rotation keeps these dimensions
+unchanged and does not dispatch `field_resized`. Screen Orientation API changes and legacy iOS
+orientation changes are handled and unsubscribed by `Viewport`.
+Default overlay messages stay centered, including their scaling pivot.
+Explicit text coordinates stay fixed. Layout repaints paused messages without
+advancing their animations.
 
 ### Stage 5: Game subclasses, Mode as data
 
