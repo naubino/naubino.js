@@ -53,9 +53,10 @@ export class Naubino
     string = JSON.stringify @scores
     localStorage.setItem("naubino_hiscore",string)
 
-  setup: ->
+  setup: (layout_options = {}) ->
     @setup_dom()
     @setup_components()
+    @viewport.layout layout_options
     @setup_input()
     @start_game @mode
     @play() if @mode.auto_start
@@ -85,6 +86,7 @@ export class Naubino
     @viewport = new Viewport container, @settings.canvas, {
       centered_elements: if form? then [form] else []
       events: @events
+      compensate_rotation: @settings.graphics.compensate_rotation
     }
 
   setup_components: ->
@@ -138,14 +140,16 @@ export class Naubino
     @game?.dispose()
     @overlay.stop() if @overlay.can 'stop'
     @mode = mode
-    @game = new Game @viewport, @mode, @events
+    field_size = @viewport.field_size()
+    @game = new Game @viewport, field_size, @mode, @events
     @layers = @game.layers.concat [@menu, @overlay]
     @viewport.set_layers @layers, @game.layers.concat [@menu]
-    @viewport.on_resize = (width, height) => @game.resize width, height
+
     @loop.game = @game
     @detach_game = @attach @game
     @game.publish_snapshot()
     @menu.check_game_state @game.current
+    @viewport.scale_to @viewport.scale
     @game
 
   # state machine forwarding

@@ -26,6 +26,7 @@ export Settings = {
     use_raf:       yes
     draw_constraints: no
     draw_pointer: no
+    compensate_rotation: no
 
   game:
     creation_offset: 50
@@ -229,6 +230,7 @@ Settings.load_from_search = (search = '') ->
     Settings.set 'graphics.draw_borders', yes
   setBooleanParam 'show_fps', 'graphics.show_fps'
   setBooleanParam 'draw_constraints', 'graphics.draw_constraints'
+  setBooleanParam 'compensate_rotation', 'graphics.compensate_rotation'
 
 # returns an unsubscribe function
 Settings.watch = (path, cb) ->

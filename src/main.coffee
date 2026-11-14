@@ -11,8 +11,17 @@ console.time("loading")
 window.onload = ->
   Settings.load_from_search window.location.search
   mode = modeFromSearch window.location.search
+  if navigator.maxTouchPoints > 0 and matchMedia("(pointer: coarse)").matches
+    document.documentElement.classList.add "touch"
+    document.querySelector("#maximizeCheck").checked = true
+
+  maximize_check = document.querySelector '#maximizeCheck'
+  layout_options = (fit = Util.isTouch()) ->
+    maximized: maximize_check.checked or Util.isFullscreen()
+    fit: fit
+
   naubino = window.Naubino = new Naubino(mode, '#gamediv')
-  naubino.setup()
+  naubino.setup layout_options(true)
   naubino.apply_color_scheme()
   document.querySelector("#highscorelink").addEventListener "click", ->
     confirm "do you want to leave this page?"
@@ -23,24 +32,13 @@ window.onload = ->
 
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", -> naubino.apply_color_scheme())
 
-  if navigator.maxTouchPoints > 0 and matchMedia("(pointer: coarse)").matches
-    document.documentElement.classList.add "touch"
-    document.querySelector("#maximizeCheck").checked = true
+  if Util.isTouch()
     naubino.menu.open()
     naubino.play()
-
-  maximize_check = document.querySelector '#maximizeCheck'
-
-  layout_options = (fit = Util.isTouch()) ->
-    maximized: maximize_check.checked or Util.isFullscreen()
-    fit: fit
 
   maximize_check.addEventListener 'change', -> naubino.viewport.layout layout_options(true)
 
   window.addEventListener 'resize', -> naubino.viewport.schedule_layout layout_options()
-  window.addEventListener 'orientationchange', -> naubino.viewport.schedule_layout layout_options(), 300
-
-  naubino.viewport.layout layout_options(true)
 
   new Controls(naubino, on_layout: ->
     naubino.viewport.layout layout_options(true)

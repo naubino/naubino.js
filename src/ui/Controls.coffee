@@ -16,6 +16,9 @@ export class Controls
 
     @settings.watch 'graphics.fullscreen', (on_) => @apply_fullscreen on_
     @settings.watch 'graphics.effects', => @apply_effects()
+    @settings.watch 'graphics.compensate_rotation', (enabled) =>
+      @naubino.viewport.compensate_rotation = enabled
+      @on_layout?()
 
     on_change = =>
       @settings.set 'graphics.fullscreen', Util.isFullscreen()

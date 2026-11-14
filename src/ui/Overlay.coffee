@@ -19,20 +19,28 @@ export class Overlay extends Layer
     active_objects
 
 
-  draw: ->
-    @pause() if @active_objects() == 0 and @can 'pause'
+  scale_to: (scale) ->
+    super scale
+    @draw no
+
+  draw: (advance = yes) ->
+    @pause() if advance and @active_objects() == 0 and @can 'pause'
 
     @clear()
     @ctx.save()
     # objects are all full size buffers
     for id, buffer of @objects
-      buffer.render() if buffer.life? or buffer.buffer.width isnt @canvas.width or buffer.buffer.height isnt @canvas.height or buffer.dark_mode isnt Util.isDarkMode()
-      @fade_object buffer, id
+      if buffer.life? or buffer.buffer.width isnt @canvas.width or
+          buffer.buffer.height isnt @canvas.height or buffer.dark_mode isnt Util.isDarkMode() or
+          buffer.width isnt @width or buffer.height isnt @height
+        buffer.render()
+      @fade_object buffer, id if advance
       @ctx.save()
       @ctx.globalAlpha = buffer.alpha if buffer.alpha?
       if buffer.scale?
-        center_x = buffer.pos.x
-        center_y = buffer.pos.y
+        position = buffer.pos ? @center()
+        center_x = position.x
+        center_y = position.y
         @ctx.translate(center_x, center_y)
         @ctx.scale(buffer.scale, buffer.scale)
         @ctx.translate(-center_x, -center_y)
@@ -166,7 +174,6 @@ class TextBuffer
   parse_text: (text) ->
     {@life, @color, @fontsize, @font, text, @pos, @weight, @align, x, y} = text unless typeof text == "string"
     @pos = new cp.v(x,y) if x? and y?
-    @pos       ?= @layer.center()
 
     @fontsize  ?= Naubino.settings.overlay.fontsize
     @fontsize   = Naubino.settings.overlay.fontsize unless typeof @fontsize == "number"
@@ -176,6 +183,8 @@ class TextBuffer
     @text = text
 
   render: ->
+    @width = @layer.width
+    @height = @layer.height
     @buffer.width = @layer.canvas.width if @buffer.width isnt @layer.canvas.width
     @buffer.height = @layer.canvas.height if @buffer.height isnt @layer.canvas.height
     @ctx.setTransform(1, 0, 0, 1, 0, 0)
@@ -185,7 +194,8 @@ class TextBuffer
     text_color = @color ? (if dark_mode then 'white' else 'black')
     @dark_mode = dark_mode
     lines = @text.split("\n")
-    pos = {x:@pos.x, y:@pos.y}
+    position = @pos ? @layer.center()
+    pos = {x: position.x, y: position.y}
     pos.y -= @fontsize * (lines.length - 1) / 2
     for line in lines
       console.log "OVERLAY:", line unless @life
