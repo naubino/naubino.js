@@ -1,3 +1,5 @@
+import {Signal} from './core/Signal'
+
 export class Viewport
 
   constructor: (@container, canvas_settings, options = {}) ->
@@ -20,6 +22,7 @@ export class Viewport
     for element in @centered_elements
       @set_canvas_style element, zIndex: '1'
     @events = options.events
+    @field_resized = new Signal
     @layers = []
     @redraw_layers = []
     @leases = new Set
@@ -161,6 +164,8 @@ export class Viewport
     @events.input.two_finger_end.dispatch()
 
   dispose: ->
+    clearTimeout @layout_timeout
+    @field_resized.active = no
     @container.removeEventListener 'pointerdown', @on_pointerdown
     @container.removeEventListener 'pointermove', @on_pointermove
     @container.removeEventListener 'pointerup', @on_pointerup
@@ -199,6 +204,9 @@ export class Viewport
 
   scale_to: (scale) ->
     @scale = scale
+    @set_canvas_style @container,
+      width: "#{@width * scale}px"
+      height: "#{@height * scale}px"
     layer.scale_to scale for layer in @layers
     layer.draw() for layer in @redraw_layers
 
@@ -227,12 +235,14 @@ export class Viewport
       @resize_field short, Math.round(short * height / width)
 
   resize_field: (width, height) ->
+    return if width is @width and height is @height
     @width = width
     @height = height
     for layer in @layers
       layer.width = width
       layer.height = height
-    @on_resize? width, height
+    @field_resized.dispatch width, height
+    @scale_to @scale
 
   to_local: (clientX, clientY, canvas = null) ->
     canvas ?= (layer.canvas for layer in @layers when layer.name is 'overlay')[0]

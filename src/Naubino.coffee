@@ -138,14 +138,16 @@ export class Naubino
     @game?.dispose()
     @overlay.stop() if @overlay.can 'stop'
     @mode = mode
-    @game = new Game @viewport, @mode, @events
+    field_size = {width: @viewport.width, height: @viewport.height}
+    @game = new Game @viewport, field_size, @mode, @events
     @layers = @game.layers.concat [@menu, @overlay]
     @viewport.set_layers @layers, @game.layers.concat [@menu]
-    @viewport.on_resize = (width, height) => @game.resize width, height
+
     @loop.game = @game
     @detach_game = @attach @game
     @game.publish_snapshot()
     @menu.check_game_state @game.current
+    @viewport.scale_to @viewport.scale
     @game
 
   # state machine forwarding

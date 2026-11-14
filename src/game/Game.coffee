@@ -13,10 +13,13 @@ import {GameEvents} from "../Events"
 export class Game
 
   # get this started
-  constructor: (@viewport, @mode = new Mode, @app_events = Naubino.events) ->
+  constructor: (@viewport, field_size, @mode = new Mode, @app_events = Naubino.events) ->
+    {@width, @height} = field_size
     @background_lease = @viewport.lease 0, 'canvas-background'
     @field_lease = @viewport.lease 1, 'canvas-game'
     @background = new Background @background_lease.canvas, @viewport
+    @background.width = @width
+    @background.height = @height
     @background.init()
     @field_layer = new Layer @field_lease.canvas, @viewport
     @field_layer.name = 'game'
@@ -27,8 +30,8 @@ export class Game
     @layers = [@background, this]
     @canvas = @field_layer.canvas
     @ctx = @field_layer.ctx
-    @width = @field_layer.width
-    @height = @field_layer.height
+    @field_layer.width = @width
+    @field_layer.height = @height
     @pointer = @field_layer.pointer
     @center = => @field_layer.center()
     @fps = @field_layer.fps
@@ -75,6 +78,7 @@ export class Game
     }
 
     @subscriptions = [
+      @viewport.field_resized.add (width, height) => @resize width, height
       @app_events.commands.play.add => @play()
       @app_events.commands.pause.add => @pause()
       @app_events.commands.stop.add (force) => @stop force
@@ -153,10 +157,11 @@ export class Game
     return
 
 
-  resize: (@width, @height) ->
-    @field_layer.width = @width
-    @field_layer.height = @height
-    # Springs must follow the field's new center.
+  resize: (width, height) ->
+    return if @disposed
+    @width = @field_layer.width = @background.width = width
+    @height = @field_layer.height = @background.height = height
+    @physics.resize width, height
     center = @center()
     @for_each (naub) ->
       naub.center = center.Copy()

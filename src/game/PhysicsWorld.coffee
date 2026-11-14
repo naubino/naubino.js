@@ -9,6 +9,12 @@ export class PhysicsWorld
     @mouseBody.p = cp.vzero
     @space.addBody @mouseBody
 
+  resize: (@width, @height) ->
+    if @walls?
+      @space.removeShape wall for name, wall of @walls
+      @add_walls()
+    return
+
   add_walls: ->
     ws = 15 #wall_strength
     @walls = {}
