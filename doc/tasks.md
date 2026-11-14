@@ -67,9 +67,9 @@ Stage 4a. Claims: O5, V1, V2, V3, V11.
 
 Stage 4a. Claims: V9, V10.
 
-- [ ] `Viewport.field_resized(width, height)` signal
-- [ ] `Game` takes initial field size in its constructor
-- [ ] `Game.resize` updates center, anchors, spawn bounds, physics bounds
+- [x] `Viewport.field_resized(width, height)` signal
+- [x] `Game` takes initial field size in its constructor
+- [x] `Game.resize` updates center, anchors, spawn bounds, physics bounds
 - [ ] Browser: rotate a phone mid-game
 
 ## 6. `feat: Route pointer input through Viewport`
