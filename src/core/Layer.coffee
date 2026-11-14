@@ -180,15 +180,7 @@ export class Layer
 
   # scale: css px per game unit; backing store additionally scaled by dpr for crisp rendering
   scale_to: (scale) ->
-    { width, height } = this
-    dpr = window.devicePixelRatio or 1
-    @viewport.set_canvas_style @canvas,
-      width: "#{width  * scale}px"
-      height: "#{height * scale}px"
-    @canvas.width  = Math.round width  * scale * dpr
-    @canvas.height = Math.round height * scale * dpr
-    @ctx.setTransform scale * dpr, 0, 0, scale * dpr, 0, 0
-    @clear()
+    @viewport.scale_layer this, scale
 
   reset_resize: -> @scale_to 1
 
@@ -230,7 +222,11 @@ export class Layer
 
   hide: -> @viewport.set_canvas_style @canvas, opacity: 0
 
-  clear: -> @ctx.clearRect(0, 0, @canvas.width, @canvas.height)
+  clear: ->
+    @ctx.save()
+    @ctx.setTransform 1, 0, 0, 1, 0, 0
+    @ctx.clearRect 0, 0, @canvas.width, @canvas.height
+    @ctx.restore()
 
   cache: -> @backup_ctx = @ctx
 

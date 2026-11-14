@@ -142,20 +142,23 @@ export class Factory
   # produces a random set of coordinates outside the field
   random_outside: ->
     offset = @layer.config?.game?.creation_offset ? Naubino.settings.game.creation_offset
+    bounds = @layer.view_bounds ? {left: 0, top: 0, right: @layer.width, bottom: @layer.height}
+    width = bounds.right - bounds.left
+    height = bounds.bottom - bounds.top
     seed = Math.round (Math.random() * 3)+1
     switch seed
       when 1
-        x = @layer.width + offset
-        y = @layer.height * Math.random()
+        x = bounds.right + offset
+        y = bounds.top + height * Math.random()
       when 2
-        x = @layer.width  * Math.random()
-        y = @layer.height + offset
+        x = bounds.left + width * Math.random()
+        y = bounds.bottom + offset
       when 3
-        x = 0 - offset
-        y = @layer.height * Math.random()
+        x = bounds.left - offset
+        y = bounds.top + height * Math.random()
       when 4
-        x = @layer.width * Math.random()
-        y = 0 - offset
+        x = bounds.left + width * Math.random()
+        y = bounds.top - offset
     new cp.v x,y
 
   #returns a random

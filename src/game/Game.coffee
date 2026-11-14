@@ -13,10 +13,15 @@ import {GameEvents} from "../Events"
 export class Game
 
   # get this started
-  constructor: (@viewport, @mode = new Mode, @app_events = Naubino.events) ->
+  constructor: (@viewport, field_size, @mode = new Mode, @app_events = Naubino.events) ->
+    {@width, @height} = field_size
+    @world_center = new cp.v @width / 2, @height / 2
     @background_lease = @viewport.lease 0, 'canvas-background'
     @field_lease = @viewport.lease 1, 'canvas-game'
     @background = new Background @background_lease.canvas, @viewport
+    @background.width = @width
+    @background.height = @height
+    @background.world_center = @world_center
     @background.init()
     @field_layer = new Layer @field_lease.canvas, @viewport
     @field_layer.name = 'game'
@@ -27,16 +32,18 @@ export class Game
     @layers = [@background, this]
     @canvas = @field_layer.canvas
     @ctx = @field_layer.ctx
-    @width = @field_layer.width
-    @height = @field_layer.height
-    @pointer = @field_layer.pointer
-    @center = => @field_layer.center()
+    @field_layer.width = @width
+    @field_layer.height = @height
+    @field_layer.world_center = @world_center
+    @pointer = @world_center.Copy()
+    @center = => @world_center.Copy()
     @fps = @field_layer.fps
     @step_rate = @field_layer.step_rate
     @name = 'game'
     @events = new GameEvents
     @timeouts = new Set
     @disposed = no
+    @resize @width, @height
     @config = @build_config()
     @world = new World(@width, @height, @config.physics)
     @expose_world()
@@ -75,6 +82,7 @@ export class Game
     }
 
     @subscriptions = [
+      @viewport.field_resized.add (width, height) => @resize width, height
       @app_events.commands.play.add => @play()
       @app_events.commands.pause.add => @pause()
       @app_events.commands.stop.add (force) => @stop force
@@ -153,14 +161,13 @@ export class Game
     return
 
 
-  resize: (@width, @height) ->
-    @field_layer.width = @width
-    @field_layer.height = @height
-    # Springs must follow the field's new center.
-    center = @center()
-    @for_each (naub) ->
-      naub.center = center.Copy()
-      naub.constraints?.center?.anchr2 = center.Copy()
+  resize: (width, height) ->
+    return if @disposed
+    @view_bounds =
+      left: @world_center.x - width / 2
+      top: @world_center.y - height / 2
+      right: @world_center.x + width / 2
+      bottom: @world_center.y + height / 2
 
   score_snapshot: -> @mode.result this
 
@@ -267,7 +274,7 @@ export class Game
 
 
   point_in_field: (pos) ->
-    0 < pos.x < @width and 0 < pos.y < @height
+    @view_bounds.left < pos.x < @view_bounds.right and @view_bounds.top < pos.y < @view_bounds.bottom
 
   schedule_timeout: (callback, delay) ->
     return if @disposed

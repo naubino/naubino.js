@@ -1,3 +1,5 @@
+import {Signal} from './core/Signal'
+
 export class Viewport
 
   constructor: (@container, canvas_settings, options = {}) ->
@@ -7,6 +9,9 @@ export class Viewport
     @width = @base_size.width
     @height = @base_size.height
     @scale = 1
+    @initial_orientation = @orientation_angle()
+    @compensate_rotation = options.compensate_rotation ? no
+    @rotation = 0
     @top_margin = 0
     @set_canvas_style @container,
       width: "#{@width}px"
@@ -20,6 +25,7 @@ export class Viewport
     for element in @centered_elements
       @set_canvas_style element, zIndex: '1'
     @events = options.events
+    @field_resized = new Signal
     @layers = []
     @redraw_layers = []
     @leases = new Set
@@ -35,6 +41,9 @@ export class Viewport
     @container.addEventListener 'pointermove', @on_pointermove
     @container.addEventListener 'pointerup', @on_pointerup
     @container.addEventListener 'pointercancel', @on_pointercancel
+    @on_orientationchange = => @schedule_layout @layout_options ? {}, 300
+    window.screen?.orientation?.addEventListener 'change', @on_orientationchange
+    window.addEventListener 'orientationchange', @on_orientationchange
 
   lease: (depth = 0, class_name = null) ->
     canvas = document.createElement 'canvas'
@@ -88,8 +97,9 @@ export class Viewport
     else
       for layer in @layers.slice().reverse()
         continue unless layer.pointer_start?
-        continue if layer.accepts_pointer? and not layer.accepts_pointer(position)
-        layer.pointer_start position
+        layer_position = @layer_position position, layer
+        continue if layer.accepts_pointer? and not layer.accepts_pointer(layer_position)
+        layer.pointer_start layer_position
         @captures[pointer_id] = layer
         break
 
@@ -106,7 +116,8 @@ export class Viewport
       if origin? and Math.hypot(position.x - origin.x, position.y - origin.y) > 10
         @gesture.eligible = no
     else if layer = @captures[pointer_id]
-      layer.move_pointer? position.x, position.y
+      layer_position = @layer_position position, layer
+      layer.move_pointer? layer_position.x, layer_position.y
     else if event.pointerType is 'mouse'
       for layer in @layers.slice().reverse() when layer.name is 'menu'
         layer.move_pointer? position.x, position.y
@@ -161,6 +172,10 @@ export class Viewport
     @events.input.two_finger_end.dispatch()
 
   dispose: ->
+    clearTimeout @layout_timeout
+    @field_resized.active = no
+    window.screen?.orientation?.removeEventListener 'change', @on_orientationchange
+    window.removeEventListener 'orientationchange', @on_orientationchange
     @container.removeEventListener 'pointerdown', @on_pointerdown
     @container.removeEventListener 'pointermove', @on_pointermove
     @container.removeEventListener 'pointerup', @on_pointerup
@@ -180,6 +195,9 @@ export class Viewport
     for layer, index in @layers
       layer.fps_label_depth = @layers.length - 1 - index
       layer.set_fps_label_depth? layer.fps_label_depth
+      unless layer.world_center?
+        layer.width = @width
+        layer.height = @height
 
   reserve_controls_space: ->
     controls_height = Math.max 0, (element.offsetHeight for element in @centered_elements)...
@@ -187,8 +205,9 @@ export class Viewport
 
   center: ->
     game_layer = (layer for layer in @layers when layer.name is 'game')[0]
-    return unless game_layer?
-    game_width = game_layer.canvas.clientWidth
+    canvas = game_layer?.canvas ? @layers[0]?.canvas
+    return unless canvas?
+    game_width = canvas.clientWidth
     left = window.innerWidth / 2 - game_width / 2
     @reserve_controls_space()
     container_top = @container.getBoundingClientRect().top + window.scrollY
@@ -199,15 +218,60 @@ export class Viewport
 
   scale_to: (scale) ->
     @scale = scale
+    @set_canvas_style @container,
+      width: "#{@width * scale}px"
+      height: "#{@height * scale}px"
     layer.scale_to scale for layer in @layers
     layer.draw() for layer in @redraw_layers
+
+  scale_layer: (layer, scale) ->
+    width = if layer.world_center? then @width else layer.width
+    height = if layer.world_center? then @height else layer.height
+    pixels = scale * (window.devicePixelRatio or 1)
+    @set_canvas_style layer.canvas,
+      width: "#{width * scale}px"
+      height: "#{height * scale}px"
+    layer.canvas.width = Math.round width * pixels
+    layer.canvas.height = Math.round height * pixels
+    if layer.world_center?
+      {cosine, sine} = @rotation_basis()
+      center = layer.world_center
+      horizontal = @width / 2 - cosine * center.x + sine * center.y
+      vertical = @height / 2 - sine * center.x - cosine * center.y
+      layer.ctx.setTransform pixels * cosine, pixels * sine,
+        -pixels * sine, pixels * cosine, pixels * horizontal, pixels * vertical
+    else
+      layer.ctx.setTransform pixels, 0, 0, pixels, 0, 0
+    layer.clear()
+
+  orientation_angle: ->
+    # Legacy iOS uses the opposite sign to the Screen Orientation API.
+    window.screen?.orientation?.angle ? -(window.orientation ? 0)
+
+  rotation_basis: ->
+    radians = @rotation * Math.PI / 180
+    cosine: Math.round Math.cos radians
+    sine: Math.round Math.sin radians
+
+  field_size: ->
+    if @rotation % 180 is 0
+      return {width: @width, height: @height}
+    {width: @height, height: @width}
+
+  layer_position: (position, layer) ->
+    return position unless layer.world_center?
+    {cosine, sine} = @rotation_basis()
+    horizontal = position.x - @width / 2
+    vertical = position.y - @height / 2
+    x: layer.world_center.x + cosine * horizontal + sine * vertical
+    y: layer.world_center.y - sine * horizontal + cosine * vertical
 
   demaximize: -> @scale_to 1
 
   available_size: ->
     @reserve_controls_space()
     game_layer = (layer for layer in @layers when layer.name is 'game')[0]
-    canvas = game_layer?.canvas
+    canvas = game_layer?.canvas ? @layers[0]?.canvas
     return {width: window.innerWidth, height: window.innerHeight} unless canvas?
     border = canvas.offsetWidth - canvas.clientWidth
     width: window.innerWidth - border
@@ -227,12 +291,21 @@ export class Viewport
       @resize_field short, Math.round(short * height / width)
 
   resize_field: (width, height) ->
+    rotation = 0
+    if @compensate_rotation
+      rotation = ((@initial_orientation - @orientation_angle()) % 360 + 360) % 360
+    return if width is @width and height is @height and rotation is @rotation
+    previous = @field_size()
+    @rotation = rotation
     @width = width
     @height = height
-    for layer in @layers
+    for layer in @layers when not layer.world_center?
       layer.width = width
       layer.height = height
-    @on_resize? width, height
+    current = @field_size()
+    if current.width isnt previous.width or current.height isnt previous.height
+      @field_resized.dispatch current.width, current.height
+    @scale_to @scale
 
   to_local: (clientX, clientY, canvas = null) ->
     canvas ?= (layer.canvas for layer in @layers when layer.name is 'overlay')[0]
@@ -242,16 +315,22 @@ export class Viewport
     x: (clientX - rect.left - canvas.clientLeft) / @scale
     y: (clientY - rect.top - canvas.clientTop) / @scale
 
-  layout: ({maximized = no, fit = no} = {}) ->
+  layout: (options = {}) ->
+    @layout_options = options
+    {maximized = no, fit = no} = options
     clearTimeout @layout_timeout
+    if maximized and fit
+      @fit_field_to_viewport()
+    else
+      @resize_field @width, @height
     if maximized
-      @fit_field_to_viewport() if fit
       @maximize()
     else
       @demaximize()
     @center()
 
   schedule_layout: (options, delay = 150) ->
+    @layout_options = options
     clearTimeout @layout_timeout
     @layout_timeout = setTimeout (=> @layout options), delay
 
