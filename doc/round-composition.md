@@ -1,11 +1,13 @@
 # Round composition
 
-Status: design exploration. This document records a proposed direction, not an
-implementation specification. Names and interfaces remain open for discussion.
+Status: design exploration and rationale. Agreed decisions from the subsequent
+design discussion are recorded in [design.md](design.md), which is the source of
+truth for the target architecture and implementation stages.
 
-This sits alongside [design.md](design.md). It revisits that document's Stage 5
-split between game subclasses and data-only modes. It does not yet replace the
-existing plan or change the status of its implementation tasks.
+That plan now supersedes the earlier Stage 5 split between game subclasses and
+data-only modes. The exploration and original open questions below are retained
+for context; some have since been resolved in design.md. Exact assembly APIs,
+state ownership, activation timing, scheduling, and result identity remain open.
 
 ## Motivation
 
@@ -249,3 +251,191 @@ the smallest assembly contract and the actual dependencies of each behavior.
 Choose the required composition flexibility before designing generic factories,
 registries, resource containers, or scheduling machinery. Update the implementation
 plan only after those boundaries are agreed.
+
+---
+
+## Design discussion: 2026-11-16
+
+The following records decisions and interface sketches from the follow-up
+conversation. It supplements the exploration above without rewriting it or
+updating the implementation plan.
+
+### Composition and mode identity
+
+Modes may assemble different behaviors through ordinary construction and explicit
+dependency wiring, within a common round lifecycle. They are not restricted to a
+closed set of supported compositions. This does not require a registry,
+dependency-injection framework, or general-purpose scheduler.
+
+Mode remains the single selectable concept, covering both composition and tuning.
+Slightly different mode implementations may hardcode different configurations.
+Shared assembly helpers are optional; separate Composition and Preset concepts
+are not needed.
+
+Required variation includes debug auto joining, rounds with walls, and naubs
+attached to screen-edge anchor points. These choices extend beyond selecting an
+ordered list of gameplay rules.
+
+### Infrastructure and assembly
+
+Game generally constructs the common infrastructure before mode assembly. The
+naub factory is an exception: the mode may construct and supply it, then inject
+it into the rules that need it.
+
+The proposed construction boundary has two steps:
+
+1. Obtain the mode's current infrastructure configuration and construct the
+   common infrastructure, including World. Game forwards physics options; the
+   physics implementation owns its defaults and configuration merging.
+2. Invoke mode assembly with explicit dependencies. The mode constructs its
+   factory, rules, and other round resources and wires them together.
+
+The recipe should not receive the whole Game. Construction access can be broader
+than any individual rule's access: the recipe needs enough dependencies to wire
+objects together, while each rule receives only what it uses. The exact assembly
+arguments, returned ownership structure, and cleanup registration remain open.
+
+### Configuration between rounds
+
+Mode configuration may change between rounds without recreating the mode.
+Each new round snapshots the current configuration, including copies of nested
+values, before constructing its instances. Changes to the mode's configuration
+do not affect an already constructed round.
+
+The distinction is:
+
+- Mode configuration is editable between rounds.
+- Round configuration is the fixed snapshot used for that round.
+- Runtime state belongs to the live objects and may change during play.
+
+### Construction is distinct from activation
+
+Construction, dependency wiring, and initial configuration must finish before
+any gameplay behavior runs. A constructor or factory must not spawn naubs or
+start running timers. In particular, the current Spawner constructor's initial
+spawn must not precede the initial level configuration.
+
+Rules need not be classes instantiated with `new`. A factory function may create
+an object and configure it further before returning it. The host operates on the
+returned Rule contract, regardless of how the object was produced. Individual
+factories must not activate their own results.
+
+Activation is a separate, once-per-round stage. Starting or resuming ongoing
+behavior is distinct from activation and must not repeat initial population.
+Whether activation happens immediately after assembly or on first play was not
+yet decided; first play was recommended.
+
+### What counts as a Rule
+
+Rule is the name for a gameplay behavior driven by the round lifecycle. There
+are no separate OneShotRule or InputDrivenRule types. Initial population can be
+a Rule that only performs work during activation. Gesture spawning is a Rule
+that responds repeatedly to input while playing.
+
+| Concept | Examples | Responsibility |
+|---|---|---|
+| Rule | Spawner, Scoring, Overflow, Levels, initial population, gesture spawning | Gameplay behavior and local runtime state |
+| Mode | Standard, Playground | Configuration, construction, and dependency wiring |
+| Simulation infrastructure | World, PhysicsWorld, Graph | Object storage, physics, connectivity, and simulation operations |
+| Factory | Naub factory | Creates configured naubs and groups when called |
+| Policy | JoinPolicy | Makes decisions when invoked rather than running independently |
+| Domain object or state | Basket, score state, attachment constraints | Domain data and operations used by rules |
+| Presentation and input infrastructure | Layers, viewport, DragSystem | Rendering and interaction mechanisms |
+| Round host | Game | Ownership and lifecycle of the assembled round |
+
+Walls and attachments are physical structures, not inherently rules. A Rule is
+appropriate if gameplay actively changes them. Basket can remain a domain object
+shared by Levels and Overflow. Configurability alone does not make a policy or
+factory a Rule, and requiring cleanup does not make a resource a Rule either.
+The exact ownership of shared domain state remains unresolved.
+
+The working TypeScript sketch uses optional hooks so a Rule implements only the
+operations it needs:
+
+```typescript
+interface Rule {
+  activate?(): void;
+  start?(): void;
+  stop?(): void;
+  check?(): void;
+  dispose?(): void;
+}
+```
+
+The proposed meanings are:
+
+- `activate`: once, after the entire composition and initial configuration are
+  ready; may perform initial gameplay effects.
+- `start`: begin or resume ongoing behavior.
+- `stop`: suspend ongoing behavior without resetting its state.
+- `check`: participate in the recurring gameplay check when implemented.
+- `dispose`: permanently release resources, including when activation never ran.
+
+Game invokes supported hooks and guarantees once-only activation. The sketch is
+not yet a complete contract for hook ordering, transition failures, or cleanup
+of non-rule resources.
+
+### Input signals and subscriptions
+
+Application input infrastructure defines and emits physical input signals. Game
+makes the input source available to mode assembly. The mode decides which inputs
+drive which rules and injects only the signals and operations each Rule needs.
+
+For example, `gestureStarted` and `gestureEnded` are local dependency names, not
+new signals defined by Game:
+
+```typescript
+const gestureSpawning = createGestureSpawning({
+  gestureStarted: input.two_finger_start,
+  gestureEnded: input.two_finger_end,
+  spawnPair: () => factory.create_naub_pair(),
+});
+```
+
+Game does not need to know that a two-finger gesture means spawning. The Rule
+owns its subscriptions and any spawning timer. The proposed pattern is to
+subscribe in `start`, unsubscribe and stop the timer in `stop`, and defensively
+clean up in `dispose`. This keeps paused and finished rounds from responding to
+input without requiring lifecycle checks in every handler. This pattern assumes
+Game does not call `start` again without an intervening `stop`.
+
+### Gameplay examples that informed the boundaries
+
+Debug auto joining disables the dragging/focus requirement and the minimum
+collision-force requirement. The remaining join behavior already works and is
+not being redesigned here. These differences can be join-policy configuration;
+replacement tie-breaking is outside this composition discussion.
+
+Edge-attached naubs are ordinary playable naubs tethered to edge anchor points,
+not special boundary entities. Edge tethering may coexist with center attraction.
+An edge tether lasts for the naub's lifetime and is cleaned up when that naub is
+destroyed. These requirements motivate configurable physical setup without
+turning every attachment into a Rule.
+
+### Questions still to answer
+
+1. **Assembly API and ownership:** What exact dependencies does assembly receive,
+   what does it return, and how does it transfer ownership of rules, factories,
+   subscriptions, and other resources to Game without exposing the whole host?
+2. **Rule dependencies:** For each existing Rule, which concrete objects, narrow
+   operations, or shared state should replace its current `@game` accesses?
+3. **Shared domain state:** Who owns score, elapsed time, destruction progress,
+   basket capacity, and live spawn parameters, and how do their consumers access
+   or change them?
+4. **Activation timing and ordering:** Does activation occur on first play or
+   immediately after assembly? In what order do rules activate, and how are all
+   initial progression values established before any activation effects?
+5. **Scheduling and transitions:** Is an ordered rule list sufficient? Does a
+   loss request stop the remaining checks or other lifecycle work immediately?
+6. **Lifecycle and cleanup contract:** Are the optional hooks above sufficient?
+   What ordering and repetition guarantees apply, how are partial assembly or
+   activation failures cleaned up, and how are non-rule resources disposed?
+7. **Identity and results:** Does a result identify the mode, composition version,
+   tuning version, or some combination? Who defines the result snapshot format
+   when configuration can change between rounds?
+8. **Host versus debug behavior:** After extracting playground population,
+   gesture spawning, and mode-specific setup, does any genuine host difference
+   still justify a DebugGame subclass?
+9. **Concrete lifecycle traces:** Do standard and playground rounds both fit
+   this boundary through construction, activation, first spawn, play, pause,
+   finish, and disposal without introducing further host special cases?
