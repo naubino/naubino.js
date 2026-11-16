@@ -42,6 +42,7 @@ export class Game
     @name = 'game'
     @events = new GameEvents
     @timeouts = new Set
+    @rules = []
     @disposed = no
     @resize @width, @height
     @config = @build_config()
@@ -51,7 +52,7 @@ export class Game
     @mode_id = @mode.id
     @graph = new Graph(this)
     @factory = new Factory(this)
-    @join_policy = @mode.join_policy this
+    @join_policy = new @mode.join_policy(this)
     @drag = new DragSystem(this)
     @space.defaultHandler = new CollisionHandler this
 
@@ -90,9 +91,6 @@ export class Game
       @app_events.input.two_finger_tap.add => @toggle()
     ]
 
-    # last, rules may want everything above
-    @rules = @mode.rules this
-    @mode_unsubscribe = @mode.bind this, @app_events
 
   advance: (dt) ->
     @background.advance dt
@@ -135,18 +133,16 @@ export class Game
 
   onbeforeloose: -> not @disposed
 
-  onplaying: (e,f,t) ->
+  onplaying: (event, from, to) ->
     @field_layer.show()
     @start_drawing()
     @start_stepping()
     rule.start() for rule in @rules
     @checking = setInterval @check, 300 unless @checking
-    @mode.playing this, f
     return
 
   onleaveplaying: ->
     rule.stop() for rule in @rules
-    @mode.stop? this
     clearInterval @checking
     @checking = null
     return
@@ -169,7 +165,7 @@ export class Game
       right: @world_center.x + width / 2
       bottom: @world_center.y + height / 2
 
-  score_snapshot: -> @mode.result this
+  score_snapshot: -> null
 
   publish_snapshot: ->
     @events.score_changed.dispatch @points ? 0
@@ -186,11 +182,12 @@ export class Game
       @completed_snapshot = null
       @events.finished.dispatch snapshot
 
-  # Forced stops skip the mode's confirmation.
+  confirm_stop: -> yes
+
   onbeforestop: (event, from, to, force = no) ->
     return false if @disposed
     @completed_snapshot = null
-    return false unless force or @mode.confirm_stop()
+    return false unless force or @confirm_stop()
     @completed_snapshot = @score_snapshot()
     true
 
@@ -229,10 +226,6 @@ export class Game
     return if @disposed
     @disposed = yes
     rule.stop() for rule in @rules
-    @mode.stop? this
-    @mode_unsubscribe?()
-    @mode_unsubscribe = null
-    @mode.dispose? this
     @stop_stepping()
     @stop_drawing()
     clearInterval @checking if @checking?

@@ -42,8 +42,8 @@ Rules for implementers:
 | O4 | `Game` owns `World`, `Graph`, rules, `Factory`, `DragSystem`, `JoinPolicy`, `CollisionHandler`, `GameEvents`, and its layers. Nothing outside `Game` constructs them. | `grep "new World\|new Graph\|new CollisionHandler" src` only hits `Game` (and `Menu`'s private `Graph`). | partial |
 | O5 | `Game` decides which layers it uses and owns them. It does not extend `Layer`. The shell registers the returned layers with `Viewport` and `GameLoop`. | `class Game` has no `extends Layer`; shell calls `viewport.set_layers` with `game.layers`. | done |
 | O6 | `Menu` belongs to the shell and survives games. | `Menu` is constructed in `Naubino`, never in `Game`. | done |
-| O7 | `Mode` is data. It holds parameters (physics, spawner probabilities, level table, game config) and may name classes (for example a join policy). It runs no lifecycle code. | `Mode` has no `init`, `reset`, `playing`, `stop`, `dispose`, `bind`, `rules`. | todo |
-| O8 | Behavior that differs in code, not numbers, is a `Game` subclass (`StandardGame`, `DebugGame`) or a pluggable rule. | `DebugMode`'s lifecycle hooks live in `DebugGame`. | todo |
+| O7 | `Mode` is data. It holds parameters (physics, spawner probabilities, level table, game config) and may name classes (for example a join policy). It runs no lifecycle code. | `Mode` has no `init`, `reset`, `playing`, `stop`, `dispose`, `bind`, `rules`. | done |
+| O8 | Behavior that differs in code, not numbers, is a `Game` subclass (`StandardGame`, `DebugGame`) or a pluggable rule. | `DebugMode`'s lifecycle hooks live in `DebugGame`. | done |
 | O9 | `active_tree` and `focused_naub` are `Game` interaction state. | Fields on `Game`, not `World`. | done |
 | O10 | `World` performs join, split, and replace (final stage). `Naub` keeps visual and local state only. | `Naub` has no `@world.physics` access and no `@graph`. | todo |
 | O11 | `Graph` takes no constructor arguments. | `constructor: ->` in `Graph.coffee`. | done |
@@ -215,7 +215,8 @@ Claims: O7, O8.
 1. Add `StandardGame` and `DebugGame`. Move `StandardMode.rules` and
    `DebugMode`'s hooks into them.
 2. `Mode` keeps only data and named classes.
-3. `main.coffee` picks game class plus mode.
+3. `main.coffee` picks game class plus mode. The shell keeps the selected class
+   for restarts; `start_game(mode, game_class)` switches both explicitly.
 
 ### Stage 6: Graph observes topology
 

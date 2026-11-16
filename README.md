@@ -29,6 +29,17 @@ The standard game is selected by default (`?mode=standard`, or no `mode` paramet
 
 In standard mode, a quick two-finger tap (under 400 ms) toggles play/pause. In debug mode, placing two fingers spawns a joined pair immediately and continues spawning pairs every 300 ms while exactly those two fingers remain held. Lifting a finger, adding another, cancelling the touch, pausing, or stopping ends the repeat. Debug runs are unranked. Space still toggles play/pause, and Escape still stops.
 
+# Device rotation
+
+By default the game follows the browser's normal rotation animation. Layout
+recenters the view without moving physics bodies, anchors, or walls.
+
+Experimental orientation compensation is opt-in with
+`?compensate_rotation=true`. It can also be toggled at runtime with
+`Naubino.settings.set('graphics.compensate_rotation', true)` or `false`.
+This applies to the game and background layers, not individual objects.
+Menu and overlay remain upright in either mode.
+
 # Application events
 
 Each application owns a `Naubino.events` hub of named signals:

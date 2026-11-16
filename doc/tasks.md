@@ -23,7 +23,7 @@ Stage 1. Claims: E2, E3, E5 (partial), E7, E8.
 - [x] `MainButton` draws a cached score
 - [x] Remove `set_basket_size_provider`
 - [x] Exit check: no `game.mode` in `src/ui`, `Shapes.coffee`, `Naubino.coffee`
-- [ ] Browser: score, level, bonus, basket, overflow glow all display
+- [x] Browser: score, level, bonus, basket, overflow glow all display
 
 ## 2. `refactor: Retire Session and make Game disposable`
 
@@ -61,7 +61,7 @@ Stage 4a. Claims: O5, V1, V2, V3, V11.
 - [x] `Background` moved into `Game`
 - [x] `GameLoop` advances shell layers plus current `Game`
 - [x] `canvas.style` only used in `Viewport`
-- [ ] Browser: desktop and touch, restart leaves no stale canvas
+- [x] Browser: desktop and touch, restart leaves no stale canvas
 
 ## 5. `feat: Resize the game through Viewport`
 
@@ -91,9 +91,9 @@ Stage 4b. Claims: V4, V5, V6, V7, V8, V12.
 
 Stage 5. Claims: O7, O8.
 
-- [ ] `StandardGame` with rules, `DebugGame` with debug hooks
-- [ ] `Mode` holds only data and named classes
-- [ ] `main.coffee` picks game class and mode
+- [x] `StandardGame` with rules, `DebugGame` with debug hooks
+- [x] `Mode` holds only data and named classes
+- [x] `main.coffee` picks game class and mode
 - [ ] Browser: both modes play, debug gestures spawn
 
 ## 8. `refactor: Sync Graph from join topology events`
