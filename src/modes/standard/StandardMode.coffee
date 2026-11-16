@@ -3,11 +3,6 @@
 #   number of naubs per spam
 #   speed up
 import {Mode} from '../Mode'
-import {Spawner} from './Spawner'
-import {Scoring} from './Scoring'
-import {Overflow} from './Overflow'
-import {Levels} from './Levels'
-import {Basket} from './Basket'
 
 export class StandardMode extends Mode
   id: 'standard'
@@ -30,33 +25,3 @@ export class StandardMode extends Mode
     { limit:420,   number_of_colors: 7, interval: 20, max_naubs: 50, probabilities:{ pair:3, mixed_1:3, mixed_2:3, triple: 2 } } #13
     { limit:500,   number_of_colors: 7, interval: 15, max_naubs: 50, probabilities:{ pair:3, mixed_1:3, mixed_2:3, triple: 2 } } #14
   ]
-
-  rules: (game) ->
-    game.basket  = new Basket game
-    game.spawner  = new Spawner game
-    game.scoring  = new Scoring game
-    game.overflow = new Overflow game
-    game.levels   = new Levels game, game.spawner, @level_details
-    # order matters: Levels writes into Spawner so it inits after it
-    # and the lose check has to run before a level up grows the basket
-    [game.spawner, game.scoring, game.overflow, game.levels]
-
-  result: (game) ->
-    name: 'nobody'
-    points: game.points
-    time: game.duration
-    naubs: game.ex_naubs
-    game_version: game.version
-    level: game.levels?.level
-    mode: @id
-
-  bind: (game) ->
-    unsubscribe_replaced = game.events.naub_replaced.add (number) -> game.graph.cycle_test(number)
-    unsubscribe_cycle = game.events.cycle_found.add (list) -> game.destroy_naubs(list)
-    unsubscribe_focused = game.events.naub_focused.add (naub) -> game.active_tree = game.graph.tree naub.number
-    ->
-      unsubscribe_replaced()
-      unsubscribe_cycle()
-      unsubscribe_focused()
-
-  confirm_stop: -> confirm "Do you realy want to stop the game?"

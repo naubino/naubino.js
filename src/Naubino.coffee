@@ -14,7 +14,7 @@ import {GameLoop} from './GameLoop'
 
 import {Menu} from './ui/Menu'
 import {Overlay} from './ui/Overlay'
-import {Game} from './game/Game'
+import {StandardGame} from './game/StandardGame'
 import {StandardMode} from './modes/standard/StandardMode'
 import {Util} from './core/Util'
 import {Signal} from './core/Signal'
@@ -26,7 +26,7 @@ export class Naubino
   settings: Settings
   Signal: Signal
 
-  constructor: (@mode = new StandardMode, @root_element_id) ->
+  constructor: (@mode = new StandardMode, @root_element_id, @game_class = StandardGame) ->
     @events = new Events
     @load_highscores()
     @audio = new Audio(@settings)
@@ -134,14 +134,15 @@ export class Naubino
     ]
     -> unsubscribe() for unsubscribe in subscriptions
 
-  start_game: (mode = @mode) ->
+  start_game: (mode = @mode, game_class = @game_class) ->
     @detach_game?()
     @detach_game = null
     @game?.dispose()
     @overlay.stop() if @overlay.can 'stop'
     @mode = mode
+    @game_class = game_class
     field_size = @viewport.field_size()
-    @game = new Game @viewport, field_size, @mode, @events
+    @game = new @game_class @viewport, field_size, @mode, @events
     @layers = @game.layers.concat [@menu, @overlay]
     @viewport.set_layers @layers, @game.layers.concat [@menu]
 

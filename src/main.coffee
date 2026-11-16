@@ -2,6 +2,8 @@ import {Naubino} from './Naubino'
 import {Settings} from './config/Settings'
 import {StandardMode} from './modes/standard/StandardMode'
 import {DebugMode} from './modes/DebugMode'
+import {StandardGame} from './game/StandardGame'
+import {DebugGame} from './game/DebugGame'
 import {Util} from './core/Util'
 import {Controls} from './ui/Controls'
 window.Util = Util
@@ -10,7 +12,7 @@ console.time("loading")
 
 window.onload = ->
   Settings.load_from_search window.location.search
-  mode = modeFromSearch window.location.search
+  {game_class, mode} = gameFromSearch window.location.search
   if navigator.maxTouchPoints > 0 and matchMedia("(pointer: coarse)").matches
     document.documentElement.classList.add "touch"
     document.querySelector("#maximizeCheck").checked = true
@@ -20,7 +22,7 @@ window.onload = ->
     maximized: maximize_check.checked or Util.isFullscreen()
     fit: fit
 
-  naubino = window.Naubino = new Naubino(mode, '#gamediv')
+  naubino = window.Naubino = new Naubino(mode, '#gamediv', game_class)
   naubino.setup layout_options(true)
   naubino.apply_color_scheme()
   document.querySelector("#highscorelink").addEventListener "click", ->
@@ -67,9 +69,8 @@ window.onload = ->
 
 
 
-modeFromSearch = (search = '') ->
+gameFromSearch = (search = '') ->
   params = new URLSearchParams search
   switch params.get('mode')
-    when 'debug' then new DebugMode
-    when null, 'standard' then new StandardMode
-    else new StandardMode
+    when 'debug' then return {game_class: DebugGame, mode: new DebugMode}
+    else return {game_class: StandardGame, mode: new StandardMode}
