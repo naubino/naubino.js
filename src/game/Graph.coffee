@@ -1,6 +1,5 @@
 export class Graph
-  constructor: (@layer) ->
-    @join_id_sequence = 0 # sequential join id
+  constructor: ->
     @naubs = []
     @joins = {}
 
@@ -12,17 +11,9 @@ export class Graph
         unless join[i] in @naubs
           @naubs.push join[i]
 
-  # adds the join between naub a and naub b
-  #
-  # @todo simplify update_naub_list
-  # @param [Naub] a first and ...
-  # @param [Naub] b ... second naub that connected
-  add_join: (a,b) ->
-    @join_id_sequence++
-    join = [ a.number, b.number ]
-    @joins[@join_id_sequence] = join
+  add_join: (id, first, second) ->
+    @joins[id] = [first, second]
     @update_naub_list()
-    @join_id_sequence
 
   # one of those functions where documentation could require more time than reading the actuall code
   #
@@ -75,8 +66,8 @@ export class Graph
     for inaub, {naub, dfs_num, color} of @dfs_map
       if dfs_num == 0
         dfs_cycle = @dfs(naub, null, first)
-        cycles = cycles.filter (x) -> x in dfs_cycle
-    return
+        cycles = cycles.concat dfs_cycle
+    return cycles
 
 
 
@@ -100,28 +91,28 @@ export class Graph
 
     for partner in @partners(naub,pre)
       if @dfs_map[partner].dfs_num == 0
-        cycles = @dfs(partner,naub, first).filter (x) -> x in cycles
+        cycles = cycles.concat @dfs(partner,naub, first)
 
       if @dfs_map[partner].color == 1
         list =  @cycle_list(naub,partner,first)
         if list.length > 0
-          @layer.events.cycle_found.dispatch(list)
+          cycles.push list
     @dfs_map[naub].color = 2
     return cycles
 
   # returns all naubs that are part of a cycle in order of connection to the active naub
   #
   # @return [array] list of naubs
-  cycle_list: (v,w,first = null) ->
+  cycle_list: (naub, partner, first = null) ->
     cycle = @dfs_map.filter ({dfs_num, color}) =>
-      dfs_num >= @dfs_map[w].dfs_num && color == 1
-    cycle.sort (a,b) -> a.dfs_num - b.dfs_num
-    cycle_naubs = (x.naub for x in cycle)
+      dfs_num >= @dfs_map[partner].dfs_num && color == 1
+    cycle.sort (first_entry, second_entry) -> first_entry.dfs_num - second_entry.dfs_num
+    cycle_naubs = (entry.naub for entry in cycle)
 
     if first? and first in cycle_naubs
       cycle_naubs = cycle_naubs
-      i = cycle_naubs.indexOf first
-      cycle_naubs = cycle_naubs[i...cycle_naubs.length].concat(cycle_naubs[0...i])
+      first_index = cycle_naubs.indexOf first
+      cycle_naubs = cycle_naubs[first_index...cycle_naubs.length].concat(cycle_naubs[0...first_index])
 
     return cycle_naubs
 
