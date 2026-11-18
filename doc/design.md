@@ -10,13 +10,14 @@ claim marked `done`.
 
 The round-composition decisions below supersede the earlier data-only Mode and
 game-subclass split. Revised claims are marked `partial` or `todo`, even where
-the previous design was complete. Unchanged statuses have not been re-audited.
+the previous design was complete. All statuses were re-audited against `src/`
+on 2026-11-17.
 [round-composition.md](round-composition.md) retains the exploration and rationale;
 this document records the agreed target and remaining decisions.
 
 Rules for implementers:
 
-- Read `src/AGENTS.md` first. Use Deno tasks. Never write or modify tests.
+- Read `AGENTS.md` first. Use Deno tasks. Writing and modifying tests is allowed.
 - One stage per change. Build and play after each stage.
 - Don't invent new classes unless a claim names them.
 - No single-letter variable names in new code.
@@ -57,13 +58,13 @@ Construction proceeds in this order:
 3. Mode assembly receives explicit infrastructure dependencies, not `Game` itself.
    It constructs its naub factory, policies, rules, and other domain objects,
    configures them, and wires their dependencies and execution order.
-4. Ownership of the assembled objects and cleanup work transfers to `Game`.
+4. Ownership of the assembled objects transfers to `Game`.
 5. Once construction, wiring, and initial configuration are complete, `Game` may
    activate the rules. Nothing starts gameplay during construction.
 
-The exact assembly arguments, return shape, and cleanup-registration mechanism
-remain open. Activation at first play versus immediately after assembly is also
-open; separating activation from construction is not.
+Mode assembly takes a `RoundContext` and returns an `AssembledRound` (see
+`types.d.ts`). Rule order in `AssembledRound.rules` is execution order. Activation happens on the `ready → playing` transition, right before
+the first start. `ready` means constructed, hidden, and unpopulated.
 
 The following TypeScript describes the intended contract, not a migration away
 from CoffeeScript:
@@ -112,48 +113,51 @@ World. Rendering must not require a host that implements simulation operations.
 
 | ID | Claim | Check | Status |
 |---|---|---|---|
-| O1 | `Naubino` is the shell. It owns `Viewport`, `GameLoop`, `Input`, `Settings`, `Audio`, `Menu`, highscores, `AppEvents`, and a reference to the current `Game`. | These are constructed in `Naubino.coffee` and nowhere else. | partial |
+| O1 | `Naubino` is the shell. It owns `Viewport`, `GameLoop`, `Input`, `Settings`, `Audio`, `Menu`, `Overlay`, highscores, `AppEvents`, and a reference to the current `Game`. | These are constructed in `Naubino.coffee` and nowhere else. | partial |
 | O2 | `Game` is disposable. One instance per round. Restart, stop, and mode switch all dispose the current `Game` and construct a new one. | No method resets a live `Game` (`configure_run`, `switch_mode` don't exist). | done |
 | O3 | `Session` does not exist. | `src/Session.coffee` is gone; `grep Session src` finds nothing. | done |
 | O4 | `Game` owns common infrastructure and the lifetime of mode-assembled objects. Mode assembly may construct the factory, policies, rules, and domain objects; construction does not imply ongoing ownership by Mode. | `Game` creates World and drives disposal of the assembled round. No mandatory Graph field on Game. | partial |
-| O5 | `Game` decides which layers it uses and owns them. It does not extend `Layer`. The shell registers the returned layers with `Viewport` and `GameLoop`. | `class Game` has no `extends Layer`; shell calls `viewport.set_layers` with `game.layers`. | done |
-| O6 | `Menu` belongs to the shell and survives games. | `Menu` is constructed in `Naubino`, never in `Game`. | done |
-| O7 | Mode supplies configuration and assembles a round through explicit construction and wiring. It receives no ongoing play, pause, or disposal callbacks and holds no live round timers or state. | Mode assembly receives explicit dependencies, not Game. Every invocation produces fresh mutable round objects. | todo |
-| O8 | A different composition or configuration does not justify a Game subclass. Standard and playground behavior is assembled by modes and implemented by rules and their dependencies. | No StandardGame or DebugGame subclass exists merely to choose rules or implement mode-specific gameplay. | todo |
+| O5 | `Game` decides which layers it uses and owns them. It does not extend `Layer`. The shell registers the returned layers with `Viewport` and `GameLoop`. Mode-assembled renderers get layers through `RoundContext.lease_layer`; Game still owns and releases those leases. | `class Game` has no `extends Layer`; shell calls `viewport.set_layers` with `game.layers`. Mode code never touches `Viewport`. | partial |
+| O6 | `Menu` and `Overlay` belong to the shell and survive games. | Both are constructed in `Naubino`, never in `Game`. | done |
+| O7 | Mode supplies configuration and assembles a round through explicit construction and wiring. It receives no ongoing play, pause, or disposal callbacks and holds no live round timers or state. Mode carries no `id` or `version`; the shell owns mode identity. | `Mode.assemble(context: RoundContext): AssembledRound`. No Game, no `request_loss`; rules request loss via `loss_requested`. Every invocation produces fresh mutable round objects. | todo |
+| O8 | A different composition or configuration does not justify a Game subclass. Standard and playground behavior is assembled by modes and implemented by rules and their dependencies. | No `StandardGame` or `DebugGame` exists. One `Game` class hosts every mode. | todo |
 | O9 | `active_tree` and `focused_naub` are `Game` interaction state. | Fields on `Game`, not `World`. | done |
 | O10 | World owns authoritative joins, join IDs, and join, split, and replace operations. Naub keeps visual and local state only; callers request mutations through World. | Naub never reaches through a layer to Graph, physics, object lookup, or join mutation services. Factory creates connections through World. | todo |
-| O11 | Graph is an optional analysis implementation private to a connection-analysis rule, not a required Game or Menu service. It knows no Game, Layer, physics, or event bus. | The rule feeds structural changes into Graph, publishes cycle outcomes, and provides narrow queries. Menu has no Graph. | todo |
-| O12 | Rules receive only the concrete objects, signals, queries, and operations they need. | No rule receives Game or a generic resource/service locator. | todo |
-| O13 | Non-rule round resources participate in Game-owned disposal without being forced into the Rule contract. | Owned resources and cleanup work have an explicit disposal path. Registration API remains open. | todo |
+| O11 | Graph is an optional analysis implementation private to a connection-analysis rule, not a required Game or Menu service. It knows no Game, Layer, physics, or event bus. | The rule feeds structural changes into Graph, publishes cycle outcomes, and provides narrow queries. Menu has no Graph. | partial |
+| O12 | Rules receive only the concrete objects, signals, queries, and operations they need. | No rule receives Game, the whole `RoundContext`, or a generic resource/service locator. | todo |
+| O13 | Only timers, subscriptions to longer-lived signals, and viewport leases outlive an unreachable `Game`. Their owner releases them on dispose. Other round objects (factory, policies, Basket, World, Graph) need no disposal. | No disposer lists or registration API for non-rule objects. | partial |
 
 ## Configuration
 
 | ID | Claim | Check | Status |
 |---|---|---|---|
 | C1 | Application preferences, round configuration, and mutable runtime state are separate. Settings is not the catch-all source of gameplay tuning. | Audio, theme, and graphics remain preferences; selected mode configuration supplies gameplay tuning. | partial |
-| C2 | Mode configuration can change between rounds. Every new round gets an isolated snapshot, including nested values; running a round never mutates that snapshot. | Changing the source configuration affects the next round, not an existing round. Progression tables are not live runtime state. | todo |
+| C2 | Mode configuration can change between rounds. Every new round gets an isolated snapshot, including nested values; running a round never mutates that snapshot. A configuration may carry an optional friendly `name`; the shell copies it into the stored `ScoreSnapshot` as `config_name`. | Changing the source configuration affects the next round, not an existing round. Progression tables are not live runtime state. | todo |
 | C3 | Consumers own their configuration defaults and merging. Game forwards options without understanding nested physics or spawn settings. | No nested spring merge or spawn-probability interpretation in Game. | todo |
 | C4 | Modes can supply and configure different naub factories. The factory is constructed during assembly using the round's explicit dependencies. | Game does not unconditionally construct one specific naub factory. | todo |
 | C5 | Center attraction and edge tethering are independent physical attachments and may coexist on a naub. Edge tethers last for that naub's lifetime and are cleaned up on removal. | Adding a tether does not implicitly replace the center spring; attachment selection is not hardcoded in Game.add_object. | todo |
+| C6 | Every round value has one owner. `Scoring` owns points, cleared naubs, and duration. `Basket` owns its capacity. `Spawner` owns its spawn parameters. `Levels` owns the level. Nothing is stored on `Game`. | No rule writes fields onto `Game` or into another object's fields. | todo |
+| C7 | `Levels` pushes level parameters: `Spawner.configure` and `Basket.set_capacity`. It reads progress through a narrow `Progress` query backed by `Scoring`. It applies level 0 in its constructor. Levels is the only writer of those parameters; revisit if another writer appears. | Spawner and Basket do not depend on Levels. | partial |
+| C8 | Mode assembly builds `RoundResults` as a small object over `Scoring` and `Levels`. `Scoring` knows nothing about levels. | No `score_snapshot` on Game or its subclasses. | todo |
 
-Ownership of score, progression totals, basket capacity, and effective spawn
-parameters is not fully settled. Prefer explicit domain owners over a shared
-round-state bag, but trace the consumers before fixing those interfaces.
+Shadow types for these are in `types.d.ts` (`Progress`, `SpawnParameters`,
+`Spawner`, `Basket`, `RoundResults`).
 
 ## Events
 
 | ID | Claim | Check | Status |
 |---|---|---|---|
 | E1 | Events use the existing `Signal` class with concrete named signals. No string event names, no new event library. | `grep "new Signal\|new Naubino.Signal" src` covers all event definitions. | done |
-| E2 | `AppEvents` (page lifetime) holds `input`, `commands`, and settings/theme notifications. It holds nothing about score, level, basket, overflow, or outcome. | `src/Events.coffee` has no `game` namespace. | partial |
+| E13 | `Signal.add` accepts an optional `AbortSignal`, using native `addEventListener` `{signal}`. Subscriptions that outlive a round use their owner's `AbortSignal` instead of stored unsubscribe functions. Deactivation (E11) stays separate. | No `@subscriptions` arrays in `Game` or rules. `Game` owns one `AbortController`; a rule that unsubscribes on stop uses one controller per start/stop cycle. | todo |
+| E2 | `AppEvents` (page lifetime) holds `input`, `commands`, and settings/theme notifications. It holds nothing about score, level, basket, overflow, or outcome. | `src/Events.coffee` has no `game` namespace. | done |
 | E3 | `AppEvents` is constructed in `Naubino`'s constructor, not as a class-body property. | No `events: new Events()` at class level in `Naubino.coffee`. | done |
-| E4 | Each Game owns round-scoped signals for simulation outcomes and outward notifications. World publishes committed structural outcomes through explicit notification dependencies; the connection-analysis rule publishes cycle outcomes. | Graph knows no event bus or host; event wiring is explicit. Exact event grouping remains open. | partial |
-| E5 | Outward `GameEvents`: `state_changed(state)`, `score_changed(points)`, `level_changed(level)`, `chain_bonus(points)`, `overflow_warning(severity)`, `basket_changed(size)`, `lost(reason)`, `finished(snapshot)`, plus sound cues. | Signals exist with those payloads. | partial |
+| E4 | Each Game owns round-scoped signals for simulation outcomes and outward notifications. World publishes committed structural outcomes through explicit notification dependencies; the connection-analysis rule publishes cycle outcomes. | Graph knows no event bus or host; event wiring is explicit. One `GameEvents` object per round holds both internal and outward signals, all typed (E5). | partial |
+| E5 | Outward `GameEvents`: `state_changed(state)`, `score_changed(points)`, `level_changed(level)`, `chain_bonus(points)`, `overflow_warning(severity)`, `lost(reason)`, `finished(snapshot)`, plus sound cues. No basket signal; the mode renders its basket itself. | Signals exist with those payloads (`GameEvents` in `types.d.ts`). | partial |
 | E6 | Game handles common lifecycle commands. Mode assembly wires existing application input signals into input-driven rules as explicit dependencies. Rules subscribe on start, unsubscribe and cancel input work on stop, and clean up defensively on dispose. | Gesture spawning has no whole application-bus or Game dependency and receives no input while stopped. Host subscriptions are also removed on disposal. | partial |
-| E7 | UI never references `Game`, `Mode`, rules, or `World`. The shell's `attach(game)` is the only code that knows both sides. It returns a disposer. | `grep "game\\.\\|\\.mode\\." src/ui src/game/Shapes.coffee` finds no traversal; `MainButton` draws a cached value. | partial |
-| E8 | Payloads carry the data consumers need. A new `Game` publishes its initial snapshot (score 0, level 0, basket size or none) after `attach`. | `basket_changed` has a payload; `set_basket_size_provider` is gone. | done |
-| E9 | A command has one handler. A request is not proof of completion (`loss_requested` is not `lost`). Listener return values are never used. | Review. | todo |
-| E10 | A multi-part mutation happens inside one owner. Only the committed result is published. Correctness never depends on subscriber order. | Review. | todo |
+| E7 | UI never references `Game`, `Mode`, rules, or `World`. The shell's `attach(game)` is the only code that knows both sides. It returns a disposer. | `grep -E 'game\.|\.mode\.' src/ui src/game/Shapes.coffee` finds no traversal; `MainButton` draws a cached value. | done |
+| E8 | Payloads carry the data consumers need. A new `Game` publishes its initial `Scoreboard` (score 0, level 0) after `attach`, or nothing if the round has no `RoundResults`. | `set_basket_size_provider` is gone; the published values come from `RoundResults.scoreboard()`. | partial |
+| E9 | A command has one handler. A request is not proof of completion: rules dispatch `loss_requested(reason)`, `Game` alone handles it and may refuse, and only a completed FSM transition dispatches `lost(reason)`. Listener return values are never used. | No rule calls `loose`; `Overflow` dispatches `loss_requested`. No caller reads a listener return value. | todo |
+| E10 | A multi-part mutation happens inside one owner. Only the committed result is published. Correctness never depends on subscriber order. | `Levels` dispatches `level_changed` only after `load_level` has applied all parameters. | todo |
 | E11 | `GameEvents` signals are deactivated on dispose. Late callbacks from a disposed game reach no subscriber. | `dispose` sets `active = false` on every `GameEvents` signal. | done |
 | E12 | Unused signals are removed: `menu.button`, `menu.focus`, `menu.blur`, `Game.game_draw`. Remove `naub_unfocused` unless a consumer appears. | `grep` finds no definitions. | done |
 
@@ -163,14 +167,15 @@ round-state bag, but trace the consumers before fixing those interfaces.
 |---|---|---|---|
 | L1 | `Game` FSM states: `ready`, `playing`, `paused`, `lost`, `finished`. `finished` is terminal and dispatches `finished(snapshot)` exactly once. | FSM config in `Game.coffee`. | done |
 | L2 | On `finished` the shell stores the highscore, calls the `attach` disposer, disposes the `Game`, constructs the next one, and attaches it. | `start_game` performs replacement; the finished handler stores the result before calling it. | done |
-| L3 | Game disposal stops and disposes rules, disposes other owned round resources, cancels its own timers, deactivates round signals, removes host subscriptions, and releases its canvases. Each rule cleans up its own timers and subscriptions. Repeated disposal is harmless. | Restart during delayed work cannot affect the replacement round. Stopping a rule is not a substitute for disposing it. | partial |
+| L3 | Game disposal stops and disposes rules, cancels its own timers, aborts its `AbortController`, deactivates round signals, and releases its viewport leases. Each rule cleans up its own timers and subscriptions. Repeated disposal is harmless. | Restart during delayed work cannot affect the replacement round. Stopping a rule is not a substitute for disposing it. `Game.dispose` calls `dispose` on every rule, activated or not. | partial |
 | L4 | Rule is a structural contract with optional activate, start, stop, check, and dispose hooks. Class instances and factory-created objects are equally valid. Start/stop mean play/pause, not initialization or reset. | Game calls supported hooks; no mandatory Rule superclass or empty hook methods. | todo |
 | L5 | Object IDs start at 1 in every `Game`. | Each `World` starts its own `objects_count` at zero. | done |
-| L6 | Stop confirmation happens in `Game` before entering `finished`. | `confirm_stop` called from `Game`'s FSM. | done |
+| L6 | Stop confirmation happens in `Game` before entering `finished`. Every round confirms, in every mode; debug mode behavior is not fixed and may follow later. | `confirm_stop` called from `Game`'s FSM; no per-mode override. | partial |
 | L7 | The loss sequence (grey out, fade, wait, finish) lives in `Game`. `Overlay` shows the warning by reacting to `lost(reason)`. | No `Overlay` call inside `Game`. | done |
-| L8 | Construction, wiring, and initial configuration finish before activation can spawn naubs or start gameplay. A factory may further configure a rule before returning it. | Spawner construction never spawns. Initial level values are applied before the first spawn. Whether activation occurs in ready or on first play remains open. | todo |
+| L8 | Construction, wiring, and initial configuration finish before activation can spawn naubs or start gameplay. A factory may further configure a rule before returning it. Activation occurs on the `ready → playing` transition. | Spawner construction never spawns. Level 0 parameters are applied during construction, before the first spawn. A round disposed while `ready` never spawns. | todo |
 | L9 | Mode switch = finish without result + construct a `Game` with the new mode. | No `finished` snapshot is stored for a mode switch. | done |
-| L10 | Game activates each rule once per round before its first start. Pause/resume never reconstructs or reactivates it. Start is not called twice without an intervening stop. | One-shot population runs once; resume only restarts ongoing work. | todo |
+| L10 | Game activates each rule once per round before its first start. Pause/resume never reconstructs or reactivates it. Start is not called twice without an intervening stop. | One-shot population runs once; resume only restarts ongoing work. | partial |
+| L12 | Game runs `check` every 300 ms while `playing`, over `AssembledRound.rules` in order. One ordered list covers all hooks. The pass ends as soon as the round leaves `playing`, so nothing runs after a loss, pause, or stop triggered inside the pass. `check` returns nothing meaningful; rules end the round only through command signals such as `loss_requested`. | `Game.check` tests `@current is 'playing'` before each rule. No caller reads a `check` return value. | partial |
 | L11 | Rule disposal is safe before activation and while stopped. Disposal permanently prevents further work. | Disposing an unplayed round releases its resources without requiring activation. | todo |
 
 ## Viewport
@@ -194,15 +199,15 @@ round-state bag, but trace the consumers before fixing those interfaces.
 
 | ID | Claim | Check | Status |
 |---|---|---|---|
-| J1 | World allocates join IDs and consistently updates physical constraints and connection state. Graph indexes those committed joins; it never allocates authoritative IDs. | Creating, splitting, or replacing joins requires no Graph instance. | todo |
+| J1 | World allocates join IDs and consistently updates physical constraints and connection state. Graph indexes those committed joins; it never allocates authoritative IDs. | Creating, splitting, or replacing joins requires no Graph instance. | partial |
 | J2 | Gameplay callers request joins and replacements through World, not Naub or Graph. Do not add consumers of the old Naub mutation return values. | Factory and collision-action execution use World operations. | todo |
-| J3 | `JoinPolicy.check_joining` returns `{action: 'join' \| 'replace', pair}` or `null`, never `false`. It does not mutate queues. `Game.check_joining` queues and returns a boolean. | Every return path in `JoinPolicy.coffee` is explicit. | done |
+| J3 | `JoinPolicy.check_joining` returns `{action: 'join' \| 'replace', pair}` or `null`, never `false`. It does not mutate queues. `Game.check_joining` queues and returns a boolean. | Every return path in `JoinPolicy.coffee` is explicit and returns a `JoinAction` or `null`. `JoinPolicy` never touches `joining_naubs` or `replacing_naubs`. | todo |
 | J4 | Collision-triggered joins and replaces are queued and executed after the physics step. | `Game.step` drains queues after `physics.step`. | done |
 | J5 | Factory joins (`create_naub_pair`, `create_naub_triple`) complete synchronously. | No queue used in `Factory`. | done |
-| J6 | Committed structural notifications (`join_added(id, first, second)`, `join_removed(id)`) report every join, including silent ones. Feedback (`naub_joined`) may be suppressed. The connection-analysis rule updates its private Graph from structural outcomes. | Graph does not subscribe itself; join correctness never depends on an observer. | todo |
+| J6 | Committed structural notifications (`join_added(id, first, second)`, `join_removed(id)`) report every join, including silent ones. Feedback (`naub_joined`) may be suppressed. The connection-analysis rule updates its private Graph from structural outcomes. | Graph does not subscribe itself; join correctness never depends on an observer. | partial |
 | J7 | Cycle evaluation runs only after a replacement has finished rewiring. | `naub_replaced` dispatched after all rewiring. | done |
 | J8 | `naub_destroyed` means destruction *started*, not removal. | Dispatched in `Naub.destroy`, before the removal timeout. | done |
-| J9 | Composition makes required execution order explicit. Preserve Overflow checking before Levels can grow the basket. Do not rely on event subscriber order for multi-part mutations. | Mode assembly expresses the constraint. Exact schedule and behavior after a loss request remain open. | partial |
+| J9 | Composition makes required execution order explicit. Preserve Overflow checking before Levels can grow the basket. Do not rely on event subscriber order for multi-part mutations. | Mode assembly expresses the constraint through rule order. After a loss request, the pass ends (L12). | partial |
 | J10 | Debug auto joining disables the focus/drag requirement and minimum-force threshold through join-policy configuration. Other joining behavior is unchanged. | Auto joining does not introduce a new replacement-selection mechanic. | todo |
 
 ## Keep as direct calls
@@ -316,6 +321,10 @@ mode assembly and explicit rule lifecycle handling. Do not extend the old split.
 
 ### Stage 6: Graph observes topology
 
+Implemented; automated checks pass except the documented lint baseline. Browser
+play-testing remains pending. J6, O11, and J1 are partial because rule ownership
+and World-owned mutations land in later stages.
+
 Claims: J6; prepares O11 and J1.
 
 1. Allocate join IDs outside Graph, temporarily in the existing mutation owner
@@ -325,12 +334,19 @@ Claims: J6; prepares O11 and J1.
    dispatches cycle signals itself. Evaluate cycles only after full replacement.
 4. Remove Naub's Graph dependency and Menu's unnecessary Graph instance.
 
-The existing round wiring may bridge this stage. Stage 9 moves that wiring and
-Graph ownership into an optional connection-analysis rule.
+Game currently allocates join IDs and feeds its Graph from structural signals.
+Naub commits connection and constraint changes before publishing them, including
+silent joins. Graph returns cycle lists; the host publishes them only after
+`naub_replaced`. Stage 7 moves allocation and mutations into World; Stage 9 moves
+the analysis wiring and Graph ownership into an optional rule.
+
+Regression coverage: `deno task test` checks cycle discovery order, silent factory
+pairs, splitting from either endpoint, joins without analysis, and complete
+replacement before cycle evaluation.
 
 ### Stage 7: World owns joins
 
-Claims: O10, J1, J2; preserves J4, J5, J6, J7.
+Claims: O10, J1, J2, J3; preserves J4, J5, J6, J7.
 
 1. Move join ID allocation and join, split, and replace logic into World.
 2. Game's collision-action execution and Factory call World. Keep collision
@@ -342,27 +358,29 @@ Claims: O10, J1, J2; preserves J4, J5, J6, J7.
 
 ### Stage 8: Separate construction and activation
 
-Claims: L3, L4, L8, L10, L11, E6.
+Claims: L3, L4, L8, L10, L11, L12, E6, E13, O13.
 
-Before implementation, settle activation timing and the cleanup-registration and
-partial-failure contract listed under Open questions.
+The existing `StandardGame` and `DebugGame` may bridge this stage: wire rules
+and input signals there until Stage 9 moves that wiring into mode assembly.
 
-1. Support optional Rule hooks for class instances and factory-created objects.
-2. Finish construction and initial configuration before invoking activation.
+1. Add the optional `AbortSignal` to `Signal.add` (E13). Replace `Game`'s
+   `@subscriptions` with one `AbortController`.
+2. Support optional Rule hooks for class instances and factory-created objects.
+3. Finish construction and initial configuration before invoking activation.
    Move Spawner's constructor spawn and playground's initial population into
    activation. Apply initial level parameters before either can spawn.
-3. Activate once; start/stop only for play/resume and pause/leave-playing.
-4. Move mode-specific gesture behavior into a rule with explicit input signals.
+4. Activate once; start/stop only for play/resume and pause/leave-playing.
+5. Move mode-specific gesture behavior into a rule with explicit input signals.
    Subscribe on start and cancel subscriptions and timers on stop and dispose.
-5. Dispose rules and non-rule resources, including unactivated objects, without
-   allowing late work to affect the next round.
+6. Dispose rules, including unactivated ones, without allowing late work to
+   affect the next round.
 
 Exit check: construction starts no gameplay; activation runs once; repeated
 pause/resume does not duplicate population, subscriptions, or timers.
 
 ### Stage 9: Mode assembles the round
 
-Claims: O4, O7, O8, O11, O12, O13, C1, C2, C3, C4, E4, J9.
+Claims: O1, O4, O7, O8, O11, O12, E9, E10, C1, C6, C7, C8, C2, C3, C4, E4, J9.
 
 Before implementation, trace standard and playground dependencies and settle the
 assembly API, shared-state ownership, schedule, and result-provider boundary.
@@ -374,7 +392,7 @@ those decisions.
 2. Create common infrastructure, then invoke mode assembly with explicit
    dependencies and narrow lifecycle operations, never Game itself.
 3. Let the mode construct the naub factory, join policy, domain objects, and rules
-   and transfer their lifetime ownership and cleanup work to Game.
+   and transfer their lifetime ownership to Game.
 4. Install connection analysis as an optional rule owning a private Graph.
    Factory uses World; highlighting receives only its needed connectivity query.
 5. Replace rule access to Game with explicit dependencies and wire required order.
@@ -392,9 +410,14 @@ connection analysis entirely; editing mode configuration affects only new rounds
 - Theme and effects notifications on `AppEvents` (`theme_changed`,
   `effects_changed`), replacing scattered recolor and rate refresh calls.
 - `CollisionHandler` dispatching `collision_observed` instead of calling `Game`.
-- Configure debug auto joining without drag or minimum-force checks (J10).
-- Support mode-selected walls and permanent edge tethers alongside independent
+- Deferred: configure debug auto joining without drag or minimum-force checks (J10).
+- Deferred: support mode-selected walls and permanent edge tethers alongside independent
   center attraction (C5). These physical options do not require new rule types.
+- Mode-owned basket renderer on a leased layer, replacing basket drawing in
+  `Background` and the `basket_changed` signal.
+- A populated but frozen pre-play field, if ever needed, gets its own FSM state
+  between `ready` and `playing` (e.g. `set`). Activation moves to `ready → set`;
+  the Rule hooks do not change. Not needed today.
 
 ---
 
@@ -403,6 +426,7 @@ connection analysis entirely; editing mode configuration affects only new rounds
 Build, after every stage:
 
 - `deno task check`
+- `deno task test`
 - `deno task build`
 - `deno task lint` (14 overlong level-table rows in `StandardMode.coffee` are pre-existing)
 
@@ -427,19 +451,9 @@ Browser, after every stage:
 
 ## Open questions
 
-1. Does `Overlay` belong to the shell or the `Game`? Shell if it ever shows
-   messages between games.
-2. One `GameEvents` object or separate internal and outward objects?
-3. Typed outward signals or a single `presentation_changed(snapshot)`?
-4. Exact mode assembly arguments, return shape, and ownership-transfer mechanism.
-5. Concrete versus narrow dependencies for each rule, including ownership of score,
-   progression totals, basket capacity, and effective spawn parameters.
-6. Activation immediately after assembly or on first play? First play is the
-   recommendation, not yet a decision. Initial UI publication must work either way.
-7. Is one ordered rule list sufficient? Does a loss request stop the remaining
-   checks in the current pass?
-8. How are non-rule cleanup and partial construction or activation failures handled?
-9. Who provides result snapshots, and how do results identify the selected mode
-   and the configuration used when tuning can change between rounds?
-10. After mode assembly replaces subclass gameplay, is any genuine host-level
-    difference left that warrants a Game subclass?
+
+
+
+
+
+None.

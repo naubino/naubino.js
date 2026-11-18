@@ -4,6 +4,7 @@
     "dev": "vite --host",
     "check": "coffee --bare --print src > /dev/null",
     "lint": "coffeelint src",
+    "test": "deno test --allow-read --allow-env=DEBUG_TOKEN_STREAM,DEBUG_REWRITTEN_TOKEN_STREAM tests/",
     "build": "vite build --mode index && vite build --mode highscore",
     "preview": "vite preview --host"
   }
