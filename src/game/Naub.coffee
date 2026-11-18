@@ -281,10 +281,15 @@ export class Naub
   split_join: (id) ->
     if id of @joins
       partner = @joins[id]
-      @layer.graph.remove_join id
+      constraints = @constraints[id] ? partner.constraints[id]
+      @layer.physics.unjoin constraints if constraints?
       delete partner.joins[id]
       delete @joins[id]
-      @layer.physics.unjoin(@constraints[id]) if @constraints[id]?
+      delete partner.constraints[id]
+      delete @constraints[id]
+      delete partner.drawing_join[id]
+      delete @drawing_join[id]
+      @layer.events.join_removed.dispatch id
 
 
   # the amount of points the user is awarded if this naub is included in a cycle
@@ -366,7 +371,7 @@ export class Naub
       other = @layer.get_object other
 
     if other? and not @is_joined_with other
-      join = @layer.graph.add_join this, other # returns the id of this join in the graph
+      join = @layer.allocate_join_id()
 
       #restLength, stiffness, damping
       minlen = Naubino.settings.naub.min_join_len * @size
@@ -380,6 +385,8 @@ export class Naub
       @drawing_join[join]      = true
       other.drawing_join[join] = false
 
+      @layer.events.join_added.dispatch join, @number, other.number
+
       if !silent
         @layer.events.naub_joined.dispatch() if @layer.events.naub_joined?
 
@@ -391,18 +398,15 @@ export class Naub
   # the 'other' naub takes my place
   replace_with: (other) ->
     for id, naub of @joins
-      @layer.physics.unjoin(naub.constraints[id]) if naub.constraints[id]?
-
       other.join_with(naub)
-      delete naub.joins[id]
-      @layer.graph.remove_join id
+      @split_join id
 
 
     @layer.unfocus()
 
-    p = other.physical_body.p
-    p2 = @physical_body.p
-    other.physical_body.p = cp.v.lerp(p, p2, 0.5)
+    other_position = other.physical_body.p
+    replaced_position = @physical_body.p
+    other.physical_body.p = cp.v.lerp(other_position, replaced_position, 0.5)
 
     @remove()
     @layer.events.naub_replaced.dispatch(other.number) if @layer.events.naub_replaced?

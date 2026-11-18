@@ -18,7 +18,7 @@ export class Factory
     naub.disabled = true
     naub.isClickable = yes
     naub.update()
-    #@layer.graph.remove_join naub.join_with( @objects.main, name ) # add the object without managing the join
+
     naub
 
 

@@ -50,7 +50,8 @@ export class Game
     @expose_world()
     @version = @mode.version
     @mode_id = @mode.id
-    @graph = new Graph(this)
+    @join_id_sequence = 0
+    @graph = new Graph
     @factory = new Factory(this)
     @join_policy = new @mode.join_policy(this)
     @drag = new DragSystem(this)
@@ -83,6 +84,8 @@ export class Game
     }
 
     @subscriptions = [
+      @events.join_added.add (id, first, second) => @graph.add_join id, first, second
+      @events.join_removed.add (id) => @graph.remove_join id
       @viewport.field_resized.add (width, height) => @resize width, height
       @app_events.commands.play.add => @play()
       @app_events.commands.pause.add => @pause()
@@ -91,6 +94,14 @@ export class Game
       @app_events.input.two_finger_tap.add => @toggle()
     ]
 
+
+  allocate_join_id: -> ++@join_id_sequence
+
+  check_cycles: (number) ->
+    return if @disposed
+    for cycle in @graph.cycle_test(number)
+      @events.cycle_found.dispatch cycle
+    return
 
   advance: (dt) ->
     @background.advance dt

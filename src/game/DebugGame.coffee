@@ -8,8 +8,7 @@ export class DebugGame extends Game
     @subscriptions = @subscriptions.concat [
       @app_events.input.two_finger_start.add => @begin_spawning()
       @app_events.input.two_finger_end.add => @end_spawning()
-      @events.naub_replaced.add (number) =>
-        @graph.cycle_test(number) unless @disposed
+      @events.naub_replaced.add (number) => @check_cycles number
       @events.cycle_found.add (list) =>
         @destroy_naubs(list) unless @disposed
     ]

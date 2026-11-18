@@ -28,6 +28,8 @@ export class GameEvents
     @state_changed = new Signal
     @lost = new Signal
     @finished = new Signal
+    @join_added = new Signal
+    @join_removed = new Signal
     @naub_joined = new Signal
     @naub_destroyed = new Signal
     @naub_focused = new Signal

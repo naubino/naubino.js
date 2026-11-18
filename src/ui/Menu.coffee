@@ -1,6 +1,6 @@
 # TODO clean up menu code
 import {Layer} from "../core/Layer"
-import {Graph} from "../game/Graph"
+
 import { SoundButton, PlayButton, PauseButton, MainButton, ClearButton } from "../game/Shapes"
 import {Factory} from "../game/Factory"
 
@@ -10,7 +10,7 @@ export class Menu extends Layer
   constructor: (canvas, @events = Naubino.events, viewport) ->
     super(canvas, viewport)
     @name = "menu"
-    @graph = new Graph this
+
     @factory = new Factory this
 
     @objects = {}

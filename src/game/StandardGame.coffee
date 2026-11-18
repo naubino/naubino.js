@@ -15,7 +15,7 @@ export class StandardGame extends Game
     @levels = new Levels this, @spawner, @mode.level_details
     @rules = [@spawner, @scoring, @overflow, @levels]
     @subscriptions = @subscriptions.concat [
-      @events.naub_replaced.add (number) => @graph.cycle_test number
+      @events.naub_replaced.add (number) => @check_cycles number
       @events.cycle_found.add (list) => @destroy_naubs list
       @events.naub_focused.add (naub) => @active_tree = @graph.tree naub.number
     ]
