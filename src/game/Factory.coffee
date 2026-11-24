@@ -5,7 +5,7 @@ import {Clock, StringShape} from "./Shapes"
 import {PlayButton, PauseButton} from "./Shapes"
 
 export class Factory
-  constructor: (@layer) ->
+  constructor: (@layer, @world) ->
 
   add_button: (pos, callback, shapes) =>
     ball = new Ball
@@ -35,7 +35,7 @@ export class Factory
     naub.physical_body.setPos( pos.Copy() ) # remember to set position
     naub.kind = 'ball'
 
-    @layer.add_object naub
+    @world.add_object naub
     #naub.add_shape new NumberShape
     #naub.update() # again just to get the numbers
     naub
@@ -58,7 +58,7 @@ export class Factory
     naub.kind = 'box'
     naub.life_rendering = on
 
-    @layer.add_object naub
+    @world.add_object naub
     #naub.add_shape new NumberShape
     #naub.update() # again just to get the numbers
     naub
@@ -91,8 +91,8 @@ export class Factory
     naub_a = factory1 pos_a, color_a
     naub_b = factory2 pos_b, color_b
 
-    naub_a.join_with(naub_b, "silent")
-    [naub_a.color_id, naub_b.color_id]
+    @world.join naub_a, naub_b, true
+    [naub_a, naub_b]
 
   # create a triple of joined naubs
   #
@@ -113,24 +113,23 @@ export class Factory
     naub_b = @add_ball pos_b, color_b
     naub_c = @add_ball pos_c, color_c
 
-    naub_a.join_with naub_b
-    naub_b.join_with naub_c
+    @world.join naub_a, naub_b
+    @world.join naub_b, naub_c
+    [naub_a, naub_b, naub_c]
 
   #create n sets of matching pairs and some leftovers
   #
-  # @param n [int] number of matching pairs
+  # @param count [int] number of matching pairs
   # @param extras [int] number of leftovers
-  create_matching_naubs: (n=1,extras=0) ->
-    for [1..n]
+  create_matching_naubs: (count = 1, extras = 0) ->
+    for [1..count]
       colors = Util.shuffle [0..5]
       colors[5] = colors[0]
-      i = 0
-      while i < (colors.length )-1
-        pos  = @random_outside()
-        #Naubino.background.draw_marker(x,y)
-        [a,b] = @create_naub_pair(pos, colors[i], colors[i+1])
-        #console.log "pairing " + [a,b]
-        i++
+      index = 0
+      while index < colors.length - 1
+        pos = @random_outside()
+        @create_naub_pair pos, colors[index], colors[index + 1]
+        index++
     #create some extras
     if extras > 0
       for [1..extras]

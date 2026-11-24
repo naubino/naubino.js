@@ -266,11 +266,7 @@ export class Naub
   # makes a naub unclickable and joinable
   enable: -> @disabled = false
 
-  # removes the reference to this naub from all its partners
-  remove: =>
-    for id, naub of @joins
-      @split_join id
-    @removed = true
+  remove: => @removed = true
 
   dispose: ->
     clearTimeout timeout_id for timeout_id in @timeouts
@@ -278,18 +274,6 @@ export class Naub
     @timeouts = []
     @intervals = []
 
-  split_join: (id) ->
-    if id of @joins
-      partner = @joins[id]
-      constraints = @constraints[id] ? partner.constraints[id]
-      @layer.physics.unjoin constraints if constraints?
-      delete partner.joins[id]
-      delete @joins[id]
-      delete partner.constraints[id]
-      delete @constraints[id]
-      delete partner.drawing_join[id]
-      delete @drawing_join[id]
-      @layer.events.join_removed.dispatch id
 
 
   # the amount of points the user is awarded if this naub is included in a cycle
@@ -318,7 +302,7 @@ export class Naub
     for shape in @shapes[1..]
       shape.destroy_animation() # these are just for fun
 
-    @layer.events.naub_destroyed.dispatch(@number) if @layer.events.naub_destroyed?
+    @events?.naub_destroyed.dispatch @number
 
 
 
@@ -351,66 +335,6 @@ export class Naub
 
 
 
-  attach_to: ( center ) ->
-    unless @centerjoin?
-      # TODO implement this
-    else
-      console.warn "object is already attached to a point"
-
-  attracted_to: ( center ) ->
-    unless @centerjoin?
-      @centerjoin = @layer.physics.attract_to_center(@physical_body, center)
-      @constraints['center'] = @centerjoin
-    else
-      console.warn "object is already attached to a point"
-
-
-  # do things a naub is supposed to do
-  join_with: (other, silent = false) ->
-    if typeof other == 'number'
-      other = @layer.get_object other
-
-    if other? and not @is_joined_with other
-      join = @layer.allocate_join_id()
-
-      #restLength, stiffness, damping
-      minlen = Naubino.settings.naub.min_join_len * @size
-      maxlen = Naubino.settings.naub.max_join_len * @size
-
-      @constraints[join] = @layer.physics.join_bodies(@physical_body, other.physical_body, minlen, maxlen)
-
-      @joins[join]      = other
-      other.joins[join] = this
-
-      @drawing_join[join]      = true
-      other.drawing_join[join] = false
-
-      @layer.events.join_added.dispatch join, @number, other.number
-
-      if !silent
-        @layer.events.naub_joined.dispatch() if @layer.events.naub_joined?
-
-      join
-    else
-      -1
-
-
-  # the 'other' naub takes my place
-  replace_with: (other) ->
-    for id, naub of @joins
-      other.join_with(naub)
-      @split_join id
-
-
-    @layer.unfocus()
-
-    other_position = other.physical_body.p
-    replaced_position = @physical_body.p
-    other.physical_body.p = cp.v.lerp(other_position, replaced_position, 0.5)
-
-    @remove()
-    @layer.events.naub_replaced.dispatch(other.number) if @layer.events.naub_replaced?
-    return 42
 
   # checks whether naub shares a common partner with other naub
   # prohibits folding of pairs
@@ -467,7 +391,7 @@ export class Naub
   focus: ->
     @focused = true
     @onfocus()
-    @layer.events.naub_focused.dispatch(@) if @layer.events.naub_focused?
+    @events?.naub_focused.dispatch this
 
   unfocus: ->
     @focused = false

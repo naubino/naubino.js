@@ -46,13 +46,12 @@ export class Game
     @disposed = no
     @resize @width, @height
     @config = @build_config()
-    @world = new World(@width, @height, @config.physics)
+    @world = new World(@width, @height, @config.physics, @events)
     @expose_world()
     @version = @mode.version
     @mode_id = @mode.id
-    @join_id_sequence = 0
     @graph = new Graph
-    @factory = new Factory(this)
+    @factory = new Factory(this, @world)
     @join_policy = new @mode.join_policy(this)
     @drag = new DragSystem(this)
     @space.defaultHandler = new CollisionHandler this
@@ -95,7 +94,6 @@ export class Game
     ]
 
 
-  allocate_join_id: -> ++@join_id_sequence
 
   check_cycles: (number) ->
     return if @disposed
@@ -326,8 +324,16 @@ export class Game
 
 
   # is one naub allowed to join with another
-  check_joining: (a, b, arbiter) ->
-    @join_policy.check_joining(a, b, arbiter)
+  check_joining: (first, second, arbiter) ->
+    action = @join_policy.check_joining first, second, arbiter
+    return false unless action?
+    if action.action is 'replace'
+      @replacing_naubs.push action.pair
+    else
+      @just_joined = action.pair[0].number
+      @schedule_timeout (=> @just_joined = -1), 300
+      @joining_naubs.push action.pair
+    return true
 
   # draws everything that happens inside the field
   draw:  ->
@@ -391,12 +397,7 @@ export class Game
 
 
 
-  add_object:(obj) ->
-    obj.center = @center()
-    number = @world.add_object obj
-    obj.physical_body.naub_number = number if obj.physical_body?
-    obj.physical_shape.naub_number = number if obj.physical_shape?
-    obj.attracted_to @center()
+  add_object: (obj) -> @world.add_object obj
 
   get_object: (id) -> @world.get_object id
 
@@ -420,12 +421,11 @@ export class Game
     @physics.step(dt, @pointer)
 
     for pair in @replacing_naubs
-      pair[0].replace_with pair[1]
-      #console.log "replacing #{pair[0].number} with #{pair[1].number}"
+      @unfocus()
+      @world.replace pair[0], pair[1]
 
     for pair in @joining_naubs
-      pair[0].join_with pair[1]
-      #console.log "joinging #{pair[0].number} with #{pair[1].number}"
+      @world.join pair[0], pair[1]
 
     @joining_naubs = []
     @replacing_naubs = []
