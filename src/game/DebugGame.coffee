@@ -1,43 +1,21 @@
 import {Game} from './Game'
 import {StringShape} from './Shapes'
+import {GestureSpawning} from '../modes/GestureSpawning'
 
 export class DebugGame extends Game
   constructor: (args...) ->
     super args...
-    @gesture_timer = null
-    @subscriptions = @subscriptions.concat [
-      @app_events.input.two_finger_start.add => @begin_spawning()
-      @app_events.input.two_finger_end.add => @end_spawning()
-      @events.naub_replaced.add (number) => @check_cycles number
-      @events.cycle_found.add (list) =>
-        @destroy_naubs(list) unless @disposed
-    ]
-
-  onplaying: (event, from, to) ->
-    super event, from, to
-    return if @disposed or from isnt 'ready'
-    @factory.create_matching_naubs()
-    @add_ball() for [0..5]
-
-  onleaveplaying: ->
-    @end_spawning()
-    super()
-
-  dispose: ->
-    @end_spawning()
-    super()
-
-  begin_spawning: ->
-    @end_spawning()
-    return if @disposed or @current isnt 'playing'
-    @spawn_pair()
-    @gesture_timer = setInterval (=>
-      @spawn_pair() unless @disposed or @current isnt 'playing'
-    ), 300
-
-  end_spawning: ->
-    clearInterval @gesture_timer if @gesture_timer?
-    @gesture_timer = null
+    population =
+      activate: =>
+        @factory.create_matching_naubs()
+        @add_ball() for [0..5]
+        return
+    {two_finger_start, two_finger_end} = @app_events.input
+    gestures = new GestureSpawning two_finger_start, two_finger_end, => @spawn_pair()
+    @rules = [population, gestures]
+    {signal} = @abort_controller
+    @events.naub_replaced.add ((number) => @check_cycles number), signal
+    @events.cycle_found.add ((list) => @destroy_naubs(list) unless @disposed), signal
 
   spawn_pair: ->
     return if @disposed

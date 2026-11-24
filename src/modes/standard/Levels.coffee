@@ -6,6 +6,7 @@ export class Levels extends Rule
     @load_level 0
 
   load_level: (level) ->
+    return if @disposed
     if 0 <= level < @level_details.length
       @load_level 0 if 0 < level < @level
 
@@ -27,5 +28,6 @@ export class Levels extends Rule
       @game.events.level_changed.dispatch @level unless level < 1
 
   check: ->
+    return if @disposed
     return if @level >= @level_details.length - 1
     @load_level(@level+1) if @level_details[@level].limit < @game.ex_naubs

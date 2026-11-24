@@ -26,6 +26,7 @@ export class GameEvents
     @chain_bonus = new Signal
     @score_changed = new Signal
     @state_changed = new Signal
+    @loss_requested = new Signal
     @lost = new Signal
     @finished = new Signal
     @join_added = new Signal

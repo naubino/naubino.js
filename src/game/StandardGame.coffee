@@ -14,11 +14,10 @@ export class StandardGame extends Game
     @overflow = new Overflow this
     @levels = new Levels this, @spawner, @mode.level_details
     @rules = [@spawner, @scoring, @overflow, @levels]
-    @subscriptions = @subscriptions.concat [
-      @events.naub_replaced.add (number) => @check_cycles number
-      @events.cycle_found.add (list) => @destroy_naubs list
-      @events.naub_focused.add (naub) => @active_tree = @graph.tree naub.number
-    ]
+    {signal} = @abort_controller
+    @events.naub_replaced.add ((number) => @check_cycles number), signal
+    @events.cycle_found.add ((list) => @destroy_naubs list), signal
+    @events.naub_focused.add ((naub) => @active_tree = @graph.tree naub.number), signal
 
   score_snapshot: ->
     name: 'nobody'

@@ -43,6 +43,10 @@ export class Game
     @events = new GameEvents
     @timeouts = new Set
     @rules = []
+    @started_rules = []
+    @activated = no
+    @rules_running = no
+    @abort_controller = new AbortController
     @disposed = no
     @resize @width, @height
     @config = @build_config()
@@ -82,16 +86,16 @@ export class Game
         console.error "#{@name}.#{event}: #{from} -> #{to}\n#{code}::#{message}"
     }
 
-    @subscriptions = [
-      @events.join_added.add (id, first, second) => @graph.add_join id, first, second
-      @events.join_removed.add (id) => @graph.remove_join id
-      @viewport.field_resized.add (width, height) => @resize width, height
-      @app_events.commands.play.add => @play()
-      @app_events.commands.pause.add => @pause()
-      @app_events.commands.stop.add (force) => @stop force
-      @app_events.commands.toggle.add => @toggle()
-      @app_events.input.two_finger_tap.add => @toggle()
-    ]
+    {signal} = @abort_controller
+    @events.join_added.add ((id, first, second) => @graph.add_join id, first, second), signal
+    @events.join_removed.add ((id) => @graph.remove_join id), signal
+    @events.loss_requested.add ((reason) => @loose reason if not @disposed and @can 'loose'), signal
+    @viewport.field_resized.add ((width, height) => @resize width, height), signal
+    @app_events.commands.play.add (=> @play()), signal
+    @app_events.commands.pause.add (=> @pause()), signal
+    @app_events.commands.stop.add ((force) => @stop force), signal
+    @app_events.commands.toggle.add (=> @toggle()), signal
+    @app_events.input.two_finger_tap.add (=> @toggle()), signal
 
 
 
@@ -143,15 +147,35 @@ export class Game
   onbeforeloose: -> not @disposed
 
   onplaying: (event, from, to) ->
+    return if @disposed or @rules_running
+    unless @activated
+      return unless from is 'ready'
+      @activated = yes
+      for rule in @rules
+        return if @disposed or @current isnt 'playing'
+        rule.activate?()
+    return if @disposed or @current isnt 'playing'
     @field_layer.show()
     @start_drawing()
     @start_stepping()
-    rule.start() for rule in @rules
+    @rules_running = yes
+    for rule in @rules
+      return if @disposed or @current isnt 'playing'
+      @started_rules.push rule
+      rule.start?()
+    return if @disposed or @current isnt 'playing'
     @checking = setInterval @check, 300 unless @checking
     return
 
+  stop_rules: ->
+    @rules_running = no
+    started_rules = @started_rules
+    @started_rules = []
+    rule.stop?() for rule in started_rules
+    return
+
   onleaveplaying: ->
-    rule.stop() for rule in @rules
+    @stop_rules()
     clearInterval @checking
     @checking = null
     return
@@ -162,7 +186,9 @@ export class Game
 
   # recurring check (@checking)
   check: =>
-    rule.check() for rule in @rules
+    for rule in @rules
+      return if @disposed or @current isnt 'playing'
+      rule.check?()
     return
 
 
@@ -234,7 +260,8 @@ export class Game
   dispose: ->
     return if @disposed
     @disposed = yes
-    rule.stop() for rule in @rules
+    @stop_rules()
+    rule.dispose?() for rule in @rules
     @stop_stepping()
     @stop_drawing()
     clearInterval @checking if @checking?
@@ -251,8 +278,7 @@ export class Game
     @background_lease.release()
     @field_lease.release()
     signal.active = no for signal in Object.values(@events)
-    unsubscribe() for unsubscribe in @subscriptions
-    @subscriptions = []
+    @abort_controller.abort()
 
 
   pointer_start: (position) ->

@@ -4,14 +4,13 @@ import {Rule} from '../Rule'
 export class Overflow extends Rule
 
   check: ->
-    return unless @game.basket?
+    return if @disposed or not @game.basket?
     capacity = @game.basket.capacity()
     critical_capacity = 45
 
-    severity = if capacity < critical_capacity
-      (critical_capacity-capacity)/critical_capacity
-    else
-      0
+    severity = Math.max 0, (critical_capacity - capacity) / critical_capacity
     @game.events.overflow_warning.dispatch severity
 
-    @game.loose('Naub Overflow') if @game.basket.capacity() < 5
+    if @game.basket.capacity() < 5
+      @game.events.loss_requested.dispatch 'Naub Overflow'
+      return

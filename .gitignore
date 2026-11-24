@@ -3,6 +3,7 @@ js/*
 *.swo
 *.js
 !vite.config.js
+!tests/*.js
 *~
 Session.vim
 docs

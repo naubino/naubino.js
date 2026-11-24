@@ -1,9 +1,9 @@
 export class Signal extends EventTarget
   active: true
 
-  add: (listener, context) =>
-    handler = (e) -> listener.apply(context, e.detail)
-    @addEventListener "dispatch", handler
+  add: (listener, abort_signal) =>
+    handler = (event) -> listener event.detail...
+    @addEventListener "dispatch", handler, {signal: abort_signal}
     => @removeEventListener "dispatch", handler
 
   dispatch: (args...) =>

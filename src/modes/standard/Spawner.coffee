@@ -22,15 +22,19 @@ export class Spawner extends Rule
 
     @inner_clock = 0 # to avoid resetting timer after pause
 
-    # spam the first naubs earlier
-    @spam()
+  activate: -> @spam() unless @disposed
 
   start: ->
+    return if @disposed
     @spamming = setInterval @event, 100 unless @spamming
 
   stop: ->
     clearInterval @spamming
     @spamming = null
+
+  dispose: ->
+    @stop()
+    super()
 
   max_color: -> Math.floor(Math.random() * (@number_of_colors))
 
@@ -43,9 +47,10 @@ export class Spawner extends Rule
 
   #picks a random spammer according to its probability
   spam: ->
+    return if @disposed
     probabilities = for name, spam of @spammers
       spam.probability
-    max = probabilities.reduce (f,s) -> f+s
+    max = probabilities.reduce (total, probability) -> total + probability
     dart = Math.floor(Math.random() * max)
     for spammer in @map_spammers()
       if dart < spammer.range
@@ -54,6 +59,7 @@ export class Spawner extends Rule
 
   # recurring event (@spamming)
   event: =>
+    return if @disposed or not @spamming?
     @spam() if @inner_clock == 0
     @inner_clock = (@inner_clock + 1) % @spammer_interval
     @spammer_interval
