@@ -153,6 +153,7 @@ export class Naubino
     @round_config = structuredClone mode.configuration()
     field_size = @viewport.field_size()
     @game = new Game @viewport, field_size, mode, @round_config, @events
+    @commands = @game.assembled.commands ? {}
     @layers = @game.layers.concat [@menu, @overlay]
     @viewport.set_layers @layers, @game.layers.concat [@menu]
 

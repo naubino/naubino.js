@@ -15,6 +15,32 @@ export class DebugMode extends Mode
       naub.life_rendering = yes
       naub.add_shape new StringShape naub.number, 'white'
       naub
+    playing = no
+    disposed = no
+    command_lifecycle =
+      start: ->
+        return if disposed
+        playing = yes
+        return
+      stop: ->
+        playing = no
+        return
+      dispose: ->
+        disposed = yes
+        playing = no
+        return
+    commands =
+      pair: (first_color = 0, second_color = 1) ->
+        return null unless playing
+        naubs = factory.create_naub_pair null, first_color, second_color
+        return (decorate naub for naub in naubs)
+      triple: (first_color = 0, second_color = 1, third_color = 2) ->
+        return null unless playing
+        naubs = factory.create_naub_triple null, first_color, second_color, third_color
+        return (decorate naub for naub in naubs)
+      ball: (color = null) ->
+        return null unless playing
+        return decorate factory.add_ball factory.random_outside(), color
     population =
       activate: ->
         factory.create_matching_naubs()
@@ -38,5 +64,5 @@ export class DebugMode extends Mode
     events.cycle_found.add ((ids) -> world.destroy_naubs ids), abort_controller.signal
     cycle_handling =
       dispose: -> abort_controller.abort()
-    rules = [population, gestures, connections, cycle_handling]
-    {rules, connections, join_policy: new JoinPolicy config.game}
+    rules = [command_lifecycle, population, gestures, connections, cycle_handling]
+    {rules, connections, commands, join_policy: new JoinPolicy config.game}
