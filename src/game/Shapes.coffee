@@ -5,9 +5,9 @@ export class Shape
   setup: (@naub) ->
     @pos      = @naub.pos
     @ctx      = @naub.ctx
-    @radius   = @naub.radius - Naubino.settings.naub.margin/2
-    @width    = @naub.width - Naubino.settings.naub.margin
-    @height   = @naub.height - Naubino.settings.naub.margin
+    @radius   = @naub.radius - @naub.config.margin/2
+    @width    = @naub.width - @naub.config.margin
+    @height   = @naub.height - @naub.config.margin
 
   apply_filters: (filters, ctx )->
     for filter in filters
@@ -123,8 +123,8 @@ export class Box extends Shape
     ctx.closePath()
 
   adjust_physics: ->
-    @naub.momentum = cp.momentForBox( Naubino.settings.naub.mass, @naub.width, @naub.height )
-    @naub.physical_body = new cp.Body( Naubino.settings.naub.mass, @naub.momentum )
+    @naub.momentum = cp.momentForBox( @naub.config.mass, @naub.width, @naub.height )
+    @naub.physical_body = new cp.Body( @naub.config.mass, @naub.momentum )
     @naub.physical_body.setAngle( 0 ) # remember to set position
     @naub.physical_shape = new cp.BoxShape( @naub.physical_body, @naub.width, @naub.height )
     @naub.physical_shape.setElasticity @naub.elasticity
@@ -259,12 +259,15 @@ export class ClearButton extends Shape
 
 
 export class MainButton extends Box
-  draw: (ctx, x, y) ->
-    text = @naub.layer.score ? ""
+  constructor: (@score = -> '') ->
+    super()
+
+  draw: (ctx, horizontal, vertical) ->
+    text = @score()
     size=38
     @width = @naub.size*1.2
     ctx.save()
-    ctx.translate(x,y)
+    ctx.translate horizontal, vertical
     ctx.rotate(Math.PI/6)
     ctx.beginPath()
     ctx.rect(-@width/2,-@width/2,@width,@width)
@@ -277,15 +280,15 @@ export class MainButton extends Box
     ctx.closePath()
     ctx.restore()
 
-    l = text.toString().length
-    switch l
+    length = text.toString().length
+    switch length
       when 1,2 then ratio = 1
       when 3 then ratio = 0.7
       when 4 then ratio = 0.5
       else ratio = 0.4
 
     ctx.save()
-    ctx.translate(x,y)
+    ctx.translate horizontal, vertical
     ctx.scale ratio, ratio
 
     ctx.font= "bold #{size}px #{Naubino.settings.menu.font}"
@@ -357,6 +360,6 @@ export class StringShape extends Shape
     ctx.rotate @naub.physical_body.a if @naub.physical_body?
     ctx.fillStyle = @color
     ctx.textAlign = 'center'
-    ctx.font= "#{size}px #{Naubino.settings.game.font}"
+    ctx.font= "#{size}px #{Naubino.settings.graphics.font ? 'Verdana'}"
     ctx.fillText(string, 0, 7)
     ctx.restore()

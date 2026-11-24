@@ -5,11 +5,11 @@ import {Clock, StringShape} from "./Shapes"
 import {PlayButton, PauseButton} from "./Shapes"
 
 export class Factory
-  constructor: (@layer, @world) ->
+  constructor: (@layer, @world, @field, @config = {}) ->
 
   add_button: (pos, callback, shapes) =>
     ball = new Ball
-    naub = new Naub @layer, null
+    naub = new Naub @layer, null, null, @config.naub
     naub.pos = naub.fixed_pos = pos
 
     naub.add_shape ball
@@ -27,7 +27,7 @@ export class Factory
   # @param pos [cp.v] position
   # @param color [int]  color_id
   add_ball: (pos = @random_outside(), color = null) =>
-    naub = new Naub @layer, color
+    naub = new Naub @layer, color, null, @config.naub
     ball = new Ball
 
     naub.add_shape ball
@@ -46,7 +46,7 @@ export class Factory
   # @param pos [cp.v] position
   # @param color [int]  color_id
   add_box: (pos = @random_outside(), color = null) =>
-    naub = new Naub @layer, color
+    naub = new Naub @layer, color, null, @config.naub
     box = new Box
 
     naub.add_shape box
@@ -140,25 +140,25 @@ export class Factory
 
   # produces a random set of coordinates outside the field
   random_outside: ->
-    offset = @layer.config?.game?.creation_offset ? Naubino.settings.game.creation_offset
-    bounds = @layer.view_bounds ? {left: 0, top: 0, right: @layer.width, bottom: @layer.height}
+    offset = @config.game?.creation_offset ? 50
+    bounds = @field.view_bounds()
     width = bounds.right - bounds.left
     height = bounds.bottom - bounds.top
     seed = Math.round (Math.random() * 3)+1
     switch seed
       when 1
-        x = bounds.right + offset
-        y = bounds.top + height * Math.random()
+        horizontal = bounds.right + offset
+        vertical = bounds.top + height * Math.random()
       when 2
-        x = bounds.left + width * Math.random()
-        y = bounds.bottom + offset
+        horizontal = bounds.left + width * Math.random()
+        vertical = bounds.bottom + offset
       when 3
-        x = bounds.left - offset
-        y = bounds.top + height * Math.random()
+        horizontal = bounds.left - offset
+        vertical = bounds.top + height * Math.random()
       when 4
-        x = bounds.left + width * Math.random()
-        y = bounds.top - offset
-    new cp.v x,y
+        horizontal = bounds.left + width * Math.random()
+        vertical = bounds.top - offset
+    new cp.v horizontal, vertical
 
   #returns a random
   random_factory: ->

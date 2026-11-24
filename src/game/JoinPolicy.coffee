@@ -1,6 +1,7 @@
 # join, replace or nothing, asked on every collision
 export class JoinPolicy
-  constructor: (@game) ->
+  constructor: (options = {}) ->
+    @min_joining_force = options.min_joining_force ? 1000
 
   # checks whether naub wants to join with other
   # OVERWRITE ME
@@ -11,13 +12,11 @@ export class JoinPolicy
 
   # is one naub allowed to join with another
   check_joining: (first, second, arbiter) ->
-    return null unless @game.joining_allowed
+
     return null unless first.focused or second.focused
     return null if first.disabled or second.disabled
     return null if first.number is second.number
-    min_joining_force = @game.config?.game?.min_joining_force ?
-      Naubino.settings.game.min_joining_force
-    return null unless arbiter.totalImpulse().Length() >= min_joining_force
+    return null unless arbiter.totalImpulse().Length() >= @min_joining_force
 
     [naub, other] = [first, second]
     [naub, other] = [second, first] unless first.focused
@@ -30,6 +29,6 @@ export class JoinPolicy
     if not joined && agree && not to_close && not alone
       return {action: 'replace', pair: [other, naub]}
 
-    if naub.is_alone() and naub.number isnt @game.just_joined
+    if naub.is_alone()
       return {action: 'join', pair: [naub, other]}
     return null

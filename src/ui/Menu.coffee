@@ -50,7 +50,7 @@ export class Menu extends Layer
     main:
       position:  new cp.v(23,26)
       function: -> #console.info "menu"
-      shapes: [new MainButton]
+      shapes: []
       #shapes: []
     play:
       command: 'play'
@@ -70,7 +70,8 @@ export class Menu extends Layer
   add_buttons: ->
     for name, button of @buttons
       callback = if button.command? then @command_callback(button.command) else button.function
-      @objects[name] = @factory.add_button button.position, callback, button.shapes
+      shapes = if name is 'main' then [new MainButton => @score] else button.shapes
+      @objects[name] = @factory.add_button button.position, callback, shapes
     @objects.main.life_rendering = on
 
   check_game_state: (state) ->

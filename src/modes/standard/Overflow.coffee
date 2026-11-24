@@ -1,16 +1,15 @@
 import {Rule} from '../Rule'
 
-# warns harder the fuller the basket gets, loses when it's nearly full
 export class Overflow extends Rule
+  constructor: (@basket, @overflow_warning, @loss_requested) ->
+    super()
 
   check: ->
-    return if @disposed or not @game.basket?
-    capacity = @game.basket.capacity()
+    return if @disposed
+    capacity = @basket.capacity()
     critical_capacity = 45
-
     severity = Math.max 0, (critical_capacity - capacity) / critical_capacity
-    @game.events.overflow_warning.dispatch severity
-
-    if @game.basket.capacity() < 5
-      @game.events.loss_requested.dispatch 'Naub Overflow'
+    @overflow_warning.dispatch severity
+    if capacity < 5
+      @loss_requested.dispatch 'Naub Overflow'
       return

@@ -1,33 +1,25 @@
 import {Rule} from '../Rule'
 
 export class Levels extends Rule
-  constructor: (game, @spawner, @level_details) ->
-    super(game)
+  constructor: (@spawner, @basket, @progress, @basket_changed, @level_changed, @level_details) ->
+    super()
     @load_level 0
 
   load_level: (level) ->
     return if @disposed
-    if 0 <= level < @level_details.length
-      @load_level 0 if 0 < level < @level
+    return unless 0 <= level < @level_details.length
+    @load_level 0 if 0 < level < @level
+    @level = level
+    parameters = @level_details[level]
+    @spawner.configure parameters
+    @basket.set_capacity parameters.max_naubs if parameters.max_naubs?
+    @basket_changed.dispatch @basket.basket_size()
+    @level_changed.dispatch @level
+    return
 
-      @level = level
-
-      #Naubino.menu.for_each (naub)->naub.set_random_palette_color() unless level < 2
-
-      set = @level_details[@level]
-
-      @game.basket.max_naubs    = set['max_naubs']        ? @game.basket.max_naubs
-      @spawner.number_of_colors = set['number_of_colors'] ? @spawner.number_of_colors
-      @spawner.spammer_interval = set['interval']         ? @spawner.spammer_interval
-
-      @game.events.basket_changed.dispatch @game.basket.basket_size()
-
-      for name, probability of set['probabilities']
-        @spawner.spammers[name].probability = probability
-
-      @game.events.level_changed.dispatch @level unless level < 1
+  start: -> @basket_changed.dispatch @basket.basket_size() unless @disposed
 
   check: ->
     return if @disposed
     return if @level >= @level_details.length - 1
-    @load_level(@level+1) if @level_details[@level].limit < @game.ex_naubs
+    @load_level(@level + 1) if @level_details[@level].limit < @progress.cleared_naubs()

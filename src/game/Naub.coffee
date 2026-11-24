@@ -7,7 +7,12 @@ import {Util} from '../core/Util'
 # @param color_id [int] representing the color from color palett, also neccessary for joining
 # @param size [int] size, what else
 export class Naub
-  constructor: (@layer, @color_id = null, @size = Naubino.settings.naub.size) ->
+  constructor: (@layer, @color_id = null, size = null, options = {}) ->
+    @config = Object.assign {
+      size: 42, margin: 8, mass: 5, friction: 0.1, elasticity: 0.3, min_join_len: 1.2, max_join_len: 2
+    }, options
+    @size = size ? @config.size
+    @highlighted = false
     @shapes       = [] # shapes this naub draws in order from bottom to top
     @joins        = {} # {id: opposing naub}
     @drawing_join = {} # {id: true/false if this naub draws the join}
@@ -75,12 +80,12 @@ export class Naub
     # this is redundant - just in case the the shapes don't do this
     @constraints = {}
 
-    @friction   = Naubino.settings.naub.friction
-    @elasticity = Naubino.settings.naub.elasticity
+    @friction   = @config.friction
+    @elasticity = @config.elasticity
 
     #this part will be adjusted by shape
-    @momentum = cp.momentForCircle( Naubino.settings.naub.mass, @radius, @radius, cp.vzero)
-    @physical_body = new cp.Body( Naubino.settings.naub.mass, @momentum )
+    @momentum = cp.momentForCircle( @config.mass, @radius, @radius, cp.vzero)
+    @physical_body = new cp.Body( @config.mass, @momentum )
     @physical_body.name = "naub"
     @physical_body.setAngle( 0 ) # remember to set position
     @physical_shape = new cp.CircleShape( @physical_body, @radius , cp.vzero )
@@ -281,6 +286,19 @@ export class Naub
   # >1 for "bonus" naubs
   points_on_destroy: -> 1
 
+  destroy_after: (delay, is_last = false) ->
+    return if @removed or @destroying or @destruction_pending
+    @disable()
+    @destruction_pending = true
+    if delay is 0
+      @destroy is_last
+      return
+    timeout_id = setTimeout((=>
+      @destroy is_last unless @removed
+    ), delay)
+    @timeouts.push timeout_id
+    return
+
   # animated remove with disabling
   destroy: (is_last = false) ->
     @destroying = true
@@ -380,9 +398,9 @@ export class Naub
     check_in_field = ->
     setInterval (check_in_field), 10
 
-  is_active: -> @focused or (@layer.active_tree? and @number in @layer.active_tree)
+  is_active: -> @focused or @highlighted
   is_active_end: ->
-    @focused or ( (@layer.active_tree? and @number in @layer.active_tree) and Object.keys(@joins).length == 1)
+    @focused or (@highlighted and Object.keys(@joins).length == 1)
 
   # user interaction
   onclick: ->

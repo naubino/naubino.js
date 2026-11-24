@@ -2,10 +2,9 @@
 import {Layer} from "../core/Layer"
 import {Background} from "../ui/Background"
 import {World} from "./World"
-import {Naub} from "./Naub"
-import {Graph} from "./Graph"
+import {JoinPolicy} from "./JoinPolicy"
 import {CollisionHandler} from "./CollisionHandler"
-import {Factory} from "./Factory"
+
 import {DragSystem} from "./DragSystem"
 import {Mode} from "../modes/Mode"
 import {GameEvents} from "../Events"
@@ -13,7 +12,8 @@ import {GameEvents} from "../Events"
 export class Game
 
   # get this started
-  constructor: (@viewport, field_size, @mode = new Mode, @app_events = Naubino.events) ->
+  constructor: (@viewport, field_size, mode = new Mode,
+    @config = mode.configuration(), @app_events = Naubino.events) ->
     {@width, @height} = field_size
     @world_center = new cp.v @width / 2, @height / 2
     @background_lease = @viewport.lease 0, 'canvas-background'
@@ -30,6 +30,7 @@ export class Game
     @field_layer.step = (dt) => @step dt
     @field_layer.draw = => @draw()
     @layers = [@background, this]
+    @leases = [@background_lease, @field_lease]
     @canvas = @field_layer.canvas
     @ctx = @field_layer.ctx
     @field_layer.width = @width
@@ -49,14 +50,10 @@ export class Game
     @abort_controller = new AbortController
     @disposed = no
     @resize @width, @height
-    @config = @build_config()
+
     @world = new World(@width, @height, @config.physics, @events)
     @expose_world()
-    @version = @mode.version
-    @mode_id = @mode.id
-    @graph = new Graph
-    @factory = new Factory(this, @world)
-    @join_policy = new @mode.join_policy(this)
+
     @drag = new DragSystem(this)
     @space.defaultHandler = new CollisionHandler this
 
@@ -64,12 +61,29 @@ export class Game
     # display stuff
     @focused_naub = null # points to the naub you click on
 
-    #@points = -1
+
     @joining_allowed = yes
 
     @joining_naubs = []
     @replacing_naubs = []
     @active_tree = []
+    field =
+      center: @center
+      view_bounds: => @view_bounds
+    context = {
+      config: @config
+      world: @world
+      events: @events
+      input: @app_events.input
+      field
+      layer: @field_layer
+      lease_layer: (depth) => @lease_layer depth
+    }
+    @assembled = mode.assemble context
+    @rules = @assembled.rules
+    @join_policy = @assembled.join_policy ? new JoinPolicy @config.game
+    @results = @assembled.results
+    @connections = @assembled.connections
 
     StateMachine.create {
       target: this
@@ -87,8 +101,7 @@ export class Game
     }
 
     {signal} = @abort_controller
-    @events.join_added.add ((id, first, second) => @graph.add_join id, first, second), signal
-    @events.join_removed.add ((id) => @graph.remove_join id), signal
+
     @events.loss_requested.add ((reason) => @loose reason if not @disposed and @can 'loose'), signal
     @viewport.field_resized.add ((width, height) => @resize width, height), signal
     @app_events.commands.play.add (=> @play()), signal
@@ -99,15 +112,17 @@ export class Game
 
 
 
-  check_cycles: (number) ->
-    return if @disposed
-    for cycle in @graph.cycle_test(number)
-      @events.cycle_found.dispatch cycle
-    return
+  lease_layer: (depth) ->
+    lease = @viewport.lease depth
+    layer = new Layer lease.canvas, @viewport
+    @leases.push lease
+    @layers.push layer
+    layer
 
   advance: (dt) ->
     @background.advance dt
     @field_layer.advance dt
+    layer.advance dt for layer in @layers when layer isnt this and layer isnt @background
 
   start_stepping: -> @field_layer.start_stepping()
   stop_stepping: -> @field_layer.stop_stepping()
@@ -121,12 +136,6 @@ export class Game
   move_pointer: (x, y) ->
     [@pointer.x, @pointer.y] = [x, y] if @mousedown
 
-  build_config: ->
-    game = Object.assign {}, Naubino.settings.game, @mode.game_config ? {}
-    physics_overrides = @mode.physics_config ? {}
-    physics = Object.assign {}, Naubino.settings.physics, physics_overrides
-    physics.center_join = Object.assign {}, Naubino.settings.physics.center_join, physics_overrides.center_join ? {}
-    {game, physics}
 
   # plenty of code still reads these off the game directly
   # rerun whenever the world swaps one out
@@ -200,12 +209,11 @@ export class Game
       right: @world_center.x + width / 2
       bottom: @world_center.y + height / 2
 
-  score_snapshot: -> null
-
-  publish_snapshot: ->
-    @events.score_changed.dispatch @points ? 0
-    @events.level_changed.dispatch @levels?.level ? 0
-    @events.basket_changed.dispatch @basket?.basket_size()
+  publish_scoreboard: ->
+    return unless @results?
+    {points, level} = @results.scoreboard()
+    @events.score_changed.dispatch points
+    @events.level_changed.dispatch level
 
 
 
@@ -213,23 +221,22 @@ export class Game
   onchangestate: (event, from, to) ->
     @events.state_changed.dispatch to
     if to is 'finished'
-      snapshot = @completed_snapshot
-      @completed_snapshot = null
-      @events.finished.dispatch snapshot
+      result = @completed_result
+      @completed_result = null
+      @events.finished.dispatch result
 
-  confirm_stop: -> yes
+  confirm_stop: -> confirm "Do you really want to stop the game?"
 
   onbeforestop: (event, from, to, force = no) ->
     return false if @disposed
-    @completed_snapshot = null
+    @completed_result = null
     return false unless force or @confirm_stop()
-    @completed_snapshot = @score_snapshot()
+    @completed_result = @results?.final() ? null
     true
 
   onstop: ->
     @stop_stepping()
     @stop_drawing()
-    @cancel_destroy_batches()
     @clear_objects()
     @clear()
 
@@ -252,10 +259,6 @@ export class Game
           @schedule_timeout (=> @stop yes if @can 'stop'), 2000
     grey_next()
 
-  clear_timeout: (timeout_id) ->
-    return unless timeout_id?
-    clearTimeout timeout_id
-    @timeouts.delete timeout_id
 
   dispose: ->
     return if @disposed
@@ -270,16 +273,34 @@ export class Game
     @field_layer.fadeloop = null
     clearTimeout timeout_id for timeout_id from @timeouts
     @timeouts.clear()
-    @cancel_destroy_batches()
     @clear_objects()
     @clear()
     @background.stop() if @background.can 'stop'
     @background.clear()
-    @background_lease.release()
-    @field_lease.release()
+    for layer in @layers when layer isnt this and layer isnt @background
+      layer.stop_stepping()
+      layer.stop_drawing()
+      layer.clear()
+    lease.release() for lease in @leases
     signal.active = no for signal in Object.values(@events)
     @abort_controller.abort()
 
+
+  focus: (naub) ->
+    @clear_focus()
+    return unless naub?
+    @focused_naub = naub
+    @active_tree = @connections?.tree(naub.number) ? [naub.number]
+    @get_object(number).highlighted = true for number in @active_tree when @get_object(number)?
+    naub.focus()
+    return
+
+  clear_focus: ->
+    @get_object(number).highlighted = false for number in @active_tree when @get_object(number)?
+    @focused_naub?.unfocus()
+    @focused_naub = null
+    @active_tree = []
+    return
 
   pointer_start: (position) ->
     @click position.x, position.y
@@ -313,46 +334,15 @@ export class Game
     @timeouts.add timeout_id
     timeout_id
 
-  cancel_destroy_batches: ->
-    @clear_timeout batch.timer for batch in (@destroy_batches ? []) when batch.timer?
-    @destroy_batches = []
-    @destroying_naubs = {}
 
-  # destroys every naub in a list of IDs by calling its own destroy function
-  destroy_naubs: (list) ->
-    @destroy_batches ?= []
-    @destroying_naubs ?= {}
-    ids = []
-    for id in list
-      naub = @get_object id
-      continue unless naub? and not naub.removed and not naub.destroying and not @destroying_naubs[id]
-      naub.disable()
-      @destroying_naubs[id] = yes
-      ids.push id
-    return unless ids.length
-
-    batch = {ids, index: 0, timer: null}
-    @destroy_batches.push batch
-    destroy_next = =>
-      return unless batch in @destroy_batches
-      id = batch.ids[batch.index]
-      naub = @get_object id
-      if naub? and not naub.removed and not naub.destroying
-        naub.destroy(batch.index == batch.ids.length - 1)
-      else unless naub?
-        delete @destroying_naubs[id]
-      batch.index++
-      if batch.index < batch.ids.length
-        batch.timer = @schedule_timeout destroy_next, 120
-      else
-        @destroy_batches.splice @destroy_batches.indexOf(batch), 1
-    destroy_next()
 
 
   # is one naub allowed to join with another
   check_joining: (first, second, arbiter) ->
+    return false unless @joining_allowed
     action = @join_policy.check_joining first, second, arbiter
     return false unless action?
+    return false if action.action is 'join' and action.pair[0].number is @just_joined
     if action.action is 'replace'
       @replacing_naubs.push action.pair
     else
@@ -405,7 +395,8 @@ export class Game
       if id?
         diff = p2.Copy()
         diff.sub(p1)
-        join_string = id.toString()
+        # join_string = id.toString()
+        join_string = Math.ceil(diff.Length())
         mid = cp.v.lerp(p1, p2, 0.5)
         @ctx.save()
         @ctx.translate mid.x,mid.y
@@ -431,14 +422,12 @@ export class Game
     callback naub for naub_id, naub of @objects
     return
 
-  remove_obj: (id) ->
-    delete @destroying_naubs[id] if @destroying_naubs?
-    @world.remove_object id
+  remove_obj: (id) -> @world.remove_object id
 
   get_obj_in_pos: (pos) -> @world.naub_at pos
 
   clear_objects: ->
-    naub.dispose?() for id, naub of @objects
+    @clear_focus()
     @world.clear @width, @height
     @expose_world()
 

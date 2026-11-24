@@ -1,5 +1,7 @@
 export class PhysicsWorld
-  constructor: (@width, @height, @config = Naubino.settings.physics) ->
+  constructor: (@width, @height, options = {}) ->
+    @config = Object.assign {damping: 0.1}, options
+    @config.center_join = Object.assign {restLength: 30, stiffness: 7, damping: 7}, options.center_join
     @GRABABLE_MASK_BIT = 1<<31
     @NOT_GRABABLE_MASK = ~@GRABABLE_MASK_BIT
     @space = new cp.Space()

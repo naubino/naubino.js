@@ -3,10 +3,45 @@
 #   number of naubs per spam
 #   speed up
 import {Mode} from '../Mode'
+import {Factory} from '../../game/Factory'
+import {JoinPolicy} from '../../game/JoinPolicy'
+import {ConnectionAnalysis} from '../ConnectionAnalysis'
+import {Basket} from './Basket'
+import {Spawner} from './Spawner'
+import {Scoring} from './Scoring'
+import {Overflow} from './Overflow'
+import {Levels} from './Levels'
 
 export class StandardMode extends Mode
-  id: 'standard'
-  version: 2 # please raise when makeing changes to this file
+  configuration: ->
+    config = super()
+    config.level_details ?= structuredClone @level_details
+    config
+
+  assemble: ({config, world, events, field, layer}) ->
+    factory = new Factory layer, world, field, config
+    basket = new Basket world, field, config.naub?.size
+    spawner = new Spawner factory, config.spawn
+    scoring = new Scoring world, basket,
+      events.naub_destroyed, events.cycle_found, events.score_changed, events.chain_bonus
+    overflow = new Overflow basket, events.overflow_warning, events.loss_requested
+    levels = new Levels spawner, basket, scoring,
+      events.basket_changed, events.level_changed, config.level_details
+    connections = new ConnectionAnalysis events.join_added, events.join_removed,
+      events.naub_replaced, events.cycle_found
+    abort_controller = new AbortController
+    events.cycle_found.add ((ids) -> world.destroy_naubs ids), abort_controller.signal
+    cycle_handling =
+      dispose: -> abort_controller.abort()
+    results =
+      scoreboard: -> {points: scoring.points, level: levels.level}
+      final: ->
+        points: scoring.points
+        time: scoring.duration
+        naubs: scoring.cleared_naubs()
+        level: levels.level
+    rules = [spawner, scoring, overflow, levels, connections, cycle_handling]
+    {rules, results, connections, join_policy: new JoinPolicy config.game}
 
   level_details: [
     { limit:-1,    number_of_colors: 3, interval: 40, max_naubs: 20 } # initial state

@@ -1,5 +1,5 @@
 export class Rule
-  constructor: (@game) ->
+  constructor: ->
     @disposed = no
 
   dispose: -> @disposed = yes

@@ -16,6 +16,7 @@ export Settings = {
     muted: no
 
   graphics:
+    font: "Verdana"
     fps:           35 # mind stepper_rate
     updating:      yes
     draw_shadows:  on
@@ -28,31 +29,8 @@ export Settings = {
     draw_pointer: no
     compensate_rotation: no
 
-  game:
-    creation_offset: 50
-    min_joining_force: 1000
-    font: "Verdana"
-
-  naub:
-    size:          42
-    margin:        8
-    mass:          5
-    friction:      0.1
-    elasticity:    0.3
-    min_join_len:  1.2 # times size
-    max_join_len:  2 # times size
-
   step_rate:            60
   step_floor_rate:      30
-
-  physics:
-    center_join:
-      restLength:   30
-      stiffness:    7
-      damping:      7
-    join_length:    3.0 # margin between joined naubs (n* avg size)
-    spring_force:   0.6
-    damping:        0.1
 
   canvas:
     scale:         1 # not yet implemented

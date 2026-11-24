@@ -14,7 +14,7 @@ import {GameLoop} from './GameLoop'
 
 import {Menu} from './ui/Menu'
 import {Overlay} from './ui/Overlay'
-import {StandardGame} from './game/StandardGame'
+import {Game} from './game/Game'
 import {StandardMode} from './modes/standard/StandardMode'
 import {Util} from './core/Util'
 import {Signal} from './core/Signal'
@@ -26,7 +26,7 @@ export class Naubino
   settings: Settings
   Signal: Signal
 
-  constructor: (@mode = new StandardMode, @root_element_id, @game_class = StandardGame) ->
+  constructor: (@mode_entry = {id: 'standard', version: '2', mode: new StandardMode}, @root_element_id) ->
     @events = new Events
     @load_highscores()
     @audio = new Audio(@settings)
@@ -38,11 +38,18 @@ export class Naubino
         JSON.parse string
       else [ {name:"nobody", points: 0, time: 0, naubs: 0, level: 0 } ]
 
-  set_score: -> @temp_score = @game.score_snapshot()
+  result_snapshot: (result, name = 'nobody') ->
+    return null unless result?
+    {id, version} = @mode_entry
+    snapshot = Object.assign {}, result, {name, mode: id, game_version: version}
+    snapshot.config_name = @round_config.name if @round_config.name?
+    snapshot
 
-  finish_run: (score) ->
-    @temp_score = score
-    return unless score? and score.points > 0
+  set_score: -> @temp_score = @result_snapshot @game.results?.final()
+
+  finish_run: (result) ->
+    @temp_score = @result_snapshot result
+    return unless result? and result.points > 0
     name = prompt "Enter your name for the highscore"
     @store_score name if name?
 
@@ -58,8 +65,8 @@ export class Naubino
     @setup_components()
     @viewport.layout layout_options
     @setup_input()
-    @start_game @mode
-    @play() if @mode.auto_start
+    @start_game @mode_entry
+    @play() if @round_config.auto_start
     @start_loop()
     console.timeEnd("loading")
 
@@ -101,6 +108,8 @@ export class Naubino
     @loop = new GameLoop @layers
 
   attach: (game) ->
+    @menu.score = ''
+    game.background.basket_size = null
     subscriptions = [
       game.events.score_changed.add (points) =>
         @menu.score = points
@@ -125,30 +134,31 @@ export class Naubino
             @overlay.stop() if @overlay.can 'stop'
             game.background.stop() if game.background.can 'stop'
       game.events.lost.add (reason) => @overlay.warning reason
-      game.events.finished.add (snapshot) =>
-        @finish_run snapshot
-        @start_game @mode
+      game.events.finished.add (result) =>
+        @finish_run result
+        @start_game @mode_entry
       game.events.naub_joined.add @audio.random_blub
       game.events.naub_replaced.add @audio.random_blub
       game.events.naub_destroyed.add @audio.random_blub
     ]
     -> unsubscribe() for unsubscribe in subscriptions
 
-  start_game: (mode = @mode, game_class = @game_class) ->
+  start_game: (mode_entry = @mode_entry) ->
     @detach_game?()
     @detach_game = null
     @game?.dispose()
     @overlay.stop() if @overlay.can 'stop'
-    @mode = mode
-    @game_class = game_class
+    @mode_entry = mode_entry
+    {mode} = mode_entry
+    @round_config = structuredClone mode.configuration()
     field_size = @viewport.field_size()
-    @game = new @game_class @viewport, field_size, @mode, @events
+    @game = new Game @viewport, field_size, mode, @round_config, @events
     @layers = @game.layers.concat [@menu, @overlay]
     @viewport.set_layers @layers, @game.layers.concat [@menu]
 
     @loop.game = @game
     @detach_game = @attach @game
-    @game.publish_snapshot()
+    @game.publish_scoreboard()
     @menu.check_game_state @game.current
     @viewport.scale_to @viewport.scale
     @game

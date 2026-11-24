@@ -3,7 +3,7 @@ import {PhysicsWorld} from './PhysicsWorld'
 # the mode agnostic part: object registry, physics, naub lifecycle signals
 # no canvas, no graph
 export class World
-  constructor: (width, height, physics_config = Naubino.settings.physics, @events) ->
+  constructor: (width, height, physics_config = {}, @events) ->
     @physics_config = physics_config
     @center = new cp.v width / 2, height / 2
     @objects       = {}
@@ -39,8 +39,8 @@ export class World
     return -1 unless @get_object(first.number) is first and @get_object(second.number) is second
     return -1 if first.removed or second.removed or first.is_joined_with second
 
-    minlen = Naubino.settings.naub.min_join_len * first.size
-    maxlen = Naubino.settings.naub.max_join_len * first.size
+    minlen = first.config.min_join_len * first.size
+    maxlen = first.config.max_join_len * first.size
     constraints = @physics.join_bodies first.physical_body, second.physical_body, minlen, maxlen
     id = ++@join_id_sequence
     @joins[id] = {first, second, constraints}
@@ -78,6 +78,17 @@ export class World
     @events?.naub_replaced.dispatch kept.number
     return
 
+  destroy_naubs: (ids) ->
+    naubs = []
+    for id in ids
+      naub = @get_object id
+      continue unless naub? and not naub.removed
+      continue if naub.destroying or naub.destruction_pending or naub in naubs
+      naubs.push naub
+    for naub, index in naubs
+      naub.destroy_after index * 120, index is naubs.length - 1
+    return
+
   remove_object: (id) ->
     naub = @get_object id
     return unless naub?
@@ -86,6 +97,7 @@ export class World
       @physics.unjoin [naub.centerjoin]
       delete naub.centerjoin
       delete naub.constraints.center
+    naub.dispose?()
     @physics.remove_object naub
     naub.removed = true
     delete @objects[id]
