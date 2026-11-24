@@ -49,11 +49,13 @@ export class Naubino
 
   finish_run: (result) ->
     @temp_score = @result_snapshot result
+    return if @mode_entry.records_highscores is no
     return unless result? and result.points > 0
     name = prompt "Enter your name for the highscore"
     @store_score name if name?
 
   store_score: (name = 'nobody')->
+    return if @mode_entry.records_highscores is no
     @temp_score.name = name
     @temp_score.date = Date.now()
     @scores.push @temp_score
@@ -162,11 +164,12 @@ export class Naubino
     @game.publish_scoreboard()
     @menu.check_game_state @game.current
     @viewport.scale_to @viewport.scale
+    @play() if @round_config.auto_restart
     @game
 
   # state machine forwarding
 
-  play:   (args...) -> @game.play args...
+  play:   (args...) -> @game.play args... if @can 'play'
   pause:  (args...) -> @game.pause args...
   stop:   (args...) -> @game.stop args...
   loose:  (args...) -> @game.loose args...

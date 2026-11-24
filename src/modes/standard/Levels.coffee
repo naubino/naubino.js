@@ -4,6 +4,7 @@ export class Levels extends Rule
   constructor: (@spawner, @basket, @progress, @level_changed, @level_details) ->
     super()
     @load_level 0
+    console.debug {@level_details}
 
   load_level: (level) ->
     return if @disposed

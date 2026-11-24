@@ -68,8 +68,24 @@ window.onload = ->
 
 
 
-mode_from_search = (search = '') ->
+export mode_from_search = (search = '') ->
   params = new URLSearchParams search
   switch params.get('mode')
     when 'debug' then return {id: 'debug', version: '0', mode: new DebugMode}
+    when 'screensaver'
+      return {
+        id: 'screensaver', version: '2', records_highscores: no
+        mode: new StandardMode {
+          auto_start: yes,
+          auto_restart: yes,
+          game:
+            auto_join: yes,
+          level_details: [{
+            limit:-1,
+            number_of_colors: 1,
+            interval: 5,
+            max_naubs: 40
+          }]
+          }
+      }
     else return {id: 'standard', version: '2', mode: new StandardMode}
