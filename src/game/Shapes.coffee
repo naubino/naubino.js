@@ -4,7 +4,7 @@ export class Shape
 
   setup: (@naub) ->
     @pos      = @naub.pos
-    @ctx      = @naub.ctx
+
     @radius   = @naub.radius - @naub.config.margin/2
     @width    = @naub.width - @naub.config.margin
     @height   = @naub.height - @naub.config.margin

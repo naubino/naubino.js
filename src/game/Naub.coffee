@@ -17,7 +17,7 @@ export class Naub
     @joins        = {} # {id: opposing naub}
     @drawing_join = {} # {id: true/false if this naub draws the join}
 
-    @ctx         = @layer.ctx
+
     @frame       = @size*1.5 # defines buffer canvas
 
     @radius      = @size/2
@@ -94,9 +94,9 @@ export class Naub
     @physical_shape.setFriction @friction
 
 
-  isHit: (pos) ->
-    s = @shapes[0]
-    s.isHit(@ctx, pos)
+  isHit: (ctx, pos) ->
+    shape = @shapes[0]
+    shape.isHit(ctx, pos)
 
   # Returns the area value of the first shape that implements it,
   area: ->
@@ -108,18 +108,17 @@ export class Naub
   # @param ctx [canvas.context] context of the target layer
   # set @life_rendering to true if you want to have an animated naub
   # either renders live or draws pre_rendered image
-  draw: () ->
+  draw: (ctx) ->
     pos = if @physical_body then @physical_body.p else @pos
 
     unless Naubino.settings.graphics.updating or @life_rendering or @is_active()
-      @ctx.save()
-      x = pos.x-@frame
-      y = pos.y-@frame
-      #@draw_frame(ctx)
-      @ctx.drawImage(@buffer, x, y)
-      @ctx.restore()
-    else # render life
-      @render(@ctx, pos.x,pos.y)
+      ctx.save()
+      horizontal = pos.x - @frame
+      vertical = pos.y - @frame
+      ctx.drawImage(@buffer, horizontal, vertical)
+      ctx.restore()
+    else
+      @render(ctx, pos.x, pos.y)
 
 
   # Renders the shape into a buffer
@@ -213,7 +212,6 @@ export class Naub
     stretched_width = @join_style.width * stretch
 
     ctx.save()
-    ctx.globalCompositeOperation = "destination-over"
     ctx.strokeStyle = Util.color_to_rgba @join_style.fill
     ctx.beginPath()
 

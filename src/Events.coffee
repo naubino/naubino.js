@@ -20,8 +20,7 @@ export class Events
 export class GameEvents
   constructor: ->
 
-    @overflow_warning = new Signal
-    @basket_changed = new Signal
+
     @level_changed = new Signal
     @chain_bonus = new Signal
     @score_changed = new Signal

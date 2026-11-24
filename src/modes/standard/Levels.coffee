@@ -1,7 +1,7 @@
 import {Rule} from '../Rule'
 
 export class Levels extends Rule
-  constructor: (@spawner, @basket, @progress, @basket_changed, @level_changed, @level_details) ->
+  constructor: (@spawner, @basket, @progress, @level_changed, @level_details) ->
     super()
     @load_level 0
 
@@ -13,11 +13,10 @@ export class Levels extends Rule
     parameters = @level_details[level]
     @spawner.configure parameters
     @basket.set_capacity parameters.max_naubs if parameters.max_naubs?
-    @basket_changed.dispatch @basket.basket_size()
+
     @level_changed.dispatch @level
     return
 
-  start: -> @basket_changed.dispatch @basket.basket_size() unless @disposed
 
   check: ->
     return if @disposed

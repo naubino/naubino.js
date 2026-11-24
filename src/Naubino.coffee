@@ -74,7 +74,10 @@ export class Naubino
   colors: ->
     @color_scheme()
 
-  recolor: -> @game.for_each (naub) -> naub.recolor()
+  recolor: ->
+    @game.for_each (naub) -> naub.recolor()
+    layer.draw() for layer in @game.layers
+    return
 
   # pushes the active scheme's background onto the page so CSS can pick it up
   # via --canvas-background-color.
@@ -109,7 +112,7 @@ export class Naubino
 
   attach: (game) ->
     @menu.score = ''
-    game.background.basket_size = null
+
     subscriptions = [
       game.events.score_changed.add (points) =>
         @menu.score = points
@@ -117,10 +120,7 @@ export class Naubino
       game.events.level_changed.add (level) =>
         @overlay.fade_in_and_out_message "Level #{level}" if level > 0
       game.events.chain_bonus.add (points) => @overlay.fly_in_and_out_message "\n\nChain Bonus #{points}"
-      game.events.overflow_warning.add (severity) -> game.background.warn_overflow severity
-      game.events.basket_changed.add (size) ->
-        game.background.basket_size = size
-        game.background.draw()
+
       game.events.state_changed.add (state) =>
         @menu.check_game_state state
         switch state

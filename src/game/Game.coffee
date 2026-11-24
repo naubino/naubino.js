@@ -1,5 +1,5 @@
 # controlls everything that has to do with logic and gameplay or menus
-import {Layer} from "../core/Layer"
+import {Layer, MAX_FRAME_TIME} from "../core/Layer"
 import {Background} from "../ui/Background"
 import {World} from "./World"
 import {JoinPolicy} from "./JoinPolicy"
@@ -25,12 +25,13 @@ export class Game
     @background.init()
     @field_layer = new Layer @field_lease.canvas, @viewport
     @field_layer.name = 'game'
+    @field_layer.hide()
     @field_layer.variable_timestep = yes
     @field_layer.use_raf = yes
     @field_layer.step = (dt) => @step dt
     @field_layer.draw = => @draw()
     @layers = [@background, this]
-    @leases = [@background_lease, @field_lease]
+
     @canvas = @field_layer.canvas
     @ctx = @field_layer.ctx
     @field_layer.width = @width
@@ -49,6 +50,19 @@ export class Game
     @rules_running = no
     @abort_controller = new AbortController
     @disposed = no
+    @frame = {time: 0, dt: 0}
+    @drawables = []
+    @stage =
+      add: (drawable, order, abort_signal) =>
+        return if @disposed or abort_signal?.aborted
+        entry = {drawable, order}
+        @drawables.push entry
+        @drawables.sort (first, second) -> first.order - second.order
+        abort_signal?.addEventListener 'abort', (=>
+          @drawables = @drawables.filter (candidate) -> candidate isnt entry
+          return
+        ), {once: yes, signal: @abort_controller.signal}
+        return
     @resize @width, @height
 
     @world = new World(@width, @height, @config.physics, @events)
@@ -77,7 +91,7 @@ export class Game
       input: @app_events.input
       field
       layer: @field_layer
-      lease_layer: (depth) => @lease_layer depth
+      stage: @stage
     }
     @assembled = mode.assemble context
     @rules = @assembled.rules
@@ -112,17 +126,14 @@ export class Game
 
 
 
-  lease_layer: (depth) ->
-    lease = @viewport.lease depth
-    layer = new Layer lease.canvas, @viewport
-    @leases.push lease
-    @layers.push layer
-    layer
-
   advance: (dt) ->
+    return if @disposed
+    if @current is 'playing'
+      play_dt = Math.min dt, MAX_FRAME_TIME
+      @frame.time += play_dt
+      @frame.dt += play_dt
     @background.advance dt
     @field_layer.advance dt
-    layer.advance dt for layer in @layers when layer isnt this and layer isnt @background
 
   start_stepping: -> @field_layer.start_stepping()
   stop_stepping: -> @field_layer.stop_stepping()
@@ -277,11 +288,9 @@ export class Game
     @clear()
     @background.stop() if @background.can 'stop'
     @background.clear()
-    for layer in @layers when layer isnt this and layer isnt @background
-      layer.stop_stepping()
-      layer.stop_drawing()
-      layer.clear()
-    lease.release() for lease in @leases
+    @drawables = []
+    @background_lease.release()
+    @field_lease.release()
     signal.active = no for signal in Object.values(@events)
     @abort_controller.abort()
 
@@ -364,11 +373,14 @@ export class Game
       @draw_point @pointer
       # @draw_point @mouseBody.p, "blue"
 
-    for id, obj of @objects
-      obj.draw_joins @ctx
-      obj.draw @ctx
+    entry.drawable.draw @ctx, @frame for entry in @drawables when entry.order < 0
+    naub.draw_joins @ctx for naub in @world.naubs()
+    naub.draw @ctx for naub in @world.naubs()
+    entry.drawable.draw @ctx, @frame for entry in @drawables when entry.order >= 0
 
     @ctx.restore()
+    @frame.dt = 0
+    return
 
 
 

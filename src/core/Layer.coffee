@@ -1,6 +1,6 @@
-export class Layer
+export MAX_FRAME_TIME = 250
 
-  MAX_FRAME_TIME = 250
+export class Layer
 
   constructor: (@canvas, @viewport) ->
     @name = "unnamed layer"
@@ -272,7 +272,7 @@ export class Layer
   # asks all objects whether they have been hit by pointer
   get_obj_in_pos: (pos) ->
     for id, obj of @objects
-      if obj.isHit(pos.x, pos.y) and obj.isClickable
+      if obj.isHit(@ctx, pos) and obj.isClickable
         return obj
 
   clear_objects: -> @objects = {}

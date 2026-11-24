@@ -102,7 +102,7 @@ export class Menu extends Layer
     in_listener_region = Math.hypot(position.x, position.y - 15) < @listener_size
     over_button = no
     if @hovering
-      for naub_name, naub of @objects when naub.isHit(cp.v(position.x, position.y))
+      for naub_name, naub of @objects when naub.isHit(@ctx, position)
         over_button = yes
         break
     in_listener_region or over_button
@@ -126,7 +126,7 @@ export class Menu extends Layer
     @draw_listener_region()
 
     for name, naub of @objects
-      if naub.isHit @pointer
+      if naub.isHit @ctx, @pointer
         naub.focus()
         @focused_naub = naub
         break
@@ -143,11 +143,10 @@ export class Menu extends Layer
     return unless @objects.main?
     @clear()
     @ctx.save()
-    for name, naub of @objects
-      naub.draw_join(@ctx,@objects.main)
-      naub.draw(@ctx)
+    naub.draw_join(@ctx, @objects.main) for name, naub of @objects
+    @objects.main.draw_joins(@ctx)
+    naub.draw(@ctx) for name, naub of @objects
     @objects.main.draw(@ctx)
-    @objects.main.draw_joins()
     @ctx.restore()
 
   activate_menu: ->

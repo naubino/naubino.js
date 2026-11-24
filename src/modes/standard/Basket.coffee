@@ -1,6 +1,16 @@
 export class Basket
-  constructor: (@world, @field, @naub_size = 42, max_naubs = 20) ->
+  constructor: (@world, @field, @loss_requested, @naub_size = 42, max_naubs = 20) ->
+    @severity = 0
     @set_capacity max_naubs
+
+  check: ->
+    capacity = @capacity()
+    critical_capacity = 45
+    @severity = Math.max 0, (critical_capacity - capacity) / critical_capacity
+    if capacity < 5
+      @loss_requested.dispatch 'Naub Overflow'
+      return
+    return
 
   max_naubs: -> @maximum
 
