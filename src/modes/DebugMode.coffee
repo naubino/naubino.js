@@ -1,16 +1,15 @@
 import {Mode} from './Mode'
-import {Factory} from '../game/Factory'
-import {JoinPolicy} from '../game/JoinPolicy'
+
 import {StringShape} from '../game/Shapes'
 import {GestureSpawning} from './GestureSpawning'
 import {ConnectionAnalysis} from './ConnectionAnalysis'
 
 export class DebugMode extends Mode
-  constructor: (config = {auto_start: yes, game: {creation_offset: -200}}) ->
-    super config
+  constructor: (config = {game: {creation_offset: -200}}, overrides = {}) ->
+    super config, overrides
 
-  assemble: ({config, world, events, input, field, layer}) ->
-    factory = new Factory layer, world, field, config
+  assemble: ({config, world, events, input, field}) ->
+    factory = @parts.factory {world, field, config}
     decorate = (naub) ->
       naub.life_rendering = yes
       naub.add_shape new StringShape naub.number, 'white'
@@ -65,4 +64,4 @@ export class DebugMode extends Mode
     cycle_handling =
       dispose: -> abort_controller.abort()
     rules = [command_lifecycle, population, gestures, connections, cycle_handling]
-    {rules, connections, commands, join_policy: new JoinPolicy config.game}
+    {rules, connections, commands, join_policy: @parts.join_policy {config}}

@@ -3,11 +3,11 @@ import {Util} from '../core/Util'
 # a Naub is everything in the game that you can move around
 # Naubs can be joined under certain circumstances
 # Naubs can be given shapes
-# @param layer [Layer] the layer on which to draw
+
 # @param color_id [int] representing the color from color palett, also neccessary for joining
 # @param size [int] size, what else
 export class Naub
-  constructor: (@layer, @color_id = null, size = null, options = {}) ->
+  constructor: (@color_id = null, size = null, options = {}) ->
     @config = Object.assign {
       size: 42, margin: 8, mass: 5, friction: 0.1, elasticity: 0.3, min_join_len: 1.2, max_join_len: 2
     }, options
@@ -30,7 +30,7 @@ export class Naub
     @removed     = false # soon to be deleted by game, garbage collector
     @focused     = false # currently activated by pointer
     @disabled    = false # cannot join with another
-    @isClickable = yes # influences @layer.isHit()
+    @isClickable = yes
 
     @life_rendering = false # if true redraw on each frame
     @set_random_palette_color() unless @color_id?  # unless a color_id has been give pick a randome color

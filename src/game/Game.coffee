@@ -90,7 +90,7 @@ export class Game
       events: @events
       input: @app_events.input
       field
-      layer: @field_layer
+
       stage: @stage
     }
     @assembled = mode.assemble context

@@ -46,7 +46,7 @@ Each application owns a `Naubino.events` hub of named signals:
 
 - `input`: `pointer_start`, `pointer_move`, `pointer_end`, `two_finger_start`, `two_finger_end`, `two_finger_tap`.
 - `commands`: `play`, `pause`, `stop`, `toggle` requests handled by `Session`.
-- `game`: `outcome`, `overflow_warning`, `basket_changed` notifications.
+- Round-local `GameEvents` carry outcomes and `overflow_warning`; standard mode renders its basket directly.
 - `session`: `state_changed` publishes the new state, allowing input to cancel active gestures.
 - `menu`: `button`, `focus`, `blur` signals.
 

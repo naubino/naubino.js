@@ -5,11 +5,11 @@ import {Clock, StringShape} from "./Shapes"
 import {PlayButton, PauseButton} from "./Shapes"
 
 export class Factory
-  constructor: (@layer, @world, @field, @config = {}) ->
+  constructor: (@world, @field, @config = {}) ->
 
   add_button: (pos, callback, shapes) =>
     ball = new Ball
-    naub = new Naub @layer, null, null, @config.naub
+    naub = new Naub null, null, @config.naub
     naub.pos = naub.fixed_pos = pos
 
     naub.add_shape ball
@@ -27,7 +27,7 @@ export class Factory
   # @param pos [cp.v] position
   # @param color [int]  color_id
   add_ball: (pos = @random_outside(), color = null) =>
-    naub = new Naub @layer, color, null, @config.naub
+    naub = new Naub color, null, @config.naub
     ball = new Ball
 
     naub.add_shape ball
@@ -46,7 +46,7 @@ export class Factory
   # @param pos [cp.v] position
   # @param color [int]  color_id
   add_box: (pos = @random_outside(), color = null) =>
-    naub = new Naub @layer, color, null, @config.naub
+    naub = new Naub color, null, @config.naub
     box = new Box
 
     naub.add_shape box

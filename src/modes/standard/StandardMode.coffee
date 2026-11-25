@@ -3,8 +3,7 @@
 #   number of naubs per spam
 #   speed up
 import {Mode} from '../Mode'
-import {Factory} from '../../game/Factory'
-import {JoinPolicy} from '../../game/JoinPolicy'
+
 import {ConnectionAnalysis} from '../ConnectionAnalysis'
 import {Basket} from './Basket'
 import {BasketRenderer} from './BasketRenderer'
@@ -14,23 +13,36 @@ import {Scoring} from './Scoring'
 import {Levels} from './Levels'
 
 export class StandardMode extends Mode
+  default_parts: ->
+    Object.assign {}, super(), {
+      basket: ({world, field, loss_requested, config}) ->
+        new Basket world, field, loss_requested, config.naub?.size
+      spawner: ({factory, config}) -> new Spawner factory, config.spawn
+      scoring: ({world, basket, naub_destroyed, cycle_found, score_changed, chain_bonus}) ->
+        new Scoring world, basket, naub_destroyed, cycle_found, score_changed, chain_bonus
+      levels: ({spawner, basket, progress, level_changed, config}) ->
+        new Levels spawner, basket, progress, level_changed, config.level_details
+      basket_renderer: ({basket, field}) -> new BasketRenderer basket, field
+      connection_analysis: ({join_added, join_removed, naub_replaced, cycle_found}) ->
+        new ConnectionAnalysis join_added, join_removed, naub_replaced, cycle_found
+    }
+
   configuration: ->
     config = super()
     config.level_details ?= structuredClone @level_details
     config
 
-  assemble: ({config, world, events, field, layer, stage}) ->
-    factory = new Factory layer, world, field, config
-    basket = new Basket world, field, events.loss_requested, config.naub?.size
-    spawner = new Spawner factory, config.spawn
-    scoring = new Scoring world, basket,
-      events.naub_destroyed, events.cycle_found, events.score_changed, events.chain_bonus
-
-    levels = new Levels spawner, basket, scoring, events.level_changed, config.level_details
-    basket_renderer = new BasketRenderer basket, field
+  assemble: ({config, world, events, field, stage}) ->
+    {loss_requested, naub_destroyed, cycle_found, score_changed, chain_bonus, level_changed,
+      join_added, join_removed, naub_replaced} = events
+    factory = @parts.factory {world, field, config}
+    basket = @parts.basket {world, field, loss_requested, config}
+    spawner = @parts.spawner {factory, config}
+    scoring = @parts.scoring {world, basket, naub_destroyed, cycle_found, score_changed, chain_bonus}
+    levels = @parts.levels {spawner, basket, progress: scoring, level_changed, config}
+    basket_renderer = @parts.basket_renderer {basket, field}
     stage.add basket_renderer, -10
-    connections = new ConnectionAnalysis events.join_added, events.join_removed,
-      events.naub_replaced, events.cycle_found
+    connections = @parts.connection_analysis {join_added, join_removed, naub_replaced, cycle_found}
     abort_controller = new AbortController
 
     events.cycle_found.add ((ids) -> world.destroy_naubs ids), abort_controller.signal
@@ -44,7 +56,7 @@ export class StandardMode extends Mode
         naubs: scoring.cleared_naubs()
         level: levels.level
     rules = [spawner, scoring, basket, levels, connections, cycle_handling]
-    {rules, results, connections, join_policy: new JoinPolicy config.game}
+    {rules, results, connections, join_policy: @parts.join_policy {config}}
 
   level_details: [
     { limit:-1,    number_of_colors: 3, interval: 40, max_naubs: 20 } # initial state

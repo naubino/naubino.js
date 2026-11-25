@@ -11,7 +11,7 @@ export class Menu extends Layer
     super(canvas, viewport)
     @name = "menu"
 
-    @factory = new Factory this
+    @factory = new Factory
 
     @objects = {}
     @hovering = off

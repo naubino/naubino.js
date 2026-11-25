@@ -68,7 +68,7 @@ export class Naubino
     @viewport.layout layout_options
     @setup_input()
     @start_game @mode_entry
-    @play() if @round_config.auto_start
+    @play() if @mode_entry.auto_start
     @start_loop()
     console.timeEnd("loading")
 
@@ -164,7 +164,7 @@ export class Naubino
     @game.publish_scoreboard()
     @menu.check_game_state @game.current
     @viewport.scale_to @viewport.scale
-    @play() if @round_config.auto_restart
+    @play() if mode_entry.auto_restart
     @game
 
   # state machine forwarding

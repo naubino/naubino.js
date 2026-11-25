@@ -2,6 +2,7 @@ import {Naubino} from './Naubino'
 import {Settings} from './config/Settings'
 import {StandardMode} from './modes/standard/StandardMode'
 import {DebugMode} from './modes/DebugMode'
+import {AutoJoinPolicy} from './game/JoinPolicy'
 
 import {Util} from './core/Util'
 import {Controls} from './ui/Controls'
@@ -71,21 +72,18 @@ window.onload = ->
 export mode_from_search = (search = '') ->
   params = new URLSearchParams search
   switch params.get('mode')
-    when 'debug' then return {id: 'debug', version: '0', mode: new DebugMode}
+    when 'debug' then return {id: 'debug', version: '0', auto_start: yes, mode: new DebugMode}
     when 'screensaver'
       return {
-        id: 'screensaver', version: '2', records_highscores: no
+        id: 'screensaver', version: '2'
+        records_highscores: no, auto_start: yes, auto_restart: yes
         mode: new StandardMode {
-          auto_start: yes,
-          auto_restart: yes,
-          game:
-            auto_join: yes,
           level_details: [{
             limit:-1,
             number_of_colors: 1,
             interval: 5,
             max_naubs: 40
           }]
-          }
+        }, join_policy: ({config}) -> new AutoJoinPolicy config.game
       }
     else return {id: 'standard', version: '2', mode: new StandardMode}
